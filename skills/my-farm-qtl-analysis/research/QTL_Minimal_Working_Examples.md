@@ -181,10 +181,10 @@ install.packages("qtl2")
 library(qtl2)
 
 # Read data
-grav2 <- read_cross2("~/my_data/grav2.yaml")
+grav2 <- read_cross2("~/my_data/moltbot/grav2.yaml")
 
 # Or read from zip
-grav2 <- read_cross2("https://kbroman.org/qtl2/assets/sampledata/grav2/grav2.zip")
+grav2 <- read_cross2("https://kbroman.org/qtl2/assets/sampledata/moltbot/grav2/grav2.zip")
 
 # Calculate genotype probabilities
 pr <- calc_genoprob(grav2, map=grav2$gmap, error_prob=0.002)

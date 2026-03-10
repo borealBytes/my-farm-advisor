@@ -33,7 +33,7 @@ import pandas as pd
 import numpy as np
 
 # Load your data
-df = pd.read_csv('data/soil_measurements.csv')
+df = pd.read_csv('data/moltbot/soil_measurements.csv')
 
 # Get comprehensive summary
 print(df.describe())
@@ -55,7 +55,7 @@ print(f"Missing values:\n{df.isnull().sum()}")
 import pandas as pd
 
 # Load data
-df = pd.read_csv('data/field_data.csv')
+df = pd.read_csv('data/moltbot/field_data.csv')
 
 # Generate descriptive statistics
 summary = df.describe()
@@ -84,7 +84,7 @@ print(f"Categorical columns: {len(df.select_dtypes(include=['object']).columns)}
 import pandas as pd
 
 # Load data
-df = pd.read_csv('data/weather_data.csv')
+df = pd.read_csv('data/moltbot/weather_data.csv')
 
 # Get data types
 print("Data Types:")
@@ -135,7 +135,7 @@ def find_outliers_iqr(df, column):
     return outliers
 
 # Load data
-df = pd.read_csv('data/soil_data.csv')
+df = pd.read_csv('data/moltbot/soil_data.csv')
 
 # Check multiple columns for outliers
 columns_to_check = ['ph_water', 'organic_matter', 'clay_content']
@@ -163,7 +163,7 @@ for col in columns_to_check:
 import pandas as pd
 
 # Load data
-df = pd.read_csv('data/crop_data.csv')
+df = pd.read_csv('data/moltbot/crop_data.csv')
 
 # Get categorical columns
 categorical_cols = df.select_dtypes(include=['object']).columns
@@ -192,7 +192,7 @@ import numpy as np
 from datetime import datetime
 
 # Load data
-df = pd.read_csv('data/agricultural_data.csv')
+df = pd.read_csv('data/moltbot/agricultural_data.csv')
 
 # Create report
 report = []
@@ -267,7 +267,7 @@ os.makedirs('output/exploration', exist_ok=True)
 
 # Load data
 print("Loading data...")
-df = pd.read_csv('data/soil_measurements.csv')
+df = pd.read_csv('data/moltbot/soil_measurements.csv')
 
 # 1. Basic info
 print(f"\nDataset loaded: {df.shape[0]} rows × {df.shape[1]} columns")

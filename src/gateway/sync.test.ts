@@ -134,7 +134,7 @@ describe('syncToR2', () => {
       expect(configCmd).toContain('--transfers=16');
       expect(configCmd).toContain("--exclude='.git/**'");
       expect(configCmd).toContain('/root/.openclaw/');
-      expect(configCmd).toContain('r2:moltbot-data/openclaw/');
+      expect(configCmd).toContain('r2:moltbot-data/moltbot/openclaw/');
     });
 
     it('uses custom bucket name', async () => {

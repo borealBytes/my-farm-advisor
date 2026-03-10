@@ -31,7 +31,7 @@ Use this file as the category router for all story templates.
 | Community Associations | [community_associations/SKILL.md](community_associations/SKILL.md) |
 | Compliance             | [compliance/SKILL.md](compliance/SKILL.md)                         |
 | Customer Success       | [customer_success/SKILL.md](customer_success/SKILL.md)             |
-| Data                   | [data/SKILL.md](data/SKILL.md)                                     |
+| Data                   | [data/moltbot/SKILL.md](data/moltbot/SKILL.md)                                     |
 | DevOps                 | [devops/SKILL.md](devops/SKILL.md)                                 |
 | Education              | [education/SKILL.md](education/SKILL.md)                           |
 | Engineering            | [engineering/SKILL.md](engineering/SKILL.md)                       |

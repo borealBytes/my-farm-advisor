@@ -100,7 +100,7 @@ def download_product(
     product_id: str,
     username: str,
     password: str,
-    output_dir: str = "data/sentinel2",
+    output_dir: str = "data/moltbot/sentinel2",
     api_url: str = "https://dataspace.copernicus.eu",
 ) -> Path:
     """Download a Sentinel-2 product.
@@ -120,7 +120,7 @@ def download_product(
         ...     'S2A_T33UUV_20240615T105031',
         ...     'my_user',
         ...     'my_pass',
-        ...     output_dir='data/sentinel2'
+        ...     output_dir='data/moltbot/sentinel2'
         ... )
     """
     api = SentinelAPI(username, password, api_url)
@@ -152,8 +152,8 @@ def calculate_ndvi(
 
     Example:
         >>> ndvi_path = calculate_ndvi(
-        ...     'data/B04_10m.jp2',
-        ...     'data/B08_10m.jp2',
+        ...     'data/moltbot/B04_10m.jp2',
+        ...     'data/moltbot/B08_10m.jp2',
         ...     'output/ndvi.tif'
         ... )
     """
@@ -306,8 +306,8 @@ def get_band_path(product_dir: Path, band: str, resolution: str = "10m") -> Path
         Path to band file or None if not found.
 
     Example:
-        >>> red_path = get_band_path(Path('data/S2A_...'), 'B04', '10m')
-        >>> nir_path = get_band_path(Path('data/S2A_...'), 'B08', '10m')
+        >>> red_path = get_band_path(Path('data/moltbot/S2A_...'), 'B04', '10m')
+        >>> nir_path = get_band_path(Path('data/moltbot/S2A_...'), 'B08', '10m')
     """
     # Sentinel-2 SAFE format: GRANULE/*/IMG_DATA/*_B04_10m.jp2
     img_data = product_dir / "GRANULE"

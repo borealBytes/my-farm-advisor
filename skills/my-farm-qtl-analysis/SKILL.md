@@ -124,7 +124,7 @@ cis_df.to_csv('cis_eqtl_results.csv')
 ```bash
 # R/qtl2 via CLI wrapper
 python scripts/qtl_cli.py lodscan \
-  --cross data/cross.json \
+  --cross data/moltbot/cross.json \
   --method haley-knott \
   --perms 1000 \
   --output lod_results/

@@ -349,7 +349,7 @@ Calculate kinship matrix from genotype probabilities.
 library(qtl2)
 
 # Read data
-iron <- read_cross2("https://raw.githubusercontent.com/rqtl/qtl2data/main/iron/iron.zip")
+iron <- read_cross2("https://raw.githubusercontent.com/rqtl/qtl2data/moltbot/main/iron/iron.zip")
 
 # Insert pseudomarkers
 map <- insert_pseudomarkers(iron$gmap, step=1)

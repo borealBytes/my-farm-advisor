@@ -17,5 +17,5 @@ This skill will own annual maturity-by-FIPS logic for the repository, including 
 ## 🔗 Integration
 
 - Code lives under `.opencode/skills/maturity-by-fips/src/`
-- Shared outputs live under `data/shared/corn_maturity/` and `data/shared/soybean_maturity/`
-- Annual entrypoints live under `data/scripts/`
+- Shared outputs live under `data/moltbot/shared/corn_maturity/` and `data/moltbot/shared/soybean_maturity/`
+- Annual entrypoints live under `data/moltbot/scripts/`

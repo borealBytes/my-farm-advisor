@@ -60,7 +60,7 @@ print(stats[['field_id', 'acquisition_date', 'mean_ndvi', 'crop_name']])
 
 ## Notes
 
-- These are small example metadata/stat files for testing and development
+- These are small example metadata/moltbot/stat files for testing and development
 - Actual Sentinel-2 imagery must be downloaded from Copernicus
 - Use the main SKILL.md for complete download instructions
 - Field IDs correspond to the field-boundaries skill examples

@@ -34,7 +34,7 @@ description: Document templates and narratives
 | **Legal**            | [reference/legal/](reference/legal/)                       | Contracts, policies  |
 | **HR**               | [reference/hr/](reference/hr/)                             | Hiring, reviews      |
 | **ETF**              | [reference/etf/](reference/etf/)                           | Fund creation        |
-| **Data**             | [reference/data/](reference/data/)                         | Governance, ETL      |
+| **Data**             | [reference/data/moltbot/](reference/data/moltbot/)                         | Governance, ETL      |
 | **Engineering**      | [reference/engineering/](reference/engineering/)           | System design        |
 | **Security**         | [reference/security/](reference/security/)                 | Audits, threats      |
 | **DevOps**           | [reference/devops/](reference/devops/)                     | CI/CD, pipelines     |

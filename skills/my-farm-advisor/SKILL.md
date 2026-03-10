@@ -110,7 +110,7 @@ This skill suite includes large data files (satellite imagery, shapefiles, repor
 
 - **Images:** `.png`, `.jpg`, `.jpeg`, `.gif`, `.webp`, `.tiff`, `.tif`, `.svg`
 - **Geospatial:** `.nc`, `.grd`, `.geojson`, `.shp`, `.shx`, `.dbf`, `.prj`
-- **Data files:** `data/**/*.csv`, `data/**/*.json`
+- **Data files:** `data/moltbot/**/*.csv`, `data/moltbot/**/*.json`
 - **Documents:** `.pdf`, `.docx`, `.pptx`
 - **Archives:** `.zip`, `.tar.gz`
 

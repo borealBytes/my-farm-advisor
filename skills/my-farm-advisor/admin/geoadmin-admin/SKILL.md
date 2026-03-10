@@ -6,7 +6,7 @@ _Repo-native skill scaffold for shared geoadmin assets._
 
 ## 📋 Purpose
 
-This skill will own shared geoadmin data handling for the repository, including canonical Level 0, Level 1, and Level 2 admin roots under `data/shared/geoadmin/`.
+This skill will own shared geoadmin data handling for the repository, including canonical Level 0, Level 1, and Level 2 admin roots under `data/moltbot/shared/geoadmin/`.
 
 ## 📦 Scope
 
@@ -17,5 +17,5 @@ This skill will own shared geoadmin data handling for the repository, including 
 ## 🔗 Integration
 
 - Code lives under `.opencode/skills/geoadmin-admin/src/`
-- Shared outputs live under `data/shared/geoadmin/`
+- Shared outputs live under `data/moltbot/shared/geoadmin/`
 - Annual maturity scripts consume this skill through repo-native path helpers and bootstrap code

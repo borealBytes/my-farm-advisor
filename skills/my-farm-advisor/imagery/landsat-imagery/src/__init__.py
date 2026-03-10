@@ -106,7 +106,7 @@ class LandsatImagerySkill:
             end_date: End date 'YYYY-MM-DD'.
             bands: List of bands to download. Default: ['B4', 'B5'] for NDVI.
             cloud_cover_max: Maximum cloud cover % (default: 20).
-            output_dir: Output directory. Default: data/raw/landsat/
+            output_dir: Output directory. Default: data/moltbot/raw/landsat/
 
         Returns:
             DataFrame with metadata for downloaded imagery.

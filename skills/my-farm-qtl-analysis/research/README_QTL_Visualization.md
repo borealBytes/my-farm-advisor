@@ -15,7 +15,7 @@ Complete guide for visualizing QTL (Quantitative Trait Loci) and genomic data us
 ### Code
 - **`generate_sample_qtl_data.py`** - Python script to generate sample datasets
 
-### Sample Data (`sample_qtl_data/`)
+### Sample Data (`sample_qtl_data/moltbot/`)
 - `phenotype_data.csv` - 200 samples with multiple traits
 - `gwas_results.csv` - 9,006 SNPs across 5 chromosomes
 - `qtl_scan.csv` - 381 markers with LOD scores
@@ -85,7 +85,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Load data
-df = pd.read_csv('sample_qtl_data/phenotype_data.csv')
+df = pd.read_csv('sample_qtl_data/moltbot/phenotype_data.csv')
 
 # Box plot
 sns.boxplot(data=df, x='Genotype', y='Plant_Height', hue='Environment')
@@ -108,8 +108,8 @@ library(ggplot2)
 library(qqman)
 
 # Load data
-df <- read.csv('sample_qtl_data/phenotype_data.csv')
-gwas <- read.csv('sample_qtl_data/gwas_results.csv')
+df <- read.csv('sample_qtl_data/moltbot/phenotype_data.csv')
+gwas <- read.csv('sample_qtl_data/moltbot/gwas_results.csv')
 
 # Box plot
 ggplot(df, aes(x=Genotype, y=Plant_Height, fill=Environment)) +

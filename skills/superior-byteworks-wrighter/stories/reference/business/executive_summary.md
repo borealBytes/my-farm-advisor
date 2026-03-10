@@ -165,7 +165,7 @@ _[Reference only — attach separately or link to full documents]_
 
 1. Start with the answer/recommendation (top of pyramid)
 2. Support with key arguments (second level)
-3. Back arguments with data/evidence (base)
+3. Back arguments with data/moltbot/evidence (base)
 
 **C-Suite Writing Rules:**
 

@@ -80,7 +80,7 @@ This research provides comprehensive coverage of phenotype visualization for QTL
    - Reproducible with random seeds
    - Realistic QTL data patterns
 
-### Sample Data (6 files in `sample_qtl_data/`)
+### Sample Data (6 files in `sample_qtl_data/moltbot/`)
 5. **`phenotype_data.csv`** (23 KB)
    - 200 samples
    - 8 traits (Height, Yield, Quality, etc.)

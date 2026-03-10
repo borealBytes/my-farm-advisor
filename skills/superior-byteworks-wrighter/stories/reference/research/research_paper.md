@@ -6,7 +6,7 @@
 
 **Use this template for:** Research papers, technical analyses, literature reviews, data-driven reports, competitive analyses, market research, or any document built around evidence and methodology. Designed for heavy citation, structured argumentation, and reproducible findings.
 
-**Key features:** Abstract for quick assessment, methodology section for credibility, findings with supporting data/diagrams, rigorous footnote citations throughout, and a complete references section.
+**Key features:** Abstract for quick assessment, methodology section for credibility, findings with supporting data/moltbot/diagrams, rigorous footnote citations throughout, and a complete references section.
 
 **Philosophy:** A great research document lets the reader evaluate your conclusions independently. Show your work. Cite your sources. Present counter-arguments. The reader should trust your findings because the evidence is right there — not because you said so.
 
