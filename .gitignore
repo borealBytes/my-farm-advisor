@@ -86,3 +86,7 @@ test/e2e/.dev.vars
 # Archives
 *.zip
 *.tar.gz
+
+# Python caches/bytecode
+__pycache__/
+*.py[cod]

@@ -1,0 +1,11 @@
+{
+  "level_slug": "l1_states",
+  "source_name": "census-tiger-line",
+  "source_url": "https://www2.census.gov/geo/tiger/TIGER2025/STATE/tl_2025_us_state.zip",
+  "archive_name": "tl_2025_us_state.zip",
+  "output_geojson": "data/moltbot/shared/geoadmin/l1_states/states_usa.geojson",
+  "output_parquet": "data/moltbot/shared/geoadmin/l1_states/states_usa.parquet",
+  "vintage": "2025",
+  "feature_count": 56,
+  "columns": ["state_fips", "state_code", "state_name", "region_code", "division_code", "source_name", "source_vintage"]
+}

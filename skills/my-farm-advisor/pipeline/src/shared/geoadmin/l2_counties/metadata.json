@@ -1,0 +1,12 @@
+{
+  "level_slug": "l2_counties",
+  "source_name": "census-tiger-line",
+  "source_url": "https://www2.census.gov/geo/tiger/TIGER2025/COUNTY/tl_2025_us_county.zip",
+  "archive_name": "tl_2025_us_county.zip",
+  "output_geojson": "data/moltbot/shared/geoadmin/l2_counties/counties_usa.geojson",
+  "output_parquet": "data/moltbot/shared/geoadmin/l2_counties/counties_usa.parquet",
+  "vintage": "2025",
+  "feature_count": 3235,
+  "columns": ["fips", "state_fips", "county_fips", "county_name", "county_name_full", "source_name", "source_vintage"],
+  "lookup_parquet": "data/moltbot/shared/geoadmin/l2_counties/fips_lookup.parquet"
+}

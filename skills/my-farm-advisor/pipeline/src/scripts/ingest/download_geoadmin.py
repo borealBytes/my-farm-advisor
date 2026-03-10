@@ -1,0 +1,83 @@
+#!/usr/bin/env python3
+"""Download and standardize shared geoadmin assets into canonical paths."""
+
+from __future__ import annotations
+
+import argparse
+import importlib
+import json
+import sys
+from pathlib import Path
+
+_SCRIPTS_DIR = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(_SCRIPTS_DIR))
+sys.path.insert(0, str(_SCRIPTS_DIR / "lib"))
+sys.path.insert(0, str(_SCRIPTS_DIR.parents[1] / ".opencode" / "skills" / "geoadmin-admin" / "src"))
+
+GEOADMIN_LEVEL_CHOICES = ("l0_countries", "l1_states", "l2_counties")
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--levels",
+        nargs="+",
+        choices=GEOADMIN_LEVEL_CHOICES,
+        default=list(GEOADMIN_LEVEL_CHOICES),
+        help="Geoadmin levels to build",
+    )
+    parser.add_argument(
+        "--census-year",
+        type=int,
+        default=2025,
+        help="TIGER/Line vintage year for US state and county layers",
+    )
+    parser.add_argument("--force", action="store_true", help="Re-download and overwrite outputs")
+    parser.add_argument(
+        "--list-sources",
+        action="store_true",
+        help="Print the resolved source catalog and exit",
+    )
+    return parser.parse_args()
+
+
+def main() -> int:
+    from reporting_bootstrap import ensure_canonical_data_tree, ensure_skill_path
+
+    args = parse_args()
+    ensure_canonical_data_tree()
+    ensure_skill_path("geoadmin-admin")
+
+    geoadmin_admin = importlib.import_module("geoadmin_admin")
+
+    catalog = geoadmin_admin.build_source_catalog(args.census_year)
+    if args.list_sources:
+        printable = {
+            level: {
+                "source_name": source.source_name,
+                "source_url": source.source_url,
+                "archive_name": source.archive_name,
+                "vintage": source.vintage,
+            }
+            for level, source in catalog.items()
+            if level in args.levels
+        }
+        print(json.dumps(printable, indent=2, sort_keys=True))
+        return 0
+
+    results: dict[str, dict[str, str]] = {}
+    for level in args.levels:
+        source = catalog[level]
+        print(f"Building {level} from {source.source_name} ({source.vintage})")
+        archive_path = geoadmin_admin.download_source_archive(source, force=args.force)
+        frame = geoadmin_admin.standardize_geoadmin_layer(source, archive_path)
+        outputs = geoadmin_admin.write_standardized_outputs(source, frame)
+        results[level] = {name: str(path) for name, path in outputs.items()}
+        print(f"  Saved {level}: {results[level]}")
+
+    print(json.dumps(results, indent=2, sort_keys=True))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

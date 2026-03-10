@@ -1,0 +1,11 @@
+{
+  "level_slug": "l0_countries",
+  "source_name": "natural-earth",
+  "source_url": "https://naciscdn.org/naturalearth/10m/cultural/ne_10m_admin_0_countries.zip",
+  "archive_name": "ne_10m_admin_0_countries.zip",
+  "output_geojson": "data/moltbot/shared/geoadmin/l0_countries/countries.geojson",
+  "output_parquet": "data/moltbot/shared/geoadmin/l0_countries/countries.parquet",
+  "vintage": "natural-earth-10m",
+  "feature_count": 258,
+  "columns": ["adm0_a3", "iso_a3", "name", "continent", "region_un", "source_name", "source_vintage"]
+}

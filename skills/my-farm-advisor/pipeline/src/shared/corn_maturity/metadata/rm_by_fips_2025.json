@@ -1,0 +1,7 @@
+{
+  "year": 2025,
+  "gdd_per_rm_c": 20.0,
+  "county_count": 1250,
+  "product_type": "heuristic",
+  "caveat": "Corn RM outputs are planning heuristics derived from county GDD and are not recommendation-grade hybrid guidance."
+}
