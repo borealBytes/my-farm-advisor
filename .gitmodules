@@ -1,0 +1,3 @@
+[submodule "skills/cloudflare-skills"]
+	path = skills/cloudflare-skills
+	url = https://github.com/cloudflare/skills.git
