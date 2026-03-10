@@ -19,6 +19,15 @@ export interface MoltbotEnv {
   ANTHROPIC_API_KEY?: string;
   ANTHROPIC_BASE_URL?: string;
   OPENAI_API_KEY?: string;
+  PREFERRED_PROVIDER?: string;
+  NVIDIA_API_KEY?: string;
+  NVIDIA_BASE_URL?: string;
+  NVIDIA_DEFAULT_MODEL?: string;
+  NVIDIA_FALLBACK_MODELS?: string;
+  OPENROUTER_API_KEY?: string;
+  OPENROUTER_BASE_URL?: string;
+  OPENROUTER_DEFAULT_MODEL?: string;
+  OPENROUTER_FALLBACK_MODELS?: string;
   MOLTBOT_GATEWAY_TOKEN?: string; // Gateway token (mapped to OPENCLAW_GATEWAY_TOKEN for container)
   DEV_MODE?: string; // Set to 'true' for local dev (skips CF Access auth + openclaw device pairing)
   E2E_TEST_MODE?: string; // Set to 'true' for E2E tests (skips CF Access auth but keeps device pairing)
