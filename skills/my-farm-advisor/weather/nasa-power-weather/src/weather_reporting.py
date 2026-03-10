@@ -4,7 +4,9 @@ import numpy as np
 import pandas as pd
 
 
-def prepare_weather_reporting(weather: pd.DataFrame, base_temp_c: float = 10.0) -> pd.DataFrame:
+def prepare_weather_reporting(
+    weather: pd.DataFrame, base_temp_c: float = 10.0
+) -> pd.DataFrame:
     df = weather.copy()
     df["date"] = pd.to_datetime(df["date"])
     df["year"] = df["date"].dt.year
@@ -12,7 +14,9 @@ def prepare_weather_reporting(weather: pd.DataFrame, base_temp_c: float = 10.0) 
     df["month"] = df["date"].dt.month
     t_avg = (df["T2M_MAX"] + df["T2M_MIN"]) / 2.0
     df["gdd"] = np.maximum(0.0, t_avg - base_temp_c)
-    df["gdd_cumulative"] = df.sort_values("date").groupby(["field_id", "year"])["gdd"].cumsum()
+    df["gdd_cumulative"] = (
+        df.sort_values("date").groupby(["field_id", "year"])["gdd"].cumsum()
+    )
     return df
 
 
@@ -48,7 +52,9 @@ def _frost_markers(df: pd.DataFrame) -> tuple[float | None, float | None]:
 def _annotate_frost_lines(ax, spring_doy: float | None, fall_doy: float | None) -> None:
     ymax = ax.get_ylim()[1]
     if spring_doy is not None:
-        ax.axvline(spring_doy, color="#2563eb", linestyle="--", linewidth=1.2, alpha=0.8)
+        ax.axvline(
+            spring_doy, color="#2563eb", linestyle="--", linewidth=1.2, alpha=0.8
+        )
         ax.text(
             spring_doy + 2,
             ymax * 0.96,
@@ -74,7 +80,17 @@ def plot_temperature_doy_overlay(
 ):
     df = prepare_weather_reporting(weather)
     for year, group in df.groupby("year"):
-        ax.plot(group["doy"], group["T2M"], label=str(year), linewidth=1.3, alpha=0.85)
+        # Add NaN after each year to prevent line connection to next year
+        group_plot = pd.concat(
+            [group[["doy", "T2M"]], pd.DataFrame({"doy": [np.nan], "T2M": [np.nan]})]
+        )
+        ax.plot(
+            group_plot["doy"],
+            group_plot["T2M"],
+            label=str(year),
+            linewidth=1.3,
+            alpha=0.85,
+        )
     spring_doy, fall_doy = _frost_markers(df)
     ax.set_title(title, fontsize=12, fontweight="bold")
     ax.set_xlabel("Day of year")
@@ -85,10 +101,25 @@ def plot_temperature_doy_overlay(
     return ax
 
 
-def plot_gdd_doy_overlay(ax, weather: pd.DataFrame, title: str = "Cumulative GDD by day-of-year"):
+def plot_gdd_doy_overlay(
+    ax, weather: pd.DataFrame, title: str = "Cumulative GDD by day-of-year"
+):
     df = prepare_weather_reporting(weather)
     for year, group in df.groupby("year"):
-        ax.plot(group["doy"], group["gdd_cumulative"], label=str(year), linewidth=1.6, alpha=0.9)
+        # Add NaN after each year to prevent line connection to next year
+        group_plot = pd.concat(
+            [
+                group[["doy", "gdd_cumulative"]],
+                pd.DataFrame({"doy": [np.nan], "gdd_cumulative": [np.nan]}),
+            ]
+        )
+        ax.plot(
+            group_plot["doy"],
+            group_plot["gdd_cumulative"],
+            label=str(year),
+            linewidth=1.6,
+            alpha=0.9,
+        )
     spring_doy, fall_doy = _frost_markers(df)
     ax.set_title(title, fontsize=12, fontweight="bold")
     ax.set_xlabel("Day of year")
@@ -106,8 +137,19 @@ def plot_precip_boxplot(
     for year, group in df.groupby("year"):
         ordered = group.sort_values("date").copy()
         ordered["precip_cumulative"] = ordered["PRECTOTCORR"].cumsum()
+        # Add NaN after each year to prevent line connection to next year
+        ordered_plot = pd.concat(
+            [
+                ordered[["doy", "precip_cumulative"]],
+                pd.DataFrame({"doy": [np.nan], "precip_cumulative": [np.nan]}),
+            ]
+        )
         ax.plot(
-            ordered["doy"], ordered["precip_cumulative"], label=str(year), linewidth=1.6, alpha=0.9
+            ordered_plot["doy"],
+            ordered_plot["precip_cumulative"],
+            label=str(year),
+            linewidth=1.6,
+            alpha=0.9,
         )
     spring_doy, fall_doy = _frost_markers(df)
     ax.set_title(title, fontsize=12, fontweight="bold")

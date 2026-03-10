@@ -26,7 +26,7 @@ import { getSandbox, Sandbox, type SandboxOptions } from '@cloudflare/sandbox';
 import type { AppEnv, MoltbotEnv } from './types';
 import { MOLTBOT_PORT } from './config';
 import { createAccessMiddleware } from './auth';
-import { ensureMoltbotGateway, findExistingMoltbotProcess } from './gateway';
+import { ensureMoltbotGateway, isGatewayHttpReady } from './gateway';
 import { publicRoutes, api, adminUi, debug, cdp } from './routes';
 import { redactSensitiveParams } from './utils/logging';
 import loadingPageHtml from './assets/loading.html';
@@ -252,58 +252,61 @@ app.all('*', async (c) => {
 
   console.log('[PROXY] Handling request:', url.pathname);
 
-  // Check if gateway is already running
-  const existingProcess = await findExistingMoltbotProcess(sandbox);
-  const isGatewayReady = existingProcess !== null && existingProcess.status === 'running';
+  // Readiness check: Use HTTP probe, not process metadata.
+  // Per Cloudflare guidance, process status 'running' and TCP port open
+  // are both insufficient — only HTTP responsiveness means ready.
+  const gatewayReady = await isGatewayHttpReady(sandbox);
 
-  // For browser requests (non-WebSocket, non-API), show loading page if gateway isn't ready
   const isWebSocketRequest = request.headers.get('Upgrade')?.toLowerCase() === 'websocket';
   const acceptsHtml = request.headers.get('Accept')?.includes('text/html');
+  const isGatewayUiPath =
+    url.pathname === '/' || url.pathname === '/chat' || url.pathname.startsWith('/chat/');
 
-  if (!isGatewayReady && !isWebSocketRequest && acceptsHtml) {
-    console.log('[PROXY] Gateway not ready, serving loading page');
-
-    // Start the gateway in the background (don't await)
+  const startGatewayInBackground = (): void => {
     c.executionCtx.waitUntil(
       ensureMoltbotGateway(sandbox, c.env).catch((err: Error) => {
         console.error('[PROXY] Background gateway start failed:', err);
       }),
     );
+  };
 
-    // Return the loading page immediately
-    return c.html(loadingPageHtml);
+  // Case 1: Gateway not HTTP-ready and browser request — show loading page
+  if (!gatewayReady && acceptsHtml && isGatewayUiPath) {
+    console.log('[PROXY] Gateway not HTTP-ready, serving bounded loading page for UI path');
+    startGatewayInBackground();
+
+    const headers = new Headers({
+      'Content-Type': 'text/html; charset=utf-8',
+      'Cache-Control': 'no-store',
+      'Retry-After': '5',
+    });
+
+    return new Response(loadingPageHtml, { status: 503, headers });
   }
 
-  // Ensure moltbot is running (this will wait for startup)
-  try {
-    await ensureMoltbotGateway(sandbox, c.env);
-  } catch (error) {
-    console.error('[PROXY] Failed to start Moltbot:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-
-    let hint = 'Check worker logs with: wrangler tail';
-    if (
-      !c.env.ANTHROPIC_API_KEY &&
-      !c.env.OPENAI_API_KEY &&
-      !c.env.NVIDIA_API_KEY &&
-      !c.env.OPENROUTER_API_KEY &&
-      !(
-        c.env.CLOUDFLARE_AI_GATEWAY_API_KEY &&
-        c.env.CF_AI_GATEWAY_ACCOUNT_ID &&
-        c.env.CF_AI_GATEWAY_GATEWAY_ID
-      )
-    ) {
-      hint =
-        'No model provider key found. Set one of ANTHROPIC_API_KEY, OPENAI_API_KEY, NVIDIA_API_KEY, OPENROUTER_API_KEY, or Cloudflare AI Gateway secrets.';
-    } else if (errorMessage.includes('heap out of memory') || errorMessage.includes('OOM')) {
-      hint = 'Gateway ran out of memory. Try again or check for memory leaks.';
-    }
-
+  // Case 2: Gateway not HTTP-ready and WebSocket request — fail fast
+  if (!gatewayReady && isWebSocketRequest) {
+    console.log('[PROXY] Gateway not HTTP-ready, rejecting WebSocket upgrade');
+    startGatewayInBackground();
     return c.json(
       {
-        error: 'Moltbot gateway failed to start',
-        details: errorMessage,
-        hint,
+        error: 'Gateway not ready',
+        message: 'WebSocket upgrade rejected: gateway is still starting',
+        hint: 'Retry after gateway is HTTP-ready',
+      },
+      503,
+    );
+  }
+
+  // Case 3: Gateway not HTTP-ready and API/non-HTML request — fail fast with bounded error
+  if (!gatewayReady) {
+    console.log('[PROXY] Gateway not HTTP-ready, returning bounded error');
+    startGatewayInBackground();
+    return c.json(
+      {
+        error: 'Gateway not ready',
+        message: 'Gateway is still starting or unhealthy',
+        hint: 'Check /api/status for readiness or wait for startup to complete',
       },
       503,
     );

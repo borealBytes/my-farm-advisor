@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import type { AppEnv } from '../types';
 import { MOLTBOT_PORT } from '../config';
-import { findExistingMoltbotProcess } from '../gateway';
+import { probeGatewayHealth } from '../gateway';
 
 /**
  * Public routes - NO Cloudflare Access authentication required
@@ -31,23 +31,38 @@ publicRoutes.get('/logo-small.png', (c) => {
 });
 
 // GET /api/status - Public health check for gateway status (no auth required)
+// Uses the multi-phase probe so the loading page and callers get accurate readiness.
 publicRoutes.get('/api/status', async (c) => {
   const sandbox = c.get('sandbox');
 
   try {
-    const process = await findExistingMoltbotProcess(sandbox);
-    if (!process) {
-      return c.json({ ok: false, status: 'not_running' });
+    const health = await probeGatewayHealth(sandbox);
+
+    if (health.ready) {
+      return c.json({
+        ok: true,
+        status: 'running',
+        phase: health.phase,
+        processId: health.processId,
+        probeTimeMs: health.probeTimeMs,
+      });
     }
 
-    // Process exists, check if it's actually responding
-    // Try to reach the gateway with a short timeout
-    try {
-      await process.waitForPort(18789, { mode: 'tcp', timeout: 5000 });
-      return c.json({ ok: true, status: 'running', processId: process.id });
-    } catch {
-      return c.json({ ok: false, status: 'not_responding', processId: process.id });
-    }
+    // Map phase to a status the loading page understands
+    const statusMap: Record<string, string> = {
+      unknown: 'not_running',
+      process_found: 'not_responding',
+      tcp_ready: 'not_responding',
+    };
+
+    return c.json({
+      ok: false,
+      status: statusMap[health.phase] ?? 'not_responding',
+      phase: health.phase,
+      detail: health.detail,
+      processId: health.processId,
+      probeTimeMs: health.probeTimeMs,
+    });
   } catch (err) {
     return c.json({
       ok: false,

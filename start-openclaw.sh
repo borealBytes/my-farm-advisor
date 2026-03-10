@@ -7,7 +7,7 @@
 # 4. Starts a background sync loop (rclone, watches for file changes)
 # 5. Starts the gateway
 
-set -e
+set -euo pipefail
 
 if pgrep -f "openclaw gateway" > /dev/null 2>&1; then
     echo "OpenClaw gateway is already running, exiting."
@@ -147,7 +147,7 @@ fi
 # - Gateway token auth
 # - Trusted proxies for sandbox networking
 # - Base URL override for legacy AI Gateway path
-node << 'EOFPATCH' || true
+node << 'EOFPATCH'
 const fs = require('fs');
 const path = require('path');
 
@@ -158,6 +158,10 @@ let config = {};
 try {
     config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
 } catch (e) {
+    if (fs.existsSync(configPath)) {
+        console.error('Failed to parse existing config:', e.message);
+        process.exit(1);
+    }
     console.log('Starting with empty config');
 }
 
@@ -464,10 +468,28 @@ rm -f "$CONFIG_DIR/gateway.lock" 2>/dev/null || true
 
 echo "Dev mode: ${OPENCLAW_DEV_MODE:-false}"
 
+gateway_args=(gateway --port 18789 --verbose --allow-unconfigured --bind loopback)
+
 if [ -n "$OPENCLAW_GATEWAY_TOKEN" ]; then
     echo "Starting gateway with token auth..."
-    exec openclaw gateway --port 18789 --verbose --allow-unconfigured --bind loopback --token "$OPENCLAW_GATEWAY_TOKEN"
+    gateway_args+=(--token "$OPENCLAW_GATEWAY_TOKEN")
 else
     echo "Starting gateway with device pairing (no token)..."
-    exec openclaw gateway --port 18789 --verbose --allow-unconfigured --bind loopback
 fi
+
+openclaw "${gateway_args[@]}" &
+GATEWAY_PID=$!
+echo "Gateway process started (PID: $GATEWAY_PID)"
+
+forward_signal() {
+    local signal="$1"
+    if kill -0 "$GATEWAY_PID" 2>/dev/null; then
+        echo "Received $signal, forwarding to gateway PID $GATEWAY_PID"
+        kill "-$signal" "$GATEWAY_PID" 2>/dev/null || true
+    fi
+}
+
+trap 'forward_signal TERM' TERM
+trap 'forward_signal INT' INT
+
+wait "$GATEWAY_PID"

@@ -4,6 +4,8 @@ import { createAccessMiddleware } from '../auth';
 import {
   ensureMoltbotGateway,
   findExistingMoltbotProcess,
+  isGatewayHttpReady,
+  probeGatewayHealth,
   syncToR2,
   waitForProcess,
 } from '../gateway';
@@ -11,6 +13,16 @@ import {
 // CLI commands can take 10-15 seconds to complete due to WebSocket connection overhead
 const CLI_TIMEOUT_MS = 20000;
 const ADMIN_ROUTE_TIMEOUT_MS = 30000;
+
+// Fast health probe timeout — probeGatewayHealth() internally runs TCP (~3s) + HTTP (~5s) probes.
+// 15s gives ample margin without blocking the admin page for minutes.
+const HEALTH_PROBE_TIMEOUT_MS = 15000;
+
+// Capped below STARTUP_TIMEOUT_MS (180s) to keep the admin POST bounded.
+const RESTART_TIMEOUT_MS = 90_000;
+const RESTART_SETTLE_MS = 2000;
+const GATEWAY_PKILL_PATTERN =
+  'openclaw gateway|start-openclaw.sh|start-moltbot.sh|clawdbot gateway';
 
 async function withTimeout<T>(promise: Promise<T>, timeoutMs: number, label: string): Promise<T> {
   return Promise.race([
@@ -42,14 +54,28 @@ adminApi.get('/devices', async (c) => {
   const sandbox = c.get('sandbox');
 
   try {
-    // Ensure moltbot is running first
-    await withTimeout(
-      ensureMoltbotGateway(sandbox, c.env),
-      ADMIN_ROUTE_TIMEOUT_MS,
-      'Gateway initialization',
+    // Fast health gate — fail immediately if gateway isn't HTTP-ready
+    // instead of blocking for up to 180s via ensureMoltbotGateway()
+    const health = await withTimeout(
+      probeGatewayHealth(sandbox),
+      HEALTH_PROBE_TIMEOUT_MS,
+      'Gateway health probe',
     );
 
-    // Run OpenClaw CLI to list devices
+    if (!health.ready) {
+      return c.json(
+        {
+          error: 'Gateway is not ready for device operations',
+          lifecycle: {
+            phase: health.phase,
+            detail: health.detail,
+            probeTimeMs: health.probeTimeMs,
+          },
+        },
+        503,
+      );
+    }
+
     const token = c.env.MOLTBOT_GATEWAY_TOKEN;
     const tokenArg = token ? ` --token ${token}` : '';
     const proc = await withTimeout(
@@ -78,16 +104,13 @@ adminApi.get('/devices', async (c) => {
     const stdout = logs.stdout || '';
     const stderr = logs.stderr || '';
 
-    // Try to parse JSON output
     try {
-      // Find JSON in output (may have other log lines)
       const jsonMatch = stdout.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         const data = JSON.parse(jsonMatch[0]);
         return c.json(data);
       }
 
-      // If no JSON found, return raw output for debugging
       return c.json({
         pending: [],
         paired: [],
@@ -119,14 +142,26 @@ adminApi.post('/devices/:requestId/approve', async (c) => {
   }
 
   try {
-    // Ensure moltbot is running first
-    await withTimeout(
-      ensureMoltbotGateway(sandbox, c.env),
-      ADMIN_ROUTE_TIMEOUT_MS,
-      'Gateway initialization',
+    const health = await withTimeout(
+      probeGatewayHealth(sandbox),
+      HEALTH_PROBE_TIMEOUT_MS,
+      'Gateway health probe',
     );
 
-    // Run OpenClaw CLI to approve the device
+    if (!health.ready) {
+      return c.json(
+        {
+          error: 'Gateway is not ready — cannot approve device',
+          lifecycle: {
+            phase: health.phase,
+            detail: health.detail,
+            probeTimeMs: health.probeTimeMs,
+          },
+        },
+        503,
+      );
+    }
+
     const token = c.env.MOLTBOT_GATEWAY_TOKEN;
     const tokenArg = token ? ` --token ${token}` : '';
     const proc = await withTimeout(
@@ -155,7 +190,6 @@ adminApi.post('/devices/:requestId/approve', async (c) => {
     const stdout = logs.stdout || '';
     const stderr = logs.stderr || '';
 
-    // Check for success indicators (case-insensitive, CLI outputs "Approved ...")
     const success = stdout.toLowerCase().includes('approved') || proc.exitCode === 0;
 
     return c.json({
@@ -176,14 +210,26 @@ adminApi.post('/devices/approve-all', async (c) => {
   const sandbox = c.get('sandbox');
 
   try {
-    // Ensure moltbot is running first
-    await withTimeout(
-      ensureMoltbotGateway(sandbox, c.env),
-      ADMIN_ROUTE_TIMEOUT_MS,
-      'Gateway initialization',
+    const health = await withTimeout(
+      probeGatewayHealth(sandbox),
+      HEALTH_PROBE_TIMEOUT_MS,
+      'Gateway health probe',
     );
 
-    // First, get the list of pending devices
+    if (!health.ready) {
+      return c.json(
+        {
+          error: 'Gateway is not ready — cannot approve devices',
+          lifecycle: {
+            phase: health.phase,
+            detail: health.detail,
+            probeTimeMs: health.probeTimeMs,
+          },
+        },
+        503,
+      );
+    }
+
     const token = c.env.MOLTBOT_GATEWAY_TOKEN;
     const tokenArg = token ? ` --token ${token}` : '';
     const listProc = await withTimeout(
@@ -356,49 +402,133 @@ adminApi.post('/storage/sync', async (c) => {
   }
 });
 
-// POST /api/admin/gateway/restart - Kill the current gateway and start a new one
+// POST /api/admin/gateway/restart - Deterministic restart with verified recovery
 adminApi.post('/gateway/restart', async (c) => {
   const sandbox = c.get('sandbox');
 
   try {
-    // Find and kill the existing gateway process
-    const existingProcess = await findExistingMoltbotProcess(sandbox);
+    // ── Phase 1: Assess pre-restart state ─────────────────────────
+    const preHealth = await withTimeout(
+      probeGatewayHealth(sandbox),
+      HEALTH_PROBE_TIMEOUT_MS,
+      'Pre-restart health probe',
+    );
+    console.log('[Restart] Pre-restart:', preHealth.phase, '-', preHealth.detail);
 
-    if (existingProcess) {
-      console.log('Killing existing gateway process:', existingProcess.id);
-      try {
-        await existingProcess.kill();
-      } catch (killErr) {
-        console.error('Error killing process:', killErr);
+    // ── Phase 2: Deterministic teardown ───────────────────────────
+    const teardownMethod = await teardownGateway(sandbox, preHealth);
+
+    // ── Phase 3: Settle and verify teardown ────────────────────────
+    if (teardownMethod !== 'none') {
+      await new Promise((r) => setTimeout(r, RESTART_SETTLE_MS));
+
+      const stillAlive = await isGatewayHttpReady(sandbox);
+      if (stillAlive) {
+        console.warn('[Restart] Gateway survived teardown via', teardownMethod);
+        return c.json(
+          {
+            success: false,
+            error:
+              'Gateway remained HTTP-responsive after teardown. ' +
+              'Container may need recycling.',
+            preHealth: { phase: preHealth.phase, detail: preHealth.detail },
+            teardownMethod,
+          },
+          500,
+        );
       }
-      // Wait a moment for the process to die
-      await new Promise((r) => setTimeout(r, 2000));
-    } else {
-      try {
-        await sandbox.exec('pkill -f "openclaw gateway|start-openclaw.sh|start-moltbot.sh" || true');
-        await sandbox.exec('rm -f /tmp/openclaw-gateway.lock /root/.openclaw/gateway.lock || true');
-      } catch {}
-      await new Promise((r) => setTimeout(r, 1000));
     }
 
-    // Start a new gateway in the background
-    const bootPromise = ensureMoltbotGateway(sandbox, c.env).catch((err) => {
-      console.error('Gateway restart failed:', err);
-    });
-    c.executionCtx.waitUntil(bootPromise);
+    // ── Phase 4: Start fresh gateway and wait for recovery ────────
+    console.log('[Restart] Starting fresh gateway...');
+    const recoveryStart = Date.now();
+
+    await withTimeout(
+      ensureMoltbotGateway(sandbox, c.env),
+      RESTART_TIMEOUT_MS,
+      'Gateway recovery after restart',
+    );
+
+    // ── Phase 5: Verify recovery health ───────────────────────────
+    const postHealth = await withTimeout(
+      probeGatewayHealth(sandbox),
+      HEALTH_PROBE_TIMEOUT_MS,
+      'Post-restart health probe',
+    );
+    const recoveryMs = Date.now() - recoveryStart;
+
+    if (!postHealth.ready) {
+      return c.json(
+        {
+          success: false,
+          error: `Gateway failed to reach healthy state after restart (${recoveryMs}ms)`,
+          preHealth: { phase: preHealth.phase, detail: preHealth.detail },
+          postHealth: { phase: postHealth.phase, detail: postHealth.detail },
+          teardownMethod,
+          recoveryMs,
+        },
+        500,
+      );
+    }
 
     return c.json({
       success: true,
-      message: existingProcess
-        ? 'Gateway process killed, new instance starting...'
-        : 'No existing process found, starting new instance...',
-      previousProcessId: existingProcess?.id,
+      message: 'Gateway restarted and verified healthy',
+      preHealth: { phase: preHealth.phase, detail: preHealth.detail },
+      postHealth: { phase: postHealth.phase, detail: postHealth.detail },
+      teardownMethod,
+      recoveryMs,
+      processId: postHealth.processId,
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return c.json({ error: errorMessage }, 500);
+    console.error('[Restart] Bounded failure:', errorMessage);
+    return c.json(
+      {
+        success: false,
+        error: `Restart failed: ${errorMessage}`,
+        bounded: true,
+      },
+      500,
+    );
   }
 });
+
+async function teardownGateway(
+  sandbox: import('@cloudflare/sandbox').Sandbox,
+  health: Awaited<ReturnType<typeof probeGatewayHealth>>,
+): Promise<string> {
+  if (health.processId) {
+    const process = await findExistingMoltbotProcess(sandbox);
+    if (process) {
+      console.log('[Restart] Killing tracked process:', process.id);
+      try {
+        await process.kill();
+        return 'process_kill';
+      } catch (killErr) {
+        console.warn('[Restart] Process.kill() failed, falling back to pkill:', killErr);
+      }
+    }
+    return await pkillGateway(sandbox, 'stale_metadata');
+  }
+
+  if (health.detail.includes('HTTP-responsive')) {
+    console.log('[Restart] Ghost gateway (HTTP alive, no metadata). Force pkill.');
+    return await pkillGateway(sandbox, 'ghost');
+  }
+
+  console.log('[Restart] No gateway detected. Starting fresh.');
+  return 'none';
+}
+
+async function pkillGateway(sandbox: import('@cloudflare/sandbox').Sandbox, reason: string): Promise<string> {
+  try {
+    await sandbox.startProcess(`sh -c "pkill -f '${GATEWAY_PKILL_PATTERN}' || true"`);
+    return `pkill_${reason}`;
+  } catch {
+    return `pkill_${reason}_failed`;
+  }
+}
 
 // Mount admin API routes under /admin
 api.route('/admin', adminApi);

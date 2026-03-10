@@ -6,7 +6,12 @@ import type { Context } from 'hono';
 
 // Mock the gateway module
 vi.mock('../gateway', () => ({
-  findExistingMoltbotProcess: vi.fn(),
+  probeGatewayHealth: vi.fn().mockResolvedValue({
+    phase: 'unknown',
+    ready: false,
+    detail: 'mock',
+    probeTimeMs: 0,
+  }),
 }));
 
 // Mock the config module

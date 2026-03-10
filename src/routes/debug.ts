@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import type { AppEnv } from '../types';
+import { MOLTBOT_PORT } from '../config';
 import { findExistingMoltbotProcess, waitForProcess } from '../gateway';
 
 /**
@@ -464,6 +465,313 @@ debug.get('/container-config', async (c) => {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return c.json({ error: errorMessage }, 500);
   }
+});
+
+interface PhaseResult {
+  phase: string;
+  status: 'pass' | 'fail' | 'skip';
+  durationMs: number;
+  detail: string;
+}
+
+async function timedPhase(
+  name: string,
+  timeoutMs: number,
+  fn: () => Promise<{ status: 'pass' | 'fail'; detail: string }>,
+): Promise<PhaseResult> {
+  const start = Date.now();
+  try {
+    const result = await Promise.race([
+      fn(),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error(`Phase "${name}" timed out after ${timeoutMs}ms`)), timeoutMs),
+      ),
+    ]);
+    return { phase: name, ...result, durationMs: Date.now() - start };
+  } catch (err) {
+    return {
+      phase: name,
+      status: 'fail',
+      durationMs: Date.now() - start,
+      detail: err instanceof Error ? err.message : 'Unknown error',
+    };
+  }
+}
+
+// GET /debug/startup-phases - Diagnose startup readiness by distinct phases
+// Each phase is independently timed and bounded. The response identifies the
+// first failing phase rather than collapsing into a generic "not ready" signal.
+debug.get('/startup-phases', async (c) => {
+  const sandbox = c.get('sandbox');
+  const overallStart = Date.now();
+  const phases: PhaseResult[] = [];
+
+  // Phase 1: Sandbox connectivity — can we list processes at all?
+  const sandboxPhase = await timedPhase('sandbox_connectivity', 5000, async () => {
+    const processes = await sandbox.listProcesses();
+    return {
+      status: 'pass' as const,
+      detail: `Listed ${processes.length} process(es)`,
+    };
+  });
+  phases.push(sandboxPhase);
+
+  if (sandboxPhase.status === 'fail') {
+    return c.json({
+      overallStatus: 'fail',
+      firstFailure: 'sandbox_connectivity',
+      overallDurationMs: Date.now() - overallStart,
+      phases,
+    });
+  }
+
+  // Phase 2: Process metadata — can we find a gateway process via metadata?
+  let processFound = false;
+  let processStatus: string | null = null;
+  let processCommand: string | null = null;
+  const processPhase = await timedPhase('process_metadata', 5000, async () => {
+    const proc = await findExistingMoltbotProcess(sandbox);
+    if (proc) {
+      processFound = true;
+      processStatus = proc.status;
+      processCommand = proc.command || null;
+      return {
+        status: 'pass' as const,
+        detail: `Found process id=${proc.id} status=${proc.status} cmd="${(proc.command || '').slice(0, 80)}"`,
+      };
+    }
+    return {
+      status: 'fail' as const,
+      detail: 'No gateway process found via metadata (findExistingMoltbotProcess returned null)',
+    };
+  });
+  phases.push(processPhase);
+
+  // Phase 3: TCP readiness — is port listening?
+  // Run this regardless of process metadata to detect the metadata-vs-port desync
+  const tcpPhase = await timedPhase('tcp_readiness', 5000, async () => {
+    const response = await Promise.race([
+      sandbox.containerFetch(new Request(`http://localhost:${MOLTBOT_PORT}/`), MOLTBOT_PORT),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('TCP probe timeout (3s)')), 3000),
+      ),
+    ]);
+    return {
+      status: response.status > 0 ? ('pass' as const) : ('fail' as const),
+      detail: `Port ${MOLTBOT_PORT} responded with HTTP status ${response.status}`,
+    };
+  });
+  phases.push(tcpPhase);
+
+  // Phase 4: HTTP readiness — does gateway return a meaningful response?
+  if (tcpPhase.status === 'pass') {
+    const httpPhase = await timedPhase('http_readiness', 5000, async () => {
+      const response = await Promise.race([
+        sandbox.containerFetch(new Request(`http://localhost:${MOLTBOT_PORT}/`), MOLTBOT_PORT),
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('HTTP probe timeout (4s)')), 4000),
+        ),
+      ]);
+      const contentType = response.headers.get('content-type') || '';
+      const bodySnippet = (await response.text()).slice(0, 200);
+      return {
+        status: response.status >= 200 && response.status < 500 ? ('pass' as const) : ('fail' as const),
+        detail: `HTTP ${response.status} content-type="${contentType}" body="${bodySnippet.replace(/"/g, "'")}"`,
+      };
+    });
+    phases.push(httpPhase);
+  } else {
+    phases.push({
+      phase: 'http_readiness',
+      status: 'skip',
+      durationMs: 0,
+      detail: 'Skipped: TCP readiness failed',
+    });
+  }
+
+  // Phase 5: CLI readiness — can we run openclaw --version?
+  const cliPhase = await timedPhase('cli_readiness', 8000, async () => {
+    const proc = await sandbox.startProcess('openclaw --version');
+    const waitResult = await waitForProcess(proc, 6000);
+    if (waitResult.timedOut) {
+      return { status: 'fail' as const, detail: 'openclaw --version timed out after 6s' };
+    }
+    const logs = await proc.getLogs();
+    const output = (logs.stdout || logs.stderr || '').trim();
+    return {
+      status: 'pass' as const,
+      detail: `CLI responded: "${output.slice(0, 120)}"`,
+    };
+  });
+  phases.push(cliPhase);
+
+  // Determine overall status and first failure
+  const firstFailure = phases.find((p) => p.status === 'fail');
+  const overallStatus = firstFailure ? 'fail' : 'pass';
+
+  // Flag the critical desync: port listening but no process metadata
+  const desyncDetected = tcpPhase.status === 'pass' && processPhase.status === 'fail';
+
+  return c.json({
+    overallStatus,
+    firstFailure: firstFailure?.phase || null,
+    desyncDetected,
+    desyncDetail: desyncDetected
+      ? 'Port is listening but process metadata is unavailable — this is the known failure mode where ensureMoltbotGateway throws "process metadata is unavailable"'
+      : null,
+    overallDurationMs: Date.now() - overallStart,
+    processFound,
+    processStatus,
+    processCommand,
+    phases,
+  });
+});
+
+// GET /debug/restart-phases - Diagnose restart and recovery timing
+// Triggers a restart then probes each recovery phase with bounded timeouts.
+debug.get('/restart-phases', async (c) => {
+  const sandbox = c.get('sandbox');
+  const overallStart = Date.now();
+  const phases: PhaseResult[] = [];
+
+  // Phase 1: Pre-restart state — capture current gateway state
+  const preState = await timedPhase('pre_restart_state', 5000, async () => {
+    const proc = await findExistingMoltbotProcess(sandbox);
+    if (proc) {
+      return {
+        status: 'pass' as const,
+        detail: `Existing process id=${proc.id} status=${proc.status}`,
+      };
+    }
+    return {
+      status: 'pass' as const,
+      detail: 'No existing gateway process found (clean state)',
+    };
+  });
+  phases.push(preState);
+
+  // Phase 2: Kill existing process
+  const killPhase = await timedPhase('kill_existing', 8000, async () => {
+    const proc = await findExistingMoltbotProcess(sandbox);
+    if (proc) {
+      try {
+        await proc.kill();
+        // Wait briefly for cleanup
+        await new Promise((r) => setTimeout(r, 1000));
+        return { status: 'pass' as const, detail: `Killed process id=${proc.id}` };
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : 'Unknown error';
+        // Also try pkill as fallback
+        try {
+          await sandbox.exec('pkill -f "openclaw gateway|start-openclaw.sh" || true');
+          await new Promise((r) => setTimeout(r, 1000));
+        } catch { /* ignore */ }
+        return { status: 'pass' as const, detail: `Kill via metadata failed (${msg}), used pkill fallback` };
+      }
+    }
+    return { status: 'pass' as const, detail: 'No process to kill' };
+  });
+  phases.push(killPhase);
+
+  // Phase 3: Verify process is gone (stale metadata check)
+  const staleCheckPhase = await timedPhase('stale_metadata_check', 5000, async () => {
+    const proc = await findExistingMoltbotProcess(sandbox);
+    if (proc && (proc.status === 'running' || proc.status === 'starting')) {
+      return {
+        status: 'fail' as const,
+        detail: `Stale process still detected: id=${proc.id} status=${proc.status} — metadata did not clear after kill`,
+      };
+    }
+    // Also check TCP
+    let portStillOpen = false;
+    try {
+      const resp = await Promise.race([
+        sandbox.containerFetch(new Request(`http://localhost:${MOLTBOT_PORT}/`), MOLTBOT_PORT),
+        new Promise<never>((_, reject) => setTimeout(() => reject(new Error('timeout')), 2000)),
+      ]);
+      portStillOpen = resp.status > 0;
+    } catch { /* port closed = good */ }
+
+    return {
+      status: 'pass' as const,
+      detail: `Process metadata cleared. Port still open: ${portStillOpen}`,
+    };
+  });
+  phases.push(staleCheckPhase);
+
+  // Phase 4: TCP port closed — confirm gateway is actually down
+  const portClosedPhase = await timedPhase('port_closed_verification', 5000, async () => {
+    // Poll for port closure (max 3s)
+    for (let i = 0; i < 6; i++) {
+      try {
+        await Promise.race([
+          sandbox.containerFetch(new Request(`http://localhost:${MOLTBOT_PORT}/`), MOLTBOT_PORT),
+          new Promise<never>((_, reject) => setTimeout(() => reject(new Error('timeout')), 1000)),
+        ]);
+        // Port still open, wait
+        await new Promise((r) => setTimeout(r, 500)); // eslint-disable-line no-await-in-loop
+      } catch {
+        return { status: 'pass' as const, detail: `Port ${MOLTBOT_PORT} confirmed closed after restart kill` };
+      }
+    }
+    return {
+      status: 'fail' as const,
+      detail: `Port ${MOLTBOT_PORT} still responding 3s after kill — gateway may not have stopped`,
+    };
+  });
+  phases.push(portClosedPhase);
+
+  // Phase 5: Post-restart process detection — after restart, can we find a new process?
+  // We don't actually restart here (that would require ensureMoltbotGateway which couples us).
+  // Instead we check the post-kill landscape to understand recovery readiness.
+  const recoveryReadyPhase = await timedPhase('recovery_readiness', 3000, async () => {
+    const proc = await findExistingMoltbotProcess(sandbox);
+    const tcpUp = await (async () => {
+      try {
+        const resp = await Promise.race([
+          sandbox.containerFetch(new Request(`http://localhost:${MOLTBOT_PORT}/`), MOLTBOT_PORT),
+          new Promise<never>((_, reject) => setTimeout(() => reject(new Error('timeout')), 2000)),
+        ]);
+        return resp.status > 0;
+      } catch {
+        return false;
+      }
+    })();
+
+    if (!proc && !tcpUp) {
+      return {
+        status: 'pass' as const,
+        detail: 'Clean state: no process metadata, no port listener — safe to restart',
+      };
+    }
+    if (proc && tcpUp) {
+      return {
+        status: 'fail' as const,
+        detail: `Unclean state: process id=${proc.id} still present AND port still open`,
+      };
+    }
+    if (!proc && tcpUp) {
+      return {
+        status: 'fail' as const,
+        detail: 'Desync: no process metadata but port still listening — ensureMoltbotGateway would throw "metadata unavailable"',
+      };
+    }
+    return {
+      status: 'fail' as const,
+      detail: `Anomaly: process metadata present (id=${proc?.id}) but port not listening`,
+    };
+  });
+  phases.push(recoveryReadyPhase);
+
+  const firstFailure = phases.find((p) => p.status === 'fail');
+  const overallStatus = firstFailure ? 'fail' : 'pass';
+
+  return c.json({
+    overallStatus,
+    firstFailure: firstFailure?.phase || null,
+    overallDurationMs: Date.now() - overallStart,
+    phases,
+  });
 });
 
 export { debug };
