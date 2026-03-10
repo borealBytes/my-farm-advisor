@@ -24,6 +24,14 @@ const RESTART_SETTLE_MS = 2000;
 const GATEWAY_PKILL_PATTERN =
   'openclaw gateway|start-openclaw.sh|start-moltbot.sh|clawdbot gateway';
 
+function scheduleGatewayBootstrap(c: { executionCtx: ExecutionContext; env: AppEnv['Bindings'] }, sandbox: import('@cloudflare/sandbox').Sandbox): void {
+  c.executionCtx.waitUntil(
+    ensureMoltbotGateway(sandbox, c.env).catch((error: Error) => {
+      console.error('[Admin] Background gateway bootstrap failed:', error);
+    }),
+  );
+}
+
 async function withTimeout<T>(promise: Promise<T>, timeoutMs: number, label: string): Promise<T> {
   return Promise.race([
     promise,
@@ -63,9 +71,11 @@ adminApi.get('/devices', async (c) => {
     );
 
     if (!health.ready) {
+      scheduleGatewayBootstrap(c, sandbox);
       return c.json(
         {
           error: 'Gateway is not ready for device operations',
+          starting: true,
           lifecycle: {
             phase: health.phase,
             detail: health.detail,
@@ -149,9 +159,11 @@ adminApi.post('/devices/:requestId/approve', async (c) => {
     );
 
     if (!health.ready) {
+      scheduleGatewayBootstrap(c, sandbox);
       return c.json(
         {
           error: 'Gateway is not ready — cannot approve device',
+          starting: true,
           lifecycle: {
             phase: health.phase,
             detail: health.detail,
@@ -217,9 +229,11 @@ adminApi.post('/devices/approve-all', async (c) => {
     );
 
     if (!health.ready) {
+      scheduleGatewayBootstrap(c, sandbox);
       return c.json(
         {
           error: 'Gateway is not ready — cannot approve devices',
+          starting: true,
           lifecycle: {
             phase: health.phase,
             detail: health.detail,
