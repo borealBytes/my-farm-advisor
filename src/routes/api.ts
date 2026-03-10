@@ -10,6 +10,16 @@ import {
 
 // CLI commands can take 10-15 seconds to complete due to WebSocket connection overhead
 const CLI_TIMEOUT_MS = 20000;
+const ADMIN_ROUTE_TIMEOUT_MS = 30000;
+
+async function withTimeout<T>(promise: Promise<T>, timeoutMs: number, label: string): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<never>((_, reject) => {
+      setTimeout(() => reject(new Error(`${label} timed out after ${timeoutMs}ms`)), timeoutMs);
+    }),
+  ]);
+}
 
 /**
  * API routes
@@ -33,13 +43,25 @@ adminApi.get('/devices', async (c) => {
 
   try {
     // Ensure moltbot is running first
-    await ensureMoltbotGateway(sandbox, c.env);
+    await withTimeout(
+      ensureMoltbotGateway(sandbox, c.env),
+      ADMIN_ROUTE_TIMEOUT_MS,
+      'Gateway initialization',
+    );
 
     // Run OpenClaw CLI to list devices
     const token = c.env.MOLTBOT_GATEWAY_TOKEN;
     const tokenArg = token ? ` --token ${token}` : '';
-    const proc = await sandbox.startProcess(`openclaw devices list --json${tokenArg}`);
-    const waitResult = await waitForProcess(proc, CLI_TIMEOUT_MS);
+    const proc = await withTimeout(
+      sandbox.startProcess(`openclaw devices list --json${tokenArg}`),
+      ADMIN_ROUTE_TIMEOUT_MS,
+      'Start devices list command',
+    );
+    const waitResult = await withTimeout(
+      waitForProcess(proc, CLI_TIMEOUT_MS),
+      ADMIN_ROUTE_TIMEOUT_MS,
+      'Wait for devices list command',
+    );
     if (waitResult.timedOut) {
       try {
         await proc.kill();
@@ -52,7 +74,7 @@ adminApi.get('/devices', async (c) => {
       );
     }
 
-    const logs = await proc.getLogs();
+    const logs = await withTimeout(proc.getLogs(), ADMIN_ROUTE_TIMEOUT_MS, 'Fetch command logs');
     const stdout = logs.stdout || '';
     const stderr = logs.stderr || '';
 
@@ -98,13 +120,25 @@ adminApi.post('/devices/:requestId/approve', async (c) => {
 
   try {
     // Ensure moltbot is running first
-    await ensureMoltbotGateway(sandbox, c.env);
+    await withTimeout(
+      ensureMoltbotGateway(sandbox, c.env),
+      ADMIN_ROUTE_TIMEOUT_MS,
+      'Gateway initialization',
+    );
 
     // Run OpenClaw CLI to approve the device
     const token = c.env.MOLTBOT_GATEWAY_TOKEN;
     const tokenArg = token ? ` --token ${token}` : '';
-    const proc = await sandbox.startProcess(`openclaw devices approve ${requestId}${tokenArg}`);
-    const waitResult = await waitForProcess(proc, CLI_TIMEOUT_MS);
+    const proc = await withTimeout(
+      sandbox.startProcess(`openclaw devices approve ${requestId}${tokenArg}`),
+      ADMIN_ROUTE_TIMEOUT_MS,
+      'Start device approve command',
+    );
+    const waitResult = await withTimeout(
+      waitForProcess(proc, CLI_TIMEOUT_MS),
+      ADMIN_ROUTE_TIMEOUT_MS,
+      'Wait for device approve command',
+    );
     if (waitResult.timedOut) {
       try {
         await proc.kill();
@@ -117,7 +151,7 @@ adminApi.post('/devices/:requestId/approve', async (c) => {
       );
     }
 
-    const logs = await proc.getLogs();
+    const logs = await withTimeout(proc.getLogs(), ADMIN_ROUTE_TIMEOUT_MS, 'Fetch command logs');
     const stdout = logs.stdout || '';
     const stderr = logs.stderr || '';
 
@@ -143,13 +177,25 @@ adminApi.post('/devices/approve-all', async (c) => {
 
   try {
     // Ensure moltbot is running first
-    await ensureMoltbotGateway(sandbox, c.env);
+    await withTimeout(
+      ensureMoltbotGateway(sandbox, c.env),
+      ADMIN_ROUTE_TIMEOUT_MS,
+      'Gateway initialization',
+    );
 
     // First, get the list of pending devices
     const token = c.env.MOLTBOT_GATEWAY_TOKEN;
     const tokenArg = token ? ` --token ${token}` : '';
-    const listProc = await sandbox.startProcess(`openclaw devices list --json${tokenArg}`);
-    const listWaitResult = await waitForProcess(listProc, CLI_TIMEOUT_MS);
+    const listProc = await withTimeout(
+      sandbox.startProcess(`openclaw devices list --json${tokenArg}`),
+      ADMIN_ROUTE_TIMEOUT_MS,
+      'Start devices list command',
+    );
+    const listWaitResult = await withTimeout(
+      waitForProcess(listProc, CLI_TIMEOUT_MS),
+      ADMIN_ROUTE_TIMEOUT_MS,
+      'Wait for devices list command',
+    );
     if (listWaitResult.timedOut) {
       try {
         await listProc.kill();
@@ -162,7 +208,11 @@ adminApi.post('/devices/approve-all', async (c) => {
       );
     }
 
-    const listLogs = await listProc.getLogs();
+    const listLogs = await withTimeout(
+      listProc.getLogs(),
+      ADMIN_ROUTE_TIMEOUT_MS,
+      'Fetch command logs',
+    );
     const stdout = listLogs.stdout || '';
 
     // Parse pending devices
@@ -187,11 +237,17 @@ adminApi.post('/devices/approve-all', async (c) => {
     for (const device of pending) {
       try {
         // eslint-disable-next-line no-await-in-loop -- sequential device approval required
-        const approveProc = await sandbox.startProcess(
-          `openclaw devices approve ${device.requestId}${tokenArg}`,
+        const approveProc = await withTimeout(
+          sandbox.startProcess(`openclaw devices approve ${device.requestId}${tokenArg}`),
+          ADMIN_ROUTE_TIMEOUT_MS,
+          'Start device approve command',
         );
         // eslint-disable-next-line no-await-in-loop
-        const approveWaitResult = await waitForProcess(approveProc, CLI_TIMEOUT_MS);
+        const approveWaitResult = await withTimeout(
+          waitForProcess(approveProc, CLI_TIMEOUT_MS),
+          ADMIN_ROUTE_TIMEOUT_MS,
+          'Wait for device approve command',
+        );
         if (approveWaitResult.timedOut) {
           try {
             await approveProc.kill();
@@ -205,7 +261,11 @@ adminApi.post('/devices/approve-all', async (c) => {
         }
 
         // eslint-disable-next-line no-await-in-loop
-        const approveLogs = await approveProc.getLogs();
+        const approveLogs = await withTimeout(
+          approveProc.getLogs(),
+          ADMIN_ROUTE_TIMEOUT_MS,
+          'Fetch command logs',
+        );
         const success =
           approveLogs.stdout?.toLowerCase().includes('approved') || approveProc.exitCode === 0;
 
