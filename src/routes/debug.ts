@@ -337,11 +337,91 @@ debug.get('/ws-test', async (c) => {
   return c.html(html);
 });
 
+debug.get('/provider', async (c) => {
+  const preferredProvider = (c.env.PREFERRED_PROVIDER || 'auto').toLowerCase();
+
+  const hasCloudflareGateway = !!(
+    c.env.CLOUDFLARE_AI_GATEWAY_API_KEY &&
+    c.env.CF_AI_GATEWAY_ACCOUNT_ID &&
+    c.env.CF_AI_GATEWAY_GATEWAY_ID
+  );
+  const hasLegacyGateway = !!(c.env.AI_GATEWAY_API_KEY && c.env.AI_GATEWAY_BASE_URL);
+  const hasAnthropic = !!c.env.ANTHROPIC_API_KEY;
+  const hasOpenAI = !!c.env.OPENAI_API_KEY;
+  const hasNvidia = !!c.env.NVIDIA_API_KEY;
+  const hasOpenRouter = !!c.env.OPENROUTER_API_KEY;
+
+  let selectedProvider = 'none';
+  let defaultModel: string | null = null;
+  let fallbackModels: string[] = [];
+
+  if (hasCloudflareGateway) {
+    selectedProvider = 'cloudflare-ai-gateway';
+    defaultModel = c.env.CF_AI_GATEWAY_MODEL || 'anthropic/claude-sonnet-4-5';
+  } else if (preferredProvider === 'nvidia' && hasNvidia) {
+    selectedProvider = 'nvidia';
+    defaultModel = c.env.NVIDIA_DEFAULT_MODEL || 'moonshotai/kimi-k2.5';
+    fallbackModels = (c.env.NVIDIA_FALLBACK_MODELS || '')
+      .split(',')
+      .map((v) => v.trim())
+      .filter(Boolean);
+  } else if (preferredProvider === 'openrouter' && hasOpenRouter) {
+    selectedProvider = 'openrouter';
+    defaultModel = c.env.OPENROUTER_DEFAULT_MODEL || 'openrouter/free';
+    fallbackModels = (c.env.OPENROUTER_FALLBACK_MODELS || '')
+      .split(',')
+      .map((v) => v.trim())
+      .filter(Boolean);
+  } else if (hasNvidia) {
+    selectedProvider = 'nvidia';
+    defaultModel = c.env.NVIDIA_DEFAULT_MODEL || 'moonshotai/kimi-k2.5';
+    fallbackModels = (c.env.NVIDIA_FALLBACK_MODELS || '')
+      .split(',')
+      .map((v) => v.trim())
+      .filter(Boolean);
+  } else if (hasOpenRouter) {
+    selectedProvider = 'openrouter';
+    defaultModel = c.env.OPENROUTER_DEFAULT_MODEL || 'openrouter/free';
+    fallbackModels = (c.env.OPENROUTER_FALLBACK_MODELS || '')
+      .split(',')
+      .map((v) => v.trim())
+      .filter(Boolean);
+  } else if (hasAnthropic) {
+    selectedProvider = 'anthropic';
+  } else if (hasOpenAI) {
+    selectedProvider = 'openai';
+  } else if (hasLegacyGateway) {
+    selectedProvider = 'legacy-ai-gateway';
+  }
+
+  return c.json({
+    preferred_provider: preferredProvider,
+    selected_provider: selectedProvider,
+    default_model: defaultModel,
+    fallback_models: fallbackModels,
+    available: {
+      cloudflare_ai_gateway: hasCloudflareGateway,
+      nvidia: hasNvidia,
+      openrouter: hasOpenRouter,
+      anthropic: hasAnthropic,
+      openai: hasOpenAI,
+      legacy_ai_gateway: hasLegacyGateway,
+    },
+    config: {
+      nvidia_base_url: c.env.NVIDIA_BASE_URL || 'https://integrate.api.nvidia.com/v1',
+      openrouter_base_url: c.env.OPENROUTER_BASE_URL || 'https://openrouter.ai/api/v1',
+    },
+  });
+});
+
 // GET /debug/env - Show environment configuration (sanitized)
 debug.get('/env', async (c) => {
   return c.json({
     has_anthropic_key: !!c.env.ANTHROPIC_API_KEY,
     has_openai_key: !!c.env.OPENAI_API_KEY,
+    has_nvidia_key: !!c.env.NVIDIA_API_KEY,
+    has_openrouter_key: !!c.env.OPENROUTER_API_KEY,
+    preferred_provider: c.env.PREFERRED_PROVIDER || 'auto',
     has_gateway_token: !!c.env.MOLTBOT_GATEWAY_TOKEN,
     has_r2_access_key: !!c.env.R2_ACCESS_KEY_ID,
     has_r2_secret_key: !!c.env.R2_SECRET_ACCESS_KEY,

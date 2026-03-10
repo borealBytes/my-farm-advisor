@@ -105,11 +105,20 @@ if [ ! -f "$CONFIG_FILE" ]; then
     echo "No existing config found, running openclaw onboard..."
 
     AUTH_ARGS=""
+    PREFERRED_PROVIDER="${PREFERRED_PROVIDER:-auto}"
     if [ -n "$CLOUDFLARE_AI_GATEWAY_API_KEY" ] && [ -n "$CF_AI_GATEWAY_ACCOUNT_ID" ] && [ -n "$CF_AI_GATEWAY_GATEWAY_ID" ]; then
         AUTH_ARGS="--auth-choice cloudflare-ai-gateway-api-key \
             --cloudflare-ai-gateway-account-id $CF_AI_GATEWAY_ACCOUNT_ID \
             --cloudflare-ai-gateway-gateway-id $CF_AI_GATEWAY_GATEWAY_ID \
             --cloudflare-ai-gateway-api-key $CLOUDFLARE_AI_GATEWAY_API_KEY"
+    elif [ "$PREFERRED_PROVIDER" = "nvidia" ] && [ -n "$NVIDIA_API_KEY" ]; then
+        AUTH_ARGS="--auth-choice openai-api-key --openai-api-key $NVIDIA_API_KEY"
+    elif [ "$PREFERRED_PROVIDER" = "openrouter" ] && [ -n "$OPENROUTER_API_KEY" ]; then
+        AUTH_ARGS="--auth-choice openai-api-key --openai-api-key $OPENROUTER_API_KEY"
+    elif [ -n "$NVIDIA_API_KEY" ]; then
+        AUTH_ARGS="--auth-choice openai-api-key --openai-api-key $NVIDIA_API_KEY"
+    elif [ -n "$OPENROUTER_API_KEY" ]; then
+        AUTH_ARGS="--auth-choice openai-api-key --openai-api-key $OPENROUTER_API_KEY"
     elif [ -n "$ANTHROPIC_API_KEY" ]; then
         AUTH_ARGS="--auth-choice apiKey --anthropic-api-key $ANTHROPIC_API_KEY"
     elif [ -n "$OPENAI_API_KEY" ]; then
@@ -138,7 +147,7 @@ fi
 # - Gateway token auth
 # - Trusted proxies for sandbox networking
 # - Base URL override for legacy AI Gateway path
-node << 'EOFPATCH'
+node << 'EOFPATCH' || true
 const fs = require('fs');
 const path = require('path');
 
@@ -156,6 +165,34 @@ config.gateway = config.gateway || {};
 config.channels = config.channels || {};
 config.skills = config.skills || {};
 config.skills.entries = config.skills.entries || {};
+
+function parseCsv(input) {
+    if (!input) return [];
+    return input
+        .split(',')
+        .map((v) => v.trim())
+        .filter(Boolean);
+}
+
+function uniq(arr) {
+    return [...new Set(arr)];
+}
+
+function providerModels(defaultModel, fallbackModels, catalogModels) {
+    const ordered = uniq([defaultModel, ...fallbackModels, ...catalogModels].filter(Boolean));
+    return ordered.map((id) => ({ id, name: id, contextWindow: 131072, maxTokens: 16384 }));
+}
+
+function setModelSelection(providerName, defaultModel, fallbackModels) {
+    config.agents = config.agents || {};
+    config.agents.defaults = config.agents.defaults || {};
+    config.agents.defaults.model = {
+        primary: providerName + '/' + defaultModel,
+    };
+    if (fallbackModels.length > 0) {
+        config.agents.defaults.model.fallbacks = fallbackModels.map((modelId) => providerName + '/' + modelId);
+    }
+}
 
 // Ensure wrighter skills are enabled for model invocation.
 // Keep both keys for compatibility with different skill-key conventions.
@@ -181,6 +218,14 @@ if (process.env.OPENCLAW_GATEWAY_TOKEN) {
 if (process.env.OPENCLAW_DEV_MODE === 'true') {
     config.gateway.controlUi = config.gateway.controlUi || {};
     config.gateway.controlUi.allowInsecureAuth = true;
+    const localOrigins = [];
+    for (let port = 8787; port <= 8800; port += 1) {
+        localOrigins.push('http://127.0.0.1:' + port, 'http://localhost:' + port);
+    }
+    const existingOrigins = Array.isArray(config.gateway.controlUi.allowedOrigins)
+        ? config.gateway.controlUi.allowedOrigins
+        : [];
+    config.gateway.controlUi.allowedOrigins = uniq([...existingOrigins, ...localOrigins, '*']);
 }
 
 // Legacy AI Gateway base URL override:
@@ -233,6 +278,66 @@ if (process.env.CF_AI_GATEWAY_MODEL) {
     }
 }
 
+const preferredProvider = (process.env.PREFERRED_PROVIDER || 'auto').toLowerCase();
+const nvidiaApiKey = process.env.NVIDIA_API_KEY;
+const openRouterApiKey = process.env.OPENROUTER_API_KEY;
+
+if (nvidiaApiKey) {
+    const defaultModel = process.env.NVIDIA_DEFAULT_MODEL || 'moonshotai/kimi-k2.5';
+    const fallbackModels = parseCsv(process.env.NVIDIA_FALLBACK_MODELS);
+    const baseUrl = (process.env.NVIDIA_BASE_URL || 'https://integrate.api.nvidia.com/v1').replace(/\/+$/, '');
+
+    config.models = config.models || {};
+    config.models.providers = config.models.providers || {};
+    config.models.providers.nvidia = {
+        baseUrl,
+        apiKey: nvidiaApiKey,
+        api: 'openai-completions',
+        models: providerModels(defaultModel, fallbackModels, [
+            'moonshotai/kimi-k2.5',
+            'stepfun-ai/step-3.5-flash',
+            'qwen/qwen3.5-397b-a17b',
+        ]),
+    };
+
+    const shouldSelectNvidia =
+        preferredProvider === 'nvidia' ||
+        preferredProvider === 'auto' ||
+        (!openRouterApiKey && preferredProvider !== 'openrouter');
+    if (shouldSelectNvidia) {
+        setModelSelection('nvidia', defaultModel, fallbackModels);
+        console.log('Selected NVIDIA provider with model:', defaultModel);
+    }
+}
+
+if (openRouterApiKey) {
+    const defaultModel = process.env.OPENROUTER_DEFAULT_MODEL || 'openrouter/free';
+    const fallbackModels = parseCsv(process.env.OPENROUTER_FALLBACK_MODELS);
+    const baseUrl = (process.env.OPENROUTER_BASE_URL || 'https://openrouter.ai/api/v1').replace(/\/+$/, '');
+
+    config.models = config.models || {};
+    config.models.providers = config.models.providers || {};
+    config.models.providers.openrouter = {
+        baseUrl,
+        apiKey: openRouterApiKey,
+        api: 'openai-completions',
+        models: providerModels(defaultModel, fallbackModels, [
+            'openrouter/free',
+            'openai/gpt-5.4',
+            'google/gemini-3.1-flash-lite-preview',
+            'anthropic/claude-sonnet-4.6',
+        ]),
+    };
+
+    const shouldSelectOpenRouter =
+        preferredProvider === 'openrouter' ||
+        (preferredProvider !== 'nvidia' && !nvidiaApiKey);
+    if (shouldSelectOpenRouter) {
+        setModelSelection('openrouter', defaultModel, fallbackModels);
+        console.log('Selected OpenRouter provider with model:', defaultModel);
+    }
+}
+
 // Telegram configuration
 // Overwrite entire channel object to drop stale keys from old R2 backups
 // that would fail OpenClaw's strict config validation (see #47)
@@ -276,47 +381,6 @@ if (process.env.SLACK_BOT_TOKEN && process.env.SLACK_APP_TOKEN) {
 
 fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
 console.log('Configuration patched successfully');
-
-// Inject a stable writing-router directive into workspace AGENTS.md.
-// This biases wrighter for output-generation turns but avoids forcing it on
-// pure research/tooling turns.
-const workspaceDir = '/root/clawd';
-const agentsPath = path.join(workspaceDir, 'AGENTS.md');
-const markerStart = '<!-- wrighter-router:start -->';
-const markerEnd = '<!-- wrighter-router:end -->';
-const routerBlock = `${markerStart}
-## Writing Skill Router
-
-- Treat \`superior-byteworks-wrighter\` (\`wrighter\`) as the default skill for output-generation work.
-- Use it when producing final user-facing deliverables: markdown docs, templates, polished channel replies, and report artifacts.
-- Use it when creating or revising document artifacts (for example: `.md` content, publication-ready summaries, PDF writeups).
-- Do not force it for pure research/tooling turns: retrieval, data gathering, debugging, command execution, or intermediate analysis.
-- For mixed tasks, do research/tool calls first, then invoke wrighter for the final composed output.
-${markerEnd}`;
-
-try {
-    fs.mkdirSync(workspaceDir, { recursive: true });
-    let agentsContent = '';
-    if (fs.existsSync(agentsPath)) {
-        agentsContent = fs.readFileSync(agentsPath, 'utf8');
-    } else {
-        agentsContent = '# AGENTS.md\n\n';
-    }
-
-    const hasMarkers = agentsContent.includes(markerStart) && agentsContent.includes(markerEnd);
-    if (hasMarkers) {
-        const pattern = new RegExp(`${markerStart}[\\s\\S]*?${markerEnd}`, 'm');
-        agentsContent = agentsContent.replace(pattern, routerBlock);
-    } else {
-        const needsNewline = agentsContent.endsWith('\n') ? '' : '\n';
-        agentsContent = `${agentsContent}${needsNewline}\n${routerBlock}\n`;
-    }
-
-    fs.writeFileSync(agentsPath, agentsContent);
-    console.log('AGENTS.md wrighter router directive ensured');
-} catch (e) {
-    console.warn('Failed to update AGENTS.md router directive:', e && e.message ? e.message : e);
-}
 EOFPATCH
 
 # ============================================================

@@ -31,10 +31,13 @@ RUN mkdir -p /root/.openclaw \
     && mkdir -p /root/clawd \
     && mkdir -p /root/clawd/skills
 
+ARG BUILD_CACHE_BUST=2026-03-10-v31
+RUN test -n "$BUILD_CACHE_BUST"
+
 # Copy startup script
-# Build cache bust: 2026-02-11-v30-rclone
-COPY start-openclaw.sh /usr/local/bin/start-openclaw.sh
-RUN chmod +x /usr/local/bin/start-openclaw.sh
+# Build cache bust: 2026-03-10-v31-nim-openrouter-local-fix
+COPY ["start-openclaw.sh", "/usr/local/bin/start-openclaw.sh"]
+RUN chmod +x /usr/local/bin/start-openclaw.sh && sha256sum /usr/local/bin/start-openclaw.sh
 
 # Copy custom skills
 COPY skills/ /root/clawd/skills/

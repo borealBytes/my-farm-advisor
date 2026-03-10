@@ -21,6 +21,34 @@ describe('buildEnvVars', () => {
     expect(result.OPENAI_API_KEY).toBe('sk-openai-key');
   });
 
+  it('passes NVIDIA and OpenRouter provider env vars', () => {
+    const env = createMockEnv({
+      PREFERRED_PROVIDER: 'nvidia',
+      NVIDIA_API_KEY: 'nv-key',
+      NVIDIA_BASE_URL: 'https://integrate.api.nvidia.com/v1',
+      NVIDIA_DEFAULT_MODEL: 'moonshotai/kimi-k2.5',
+      NVIDIA_FALLBACK_MODELS: 'stepfun-ai/step-3.5-flash,qwen/qwen3.5-397b-a17b',
+      OPENROUTER_API_KEY: 'or-key',
+      OPENROUTER_BASE_URL: 'https://openrouter.ai/api/v1',
+      OPENROUTER_DEFAULT_MODEL: 'openrouter/free',
+      OPENROUTER_FALLBACK_MODELS:
+        'openai/gpt-5.4,google/gemini-3.1-flash-lite-preview,anthropic/claude-sonnet-4.6',
+    });
+    const result = buildEnvVars(env);
+
+    expect(result.PREFERRED_PROVIDER).toBe('nvidia');
+    expect(result.NVIDIA_API_KEY).toBe('nv-key');
+    expect(result.NVIDIA_BASE_URL).toBe('https://integrate.api.nvidia.com/v1');
+    expect(result.NVIDIA_DEFAULT_MODEL).toBe('moonshotai/kimi-k2.5');
+    expect(result.NVIDIA_FALLBACK_MODELS).toBe('stepfun-ai/step-3.5-flash,qwen/qwen3.5-397b-a17b');
+    expect(result.OPENROUTER_API_KEY).toBe('or-key');
+    expect(result.OPENROUTER_BASE_URL).toBe('https://openrouter.ai/api/v1');
+    expect(result.OPENROUTER_DEFAULT_MODEL).toBe('openrouter/free');
+    expect(result.OPENROUTER_FALLBACK_MODELS).toBe(
+      'openai/gpt-5.4,google/gemini-3.1-flash-lite-preview,anthropic/claude-sonnet-4.6',
+    );
+  });
+
   // Cloudflare AI Gateway (new native provider)
   it('passes Cloudflare AI Gateway env vars', () => {
     const env = createMockEnv({
