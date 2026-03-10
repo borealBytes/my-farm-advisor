@@ -161,7 +161,7 @@ Critical Path: T1 → T6 → T8 → T10 → F1-F4
 
 ## TODOs
 
-- [ ] 1. Baseline inventory: what is already done vs missing for production deploy
+- [x] 1. Baseline inventory: what is already done vs missing for production deploy
 
   **What to do**:
   - Audit current workflows, wrangler config, route exposure, and secrets references.
@@ -208,7 +208,7 @@ Critical Path: T1 → T6 → T8 → T10 → F1-F4
     Evidence: .sisyphus/evidence/task-1-reference-check.txt
   ```
 
-- [ ] 2. Build exact secrets matrix for GitHub Actions + Cloudflare runtime
+- [x] 2. Build exact secrets matrix for GitHub Actions + Cloudflare runtime
 
   **What to do**:
   - Create definitive secrets table grouped as CI deploy vs runtime secrets.
@@ -254,7 +254,7 @@ Critical Path: T1 → T6 → T8 → T10 → F1-F4
     Evidence: .sisyphus/evidence/task-2-no-secrets-leak.txt
   ```
 
-- [ ] 3. Lock OpenRouter + Kimi K2.5-only runtime configuration path
+- [x] 3. Lock OpenRouter + Kimi K2.5-only runtime configuration path
 
   **What to do**:
   - Document and implement config path that activates only `openrouter/moonshotai/kimi-k2.5`.

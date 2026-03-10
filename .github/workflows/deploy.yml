@@ -1,0 +1,97 @@
+name: Deploy
+
+on:
+  # Manual trigger only - production deployments require explicit approval
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build project
+        run: npm run build
+
+      # Required secrets for Cloudflare deployment:
+      # - CLOUDFLARE_API_TOKEN: API token with Cloudflare Workers edit permissions
+      #   Create at: https://dash.cloudflare.com/profile/api-tokens
+      #   Template: "Edit Cloudflare Workers" or custom with Zone:Read, Workers Scripts:Edit
+      # - CLOUDFLARE_ACCOUNT_ID: Your Cloudflare account ID
+      #   Found in the Cloudflare dashboard sidebar or via: https://dash.cloudflare.com/?to=/:account/workers/overview
+      - name: Verify required secrets
+        run: |
+          if [ -z "${{ secrets.CLOUDFLARE_API_TOKEN }}" ]; then
+            echo "::error::CLOUDFLARE_API_TOKEN secret is required but not set"
+            exit 1
+          fi
+          if [ -z "${{ secrets.CLOUDFLARE_ACCOUNT_ID }}" ]; then
+            echo "::error::CLOUDFLARE_ACCOUNT_ID secret is required but not set"
+            exit 1
+          fi
+          echo "✓ All required secrets are configured"
+
+      - name: Deploy to Cloudflare
+        id: deploy
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy
+
+      - name: Post-deploy smoke test
+        run: |
+          # Extract worker URL from wrangler output or construct from known pattern
+          # Worker name from wrangler.jsonc: my-farm-advisor-sandbox
+          WORKER_URL="${{ steps.deploy.outputs.deployment-url }}"
+
+          # Fallback: construct URL from account subdomain if deployment-url not available
+          if [ -z "$WORKER_URL" ]; then
+            echo "::warning::Deployment URL not available from wrangler output, using fallback"
+            # Note: This assumes standard workers.dev subdomain pattern
+            # The actual URL may vary based on your Cloudflare account configuration
+            WORKER_URL="https://my-farm-advisor-sandbox.${{ secrets.CF_WORKERS_SUBDOMAIN }}.workers.dev"
+          fi
+
+          echo "Testing deployment at: $WORKER_URL"
+
+          # Perform HTTP status check with retry
+          MAX_RETRIES=5
+          RETRY_DELAY=10
+
+          for i in $(seq 1 $MAX_RETRIES); do
+            echo "Attempt $i/$MAX_RETRIES..."
+
+            # Check HTTP status (follow redirects, timeout after 30s)
+            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+              --max-time 30 \
+              --retry 0 \
+              "$WORKER_URL" 2>/dev/null || echo "000")
+
+            echo "HTTP Status: $HTTP_STATUS"
+
+            # Accept 200, 302 (redirect to Access), or 401 (Access protected)
+            if [ "$HTTP_STATUS" = "200" ] || [ "$HTTP_STATUS" = "302" ] || [ "$HTTP_STATUS" = "401" ]; then
+              echo "✓ Deployment smoke test passed (HTTP $HTTP_STATUS)"
+              exit 0
+            fi
+
+            if [ $i -lt $MAX_RETRIES ]; then
+              echo "Waiting ${RETRY_DELAY}s before retry..."
+              sleep $RETRY_DELAY
+            fi
+          done
+
+          echo "::error::Smoke test failed after $MAX_RETRIES attempts"
+          exit 1

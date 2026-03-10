@@ -1,10 +1,10 @@
 {
-  "active_plan": "/media/clay/Data/dev/my-farm-advisor/.sisyphus/plans/setup-farm-advisor-skills.md",
-  "started_at": "2026-03-10T00:35:59.021Z",
+  "active_plan": "/media/clay/Data/dev/my-farm-advisor/.sisyphus/plans/deploy-pr-openrouter-kimi-cloudflare.md",
+  "started_at": "2026-03-10T04:05:54.348Z",
   "session_ids": [
-    "ses_32b04db16ffekP4eBuctzPq8Sz"
+    "ses_32a2b5d0affeYl9wk3KPK7NRUb"
   ],
-  "plan_name": "setup-farm-advisor-skills",
+  "plan_name": "deploy-pr-openrouter-kimi-cloudflare",
   "agent": "atlas",
   "worktree_path": "/media/clay/Data/dev/my-farm-advisor"
 }

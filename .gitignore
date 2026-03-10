@@ -9,6 +9,9 @@ build-info.json
 .wrangler/
 .dev.vars
 
+# oh-my-opencode
+.sisyphus/
+
 # Logs
 *.log
 npm-debug.log*
