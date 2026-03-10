@@ -11,7 +11,7 @@ from pathlib import Path
 import pandas as pd
 
 _SCRIPTS_DIR = Path(__file__).resolve().parent.parent
-_REPO_ROOT = _SCRIPTS_DIR.parents[1]
+_REPO_ROOT = _SCRIPTS_DIR.parents[2]
 sys.path.insert(0, str(_SCRIPTS_DIR))
 sys.path.insert(0, str(_SCRIPTS_DIR / "lib"))
 

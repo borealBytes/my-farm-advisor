@@ -12,7 +12,6 @@ from pathlib import Path
 _SCRIPTS_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_SCRIPTS_DIR))
 sys.path.insert(0, str(_SCRIPTS_DIR / "lib"))
-sys.path.insert(0, str(_SCRIPTS_DIR.parents[1] / ".opencode" / "skills" / "geoadmin-admin" / "src"))
 
 GEOADMIN_LEVEL_CHOICES = ("l0_countries", "l1_states", "l2_counties")
 
@@ -32,7 +31,9 @@ def parse_args() -> argparse.Namespace:
         default=2025,
         help="TIGER/Line vintage year for US state and county layers",
     )
-    parser.add_argument("--force", action="store_true", help="Re-download and overwrite outputs")
+    parser.add_argument(
+        "--force", action="store_true", help="Re-download and overwrite outputs"
+    )
     parser.add_argument(
         "--list-sources",
         action="store_true",

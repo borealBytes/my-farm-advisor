@@ -33,10 +33,10 @@ from lib.satellite_imagery import (  # noqa: E402
     sign_planetary_computer_href,
 )
 
-_REPO = Path(__file__).resolve().parents[3]
+_REPO = Path(__file__).resolve().parents[4]
 _SKILLS = _REPO / ".opencode" / "skills"
 _FIELD_INVENTORY = _REPO / os.environ.get(
-    "AG_INVENTORY_CSV", ".sisyphus/evidence/task-3-field-inventory.csv"
+    "AG_INVENTORY_CSV", "data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/manifests/field-inventory.csv"
 )
 _DEFAULT_GROWER = os.environ.get("AG_GROWER_SLUG", "iowa-demo-grower")
 _DEFAULT_FARM = os.environ.get("AG_FARM_SLUG", "iowa-demo-farm")

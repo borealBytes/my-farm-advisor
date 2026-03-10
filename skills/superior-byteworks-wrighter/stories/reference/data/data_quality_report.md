@@ -1,371 +1,263 @@
----
-title: Data Quality Report
-description: Comprehensive assessment of data quality dimensions, metrics, and remediation plans
-version: "1.0.0"
-compliance:
-  - DAMA-DMBOK
-  - ISO 8000
-author: Data Engineering Team
----
-
 # Data Quality Report
-
-<!-- Data quality assessment following DAMA-DMBOK framework -->
-
----
 
 ## Document Control
 
-| Field              | Value                     |
-| ------------------ | ------------------------- |
-| **Report ID**      | DQR-[YYYY]-[NNN]          |
-| **Version**        | [X.Y.Z]                   |
-| **Date**           | [YYYY-MM-DD]              |
-| **Author**         | [Name, Role]              |
-| **Reviewer**       | [Name, Role]              |
-| **Data Owner**     | [Name, Role]              |
-| **Status**         | Draft / Review / Approved |
-| **Classification** | Internal / Confidential   |
-
-> [!NOTE]
-> This report assesses data quality across six dimensions: accuracy, completeness, consistency, timeliness, validity, and uniqueness.
+| Field                | Value                        |
+| -------------------- | ---------------------------- |
+| **Document ID**      | DQR-001                      |
+| **Version**          | 1.0                          |
+| **Classification**   | Internal                     |
+| **Author**           | `[Author Name]`              |
+| **Reviewer**         | `[Reviewer Name]`            |
+| **Approver**         | `[Approver Name]`            |
+| **Reporting Period** | `YYYY-MM-DD` to `YYYY-MM-DD` |
+| **Created**          | `YYYY-MM-DD`                 |
+| **Status**           | Draft / Final                |
 
 ---
 
 ## Executive Summary
 
-### Assessment Overview
+This report presents the current state of data quality across enterprise data assets for the reporting period. Overall data health score is **`___%`** against a target of **95%**. Key findings and recommended actions are summarized below.
 
-| Metric               | Score | Target | Status   |
-| -------------------- | ----- | ------ | -------- |
-| Overall Data Quality | [X]%  | > 95%  | ✅/⚠️/❌ |
-| Critical Issues      | [N]   | 0      | ✅/⚠️/❌ |
-| High Priority Issues | [N]   | < 5    | ✅/⚠️/❌ |
-| Data Assets Assessed | [N]   | -      | -        |
+### Health Score Summary
 
-### Key Findings
-
-1. **[Finding 1]:** [Brief description and impact]
-2. **[Finding 2]:** [Brief description and impact]
-3. **[Finding 3]:** [Brief description and impact]
-
-### Recommendations
-
-1. [Recommendation 1 with priority]
-2. [Recommendation 2 with priority]
-3. [Recommendation 3 with priority]
+| Domain           | Score  | Target | Status                            |
+| ---------------- | ------ | ------ | --------------------------------- |
+| Customer Data    | `___%` | 95%    | `[On Track / At Risk / Critical]` |
+| Financial Data   | `___%` | 98%    | `[On Track / At Risk / Critical]` |
+| Product Data     | `___%` | 95%    | `[On Track / At Risk / Critical]` |
+| Operational Data | `___%` | 93%    | `[On Track / At Risk / Critical]` |
+| Marketing Data   | `___%` | 90%    | `[On Track / At Risk / Critical]` |
 
 ---
 
-## Scope & Methodology
+## Overall Data Health
 
-### Assessment Scope
-
-| Data Asset | Type            | Records | Owner  | Criticality  |
-| ---------- | --------------- | ------- | ------ | ------------ |
-| [Asset 1]  | [Table/Dataset] | [N]     | [Name] | High/Med/Low |
-| [Asset 2]  | [Table/Dataset] | [N]     | [Name] | High/Med/Low |
-| [Asset 3]  | [Table/Dataset] | [N]     | [Name] | High/Med/Low |
-
-### Quality Dimensions
+### Quality Score Distribution
 
 ```mermaid
-flowchart TB
-    accTitle: Data Quality Dimensions
-    accDescr: Six dimensions of data quality assessment
+pie showData
+    accTitle: Data Quality Score Distribution
+    accDescr: Pie chart showing percentage of datasets by quality tier
 
-    DQ[Data Quality]
-    DQ --> A[Accuracy]
-    DQ --> C[Completeness]
-    DQ --> CON[Consistency]
-    DQ --> T[Timeliness]
-    DQ --> V[Validity]
-    DQ --> U[Uniqueness]
-
-    A --> A1[Correct Values]
-    C --> C1[Missing Values]
-    CON --> CON1[Cross-System]
-    T --> T1[Freshness]
-    V --> V1[Format/Range]
-    U --> U1[Duplicates]
+    title Dataset Quality Distribution
+    "Excellent (>95%)" : 42
+    "Good (85-95%)" : 31
+    "Fair (70-85%)" : 18
+    "Poor (<70%)" : 9
 ```
 
-### Assessment Methodology
-
-1. **Automated Profiling:** [Tools used, e.g., Great Expectations, dbt tests]
-2. **Statistical Analysis:** [Methods applied]
-3. **Business Rule Validation:** [Rules checked]
-4. **Sampling:** [Sample size and method]
-
----
-
-## Data Quality Scores
-
-### Overall Quality Score
-
-$$\text{Data Quality Score} = \frac{\sum_{i=1}^{n} (w_i \times s_i)}{\sum_{i=1}^{n} w_i}$$
-
-Where:
-
-- $w_i$ = weight of dimension $i$
-- $s_i$ = score of dimension $i$
-- $n$ = number of dimensions
-
-```mermaid
-pie title Data Quality Score Distribution
-    "Accuracy" : 25
-    "Completeness" : 20
-    "Consistency" : 20
-    "Timeliness" : 15
-    "Validity" : 12
-    "Uniqueness" : 8
-```
-
-### Dimension Scores
-
-| Dimension    | Weight   | Score | Weighted | Status   |
-| ------------ | -------- | ----- | -------- | -------- |
-| Accuracy     | 25%      | [X]%  | [X]%     | ✅/⚠️/❌ |
-| Completeness | 20%      | [X]%  | [X]%     | ✅/⚠️/❌ |
-| Consistency  | 20%      | [X]%  | [X]%     | ✅/⚠️/❌ |
-| Timeliness   | 15%      | [X]%  | [X]%     | ✅/⚠️/❌ |
-| Validity     | 12%      | [X]%  | [X]%     | ✅/⚠️/❌ |
-| Uniqueness   | 8%       | [X]%  | [X]%     | ✅/⚠️/❌ |
-| **Overall**  | **100%** | -     | **[X]%** | ✅/⚠️/❌ |
-
----
-
-## Detailed Findings
-
-### 1. Accuracy
-
-**Definition:** Data correctly represents the real-world entity it describes.
-
-**Score:** [X]%
-
-| Check                     | Records Checked | Passed | Failed | Score |
-| ------------------------- | --------------- | ------ | ------ | ----- |
-| Reference data match      | [N]             | [N]    | [N]    | [X]%  |
-| Calculated field accuracy | [N]             | [N]    | [N]    | [X]%  |
-| Business rule compliance  | [N]             | [N]    | [N]    | [X]%  |
-
-**Issues:**
-
-| Issue     | Severity      | Records Affected | Root Cause |
-| --------- | ------------- | ---------------- | ---------- |
-| [Issue 1] | Critical/High | [N]              | [Cause]    |
-| [Issue 2] | Medium        | [N]              | [Cause]    |
-
-### 2. Completeness
-
-**Definition:** All required data elements are present.
-
-**Score:** [X]%
-
-| Field     | Null Rate | Target | Status   |
-| --------- | --------- | ------ | -------- |
-| [Field 1] | [X]%      | < 1%   | ✅/⚠️/❌ |
-| [Field 2] | [X]%      | < 5%   | ✅/⚠️/❌ |
-| [Field 3] | [X]%      | < 10%  | ✅/⚠️/❌ |
-
-**Completeness Formula:**
-
-$$\text{Completeness} = \frac{\text{Non-Null Values}}{\text{Total Records}} \times 100$$
-
-### 3. Consistency
-
-**Definition:** Data values are consistent across systems and time.
-
-**Score:** [X]%
-
-| Check                       | Systems | Matches | Mismatches | Score |
-| --------------------------- | ------- | ------- | ---------- | ----- |
-| Cross-system reconciliation | [N]     | [N]     | [N]        | [X]%  |
-| Temporal consistency        | [N]     | [N]     | [N]        | [X]%  |
-| Format consistency          | [N]     | [N]     | [N]        | [X]%  |
-
-### 4. Timeliness
-
-**Definition:** Data is available when needed and reflects current state.
-
-**Score:** [X]%
-
-| Data Asset | Update Frequency | Last Update | Latency   | Status   |
-| ---------- | ---------------- | ----------- | --------- | -------- |
-| [Asset 1]  | Hourly           | [Time]      | [X] min   | ✅/⚠️/❌ |
-| [Asset 2]  | Daily            | [Time]      | [X] hours | ✅/⚠️/❌ |
-| [Asset 3]  | Real-time        | [Time]      | [X] sec   | ✅/⚠️/❌ |
-
-### 5. Validity
-
-**Definition:** Data conforms to defined formats, types, and ranges.
-
-**Score:** [X]%
-
-| Rule          | Records Checked | Violations | Score |
-| ------------- | --------------- | ---------- | ----- |
-| Email format  | [N]             | [N]        | [X]%  |
-| Date range    | [N]             | [N]        | [X]%  |
-| Numeric range | [N]             | [N]        | [X]%  |
-| Enum values   | [N]             | [N]        | [X]%  |
-
-### 6. Uniqueness
-
-**Definition:** No unintended duplicate records exist.
-
-**Score:** [X]%
-
-| Entity     | Total Records | Unique | Duplicates | Score |
-| ---------- | ------------- | ------ | ---------- | ----- |
-| [Entity 1] | [N]           | [N]    | [N]        | [X]%  |
-| [Entity 2] | [N]           | [N]    | [N]        | [X]%  |
-
-**Duplicate Detection:**
-
-$$\text{Uniqueness} = \frac{\text{Unique Records}}{\text{Total Records}} \times 100$$
-
----
-
-## Issue Summary
-
-### Issue Breakdown
-
-```mermaid
-flowchart TB
-    accTitle: Data Quality Issues by Category
-    accDescr: Distribution of identified issues
-
-    subgraph Critical["Critical Issues"]
-        C1[Missing Primary Keys]
-        C2[Invalid Financial Data]
-    end
-
-    subgraph High["High Priority"]
-        H1[Stale Data]
-        H2[Format Inconsistencies]
-    end
-
-    subgraph Medium["Medium Priority"]
-        M1[Missing Optional Fields]
-        M2[Minor Duplicates]
-    end
-
-    subgraph Low["Low Priority"]
-        L1[Whitespace Issues]
-        L2[Case Inconsistencies]
-    end
-```
-
-### Issue Register
-
-| ID     | Description   | Dimension   | Severity | Records | Owner  | Due Date |
-| ------ | ------------- | ----------- | -------- | ------- | ------ | -------- |
-| DQ-001 | [Description] | [Dimension] | Critical | [N]     | [Name] | [Date]   |
-| DQ-002 | [Description] | [Dimension] | High     | [N]     | [Name] | [Date]   |
-| DQ-003 | [Description] | [Dimension] | Medium   | [N]     | [Name] | [Date]   |
-
----
-
-## Root Cause Analysis
-
-### Common Causes
-
-| Cause Category | Count | % of Issues | Examples   |
-| -------------- | ----- | ----------- | ---------- |
-| Source System  | [N]   | [X]%        | [Examples] |
-| ETL Process    | [N]   | [X]%        | [Examples] |
-| User Input     | [N]   | [X]%        | [Examples] |
-| Integration    | [N]   | [X]%        | [Examples] |
-| Unknown        | [N]   | [X]%        | [Examples] |
-
-### 5 Whys Example
-
-**Problem:** [Specific data quality issue]
-
-1. **Why:** [Answer]
-2. **Why:** [Answer]
-3. **Why:** [Answer]
-4. **Why:** [Answer]
-5. **Why:** [Root cause]
-
----
-
-## Remediation Plan
-
-### Immediate Actions (This Week)
-
-| Action     | Owner  | Priority | Due Date | Status |
-| ---------- | ------ | -------- | -------- | ------ |
-| [Action 1] | [Name] | P0       | [Date]   | ⬜     |
-| [Action 2] | [Name] | P0       | [Date]   | ⬜     |
-
-### Short-term Actions (This Month)
-
-| Action     | Owner  | Priority | Due Date | Status |
-| ---------- | ------ | -------- | -------- | ------ |
-| [Action 1] | [Name] | P1       | [Date]   | ⬜     |
-| [Action 2] | [Name] | P1       | [Date]   | ⬜     |
-
-### Long-term Improvements (This Quarter)
-
-| Action     | Owner  | Priority | Due Date | Status |
-| ---------- | ------ | -------- | -------- | ------ |
-| [Action 1] | [Name] | P2       | [Date]   | ⬜     |
-| [Action 2] | [Name] | P2       | [Date]   | ⬜     |
-
----
-
-## Monitoring & Governance
-
-### Quality Rules
-
-| Rule     | Description   | Threshold   | Alert     |
-| -------- | ------------- | ----------- | --------- |
-| [Rule 1] | [Description] | [Threshold] | [Channel] |
-| [Rule 2] | [Description] | [Threshold] | [Channel] |
-
-### Data Quality Dashboard
+### Quality Trend (6-Month)
 
 ```mermaid
 xychart-beta
-    title "Data Quality Trend"
-    x-axis [Week 1, Week 2, Week 3, Week 4, Week 5, Week 6]
-    y-axis "Quality Score %" 80 --> 100
-    line [85, 87, 89, 92, 94, 95]
+    accTitle: Data Quality Trend Over 6 Months
+    accDescr: Line chart showing monthly quality scores across dimensions
+
+    title "Quality Score Trend"
+    x-axis ["Oct", "Nov", "Dec", "Jan", "Feb", "Mar"]
+    y-axis "Score (%)" 70 --> 100
+    line "Accuracy" [92, 93, 91, 94, 95, 96]
+    line "Completeness" [88, 89, 90, 91, 92, 93]
+    line "Consistency" [85, 86, 88, 89, 90, 91]
+    line "Timeliness" [95, 94, 96, 95, 97, 97]
 ```
 
-### Review Schedule
+---
 
-| Review Type     | Frequency | Owner            |
-| --------------- | --------- | ---------------- |
-| Quality Metrics | Daily     | Data Engineering |
-| Quality Report  | Weekly    | Data Steward     |
-| Quality Review  | Monthly   | Data Governance  |
+## Quality by Dimension
+
+### Accuracy
+
+| Dataset             | Records Checked | Accurate | Inaccurate | Score  | Trend     |
+| ------------------- | --------------- | -------- | ---------- | ------ | --------- |
+| Customer Profiles   | `___`           | `___`    | `___`      | `___%` | `[arrow]` |
+| Transaction Records | `___`           | `___`    | `___`      | `___%` | `[arrow]` |
+| Product Catalog     | `___`           | `___`    | `___`      | `___%` | `[arrow]` |
+| Employee Records    | `___`           | `___`    | `___`      | `___%` | `[arrow]` |
+
+### Completeness
+
+| Dataset             | Total Fields | Populated | Missing | Score  | Trend     |
+| ------------------- | ------------ | --------- | ------- | ------ | --------- |
+| Customer Profiles   | `___`        | `___`     | `___`   | `___%` | `[arrow]` |
+| Transaction Records | `___`        | `___`     | `___`   | `___%` | `[arrow]` |
+| Product Catalog     | `___`        | `___`     | `___`   | `___%` | `[arrow]` |
+| Employee Records    | `___`        | `___`     | `___`   | `___%` | `[arrow]` |
+
+### Completeness Breakdown
+
+```mermaid
+pie showData
+    accTitle: Missing Data Distribution by Category
+    accDescr: Pie chart showing which data categories have the most missing fields
+
+    title Missing Data by Category
+    "Contact Information" : 35
+    "Address Fields" : 25
+    "Demographic Data" : 20
+    "Preference Settings" : 12
+    "Optional Fields" : 8
+```
+
+### Consistency
+
+| Cross-System Check | System A | System B | Matches | Mismatches | Score  |
+| ------------------ | -------- | -------- | ------- | ---------- | ------ |
+| Customer ID        | CRM      | Billing  | `___`   | `___`      | `___%` |
+| Product Price      | Catalog  | POS      | `___`   | `___`      | `___%` |
+| Employee Status    | HR       | Payroll  | `___`   | `___`      | `___%` |
+| Order Total        | Orders   | Finance  | `___`   | `___`      | `___%` |
+
+### Timeliness
+
+| Pipeline          | SLA         | Avg Delivery | SLA Breaches | Score  |
+| ----------------- | ----------- | ------------ | ------------ | ------ |
+| Customer Sync     | 15 min      | `___ min`    | `___`        | `___%` |
+| Transaction Load  | 1 hour      | `___ min`    | `___`        | `___%` |
+| Daily Aggregation | 6:00 AM     | `___`        | `___`        | `___%` |
+| Weekly Reports    | Monday 9 AM | `___`        | `___`        | `___%` |
+
+### Uniqueness
+
+| Dataset         | Total Records | Unique Records | Duplicates | Score  |
+| --------------- | ------------- | -------------- | ---------- | ------ |
+| Customer Master | `___`         | `___`          | `___`      | `___%` |
+| Product SKUs    | `___`         | `___`          | `___`      | `___%` |
+| Contact List    | `___`         | `___`          | `___`      | `___%` |
+| Transaction Log | `___`         | `___`          | `___`      | `___%` |
+
+### Duplicate Distribution
+
+```mermaid
+pie showData
+    accTitle: Duplicate Record Distribution
+    accDescr: Pie chart showing source of duplicate records across systems
+
+    title Duplicate Records by Source
+    "CRM Import" : 40
+    "Manual Entry" : 28
+    "Migration Artifacts" : 18
+    "API Sync Issues" : 14
+```
 
 ---
 
-## Appendices
+## Data Quality Rules
 
-### A. Data Profiling Results
+### Rule Execution Summary
 
-[Detailed profiling statistics]
+| Rule Category         | Total Rules | Passed | Failed | Error | Pass Rate |
+| --------------------- | ----------- | ------ | ------ | ----- | --------- |
+| Schema Validation     | `___`       | `___`  | `___`  | `___` | `___%`    |
+| Business Logic        | `___`       | `___`  | `___`  | `___` | `___%`    |
+| Referential Integrity | `___`       | `___`  | `___`  | `___` | `___%`    |
+| Range/Format Checks   | `___`       | `___`  | `___`  | `___` | `___%`    |
+| Freshness Checks      | `___`       | `___`  | `___`  | `___` | `___%`    |
 
-### B. Test Results
+### Quality Rule Processing
 
-[Detailed test execution results]
+```mermaid
+flowchart LR
+    accTitle: Quality Rule Processing Flow
+    accDescr: How data quality rules are executed and results handled
 
-### C. Sample Issues
-
-[Examples of data quality issues found]
+    A["Schedule<br/>Trigger"] --> B["Load<br/>Dataset"]
+    B --> C["Execute<br/>Rules"]
+    C --> D{"All<br/>Pass?"}
+    D -->|Yes| E["Publish<br/>Dataset"]
+    D -->|No| F["Quarantine<br/>Records"]
+    F --> G["Notify<br/>Steward"]
+    G --> H["Remediate"]
+    H --> C
+    E --> I["Update<br/>Scorecard"]
+```
 
 ---
 
-_Last updated: [Date]_
+## Top Issues
+
+### Critical Issues (Requiring Immediate Action)
+
+| ID     | Issue           | Domain     | Impact     | Root Cause | Owner     | Due Date     |
+| ------ | --------------- | ---------- | ---------- | ---------- | --------- | ------------ |
+| DQ-001 | `[Description]` | `[Domain]` | `[Impact]` | `[Cause]`  | `[Owner]` | `YYYY-MM-DD` |
+| DQ-002 | `[Description]` | `[Domain]` | `[Impact]` | `[Cause]`  | `[Owner]` | `YYYY-MM-DD` |
+| DQ-003 | `[Description]` | `[Domain]` | `[Impact]` | `[Cause]`  | `[Owner]` | `YYYY-MM-DD` |
+
+### Issue Category Distribution
+
+```mermaid
+pie showData
+    accTitle: Issue Category Distribution
+    accDescr: Pie chart showing breakdown of data quality issues by root cause category
+
+    title Issues by Root Cause
+    "Source System Bug" : 30
+    "ETL Logic Error" : 25
+    "Schema Drift" : 20
+    "Manual Entry Error" : 15
+    "Third-Party Data" : 10
+```
 
 ---
 
-## See Also
+## Remediation Tracker
 
-- [ETL Specification](./etl_spec.md) — Data pipeline documentation
-- [Data Lineage](./data_lineage.md) — Data flow documentation
-- [Data Governance Framework](./data_governance_framework.md) — Governance policies
+| Issue ID | Description     | Status      | Owner     | Target Date  | Progress |
+| -------- | --------------- | ----------- | --------- | ------------ | -------- |
+| DQ-001   | `[Description]` | Open        | `[Owner]` | `YYYY-MM-DD` | 0%       |
+| DQ-002   | `[Description]` | In Progress | `[Owner]` | `YYYY-MM-DD` | 50%      |
+| DQ-003   | `[Description]` | Resolved    | `[Owner]` | `YYYY-MM-DD` | 100%     |
+
+---
+
+## Recommendations
+
+### Immediate Actions (0-30 Days)
+
+1. `[Action item with specific owner and deadline]`
+2. `[Action item with specific owner and deadline]`
+3. `[Action item with specific owner and deadline]`
+
+### Medium-Term Improvements (30-90 Days)
+
+1. `[Action item with specific owner and deadline]`
+2. `[Action item with specific owner and deadline]`
+
+### Long-Term Initiatives (90+ Days)
+
+1. `[Action item with specific owner and deadline]`
+2. `[Action item with specific owner and deadline]`
+
+---
+
+## Appendix: Monitoring Dashboard Specifications
+
+| Metric           | Visualization | Refresh   | Alert Threshold |
+| ---------------- | ------------- | --------- | --------------- |
+| Overall DQ Score | Gauge chart   | Hourly    | < 90%           |
+| Rule Pass Rate   | Time series   | Hourly    | < 95%           |
+| Duplicate Rate   | Trend line    | Daily     | > 2%            |
+| SLA Compliance   | Heatmap       | Real-time | < 99%           |
+| Issue Backlog    | Stacked bar   | Daily     | > 10 open       |
+
+---
+
+## Approval & Sign-Off
+
+| Role                  | Name              | Signature         | Date         |
+| --------------------- | ----------------- | ----------------- | ------------ |
+| Data Quality Lead     | `_______________` | `_______________` | `YYYY-MM-DD` |
+| Domain Steward        | `_______________` | `_______________` | `YYYY-MM-DD` |
+| Data Engineering Lead | `_______________` | `_______________` | `YYYY-MM-DD` |
+
+---
+
+## Revision History
+
+| Version | Date         | Author     | Changes       |
+| ------- | ------------ | ---------- | ------------- |
+| 0.1     | `YYYY-MM-DD` | `[Author]` | Initial draft |
+| 1.0     | `YYYY-MM-DD` | `[Author]` | Final report  |

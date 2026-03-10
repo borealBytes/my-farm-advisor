@@ -7,17 +7,29 @@ import os
 import sys
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
-DATA_ROOT = REPO_ROOT / "data"
+REPO_ROOT = Path(__file__).resolve().parents[3]
+DATA_ROOT = REPO_ROOT / "data" / "moltbot"
 DEFAULT_GROWER = os.environ.get("AG_GROWER_SLUG", "iowa-demo-grower")
 DEFAULT_FARM = os.environ.get("AG_FARM_SLUG", "iowa-demo-farm")
 DEFAULT_INVENTORY = Path(
-    os.environ.get("AG_INVENTORY_CSV", ".sisyphus/evidence/task-3-field-inventory.csv")
+    os.environ.get(
+        "AG_INVENTORY_CSV",
+        f"data/moltbot/growers/{DEFAULT_GROWER}/farms/{DEFAULT_FARM}/manifests/field-inventory.csv",
+    )
 )
 
 
 def ensure_skill_path(skill_name: str) -> Path:
-    skill_path = REPO_ROOT / ".opencode" / "skills" / skill_name / "src"
+    direct = REPO_ROOT / "skills" / "my-farm-advisor" / skill_name / "src"
+    if direct.exists():
+        skill_path = direct
+    else:
+        matches = sorted(
+            (REPO_ROOT / "skills" / "my-farm-advisor").glob(f"**/{skill_name}/src")
+        )
+        if not matches:
+            raise FileNotFoundError(f"Skill source path not found for '{skill_name}'")
+        skill_path = matches[0]
     resolved = str(skill_path)
     if resolved not in sys.path:
         sys.path.insert(0, resolved)
@@ -28,7 +40,9 @@ def farm_root(grower_slug: str = DEFAULT_GROWER, farm_slug: str = DEFAULT_FARM) 
     return DATA_ROOT / "growers" / grower_slug / "farms" / farm_slug
 
 
-def fields_root(grower_slug: str = DEFAULT_GROWER, farm_slug: str = DEFAULT_FARM) -> Path:
+def fields_root(
+    grower_slug: str = DEFAULT_GROWER, farm_slug: str = DEFAULT_FARM
+) -> Path:
     return farm_root(grower_slug, farm_slug) / "fields"
 
 
@@ -121,8 +135,12 @@ def ensure_canonical_field_artifacts(
         },
         overwrite=False,
     )
-    _write_json(base / "boundary" / "field_boundary.geojson", field_geojson, overwrite=False)
-    _write_json(base / "soil" / "ssurgo_soil_types.geojson", field_geojson, overwrite=False)
+    _write_json(
+        base / "boundary" / "field_boundary.geojson", field_geojson, overwrite=False
+    )
+    _write_json(
+        base / "soil" / "ssurgo_soil_types.geojson", field_geojson, overwrite=False
+    )
     _write_text(
         base / "weather" / "daily_weather.csv",
         "field_id,date,T2M,T2M_MAX,T2M_MIN,PRECTOTCORR,ALLSKY_SFC_SW_DWN,RH2M,WS10M\n",
@@ -186,27 +204,57 @@ def ensure_canonical_data_tree(
     inventory_path: Path | None = None,
 ) -> list[str]:
     (DATA_ROOT / "shared" / "weather").mkdir(parents=True, exist_ok=True)
-    (DATA_ROOT / "shared" / "geoadmin" / "l0_countries" / "raw").mkdir(parents=True, exist_ok=True)
-    (DATA_ROOT / "shared" / "geoadmin" / "l1_states" / "raw").mkdir(parents=True, exist_ok=True)
-    (DATA_ROOT / "shared" / "geoadmin" / "l2_counties" / "raw").mkdir(parents=True, exist_ok=True)
-    (DATA_ROOT / "shared" / "corn_maturity" / "tables").mkdir(parents=True, exist_ok=True)
-    (DATA_ROOT / "shared" / "corn_maturity" / "reports").mkdir(parents=True, exist_ok=True)
-    (DATA_ROOT / "shared" / "corn_maturity" / "metadata").mkdir(parents=True, exist_ok=True)
-    (DATA_ROOT / "shared" / "corn_maturity" / "manifests").mkdir(parents=True, exist_ok=True)
+    (DATA_ROOT / "shared" / "geoadmin" / "l0_countries" / "raw").mkdir(
+        parents=True, exist_ok=True
+    )
+    (DATA_ROOT / "shared" / "geoadmin" / "l1_states" / "raw").mkdir(
+        parents=True, exist_ok=True
+    )
+    (DATA_ROOT / "shared" / "geoadmin" / "l2_counties" / "raw").mkdir(
+        parents=True, exist_ok=True
+    )
+    (DATA_ROOT / "shared" / "corn_maturity" / "tables").mkdir(
+        parents=True, exist_ok=True
+    )
+    (DATA_ROOT / "shared" / "corn_maturity" / "reports").mkdir(
+        parents=True, exist_ok=True
+    )
+    (DATA_ROOT / "shared" / "corn_maturity" / "metadata").mkdir(
+        parents=True, exist_ok=True
+    )
+    (DATA_ROOT / "shared" / "corn_maturity" / "manifests").mkdir(
+        parents=True, exist_ok=True
+    )
     (DATA_ROOT / "shared" / "corn_maturity" / "logs").mkdir(parents=True, exist_ok=True)
-    (DATA_ROOT / "shared" / "soybean_maturity" / "tables").mkdir(parents=True, exist_ok=True)
-    (DATA_ROOT / "shared" / "soybean_maturity" / "reports").mkdir(parents=True, exist_ok=True)
-    (DATA_ROOT / "shared" / "soybean_maturity" / "metadata").mkdir(parents=True, exist_ok=True)
-    (DATA_ROOT / "shared" / "soybean_maturity" / "manifests").mkdir(parents=True, exist_ok=True)
-    (DATA_ROOT / "shared" / "soybean_maturity" / "logs").mkdir(parents=True, exist_ok=True)
+    (DATA_ROOT / "shared" / "soybean_maturity" / "tables").mkdir(
+        parents=True, exist_ok=True
+    )
+    (DATA_ROOT / "shared" / "soybean_maturity" / "reports").mkdir(
+        parents=True, exist_ok=True
+    )
+    (DATA_ROOT / "shared" / "soybean_maturity" / "metadata").mkdir(
+        parents=True, exist_ok=True
+    )
+    (DATA_ROOT / "shared" / "soybean_maturity" / "manifests").mkdir(
+        parents=True, exist_ok=True
+    )
+    (DATA_ROOT / "shared" / "soybean_maturity" / "logs").mkdir(
+        parents=True, exist_ok=True
+    )
     (DATA_ROOT / "shared" / "cdl" / "metadata").mkdir(parents=True, exist_ok=True)
     (DATA_ROOT / "shared" / "cdl" / "rasters").mkdir(parents=True, exist_ok=True)
     (DATA_ROOT / "shared" / "cdl" / "derived").mkdir(parents=True, exist_ok=True)
-    (DATA_ROOT / "shared" / "cdl" / "derived" / "tables").mkdir(parents=True, exist_ok=True)
-    (DATA_ROOT / "shared" / "cdl" / "derived" / "reports").mkdir(parents=True, exist_ok=True)
+    (DATA_ROOT / "shared" / "cdl" / "derived" / "tables").mkdir(
+        parents=True, exist_ok=True
+    )
+    (DATA_ROOT / "shared" / "cdl" / "derived" / "reports").mkdir(
+        parents=True, exist_ok=True
+    )
     (DATA_ROOT / "shared" / "cdl" / "manifests").mkdir(parents=True, exist_ok=True)
     (DATA_ROOT / "shared" / "cdl" / "logs").mkdir(parents=True, exist_ok=True)
-    (DATA_ROOT / "shared" / "reference" / "crop_codes").mkdir(parents=True, exist_ok=True)
+    (DATA_ROOT / "shared" / "reference" / "crop_codes").mkdir(
+        parents=True, exist_ok=True
+    )
     (DATA_ROOT / "shared" / "reference" / "units").mkdir(parents=True, exist_ok=True)
     (DATA_ROOT / "shared" / "reference" / "schemas").mkdir(parents=True, exist_ok=True)
     (DATA_ROOT / "shared" / "manifests").mkdir(parents=True, exist_ok=True)

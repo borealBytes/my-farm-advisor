@@ -15,7 +15,7 @@ python scripts/rebuild_data_folder.py \
 ## Deterministic behavior
 
 - Sorts input boundaries by `field_id`.
-- Writes stable slug mapping to `.sisyphus/evidence/task-3-field-inventory.csv`.
+- Writes stable slug mapping to `data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/manifests/field-inventory.csv`.
 - Uses fixed canonical output locations.
 - Verifies required files per field before reporting success.
 

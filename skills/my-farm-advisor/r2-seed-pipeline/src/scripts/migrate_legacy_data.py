@@ -5,7 +5,7 @@ import argparse
 import shutil
 from pathlib import Path
 
-_REPO = Path(__file__).resolve().parents[2]
+_REPO = Path(__file__).resolve().parents[3]
 _DATA = _REPO / "data"
 
 _LEGACY_ROOTS = {
@@ -80,7 +80,13 @@ def migrate(delete_legacy: bool = False) -> None:
 
     soil_copied, soil_existing = _copy_tree(
         _LEGACY_ROOTS["soil"],
-        _DATA / "growers" / "iowa-demo-grower" / "farms" / "iowa-demo-farm" / "derived" / "tables",
+        _DATA
+        / "growers"
+        / "iowa-demo-grower"
+        / "farms"
+        / "iowa-demo-farm"
+        / "derived"
+        / "tables",
     )
     print(f"Soil table backfill: copied={soil_copied} existing={soil_existing}")
 
@@ -112,7 +118,13 @@ def migrate(delete_legacy: bool = False) -> None:
 
     weather_copied, weather_existing = _copy_tree(
         _LEGACY_ROOTS["weather"],
-        _DATA / "growers" / "iowa-demo-grower" / "farms" / "iowa-demo-farm" / "derived" / "tables",
+        _DATA
+        / "growers"
+        / "iowa-demo-grower"
+        / "farms"
+        / "iowa-demo-farm"
+        / "derived"
+        / "tables",
     )
     print(f"Weather backfill: copied={weather_copied} existing={weather_existing}")
 
@@ -131,9 +143,13 @@ def migrate(delete_legacy: bool = False) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Backfill legacy data roots into canonical roots")
+    parser = argparse.ArgumentParser(
+        description="Backfill legacy data roots into canonical roots"
+    )
     parser.add_argument(
-        "--delete-legacy", action="store_true", help="Delete legacy roots after backfill"
+        "--delete-legacy",
+        action="store_true",
+        help="Delete legacy roots after backfill",
     )
     args = parser.parse_args()
     migrate(delete_legacy=args.delete_legacy)

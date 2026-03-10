@@ -16,7 +16,7 @@ import pandas as pd
 import requests
 
 _SCRIPTS_DIR = Path(__file__).resolve().parent.parent
-_REPO_ROOT = _SCRIPTS_DIR.parents[1]
+_REPO_ROOT = _SCRIPTS_DIR.parents[2]
 sys.path.insert(0, str(_SCRIPTS_DIR))
 sys.path.insert(0, str(_SCRIPTS_DIR / "lib"))
 
@@ -106,7 +106,9 @@ def _query_grid_weather(
             dates = list(parameter_data[parameters[0]].keys())
             records: list[dict[str, object]] = []
             for date_key in dates:
-                record: dict[str, object] = {"date": pd.to_datetime(date_key, format="%Y%m%d")}
+                record: dict[str, object] = {
+                    "date": pd.to_datetime(date_key, format="%Y%m%d")
+                }
                 for parameter in parameters:
                     value = parameter_data.get(parameter, {}).get(date_key, -999.0)
                     record[parameter] = None if value == -999.0 else value
@@ -135,12 +137,16 @@ def _query_grid_weather(
             ]
             if request_delay > 0:
                 time.sleep(request_delay)
-            return str(grid_row["grid_key"]), cast(pd.DataFrame, weather[ordered_columns].copy())
+            return str(grid_row["grid_key"]), cast(
+                pd.DataFrame, weather[ordered_columns].copy()
+            )
         except Exception as exc:  # requests errors bubble here
             last_error = exc
             if attempt + 1 < retries:
                 backoff = (
-                    max(request_delay, 1.0) * (5 if "429" in str(exc) else 1.5) * (attempt + 1)
+                    max(request_delay, 1.0)
+                    * (5 if "429" in str(exc) else 1.5)
+                    * (attempt + 1)
                 )
                 time.sleep(backoff)
 
@@ -154,7 +160,9 @@ def _assign_power_grid(county_lookup: pd.DataFrame) -> pd.DataFrame:
     lookup["grid_lat"] = (lookup["centroid_lat"] / 0.5).round() * 0.5
     lookup["grid_lon"] = (lookup["centroid_lon"] / 0.625).round() * 0.625
     lookup["grid_key"] = (
-        lookup["grid_lat"].map("{:.3f}".format) + ":" + lookup["grid_lon"].map("{:.3f}".format)
+        lookup["grid_lat"].map("{:.3f}".format)
+        + ":"
+        + lookup["grid_lon"].map("{:.3f}".format)
     )
     return cast(pd.DataFrame, lookup)
 
@@ -181,13 +189,15 @@ def _build_lower48_county_weather(
     if completed_grid_keys:
         grid_lookup = cast(
             pd.DataFrame,
-            grid_lookup[~grid_lookup["grid_key"].isin(sorted(completed_grid_keys))].reset_index(
-                drop=True
-            ),
+            grid_lookup[
+                ~grid_lookup["grid_key"].isin(sorted(completed_grid_keys))
+            ].reset_index(drop=True),
         )
         scoped_lookup = cast(
             pd.DataFrame,
-            scoped_lookup[~scoped_lookup["grid_key"].isin(sorted(completed_grid_keys))].copy(),
+            scoped_lookup[
+                ~scoped_lookup["grid_key"].isin(sorted(completed_grid_keys))
+            ].copy(),
         )
     grids = cast(list[dict[str, object]], grid_lookup.to_dict(orient="records"))
     frames: list[pd.DataFrame] = []
@@ -226,7 +236,9 @@ def _build_lower48_county_weather(
     grid_weather = cast(pd.DataFrame, pd.concat(frames, ignore_index=True))
     county_weather = cast(
         pd.DataFrame,
-        scoped_lookup.merge(grid_weather, on=["grid_key", "grid_lat", "grid_lon"], how="inner"),
+        scoped_lookup.merge(
+            grid_weather, on=["grid_key", "grid_lat", "grid_lon"], how="inner"
+        ),
     )
     county_weather["field_count"] = 0
     county_weather = cast(
@@ -269,7 +281,9 @@ def _build_field_mapped_county_weather(
     farm_table_path = _paths_module().farm_table_path
     aggregate_weather_to_counties = _maturity_module().aggregate_weather_to_counties
     weather_csv = farm_weather_path(grower_slug, farm_slug, 2021, 2025)
-    field_fips_path = farm_table_path(grower_slug, farm_slug, "field_fips_mapping.parquet")
+    field_fips_path = farm_table_path(
+        grower_slug, farm_slug, "field_fips_mapping.parquet"
+    )
     weather = pd.read_csv(weather_csv, parse_dates=["date"])
     mapping = pd.read_parquet(field_fips_path)
     return aggregate_weather_to_counties(weather, mapping)
@@ -285,7 +299,9 @@ def main() -> int:
 
     shared_geoadmin_counties_dir = _paths_module().shared_geoadmin_counties_dir
     shared_weather_county_table_path = _paths_module().shared_weather_county_table_path
-    build_county_weather_coverage_summary = _maturity_module().build_county_weather_coverage_summary
+    build_county_weather_coverage_summary = (
+        _maturity_module().build_county_weather_coverage_summary
+    )
     county_lookup_for_scope = _maturity_module().county_lookup_for_scope
 
     table_path = shared_weather_county_table_path(
@@ -294,7 +310,9 @@ def main() -> int:
     summary_path = shared_weather_county_table_path(
         args.weather_source, args.year, "county_weather_coverage_summary.json"
     )
-    county_lookup = pd.read_parquet(shared_geoadmin_counties_dir() / "fips_lookup.parquet")
+    county_lookup = pd.read_parquet(
+        shared_geoadmin_counties_dir() / "fips_lookup.parquet"
+    )
     scoped_lookup = county_lookup_for_scope(county_lookup, args.coverage)
     existing_weather = pd.DataFrame()
     completed_grid_keys: set[str] = set()
@@ -314,7 +332,9 @@ def main() -> int:
                 ].copy(),
             )
             if not completed_lookup.empty:
-                completed_grid_keys = set(_assign_power_grid(completed_lookup)["grid_key"])
+                completed_grid_keys = set(
+                    _assign_power_grid(completed_lookup)["grid_key"]
+                )
 
     if args.coverage in {"traditional-corn-belt", "lower48"}:
         county_weather_new, failure_count, total_grid_count, queried_grid_count = (
@@ -367,7 +387,9 @@ def main() -> int:
 
     table_path.parent.mkdir(parents=True, exist_ok=True)
     county_weather.to_parquet(table_path, index=False)
-    summary_path.write_text(json.dumps(coverage_summary, indent=2) + "\n", encoding="utf-8")
+    summary_path.write_text(
+        json.dumps(coverage_summary, indent=2) + "\n", encoding="utf-8"
+    )
 
     print(
         json.dumps(
@@ -379,7 +401,9 @@ def main() -> int:
                 "coverage_summary_path": _repo_relative(summary_path),
                 "row_count": int(len(county_weather)),
                 "county_count_covered": int(coverage_summary["county_count_covered"]),
-                "county_count_uncovered": int(coverage_summary["county_count_uncovered"]),
+                "county_count_uncovered": int(
+                    coverage_summary["county_count_uncovered"]
+                ),
                 "grid_cell_count_total": int(total_grid_count),
                 "grid_cell_count_queried": int(queried_grid_count),
                 "request_failure_count": int(coverage_summary["request_failure_count"]),

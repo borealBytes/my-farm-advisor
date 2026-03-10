@@ -49,7 +49,7 @@ def main():
     farm_slug = os.environ.get("AG_FARM_SLUG", "iowa-demo-farm")
     boundary_source_env = os.environ.get("AG_BOUNDARIES")
     inventory_path = Path(
-        os.environ.get("AG_INVENTORY_CSV", ".sisyphus/evidence/task-3-field-inventory.csv")
+        os.environ.get("AG_INVENTORY_CSV", "data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/manifests/field-inventory.csv")
     )
     ensure_canonical_data_tree(
         grower_slug=grower_slug, farm_slug=farm_slug, inventory_path=inventory_path

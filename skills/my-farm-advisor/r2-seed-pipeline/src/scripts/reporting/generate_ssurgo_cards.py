@@ -16,10 +16,10 @@ import pandas as pd
 
 matplotlib.use("Agg")
 
-_REPO = Path(__file__).resolve().parents[3]
+_REPO = Path(__file__).resolve().parents[4]
 _SKILLS = _REPO / ".opencode" / "skills"
-_SCRIPTS = _REPO / "data" / "scripts"
-_LIB = _REPO / "data" / "scripts" / "lib"
+_SCRIPTS = _REPO / "data" / "moltbot" / "scripts"
+_LIB = _REPO / "data" / "moltbot" / "scripts" / "lib"
 
 sys.path.insert(0, str(_SKILLS / "farm-intelligence-reporting" / "src"))
 sys.path.insert(0, str(_SCRIPTS))

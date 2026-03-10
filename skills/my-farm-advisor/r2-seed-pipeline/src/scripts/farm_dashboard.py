@@ -22,14 +22,22 @@ import rasterio
 from rasterstats import zonal_stats
 
 SCRIPTS_DIR = Path(__file__).resolve().parent
-REPO_ROOT = SCRIPTS_DIR.parents[1]
+REPO_ROOT = SCRIPTS_DIR.parents[2]
 sys.path.insert(0, str(SCRIPTS_DIR))
 sys.path.insert(0, str(SCRIPTS_DIR / "lib"))
 
 from naming import field_slug_from_id
 from paths import farm_boundary_path, shared_cdl_raster_dir
 
-COUNTIES_PATH = REPO_ROOT / "data" / "shared" / "geoadmin" / "l2_counties" / "counties_usa.geojson"
+COUNTIES_PATH = (
+    REPO_ROOT
+    / "data"
+    / "moltbot"
+    / "shared"
+    / "geoadmin"
+    / "l2_counties"
+    / "counties_usa.geojson"
+)
 NON_CONTIGUOUS = {"02", "15", "60", "66", "69", "72", "78"}
 CROP_CODE = {"corn": 1, "soybeans": 5, "wheat": 24, "cotton": 2}
 
@@ -41,7 +49,14 @@ def _run(command: list[str]) -> None:
 def _ensure_counties() -> None:
     if COUNTIES_PATH.exists():
         return
-    _run(["python", "data/moltbot/scripts/ingest/download_geoadmin.py", "--levels", "l2_counties"])
+    _run(
+        [
+            "python",
+            "data/moltbot/scripts/ingest/download_geoadmin.py",
+            "--levels",
+            "l2_counties",
+        ]
+    )
 
 
 def _load_counties() -> gpd.GeoDataFrame:
@@ -75,9 +90,13 @@ def _download_cdl_if_missing(year: int, state_fips: str) -> Path:
     )
 
 
-def _top_crop_county_in_state(*, state_fips: str, crop: str, year: int) -> dict[str, str]:
+def _top_crop_county_in_state(
+    *, state_fips: str, crop: str, year: int
+) -> dict[str, str]:
     counties = _load_counties()
-    state = counties[counties["state_fips"].astype(str).str.zfill(2) == state_fips.zfill(2)].copy()
+    state = counties[
+        counties["state_fips"].astype(str).str.zfill(2) == state_fips.zfill(2)
+    ].copy()
     if state.empty:
         raise ValueError(f"No counties found for state_fips={state_fips}")
 
@@ -107,7 +126,9 @@ def _top_crop_county_in_state(*, state_fips: str, crop: str, year: int) -> dict[
 
     ranked.sort(key=lambda item: (item[0], item[1]), reverse=True)
     if not ranked or ranked[0][0] <= 0:
-        raise RuntimeError(f"No county had crop code for {crop} in state_fips={state_fips}")
+        raise RuntimeError(
+            f"No county had crop code for {crop} in state_fips={state_fips}"
+        )
     _, county_fips, state_code, county_name = ranked[0]
     return {"fips": county_fips, "state_fips": state_code, "county_name": county_name}
 
@@ -140,7 +161,9 @@ def _resolve_counties_from_fips(
         value_set = {code.strip().lower() for code in fips_codes if code.strip()}
         if value_set and not ({"us", "usa", "lower48", "lower-48"} & value_set):
             raise ValueError("For l0, use one of: us, usa, lower48, lower-48")
-        frame = frame[~frame["state_fips"].astype(str).str.zfill(2).isin(NON_CONTIGUOUS)].copy()
+        frame = frame[
+            ~frame["state_fips"].astype(str).str.zfill(2).isin(NON_CONTIGUOUS)
+        ].copy()
     else:
         raise ValueError(f"Unsupported fips level: {fips_level}")
 
@@ -171,7 +194,17 @@ def _field_allocation(total_fields: int, county_count: int) -> list[int]:
 
 
 def _inventory_path_for_farm(farm_slug: str) -> Path:
-    return REPO_ROOT / ".sisyphus" / "evidence" / f"{farm_slug}-field-inventory.csv"
+    return (
+        REPO_ROOT
+        / "data"
+        / "moltbot"
+        / "growers"
+        / grower_slug
+        / "farms"
+        / farm_slug
+        / "manifests"
+        / "field-inventory.csv"
+    )
 
 
 def _run_bootstrap_for_counties(
@@ -315,7 +348,7 @@ def _ensure_inventory_for_boundary(boundary_path: Path, inventory_path: Path) ->
 def _discover_farms(
     scope: str, grower_slug: str | None, farm_slug: str | None
 ) -> list[dict[str, str]]:
-    growers_root = REPO_ROOT / "data" / "growers"
+    growers_root = REPO_ROOT / "data" / "moltbot" / "growers"
     farms: list[dict[str, str]] = []
     for grower_dir in sorted(growers_root.glob("*")):
         if not grower_dir.is_dir():
@@ -373,7 +406,9 @@ def refresh_command(args: argparse.Namespace) -> None:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Create or refresh farm intelligence dashboards")
+    parser = argparse.ArgumentParser(
+        description="Create or refresh farm intelligence dashboards"
+    )
     sub = parser.add_subparsers(dest="command", required=True)
 
     create = sub.add_parser("create", help="Create/expand farm and run full pipeline")
@@ -385,7 +420,9 @@ def build_parser() -> argparse.ArgumentParser:
     create.add_argument("--state-fips", default=None)
     create.add_argument("--fips-level", choices=["l2", "l1", "l0"], default="l2")
     create.add_argument(
-        "--fips-codes", default=None, help="Comma-separated FIPS codes for selector=fips"
+        "--fips-codes",
+        default=None,
+        help="Comma-separated FIPS codes for selector=fips",
     )
     create.add_argument("--county-limit", type=int, default=None)
     create.add_argument("--field-count", type=int, required=True)
@@ -396,7 +433,9 @@ def build_parser() -> argparse.ArgumentParser:
     create.add_argument("--force", action="store_true")
     create.set_defaults(handler=create_command)
 
-    refresh = sub.add_parser("refresh", help="Refresh one farm, one grower, or all farms")
+    refresh = sub.add_parser(
+        "refresh", help="Refresh one farm, one grower, or all farms"
+    )
     refresh.add_argument("--scope", choices=["farm", "grower", "all"], default="farm")
     refresh.add_argument("--grower-slug", default=None)
     refresh.add_argument("--farm-slug", default=None)

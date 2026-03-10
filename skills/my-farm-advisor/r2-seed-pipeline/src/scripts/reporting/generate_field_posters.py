@@ -19,9 +19,9 @@ from matplotlib.patches import Rectangle
 
 matplotlib.use("Agg")
 
-_REPO = Path(__file__).resolve().parents[3]
+_REPO = Path(__file__).resolve().parents[4]
 _SKILLS = _REPO / ".opencode" / "skills"
-_LIB = _REPO / "data" / "scripts" / "lib"
+_LIB = _REPO / "data" / "moltbot" / "scripts" / "lib"
 
 sys.path.insert(0, str(_SKILLS / "farm-intelligence-reporting" / "src"))
 sys.path.insert(0, str(_SKILLS / "headlands-ring" / "src"))
@@ -72,7 +72,7 @@ _DEFAULT_GROWER = os.environ.get("AG_GROWER_SLUG", "iowa-demo-grower")
 _DEFAULT_FARM = os.environ.get("AG_FARM_SLUG", "iowa-demo-farm")
 _DEFAULT_FARM_NAME = os.environ.get("AG_FARM_NAME", "Iowa Demo Farm")
 _FIELD_INVENTORY = _REPO / os.environ.get(
-    "AG_INVENTORY_CSV", ".sisyphus/evidence/task-3-field-inventory.csv"
+    "AG_INVENTORY_CSV", "data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/manifests/field-inventory.csv"
 )
 _CDL_PRIMARY = farm_cdl_preferred_full_composition_path(_DEFAULT_GROWER, _DEFAULT_FARM)
 _CDL_FALLBACK = shared_cdl_preferred_full_composition_path()

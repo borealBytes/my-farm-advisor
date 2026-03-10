@@ -9,7 +9,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 _SCRIPTS_DIR = Path(__file__).resolve().parent
-_REPO_ROOT = _SCRIPTS_DIR.parents[1]
+_REPO_ROOT = _SCRIPTS_DIR.parents[2]
 sys.path.insert(0, str(_SCRIPTS_DIR))
 sys.path.insert(0, str(_SCRIPTS_DIR / "lib"))
 
@@ -18,7 +18,9 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Prepare repo-native annual maturity-by-FIPS pipeline scaffolding"
     )
-    parser.add_argument("--year", type=int, required=True, help="Annual maturity output year")
+    parser.add_argument(
+        "--year", type=int, required=True, help="Annual maturity output year"
+    )
     parser.add_argument(
         "--weather-source",
         default="nasa-power",
@@ -90,13 +92,17 @@ def main() -> int:
     build_year_output_index = maturity_module.build_year_output_index
     shared_manifest_dir = paths_module.shared_manifest_dir
 
-    config = annual_maturity_config_cls(year=args.year, weather_source=args.weather_source)
+    config = annual_maturity_config_cls(
+        year=args.year, weather_source=args.weather_source
+    )
     output_index = build_year_output_index(config)
     if args.list_steps:
         print(json.dumps(output_index, indent=2, sort_keys=True))
         return 0
 
-    geoadmin_output = Path(output_index["geoadmin_root"]) / "l2_counties" / "metadata.json"
+    geoadmin_output = (
+        Path(output_index["geoadmin_root"]) / "l2_counties" / "metadata.json"
+    )
     field_fips_output = Path(output_index["field_fips_summary"])
     manifest_path = shared_manifest_dir() / f"maturity_by_fips_{args.year}.json"
     manifest = read_json(manifest_path, default={}) or {}
@@ -153,7 +159,8 @@ def main() -> int:
             "county-gdd",
             [
                 Path(output_index["corn_gdd"]),
-                _REPO_ROOT / f"data/moltbot/shared/corn_maturity/metadata/moltbot/gdd_by_fips_{args.year}.json",
+                _REPO_ROOT
+                / f"data/moltbot/shared/corn_maturity/metadata/moltbot/gdd_by_fips_{args.year}.json",
             ],
             [
                 sys.executable,
@@ -169,7 +176,8 @@ def main() -> int:
             [
                 Path(output_index["corn_rm"]),
                 Path(output_index["corn_rm_csv"]),
-                _REPO_ROOT / f"data/moltbot/shared/corn_maturity/metadata/moltbot/rm_by_fips_{args.year}.json",
+                _REPO_ROOT
+                / f"data/moltbot/shared/corn_maturity/metadata/moltbot/rm_by_fips_{args.year}.json",
             ],
             [
                 sys.executable,
@@ -183,7 +191,8 @@ def main() -> int:
             [
                 Path(output_index["soybean_mg"]),
                 Path(output_index["soybean_mg_csv"]),
-                _REPO_ROOT / f"data/moltbot/shared/soybean_maturity/metadata/moltbot/mg_by_fips_{args.year}.json",
+                _REPO_ROOT
+                / f"data/moltbot/shared/soybean_maturity/metadata/moltbot/mg_by_fips_{args.year}.json",
             ],
             [
                 sys.executable,
@@ -210,7 +219,9 @@ def main() -> int:
     for step_name, output_paths, command in steps:
         step_record = dict(manifest["steps"].get(step_name, {}))
         primary_output = output_paths[0] if output_paths else None
-        outputs_exist = bool(output_paths) and all(path.exists() for path in output_paths)
+        outputs_exist = bool(output_paths) and all(
+            path.exists() for path in output_paths
+        )
         if outputs_exist and not args.force:
             print(f"skip {step_name}: {primary_output}")
             step_record.update(

@@ -11,7 +11,7 @@ from pathlib import Path
 import pandas as pd
 
 _SCRIPTS_DIR = Path(__file__).resolve().parent.parent
-_REPO_ROOT = _SCRIPTS_DIR.parents[1]
+_REPO_ROOT = _SCRIPTS_DIR.parents[2]
 sys.path.insert(0, str(_SCRIPTS_DIR))
 sys.path.insert(0, str(_SCRIPTS_DIR / "lib"))
 
@@ -45,7 +45,9 @@ def main() -> int:
     from maturity_by_fips import build_soybean_mg_summary, compute_soybean_mg
 
     county_gdd = pd.read_parquet(shared_corn_gdd_table_path(args.year))
-    county_lookup = pd.read_parquet(shared_geoadmin_counties_dir() / "fips_lookup.parquet")
+    county_lookup = pd.read_parquet(
+        shared_geoadmin_counties_dir() / "fips_lookup.parquet"
+    )
     county_mg = compute_soybean_mg(
         county_lookup,
         county_gdd,
@@ -61,7 +63,9 @@ def main() -> int:
 
     mg_path = shared_soybean_mg_table_path(args.year)
     mg_csv_path = shared_soybean_mg_csv_path(args.year)
-    metadata_path = shared_soybean_maturity_metadata_dir() / f"mg_by_fips_{args.year}.json"
+    metadata_path = (
+        shared_soybean_maturity_metadata_dir() / f"mg_by_fips_{args.year}.json"
+    )
     mg_path.parent.mkdir(parents=True, exist_ok=True)
     mg_csv_path.parent.mkdir(parents=True, exist_ok=True)
     metadata_path.parent.mkdir(parents=True, exist_ok=True)

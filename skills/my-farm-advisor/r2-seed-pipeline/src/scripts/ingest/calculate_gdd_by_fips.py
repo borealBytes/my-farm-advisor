@@ -11,7 +11,7 @@ from pathlib import Path
 import pandas as pd
 
 _SCRIPTS_DIR = Path(__file__).resolve().parent.parent
-_REPO_ROOT = _SCRIPTS_DIR.parents[1]
+_REPO_ROOT = _SCRIPTS_DIR.parents[2]
 sys.path.insert(0, str(_SCRIPTS_DIR))
 sys.path.insert(0, str(_SCRIPTS_DIR / "lib"))
 
@@ -61,7 +61,9 @@ def main() -> int:
     )
 
     gdd_path = shared_corn_gdd_table_path(args.year)
-    metadata_path = shared_corn_maturity_metadata_dir() / f"gdd_by_fips_{args.year}.json"
+    metadata_path = (
+        shared_corn_maturity_metadata_dir() / f"gdd_by_fips_{args.year}.json"
+    )
     gdd_path.parent.mkdir(parents=True, exist_ok=True)
     metadata_path.parent.mkdir(parents=True, exist_ok=True)
     county_gdd.to_parquet(gdd_path, index=False)

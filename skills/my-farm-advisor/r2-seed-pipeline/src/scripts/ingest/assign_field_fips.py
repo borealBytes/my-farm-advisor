@@ -12,10 +12,9 @@ from pathlib import Path
 import geopandas as gpd
 
 _SCRIPTS_DIR = Path(__file__).resolve().parent.parent
-_REPO_ROOT = _SCRIPTS_DIR.parents[1]
+_REPO_ROOT = _SCRIPTS_DIR.parents[2]
 sys.path.insert(0, str(_SCRIPTS_DIR))
 sys.path.insert(0, str(_SCRIPTS_DIR / "lib"))
-sys.path.insert(0, str(_SCRIPTS_DIR.parents[1] / ".opencode" / "skills" / "geoadmin-admin" / "src"))
 
 
 def _repo_relative(path: Path) -> str:
@@ -29,7 +28,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--inventory-path",
         type=Path,
-        default=Path(".sisyphus/evidence/task-3-field-inventory.csv"),
+        default=Path(
+            "data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/manifests/field-inventory.csv"
+        ),
         help="Optional inventory CSV used to map field IDs to canonical field slugs",
     )
     return parser.parse_args()
@@ -42,8 +43,13 @@ def main() -> int:
         farm_table_path,
         shared_geoadmin_counties_dir,
     )
-    from reporting_bootstrap import ensure_canonical_data_tree, field_slug_map_from_inventory
+    from reporting_bootstrap import (
+        ensure_canonical_data_tree,
+        ensure_skill_path,
+        field_slug_map_from_inventory,
+    )
 
+    ensure_skill_path("geoadmin-admin")
     args = parse_args()
     ensure_canonical_data_tree(
         grower_slug=args.grower_slug,
@@ -60,8 +66,12 @@ def main() -> int:
         fields, counties, field_slug_map=field_slug_map
     )
 
-    mapping_path = farm_table_path(args.grower_slug, args.farm_slug, "field_fips_mapping.parquet")
-    ambiguity_path = farm_table_path(args.grower_slug, args.farm_slug, "field_fips_ambiguity.csv")
+    mapping_path = farm_table_path(
+        args.grower_slug, args.farm_slug, "field_fips_mapping.parquet"
+    )
+    ambiguity_path = farm_table_path(
+        args.grower_slug, args.farm_slug, "field_fips_ambiguity.csv"
+    )
     summary_path = farm_summary_path(
         args.grower_slug, args.farm_slug, "field_fips_mapping_summary.json"
     )
