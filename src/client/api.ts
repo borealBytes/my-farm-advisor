@@ -63,20 +63,48 @@ export class AuthError extends Error {
 }
 
 async function apiRequest<T>(path: string, options: globalThis.RequestInit = {}): Promise<T> {
-  const response = await fetch(`${API_BASE}${path}`, {
-    ...options,
-    credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-  } as globalThis.RequestInit);
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 30000);
+  let response: Response;
+  try {
+    response = await fetch(`${API_BASE}${path}`, {
+      ...options,
+      credentials: 'include',
+      signal: options.signal || controller.signal,
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      },
+    } as globalThis.RequestInit);
+  } catch (error) {
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new Error('Request timed out after 30 seconds');
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
+  }
 
   if (response.status === 401) {
     throw new AuthError('Unauthorized - please log in via Cloudflare Access');
   }
 
-  const data = (await response.json()) as T & { error?: string };
+  const contentType = response.headers.get('content-type') || '';
+  const rawBody = await response.text();
+
+  if (!contentType.includes('application/json')) {
+    if (rawBody.includes('cloudflareaccess.com') || rawBody.includes('CF_Authorization')) {
+      throw new AuthError('Cloudflare Access session required. Please log in again.');
+    }
+    throw new Error(`Unexpected API response format (${contentType || 'unknown content-type'})`);
+  }
+
+  let data: (T & { error?: string }) | null = null;
+  try {
+    data = JSON.parse(rawBody) as T & { error?: string };
+  } catch {
+    throw new Error('Invalid JSON response from server');
+  }
 
   if (!response.ok) {
     throw new Error(data.error || `API error: ${response.status}`);
