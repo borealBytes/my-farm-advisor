@@ -35,13 +35,13 @@ import configErrorHtml from './assets/config-error.html';
 /**
  * Transform error messages from the gateway to be more user-friendly.
  */
-function transformErrorMessage(message: string, host: string): string {
+function transformErrorMessage(message: string, origin: string): string {
   if (message.includes('gateway token missing') || message.includes('gateway token mismatch')) {
-    return `Invalid or missing token. Visit https://${host}?token={REPLACE_WITH_YOUR_TOKEN}`;
+    return `Invalid or missing token. Visit ${origin}?token={REPLACE_WITH_YOUR_TOKEN}`;
   }
 
   if (message.includes('pairing required')) {
-    return `Pairing required. Visit https://${host}/_admin/`;
+    return `Pairing required. Visit ${origin}/_admin/`;
   }
 
   return message;
@@ -390,7 +390,7 @@ app.all('*', async (c) => {
             if (debugLogs) {
               console.log('[WS] Original error.message:', parsed.error.message);
             }
-            parsed.error.message = transformErrorMessage(parsed.error.message, url.host);
+            parsed.error.message = transformErrorMessage(parsed.error.message, url.origin);
             if (debugLogs) {
               console.log('[WS] Transformed error.message:', parsed.error.message);
             }
@@ -423,7 +423,7 @@ app.all('*', async (c) => {
         console.log('[WS] Container closed:', event.code, event.reason);
       }
       // Transform the close reason (truncate to 123 bytes max for WebSocket spec)
-      let reason = transformErrorMessage(event.reason, url.host);
+      let reason = transformErrorMessage(event.reason, url.origin);
       if (reason.length > 123) {
         reason = reason.slice(0, 120) + '...';
       }
