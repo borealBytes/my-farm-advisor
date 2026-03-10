@@ -205,6 +205,22 @@ config.skills.entries['superior-byteworks-wrighter'] = {
     enabled: true,
 };
 
+const skillsRoot = '/root/clawd/skills';
+if (fs.existsSync(skillsRoot)) {
+    const skillDirs = fs
+        .readdirSync(skillsRoot, { withFileTypes: true })
+        .filter((entry) => entry.isDirectory())
+        .map((entry) => entry.name)
+        .filter((name) => fs.existsSync(path.join(skillsRoot, name, 'SKILL.md')));
+
+    for (const skillName of skillDirs) {
+        config.skills.entries[skillName] = {
+            ...(config.skills.entries[skillName] || {}),
+            enabled: true,
+        };
+    }
+}
+
 // Gateway configuration
 config.gateway.port = 18789;
 config.gateway.mode = 'local';

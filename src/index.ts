@@ -144,7 +144,7 @@ app.use('*', async (c, next) => {
 // Middleware: Initialize sandbox for all requests
 app.use('*', async (c, next) => {
   const options = buildSandboxOptions(c.env);
-  const sandboxName = c.env.DEV_MODE === 'true' ? 'moltbot-dev-v2' : 'moltbot';
+  const sandboxName = c.env.DEV_MODE === 'true' ? 'moltbot-dev-v3' : 'moltbot';
   const sandbox = getSandbox(c.env.Sandbox, sandboxName, options);
   c.set('sandbox', sandbox);
   await next();
