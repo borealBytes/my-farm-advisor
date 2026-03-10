@@ -231,18 +231,27 @@ if (process.env.OPENCLAW_GATEWAY_TOKEN) {
     config.gateway.auth.token = process.env.OPENCLAW_GATEWAY_TOKEN;
 }
 
+config.gateway.controlUi = config.gateway.controlUi || {};
+
 if (process.env.OPENCLAW_DEV_MODE === 'true') {
-    config.gateway.controlUi = config.gateway.controlUi || {};
     config.gateway.controlUi.allowInsecureAuth = true;
-    const localOrigins = [];
-    for (let port = 8787; port <= 8800; port += 1) {
-        localOrigins.push('http://127.0.0.1:' + port, 'http://localhost:' + port);
-    }
-    const existingOrigins = Array.isArray(config.gateway.controlUi.allowedOrigins)
-        ? config.gateway.controlUi.allowedOrigins
-        : [];
-    config.gateway.controlUi.allowedOrigins = uniq([...existingOrigins, ...localOrigins, '*']);
 }
+
+const localOrigins = [];
+for (let port = 8787; port <= 8800; port += 1) {
+    localOrigins.push('http://127.0.0.1:' + port, 'http://localhost:' + port);
+}
+
+const configuredOrigins = parseCsv(process.env.OPENCLAW_ALLOWED_ORIGINS || process.env.GATEWAY_ALLOWED_ORIGINS);
+const existingOrigins = Array.isArray(config.gateway.controlUi.allowedOrigins)
+    ? config.gateway.controlUi.allowedOrigins
+    : [];
+const allowAllOrigins = process.env.OPENCLAW_CONTROL_UI_ALLOW_ALL_ORIGINS !== 'false';
+const mergedOrigins = uniq([...existingOrigins, ...localOrigins, ...configuredOrigins]);
+if (allowAllOrigins) {
+    mergedOrigins.push('*');
+}
+config.gateway.controlUi.allowedOrigins = uniq(mergedOrigins);
 
 // Legacy AI Gateway base URL override:
 // ANTHROPIC_BASE_URL is picked up natively by the Anthropic SDK,
