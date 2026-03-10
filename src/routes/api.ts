@@ -36,12 +36,9 @@ adminApi.get('/devices', async (c) => {
     await ensureMoltbotGateway(sandbox, c.env);
 
     // Run OpenClaw CLI to list devices
-    // Must specify --url and --token (OpenClaw v2026.2.3 requires explicit credentials with --url)
     const token = c.env.MOLTBOT_GATEWAY_TOKEN;
     const tokenArg = token ? ` --token ${token}` : '';
-    const proc = await sandbox.startProcess(
-      `openclaw devices list --json --url ws://localhost:18789${tokenArg}`,
-    );
+    const proc = await sandbox.startProcess(`openclaw devices list --json${tokenArg}`);
     await waitForProcess(proc, CLI_TIMEOUT_MS);
 
     const logs = await proc.getLogs();
@@ -95,9 +92,7 @@ adminApi.post('/devices/:requestId/approve', async (c) => {
     // Run OpenClaw CLI to approve the device
     const token = c.env.MOLTBOT_GATEWAY_TOKEN;
     const tokenArg = token ? ` --token ${token}` : '';
-    const proc = await sandbox.startProcess(
-      `openclaw devices approve ${requestId} --url ws://localhost:18789${tokenArg}`,
-    );
+    const proc = await sandbox.startProcess(`openclaw devices approve ${requestId}${tokenArg}`);
     await waitForProcess(proc, CLI_TIMEOUT_MS);
 
     const logs = await proc.getLogs();
@@ -131,9 +126,7 @@ adminApi.post('/devices/approve-all', async (c) => {
     // First, get the list of pending devices
     const token = c.env.MOLTBOT_GATEWAY_TOKEN;
     const tokenArg = token ? ` --token ${token}` : '';
-    const listProc = await sandbox.startProcess(
-      `openclaw devices list --json --url ws://localhost:18789${tokenArg}`,
-    );
+    const listProc = await sandbox.startProcess(`openclaw devices list --json${tokenArg}`);
     await waitForProcess(listProc, CLI_TIMEOUT_MS);
 
     const listLogs = await listProc.getLogs();
@@ -162,7 +155,7 @@ adminApi.post('/devices/approve-all', async (c) => {
       try {
         // eslint-disable-next-line no-await-in-loop -- sequential device approval required
         const approveProc = await sandbox.startProcess(
-          `openclaw devices approve ${device.requestId} --url ws://localhost:18789${tokenArg}`,
+          `openclaw devices approve ${device.requestId}${tokenArg}`,
         );
         // eslint-disable-next-line no-await-in-loop
         await waitForProcess(approveProc, CLI_TIMEOUT_MS);
@@ -226,6 +219,8 @@ adminApi.get('/storage', async (c) => {
     configured: hasCredentials,
     missing: missing.length > 0 ? missing : undefined,
     lastSync,
+    devMode: c.env.DEV_MODE === 'true',
+    e2eTestMode: c.env.E2E_TEST_MODE === 'true',
     message: hasCredentials
       ? 'R2 storage is configured. Your data will persist across container restarts.'
       : 'R2 storage is not configured. Paired devices and conversations will be lost when the container restarts.',

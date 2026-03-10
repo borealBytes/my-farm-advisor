@@ -37,6 +37,22 @@ src/
     ├── App.tsx
     ├── api.ts        # API client
     └── pages/
+
+skills/                 # Agent skills for OpenClaw and OpenCode
+├── cloudflare-skills/  # Cloudflare official skills (git submodule)
+│   ├── skills/
+│   │   ├── cloudflare/           # Core Cloudflare platform skill
+│   │   ├── agents-sdk/           # Agents SDK development
+│   │   ├── durable-objects/      # Durable Objects patterns
+│   │   ├── sandbox-sdk/          # Sandbox SDK usage
+│   │   ├── wrangler/             # Wrangler CLI
+│   │   ├── web-perf/             # Web performance
+│   │   ├── building-mcp-server-on-cloudflare/
+│   │   ├── building-ai-agent-on-cloudflare/
+│   │   └── workers-best-practices/
+│   ├── commands/                 # Slash commands
+│   └── .mcp.json                 # MCP server configuration
+└── superior-byte-works-wrighter/  # Research writing skill
 ```
 
 ## Key Patterns
@@ -103,6 +119,65 @@ When adding new functionality, add corresponding tests.
 - `AGENTS.md` - This file, for AI agents
 
 Development documentation goes in AGENTS.md, not README.md.
+
+---
+
+## Skills
+
+This project includes [Cloudflare Skills](https://github.com/cloudflare/skills) for enhanced agent capabilities. Skills provide contextual knowledge and best practices for Cloudflare development.
+
+### Available Skills
+
+**Cloudflare Official Skills** (in `skills/cloudflare-skills/`):
+- `cloudflare` - Comprehensive platform skill covering Workers, Pages, storage (KV, D1, R2), AI (Workers AI, Vectorize, Agents SDK), networking, security, and IaC
+- `agents-sdk` - Building stateful AI agents with state, scheduling, RPC, MCP servers, email, and streaming chat
+- `durable-objects` - Stateful coordination, RPC, SQLite, alarms, WebSockets
+- `sandbox-sdk` - Secure code execution for AI code execution and interactive dev environments
+- `wrangler` - Deploying and managing Workers, KV, R2, D1, Vectorize, Queues, Workflows
+- `web-perf` - Auditing Core Web Vitals, render-blocking resources, network chains
+- `building-mcp-server-on-cloudflare` - Building remote MCP servers with tools, OAuth, and deployment
+- `building-ai-agent-on-cloudflare` - Building AI agents with state, WebSockets, and tool integration
+- `workers-best-practices` - Best practices for Workers development
+
+**Custom Skills**:
+- `superior-byte-works-wrighter` - Research writing and technical documentation skill
+
+### Using Skills with OpenCode
+
+Skills are automatically loaded by OpenCode when conversations match their triggers. They are symlinked from `~/.config/opencode/skills/` to this project's `skills/` directory.
+
+To manually add Cloudflare skills for your user:
+```bash
+# Skills are automatically symlinked, but if you need to add them manually:
+cd ~/.config/opencode/skills/
+npx skills add https://github.com/cloudflare/skills
+```
+
+### Using Skills with OpenClaw
+
+Cloudflare skills are copied to the container at build time via the Dockerfile:
+```dockerfile
+COPY skills/ /root/clawd/skills/
+```
+
+This makes them available to OpenClaw agents running in the sandbox container.
+
+### Skill Commands
+
+The Cloudflare skills include slash commands that can be invoked explicitly:
+
+| Command | Description |
+|---------|-------------|
+| `/cloudflare:build-agent` | Build an AI agent on Cloudflare using the Agents SDK |
+| `/cloudflare:build-mcp` | Build an MCP server on Cloudflare |
+
+### MCP Servers
+
+The `.mcp.json` configuration includes Cloudflare's remote MCP servers:
+- `cloudflare-docs` - Up-to-date Cloudflare documentation
+- `cloudflare-bindings` - Workers applications with storage, AI, and compute
+- `cloudflare-builds` - Workers build insights
+- `cloudflare-observability` - Application logs and analytics
 
 ---
 

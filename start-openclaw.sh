@@ -200,15 +200,31 @@ config.skills.entries.wrighter = {
     ...(config.skills.entries.wrighter || {}),
     enabled: true,
 };
-config.skills.entries['superior-byteworks-wrighter'] = {
-    ...(config.skills.entries['superior-byteworks-wrighter'] || {}),
+config.skills.entries['superior-byte-works-wrighter'] = {
+    ...(config.skills.entries['superior-byte-works-wrighter'] || {}),
     enabled: true,
 };
+
+const skillsRoot = '/root/clawd/skills';
+if (fs.existsSync(skillsRoot)) {
+    const skillDirs = fs
+        .readdirSync(skillsRoot, { withFileTypes: true })
+        .filter((entry) => entry.isDirectory())
+        .map((entry) => entry.name)
+        .filter((name) => fs.existsSync(path.join(skillsRoot, name, 'SKILL.md')));
+
+    for (const skillName of skillDirs) {
+        config.skills.entries[skillName] = {
+            ...(config.skills.entries[skillName] || {}),
+            enabled: true,
+        };
+    }
+}
 
 // Gateway configuration
 config.gateway.port = 18789;
 config.gateway.mode = 'local';
-config.gateway.trustedProxies = ['10.1.0.0'];
+config.gateway.trustedProxies = ['127.0.0.1/32', '::1/128', '10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16'];
 
 if (process.env.OPENCLAW_GATEWAY_TOKEN) {
     config.gateway.auth = config.gateway.auth || {};
@@ -441,8 +457,8 @@ echo "Dev mode: ${OPENCLAW_DEV_MODE:-false}"
 
 if [ -n "$OPENCLAW_GATEWAY_TOKEN" ]; then
     echo "Starting gateway with token auth..."
-    exec openclaw gateway --port 18789 --verbose --allow-unconfigured --bind lan --token "$OPENCLAW_GATEWAY_TOKEN"
+    exec openclaw gateway --port 18789 --verbose --allow-unconfigured --bind loopback --token "$OPENCLAW_GATEWAY_TOKEN"
 else
     echo "Starting gateway with device pairing (no token)..."
-    exec openclaw gateway --port 18789 --verbose --allow-unconfigured --bind lan
+    exec openclaw gateway --port 18789 --verbose --allow-unconfigured --bind loopback
 fi

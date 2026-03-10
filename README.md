@@ -69,8 +69,8 @@ Farm-focused extensions in this repo include:
 - `skills/my-farm-advisor/` - orchestration skill for EDA, field management, imagery, soil, strategy, weather, and admin tooling
 - `skills/my-farm-breeding-trial-management/` - breeding workflow and trial operations
 - `skills/my-farm-qtl-analysis/` - QTL/GWAS analysis workflows
-- `skills/superior-byteworks-google-timesfm-forecasting/` - forecasting workflows
-- `skills/superior-byteworks-wrighter/` - structured research and technical writing support
+- `skills/superior-byte-works-google-timesfm-forecasting/` - forecasting workflows
+- `skills/superior-byte-works-wrighter/` - structured research and technical writing support
 
 This project runs in a [Cloudflare Sandbox](https://developers.cloudflare.com/sandbox/) container, providing a managed deployment model without self-hosting overhead. Optional R2 storage enables persistence across container restarts.
 

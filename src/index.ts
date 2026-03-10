@@ -47,6 +47,16 @@ function transformErrorMessage(message: string, host: string): string {
   return message;
 }
 
+async function fetchGatewayHttpWithTimeout(request: Request, sandbox: Sandbox): Promise<Response> {
+  const timeoutMs = 8000;
+  return Promise.race([
+    sandbox.containerFetch(request, MOLTBOT_PORT),
+    new Promise<never>((_, reject) => {
+      setTimeout(() => reject(new Error(`Gateway HTTP proxy timeout after ${timeoutMs}ms`)), timeoutMs);
+    }),
+  ]);
+}
+
 export { Sandbox };
 
 /**
@@ -174,8 +184,7 @@ app.use('*', async (c, next) => {
     return next();
   }
 
-  // Skip validation in dev mode
-  if (c.env.DEV_MODE === 'true') {
+  if (c.env.DEV_MODE === 'true' || c.env.E2E_TEST_MODE === 'true') {
     return next();
   }
 
@@ -454,7 +463,28 @@ app.all('*', async (c) => {
   }
 
   console.log('[HTTP] Proxying:', url.pathname + url.search);
-  const httpResponse = await sandbox.containerFetch(request, MOLTBOT_PORT);
+  let httpResponse: Response;
+  try {
+    httpResponse = await fetchGatewayHttpWithTimeout(request, sandbox);
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Gateway HTTP proxy failed';
+    console.error('[HTTP] Proxy error:', errorMessage);
+
+    if (acceptsHtml) {
+      return c.html(
+        `<html><body><h1>Gateway UI not reachable in local dev</h1><p>${errorMessage}</p><p>Admin pairing is working at <a href="/_admin/">/_admin/</a>. For full web UI reliability, deploy and test on Cloudflare.</p></body></html>`,
+        504,
+      );
+    }
+
+    return c.json(
+      {
+        error: 'Gateway HTTP proxy failed',
+        details: errorMessage,
+      },
+      504,
+    );
+  }
   console.log('[HTTP] Response status:', httpResponse.status);
 
   // Add debug header to verify worker handled the request

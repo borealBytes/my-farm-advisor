@@ -206,6 +206,21 @@ export default function AdminPage() {
         </div>
       )}
 
+      {storageStatus?.devMode && (
+        <div className="warning-banner">
+          <div className="warning-content">
+            <strong>DEV_MODE is enabled</strong>
+            <p>
+              Device pairing is bypassed in DEV_MODE, so pending and paired device lists may stay
+              empty during local development.
+            </p>
+            <p>
+              To test real pairing locally, disable DEV_MODE and use E2E_TEST_MODE=true.
+            </p>
+          </div>
+        </div>
+      )}
+
       {storageStatus?.configured && (
         <div className="success-banner">
           <div className="storage-status">

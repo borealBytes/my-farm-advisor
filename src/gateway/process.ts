@@ -4,6 +4,37 @@ import { MOLTBOT_PORT, STARTUP_TIMEOUT_MS } from '../config';
 import { buildEnvVars } from './env';
 import { ensureRcloneConfig } from './r2';
 
+async function isGatewayPortListening(sandbox: Sandbox): Promise<boolean> {
+  try {
+    const response = await Promise.race([
+      sandbox.containerFetch(new Request(`http://localhost:${MOLTBOT_PORT}/`), MOLTBOT_PORT),
+      new Promise<never>((_, reject) => {
+        setTimeout(() => reject(new Error('Port probe timeout')), 2000);
+      }),
+    ]);
+    return response.status > 0;
+  } catch {
+    return false;
+  }
+}
+
+async function waitForGatewayProcessDetection(sandbox: Sandbox, timeoutMs: number): Promise<Process | null> {
+  const intervalMs = 500;
+  const maxAttempts = Math.ceil(timeoutMs / intervalMs);
+
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    // eslint-disable-next-line no-await-in-loop -- intentional sequential polling
+    const process = await findExistingMoltbotProcess(sandbox);
+    if (process) {
+      return process;
+    }
+    // eslint-disable-next-line no-await-in-loop -- intentional sequential polling
+    await new Promise((resolve) => setTimeout(resolve, intervalMs));
+  }
+
+  return null;
+}
+
 /**
  * Find an existing OpenClaw gateway process
  *
@@ -18,6 +49,7 @@ export async function findExistingMoltbotProcess(sandbox: Sandbox): Promise<Proc
       // Don't match CLI commands like "openclaw devices list"
       const isGatewayProcess =
         proc.command.includes('start-openclaw.sh') ||
+        proc.command.includes('/usr/local/bin/start-openclaw.sh') ||
         proc.command.includes('openclaw gateway') ||
         // Legacy: match old startup script during transition
         proc.command.includes('start-moltbot.sh') ||
@@ -86,6 +118,18 @@ export async function ensureMoltbotGateway(sandbox: Sandbox, env: MoltbotEnv): P
         console.log('Failed to kill process:', killError);
       }
     }
+  }
+
+  const portListening = await isGatewayPortListening(sandbox);
+  if (portListening) {
+    console.log('Gateway port is already listening; waiting for process detection to avoid double spawn...');
+    const detectedProcess = await waitForGatewayProcessDetection(sandbox, 5000);
+    if (detectedProcess) {
+      return detectedProcess;
+    }
+    throw new Error(
+      `Gateway is already listening on port ${MOLTBOT_PORT} but no matching process was detected. Refusing to start a duplicate process.`,
+    );
   }
 
   // Start a new OpenClaw gateway

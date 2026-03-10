@@ -117,6 +117,8 @@ export interface StorageStatusResponse {
   configured: boolean;
   missing?: string[];
   lastSync: string | null;
+  devMode?: boolean;
+  e2eTestMode?: boolean;
   message: string;
 }
 
