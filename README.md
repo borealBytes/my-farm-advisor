@@ -1,12 +1,26 @@
-# OpenClaw on Cloudflare Workers
+# MY Farm Advisor (`my-farm-advisor`)
 
-Run [OpenClaw](https://github.com/openclaw/openclaw) (formerly Moltbot, formerly Clawdbot) personal AI assistant in a [Cloudflare Sandbox](https://developers.cloudflare.com/sandbox/).
+MY Farm Advisor is a farm decision-support and agricultural research assistant built on top of [OpenClaw](https://github.com/openclaw/openclaw), running in [Cloudflare Sandbox](https://developers.cloudflare.com/sandbox/).
 
-![moltworker architecture](./assets/logo.png)
+It combines a production-ready AI gateway with open-source farm skills for field intelligence, crop strategy, imagery analysis, weather-aware planning, and reproducible research workflows.
 
-> **Experimental:** This is a proof of concept demonstrating that OpenClaw can run in Cloudflare Sandbox. It is not officially supported and may break without notice. Use at your own risk.
+![MY Farm Advisor architecture](./assets/logo.png)
 
-[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/cloudflare/moltworker)
+> **Status:** Active fork of the OpenClaw-on-Cloudflare architecture, specialized for agricultural science and practical farm advisory workflows.
+
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/borealBytes/my-farm-advisor)
+
+## Why MY Farm Advisor
+
+Farm teams do not need more disconnected dashboards. They need clear, field-level decisions they can trust.
+
+MY Farm Advisor is designed to help growers, consultants, and researchers:
+
+- Turn scattered farm data into actionable recommendations
+- Compare management scenarios before committing input spend
+- Blend weather, soil, and imagery signals into one workflow
+- Capture reproducible research notes and method history
+- Build on open, inspectable skills instead of black-box tooling
 
 ## Requirements
 
@@ -38,9 +52,11 @@ Notes:
 - Network egress, Workers/Durable Objects requests, and logs are additional but typically minimal for personal use.
 - See the [instance types table](https://developers.cloudflare.com/containers/pricing/) for other options (e.g., `lite` at 256 MiB/$0.50/mo memory or `standard-4` at 12 GiB for heavier workloads).
 
-## What is OpenClaw?
+## What is MY Farm Advisor?
 
-[OpenClaw](https://github.com/openclaw/openclaw) (formerly Moltbot, formerly Clawdbot) is a personal AI assistant with a gateway architecture that connects to multiple chat platforms. Key features:
+MY Farm Advisor packages [OpenClaw](https://github.com/openclaw/openclaw) as the runtime and extends it with agricultural skill packs. The platform keeps OpenClaw's gateway strengths and adds farm-specific capability for day-to-day advisory and research.
+
+Core platform features:
 
 - **Control UI** - Web-based chat interface at the gateway
 - **Multi-channel support** - Telegram, Discord, Slack
@@ -48,11 +64,28 @@ Notes:
 - **Persistent conversations** - Chat history and context across sessions
 - **Agent runtime** - Extensible AI capabilities with workspace and skills
 
-This project packages OpenClaw to run in a [Cloudflare Sandbox](https://developers.cloudflare.com/sandbox/) container, providing a fully managed, always-on deployment without needing to self-host. Optional R2 storage enables persistence across container restarts.
+Farm-focused extensions in this repo include:
+
+- `skills/my-farm-advisor/` - orchestration skill for EDA, field management, imagery, soil, strategy, weather, and admin tooling
+- `skills/my-farm-breeding-trial-management/` - breeding workflow and trial operations
+- `skills/my-farm-qtl-analysis/` - QTL/GWAS analysis workflows
+- `skills/superior-byteworks-google-timesfm-forecasting/` - forecasting workflows
+- `skills/superior-byteworks-wrighter/` - structured research and technical writing support
+
+This project runs in a [Cloudflare Sandbox](https://developers.cloudflare.com/sandbox/) container, providing a managed deployment model without self-hosting overhead. Optional R2 storage enables persistence across container restarts.
 
 ## Architecture
 
-![moltworker architecture](./assets/architecture.png)
+![MY Farm Advisor architecture](./assets/architecture.png)
+
+## Farm Science Principles (Lightweight)
+
+This project follows a practical evidence-first approach inspired by `SOUL.md`:
+
+- **Evidence over hype** - prioritize measurable outcomes over slogans
+- **Reproducible methods** - document assumptions, methods, and outcomes
+- **Responsible sharing** - maximize useful learning while reducing harm
+- **Open skill sovereignty** - prefer durable, inspectable, permissive open-source components
 
 ## Quick Start
 
