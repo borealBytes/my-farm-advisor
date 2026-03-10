@@ -66,7 +66,7 @@ from ssurgo_soil import download_soil, get_dominant_soil
 fields = gpd.read_file('.skills/field-boundaries/examples/sample_2_fields.geojson')
 
 # Download soil data for all fields
-soil = download_soil(fields, output_path='data/growers/demo-grower/farms/demo-farm/derived/tables/soil_data.csv')
+soil = download_soil(fields, output_path='data/moltbot/growers/demo-grower/farms/demo-farm/derived/tables/soil_data.csv')
 print(f'Downloaded {len(soil)} soil records for {soil["field_id"].nunique()} fields')
 
 # Get dominant soil per field
@@ -139,14 +139,14 @@ import geopandas as gpd
 from ssurgo_soil import download_soil, get_dominant_soil
 
 # Load field boundaries
-fields = gpd.read_file('data/growers/demo-grower/farms/demo-farm/boundary/field_boundaries.geojson')
+fields = gpd.read_file('data/moltbot/growers/demo-grower/farms/demo-farm/boundary/field_boundaries.geojson')
 
 # Download soil data for all fields
 soil = download_soil(
     fields,
     field_id_column='field_id',
     max_depth_cm=30,
-    output_path='data/growers/demo-grower/farms/demo-farm/derived/tables/soil_EPSG4326.csv'
+    output_path='data/moltbot/growers/demo-grower/farms/demo-farm/derived/tables/soil_EPSG4326.csv'
 )
 
 # Get one row per field (dominant soil)

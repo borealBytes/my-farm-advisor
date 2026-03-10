@@ -34,7 +34,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Load your data
-df = pd.read_csv('data/soil_measurements.csv')
+df = pd.read_csv('data/moltbot/soil_measurements.csv')
 
 # Create a histogram
 plt.figure(figsize=(10, 6))
@@ -62,7 +62,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Load data
-df = pd.read_csv('data/soil_data.csv')
+df = pd.read_csv('data/moltbot/soil_data.csv')
 
 # Create histogram
 plt.figure(figsize=(10, 6))
@@ -91,7 +91,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Load data
-df = pd.read_csv('data/fields_with_soil.csv')
+df = pd.read_csv('data/moltbot/fields_with_soil.csv')
 
 # Create scatter plot
 plt.figure(figsize=(10, 6))
@@ -122,7 +122,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Load data
-df = pd.read_csv('data/field_data.csv')
+df = pd.read_csv('data/moltbot/field_data.csv')
 
 # Create box plot
 plt.figure(figsize=(12, 6))
@@ -152,7 +152,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Load data
-df = pd.read_csv('data/crop_data.csv')
+df = pd.read_csv('data/moltbot/crop_data.csv')
 
 # Count crops and create bar chart
 plt.figure(figsize=(10, 6))
@@ -183,7 +183,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Load data
-df = pd.read_csv('data/soil_data.csv')
+df = pd.read_csv('data/moltbot/soil_data.csv')
 
 # Select numeric columns
 numeric_cols = ['ph_water', 'organic_matter', 'clay', 'sand', 'silt']
@@ -217,7 +217,7 @@ import os
 os.makedirs('output/visualizations', exist_ok=True)
 
 # Load data
-df = pd.read_csv('data/agricultural_data.csv')
+df = pd.read_csv('data/moltbot/agricultural_data.csv')
 
 print(f"Dataset shape: {df.shape}")
 print(f"\nCreating visualization suite...")
@@ -312,10 +312,10 @@ Always save the Python script that generates your plots:
 """Create visualization suite for field data.
 
 Creates:
-- data/plots/field_size_distribution.png
-- data/plots/ph_vs_organic_matter.png
-- data/plots/yield_by_region.png
-- data/plots/correlation_heatmap.png
+- data/moltbot/plots/field_size_distribution.png
+- data/moltbot/plots/ph_vs_organic_matter.png
+- data/moltbot/plots/yield_by_region.png
+- data/moltbot/plots/correlation_heatmap.png
 """
 
 import pandas as pd
@@ -324,10 +324,10 @@ import seaborn as sns
 from pathlib import Path
 
 # Create directories
-Path('data/plots').mkdir(parents=True, exist_ok=True)
+Path('data/moltbot/plots').mkdir(parents=True, exist_ok=True)
 
 # Load data
-df = pd.read_csv('data/soil_measurements.csv')
+df = pd.read_csv('data/moltbot/soil_measurements.csv')
 
 # Plot 1: Field size distribution
 plt.figure(figsize=(10, 6))
@@ -335,28 +335,28 @@ sns.histplot(df['area_acres'], bins=20, kde=True)
 plt.title('Field Size Distribution')
 plt.xlabel('Area (acres)')
 plt.ylabel('Count')
-plt.savefig('data/plots/field_size_distribution.png', dpi=300, bbox_inches='tight')
+plt.savefig('data/moltbot/plots/field_size_distribution.png', dpi=300, bbox_inches='tight')
 plt.close()
 
-print("Created: data/plots/field_size_distribution.png")
+print("Created: data/moltbot/plots/field_size_distribution.png")
 
 # Plot 2: pH vs Organic Matter
 plt.figure(figsize=(10, 6))
 sns.scatterplot(data=df, x='ph_water', y='organic_matter', hue='region')
 plt.title('pH vs Organic Matter by Region')
-plt.savefig('data/plots/ph_vs_organic_matter.png', dpi=300, bbox_inches='tight')
+plt.savefig('data/moltbot/plots/ph_vs_organic_matter.png', dpi=300, bbox_inches='tight')
 plt.close()
 
-print("Created: data/plots/ph_vs_organic_matter.png")
+print("Created: data/moltbot/plots/ph_vs_organic_matter.png")
 
-print("All plots saved to: data/plots/")
+print("All plots saved to: data/moltbot/plots/")
 ```
 
 ### Output Directory Structure
 
 ```
 eda-visualize/
-├── data/
+├── data/moltbot/
 │   ├── plots/                      # Generated visualizations
 │   │   ├── field_size_distribution.png
 │   │   ├── ph_vs_organic_matter.png
@@ -369,7 +369,7 @@ eda-visualize/
 └── SKILL.md
 ```
 
-### README Template for data/plots/
+### README Template for data/moltbot/plots/
 
 ````markdown
 # Visualization Outputs

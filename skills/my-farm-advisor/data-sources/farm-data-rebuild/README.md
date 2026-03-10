@@ -1,12 +1,12 @@
 # farm-data-rebuild
 
-Single high-level skill that rebuilds the canonical `data/` tree from a boundary input using existing repository skills.
+Single high-level skill that rebuilds the canonical `data/moltbot/` tree from a boundary input using existing repository skills.
 
 ## Run
 
 ```bash
 python scripts/rebuild_data_folder.py \
-  --boundaries data/input/fields.geojson \
+  --boundaries data/moltbot/input/fields.geojson \
   --grower-slug demo-grower \
   --farm-slug demo-farm \
   --farm-name "Demo Farm"

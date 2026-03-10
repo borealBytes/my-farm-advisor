@@ -85,7 +85,7 @@ C4Context
 
     System_Ext(ext1, "[External System 1]", "Provides [capability]")
     System_Ext(ext2, "[External System 2]", "Provides [capability]")
-    System_Ext(ext3, "[External System 3]", "Receives [data/events]")
+    System_Ext(ext3, "[External System 3]", "Receives [data/moltbot/events]")
 
     Rel(user, system, "Uses", "HTTPS")
     Rel(admin, system, "Configures", "HTTPS")

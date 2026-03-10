@@ -58,7 +58,7 @@ import pandas as pd
 import geopandas as gpd
 
 # Load field boundaries
-fields = gpd.read_file('data/fields.geojson')
+fields = gpd.read_file('data/moltbot/fields.geojson')
 
 # Convert to GeoJSON for embedding
 geojson_data = json.loads(fields.to_json())

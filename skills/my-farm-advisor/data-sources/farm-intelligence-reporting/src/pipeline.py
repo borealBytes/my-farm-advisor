@@ -85,8 +85,8 @@ class FieldReportingConfig:
     field_boundary_path: str
     grower_slug: str = "default-grower"
     farm_slug: str = "default-farm"
-    output_dir: str = "data/EDA"
-    reporting_dir: str = "data/reporting"
+    output_dir: str = "data/moltbot/EDA"
+    reporting_dir: str = "data/moltbot/reporting"
     headland_width_m: float = 9.0
     weather_years: tuple[int, ...] = (2021, 2022, 2023, 2024, 2025)
     cdl_years: tuple[int, ...] = (2021, 2022, 2023, 2024, 2025)

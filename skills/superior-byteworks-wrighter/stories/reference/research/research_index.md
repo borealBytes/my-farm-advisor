@@ -45,7 +45,7 @@ research-project/
 │   ├── financial-model.md       ← Financial sub-document
 │   ├── regulatory-landscape.md  ← Regulatory sub-document
 │   └── patent-analysis.md       ← IP sub-document
-├── data/
+├── data/moltbot/
 │   ├── raw/                     ← Unprocessed data files
 │   ├── processed/               ← Cleaned data
 │   └── charts/                  ← Generated visualizations
@@ -124,9 +124,9 @@ flowchart TD
 
 | #   | Asset                   | Format     | Location          | Last Updated | Size   |
 | --- | ----------------------- | ---------- | ----------------- | ------------ | ------ |
-| 1   | [Financial comparisons] | CSV / XLSX | `data/processed/` | YYYY-MM-DD   | [X] KB |
-| 2   | [Market data extract]   | CSV        | `data/raw/`       | YYYY-MM-DD   | [X] KB |
-| 3   | [Visualization charts]  | PNG / SVG  | `data/charts/`    | YYYY-MM-DD   | [X] KB |
+| 1   | [Financial comparisons] | CSV / XLSX | `data/moltbot/processed/` | YYYY-MM-DD   | [X] KB |
+| 2   | [Market data extract]   | CSV        | `data/moltbot/raw/`       | YYYY-MM-DD   | [X] KB |
+| 3   | [Visualization charts]  | PNG / SVG  | `data/moltbot/charts/`    | YYYY-MM-DD   | [X] KB |
 
 ---
 

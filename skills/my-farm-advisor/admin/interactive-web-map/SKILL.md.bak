@@ -87,8 +87,8 @@ for _, row in fields.iterrows():
     geo.add_to(m)
 
 # Save as self-contained HTML
-m.save('data/field_map.html')
-print('Map saved to data/field_map.html')
+m.save('data/moltbot/field_map.html')
+print('Map saved to data/moltbot/field_map.html')
 EOF
 ```
 
@@ -151,7 +151,7 @@ m.fit_bounds([[bounds[1], bounds[0]], [bounds[3], bounds[2]]])
 # Add layer control
 folium.LayerControl().add_to(m)
 
-m.save('data/field_boundaries_map.html')
+m.save('data/moltbot/field_boundaries_map.html')
 ```
 
 ### Example 2: Choropleth by Field Area
@@ -163,7 +163,7 @@ import folium
 import geopandas as gpd
 import branca.colormap as cm
 
-fields = gpd.read_file('data/fields_EPSG4326.geojson')
+fields = gpd.read_file('data/moltbot/fields_EPSG4326.geojson')
 
 # Create a color scale based on area
 colormap = cm.LinearColormap(
@@ -196,7 +196,7 @@ folium.GeoJson(
 colormap.add_to(m)
 folium.LayerControl().add_to(m)
 
-m.save('data/fields_by_area.html')
+m.save('data/moltbot/fields_by_area.html')
 ```
 
 ### Example 3: Multiple Basemaps with Satellite Imagery
@@ -244,7 +244,7 @@ folium.GeoJson(
 m.fit_bounds(fields.total_bounds[[1, 0, 3, 2]].reshape(2, 2).tolist())
 folium.LayerControl(collapsed=False).add_to(m)
 
-m.save('data/fields_satellite.html')
+m.save('data/moltbot/fields_satellite.html')
 ```
 
 ### Example 4: Marker Cluster for Many Fields
@@ -256,7 +256,7 @@ import folium
 from folium.plugins import MarkerCluster
 import geopandas as gpd
 
-fields = gpd.read_file('data/fields_EPSG4326.geojson')
+fields = gpd.read_file('data/moltbot/fields_EPSG4326.geojson')
 
 center = [fields.geometry.centroid.y.mean(), fields.geometry.centroid.x.mean()]
 m = folium.Map(location=center, zoom_start=5)
@@ -286,7 +286,7 @@ for _, row in fields.iterrows():
 
 folium.LayerControl().add_to(m)
 
-m.save('data/fields_clustered.html')
+m.save('data/moltbot/fields_clustered.html')
 ```
 
 ### Example 5: Complete Script — Field Boundaries to HTML
@@ -300,7 +300,7 @@ import geopandas as gpd
 
 # --- Configuration ---
 INPUT_GEOJSON = '.skills/field-boundaries/examples/sample_2_fields.geojson'
-OUTPUT_HTML = 'data/interactive_map.html'
+OUTPUT_HTML = 'data/moltbot/interactive_map.html'
 MAP_TITLE = 'Agricultural Fields — Minnesota'
 
 # --- Load data ---

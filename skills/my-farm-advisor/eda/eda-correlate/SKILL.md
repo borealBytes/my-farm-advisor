@@ -35,7 +35,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Load your data
-df = pd.read_csv('data/soil_measurements.csv')
+df = pd.read_csv('data/moltbot/soil_measurements.csv')
 
 # Calculate correlation matrix for numeric columns
 numeric_cols = ['ph_water', 'organic_matter', 'clay', 'sand']
@@ -65,7 +65,7 @@ plt.close()
 import pandas as pd
 
 # Load data
-df = pd.read_csv('data/soil_data.csv')
+df = pd.read_csv('data/moltbot/soil_data.csv')
 
 # Select numeric columns
 numeric_cols = df.select_dtypes(include=[np.number]).columns
@@ -93,7 +93,7 @@ import pandas as pd
 import numpy as np
 
 # Load data
-df = pd.read_csv('data/soil_data.csv')
+df = pd.read_csv('data/moltbot/soil_data.csv')
 
 # Calculate correlation matrix
 numeric_cols = df.select_dtypes(include=[np.number]).columns
@@ -129,7 +129,7 @@ import pandas as pd
 from scipy.stats import pearsonr
 
 # Load data
-df = pd.read_csv('data/soil_data.csv')
+df = pd.read_csv('data/moltbot/soil_data.csv')
 
 # Test correlation between two variables
 var1 = 'ph_water'
@@ -178,7 +178,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Load data
-df = pd.read_csv('data/soil_data.csv')
+df = pd.read_csv('data/moltbot/soil_data.csv')
 
 # Select numeric columns
 numeric_cols = ['ph_water', 'organic_matter', 'clay', 'sand', 'silt']
@@ -220,7 +220,7 @@ import pandas as pd
 from scipy.stats import pearsonr, spearmanr, kendalltau
 
 # Load data
-df = pd.read_csv('data/soil_data.csv')
+df = pd.read_csv('data/moltbot/soil_data.csv')
 
 var1 = 'ph_water'
 var2 = 'organic_matter'
@@ -263,7 +263,7 @@ os.makedirs('output/correlations', exist_ok=True)
 
 # Load data
 print("Loading data...")
-df = pd.read_csv('data/agricultural_data.csv')
+df = pd.read_csv('data/moltbot/agricultural_data.csv')
 
 # Select numeric columns
 numeric_cols = ['field_size', 'ph_water', 'organic_matter', 'clay', 'sand', 'yield']

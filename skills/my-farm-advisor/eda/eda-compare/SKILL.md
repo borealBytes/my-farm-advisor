@@ -35,7 +35,7 @@ import seaborn as sns
 from scipy import stats
 
 # Load data
-df = pd.read_csv('data/yields.csv')
+df = pd.read_csv('data/moltbot/yields.csv')
 
 # Compare yields by crop
 plt.figure(figsize=(10, 6))
@@ -67,7 +67,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Load data
-df = pd.read_csv('data/soil_by_region.csv')
+df = pd.read_csv('data/moltbot/soil_by_region.csv')
 
 # Create box plot
 plt.figure(figsize=(12, 6))
@@ -95,7 +95,7 @@ print("Created: output/ph_by_region.png")
 import pandas as pd
 
 # Load data
-df = pd.read_csv('data/yields.csv')
+df = pd.read_csv('data/moltbot/yields.csv')
 
 # Calculate statistics by group
 stats = df.groupby('crop')['yield'].agg([
@@ -126,7 +126,7 @@ import pandas as pd
 from scipy import stats
 
 # Load data
-df = pd.read_csv('data/treatment_results.csv')
+df = pd.read_csv('data/moltbot/treatment_results.csv')
 
 # Separate groups
 treated = df[df['treatment'] == 'treated']['yield']
@@ -165,7 +165,7 @@ import pandas as pd
 from scipy import stats
 
 # Load data
-df = pd.read_csv('data/yields_by_region.csv')
+df = pd.read_csv('data/moltbot/yields_by_region.csv')
 
 # Separate groups
 groups = []
@@ -215,7 +215,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Load data
-df = pd.read_csv('data/soil_data.csv')
+df = pd.read_csv('data/moltbot/soil_data.csv')
 
 # Create violin plot
 plt.figure(figsize=(12, 6))
@@ -247,7 +247,7 @@ os.makedirs('output/comparisons', exist_ok=True)
 
 # Load data
 print("Loading data...")
-df = pd.read_csv('data/field_data.csv')
+df = pd.read_csv('data/moltbot/field_data.csv')
 
 # 1. Group statistics
 print("\n1. Calculating group statistics...")
