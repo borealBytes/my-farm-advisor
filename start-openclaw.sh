@@ -232,6 +232,7 @@ if (process.env.OPENCLAW_GATEWAY_TOKEN) {
 }
 
 if (process.env.OPENCLAW_DEV_MODE === 'true') {
+    config.gateway.dangerouslyDisableDeviceAuth = true;
     config.gateway.controlUi = config.gateway.controlUi || {};
     config.gateway.controlUi.allowInsecureAuth = true;
     config.gateway.controlUi.dangerouslyDisableDeviceAuth = true;
@@ -456,10 +457,16 @@ rm -f "$CONFIG_DIR/gateway.lock" 2>/dev/null || true
 
 echo "Dev mode: ${OPENCLAW_DEV_MODE:-false}"
 
+if [ "${OPENCLAW_DEV_MODE:-false}" = "true" ]; then
+    GATEWAY_BIND="local"
+else
+    GATEWAY_BIND="lan"
+fi
+
 if [ -n "$OPENCLAW_GATEWAY_TOKEN" ]; then
     echo "Starting gateway with token auth..."
-    exec openclaw gateway --port 18789 --verbose --allow-unconfigured --bind lan --token "$OPENCLAW_GATEWAY_TOKEN"
+    exec openclaw gateway --port 18789 --verbose --allow-unconfigured --bind "$GATEWAY_BIND" --token "$OPENCLAW_GATEWAY_TOKEN"
 else
     echo "Starting gateway with device pairing (no token)..."
-    exec openclaw gateway --port 18789 --verbose --allow-unconfigured --bind lan
+    exec openclaw gateway --port 18789 --verbose --allow-unconfigured --bind "$GATEWAY_BIND"
 fi
