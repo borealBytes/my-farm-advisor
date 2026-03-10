@@ -4,6 +4,20 @@ import { MOLTBOT_PORT, STARTUP_TIMEOUT_MS } from '../config';
 import { buildEnvVars } from './env';
 import { ensureRcloneConfig } from './r2';
 
+async function isGatewayHttpReachable(sandbox: Sandbox): Promise<boolean> {
+  try {
+    const response = await Promise.race([
+      sandbox.containerFetch(new Request(`http://localhost:${MOLTBOT_PORT}/`), MOLTBOT_PORT),
+      new Promise<never>((_, reject) => {
+        setTimeout(() => reject(new Error('Gateway HTTP probe timeout')), 3000);
+      }),
+    ]);
+    return response.status > 0;
+  } catch {
+    return false;
+  }
+}
+
 async function isGatewayPortListening(sandbox: Sandbox): Promise<boolean> {
   try {
     const response = await Promise.race([
@@ -106,6 +120,10 @@ export async function ensureMoltbotGateway(sandbox: Sandbox, env: MoltbotEnv): P
     try {
       console.log('Waiting for gateway on port', MOLTBOT_PORT, 'timeout:', STARTUP_TIMEOUT_MS);
       await existingProcess.waitForPort(MOLTBOT_PORT, { mode: 'tcp', timeout: STARTUP_TIMEOUT_MS });
+      const httpReachable = await isGatewayHttpReachable(sandbox);
+      if (!httpReachable) {
+        throw new Error('Gateway TCP port opened but HTTP probe failed');
+      }
       console.log('Gateway is reachable');
       return existingProcess;
       // eslint-disable-next-line no-unused-vars
@@ -122,6 +140,12 @@ export async function ensureMoltbotGateway(sandbox: Sandbox, env: MoltbotEnv): P
 
   const portListening = await isGatewayPortListening(sandbox);
   if (portListening) {
+    const httpReachable = await isGatewayHttpReachable(sandbox);
+    if (!httpReachable) {
+      throw new Error(
+        `Gateway TCP port ${MOLTBOT_PORT} is open but HTTP probe failed. Refusing to continue with unhealthy gateway state.`,
+      );
+    }
     console.log('Gateway port is already listening; waiting for process detection to avoid double spawn...');
     const detectedProcess = await waitForGatewayProcessDetection(sandbox, 5000);
     if (detectedProcess) {
@@ -155,6 +179,10 @@ export async function ensureMoltbotGateway(sandbox: Sandbox, env: MoltbotEnv): P
   try {
     console.log('[Gateway] Waiting for OpenClaw gateway to be ready on port', MOLTBOT_PORT);
     await process.waitForPort(MOLTBOT_PORT, { mode: 'tcp', timeout: STARTUP_TIMEOUT_MS });
+    const httpReachable = await isGatewayHttpReachable(sandbox);
+    if (!httpReachable) {
+      throw new Error('Gateway HTTP probe failed after TCP port became ready');
+    }
     console.log('[Gateway] OpenClaw gateway is ready!');
 
     const logs = await process.getLogs();
