@@ -28,6 +28,41 @@ We have a few rules regarding AI usage:
 
 These rules apply only to outside contributions to Ghostty. Maintainers are exempt from these rules and may use AI tools at their discretion; they've proven themselves trustworthy to apply good judgment.
 
+## License Compatibility (Required)
+
+All contributions must be license-compatible with project release policy.
+
+- **Only permissive OSS releases**: shipped package artifacts must remain compatible with permissive licenses such as MIT or Apache-2.0.
+- **No incompatible imports**: do not submit code, assets, prompts, or skills under unclear, restrictive, or incompatible terms.
+- **Greenfield replacement required**: if a needed capability exists only under incompatible licensing, recreate it from scratch with clean-room implementation.
+- **Provenance required**: for third-party dependencies and imported materials, include license and source provenance in the PR description.
+- **Maintainer check**: PRs missing license/provenance clarity may be closed until resolved.
+
+Suggested PR checklist snippet:
+
+- [ ] All included code/assets/skills are MIT/Apache-2.0 compatible (or otherwise approved by maintainers)
+- [ ] No incompatible licensed material was imported
+- [ ] Any recreated capability was implemented clean-room
+- [ ] License and provenance notes are included in the PR description
+
+### What counts as incompatible?
+
+Unless explicitly approved by maintainers, treat the following as incompatible for shipped artifacts:
+
+- Copyleft licenses that impose downstream redistribution obligations on this project (for example GPL-family licenses).
+- Non-commercial, field-of-use restricted, source-available-only, or no-derivatives terms.
+- Custom licenses with unclear redistribution, modification, or sublicensing rights.
+- Content with missing license metadata, unknown origin, or unverifiable provenance.
+
+Generally acceptable (subject to normal review):
+
+- MIT
+- Apache-2.0
+- BSD-2-Clause / BSD-3-Clause
+- ISC
+
+When unsure, do not import. Open an issue and request maintainer guidance before proceeding.
+
 ## There are Humans Here
 
 Please remember that this software is ultimately maintained by humans. 

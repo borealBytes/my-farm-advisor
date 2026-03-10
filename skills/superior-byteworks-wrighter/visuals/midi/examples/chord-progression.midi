@@ -1,0 +1,30 @@
+# I-V-vi-IV Chord Progression
+# The "Pop Punk" progression - most common in pop music
+# Examples: Let It Be, Someone Like You, Don't Stop Believin'
+
+Track: Piano
+Tempo: 90
+Time: 4/4
+Key: C Major
+
+Measure 1 (I - C Major):
+C3 whole velocity=90
+E3 whole velocity=90
+G3 whole velocity=90
+
+Measure 2 (V - G Major):
+G2 whole velocity=90
+B2 whole velocity=90
+D3 whole velocity=90
+
+Measure 3 (vi - A Minor):
+A2 whole velocity=90
+C3 whole velocity=90
+E3 whole velocity=90
+
+Measure 4 (IV - F Major):
+F2 whole velocity=90
+A2 whole velocity=90
+C3 whole velocity=90
+
+End

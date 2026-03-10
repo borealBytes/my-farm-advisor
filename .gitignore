@@ -61,3 +61,28 @@ test/e2e/.dev.vars
 
 # npm config
 .npmrc
+
+# Data folder - completely ignored for now (will be strategic later)
+/data/
+
+# Binary data files
+*.geojson
+*.tif
+*.nc
+*.csv
+*.xlsx
+*.parquet
+*.shp
+*.shx
+*.dbf
+*.prj
+
+# Output files
+*.png
+*.jpg
+*.svg
+*.pdf
+
+# Archives
+*.zip
+*.tar.gz

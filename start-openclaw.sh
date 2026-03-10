@@ -140,6 +140,7 @@ fi
 # - Base URL override for legacy AI Gateway path
 node << 'EOFPATCH'
 const fs = require('fs');
+const path = require('path');
 
 const configPath = '/root/.openclaw/openclaw.json';
 console.log('Patching config at:', configPath);
@@ -153,6 +154,19 @@ try {
 
 config.gateway = config.gateway || {};
 config.channels = config.channels || {};
+config.skills = config.skills || {};
+config.skills.entries = config.skills.entries || {};
+
+// Ensure wrighter skills are enabled for model invocation.
+// Keep both keys for compatibility with different skill-key conventions.
+config.skills.entries.wrighter = {
+    ...(config.skills.entries.wrighter || {}),
+    enabled: true,
+};
+config.skills.entries['superior-byteworks-wrighter'] = {
+    ...(config.skills.entries['superior-byteworks-wrighter'] || {}),
+    enabled: true,
+};
 
 // Gateway configuration
 config.gateway.port = 18789;
@@ -262,6 +276,47 @@ if (process.env.SLACK_BOT_TOKEN && process.env.SLACK_APP_TOKEN) {
 
 fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
 console.log('Configuration patched successfully');
+
+// Inject a stable writing-router directive into workspace AGENTS.md.
+// This biases wrighter for output-generation turns but avoids forcing it on
+// pure research/tooling turns.
+const workspaceDir = '/root/clawd';
+const agentsPath = path.join(workspaceDir, 'AGENTS.md');
+const markerStart = '<!-- wrighter-router:start -->';
+const markerEnd = '<!-- wrighter-router:end -->';
+const routerBlock = `${markerStart}
+## Writing Skill Router
+
+- Treat \`superior-byteworks-wrighter\` (\`wrighter\`) as the default skill for output-generation work.
+- Use it when producing final user-facing deliverables: markdown docs, templates, polished channel replies, and report artifacts.
+- Use it when creating or revising document artifacts (for example: `.md` content, publication-ready summaries, PDF writeups).
+- Do not force it for pure research/tooling turns: retrieval, data gathering, debugging, command execution, or intermediate analysis.
+- For mixed tasks, do research/tool calls first, then invoke wrighter for the final composed output.
+${markerEnd}`;
+
+try {
+    fs.mkdirSync(workspaceDir, { recursive: true });
+    let agentsContent = '';
+    if (fs.existsSync(agentsPath)) {
+        agentsContent = fs.readFileSync(agentsPath, 'utf8');
+    } else {
+        agentsContent = '# AGENTS.md\n\n';
+    }
+
+    const hasMarkers = agentsContent.includes(markerStart) && agentsContent.includes(markerEnd);
+    if (hasMarkers) {
+        const pattern = new RegExp(`${markerStart}[\\s\\S]*?${markerEnd}`, 'm');
+        agentsContent = agentsContent.replace(pattern, routerBlock);
+    } else {
+        const needsNewline = agentsContent.endsWith('\n') ? '' : '\n';
+        agentsContent = `${agentsContent}${needsNewline}\n${routerBlock}\n`;
+    }
+
+    fs.writeFileSync(agentsPath, agentsContent);
+    console.log('AGENTS.md wrighter router directive ensured');
+} catch (e) {
+    console.warn('Failed to update AGENTS.md router directive:', e && e.message ? e.message : e);
+}
 EOFPATCH
 
 # ============================================================

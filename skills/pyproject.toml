@@ -1,0 +1,10 @@
+[project]
+name = "ag-data-analysis-skills"
+version = "1.0.0"
+description = "Agricultural data analysis skills - collection meta-skill"
+requires-python = ">=3.10"
+dependencies = []
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

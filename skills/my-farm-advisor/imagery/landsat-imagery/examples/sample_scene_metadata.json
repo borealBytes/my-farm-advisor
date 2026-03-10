@@ -1,0 +1,50 @@
+{
+  "source": "USGS Landsat 8/9 Collection 2 Level-2",
+  "date_range": "2023-01-01 to 2024-12-31",
+  "aoi_source": "field-boundaries/examples/real_10_fields_iowa.geojson",
+  "scenes": [
+    {
+      "scene_id": "LC08_L2SP_029032_20230715_20230722_02_T1",
+      "satellite": "Landsat 8",
+      "acquisition_date": "2023-07-15",
+      "cloud_cover": 5,
+      "path": 29,
+      "row": 32,
+      "bounds": {
+        "west": -93.95,
+        "east": -93.4,
+        "north": 40.9,
+        "south": 40.45
+      }
+    },
+    {
+      "scene_id": "LC09_L2SP_029032_20230816_20230823_02_T1",
+      "satellite": "Landsat 9",
+      "acquisition_date": "2023-08-16",
+      "cloud_cover": 8,
+      "path": 29,
+      "row": 32,
+      "bounds": {
+        "west": -93.95,
+        "east": -93.4,
+        "north": 40.9,
+        "south": 40.45
+      }
+    },
+    {
+      "scene_id": "LC08_L2SP_029032_20240618_20240625_02_T1",
+      "satellite": "Landsat 8",
+      "acquisition_date": "2024-06-18",
+      "cloud_cover": 3,
+      "path": 29,
+      "row": 32,
+      "bounds": {
+        "west": -93.95,
+        "east": -93.4,
+        "north": 40.9,
+        "south": 40.45
+      }
+    }
+  ],
+  "note": "Sample metadata for Iowa corn belt fields. Requires USGS EarthExplorer credentials for actual download."
+}
