@@ -17,11 +17,24 @@ import pandas as pd
 matplotlib.use("Agg")
 
 _REPO = Path(__file__).resolve().parents[4]
-_SKILLS = _REPO / ".opencode" / "skills"
 _SCRIPTS = _REPO / "data" / "moltbot" / "scripts"
 _LIB = _REPO / "data" / "moltbot" / "scripts" / "lib"
 
-sys.path.insert(0, str(_SKILLS / "farm-intelligence-reporting" / "src"))
+
+def _ensure_skill_path(skill_name: str) -> Path:
+    matches = sorted(
+        (_REPO / "skills" / "my-farm-advisor").glob(f"**/{skill_name}/src")
+    )
+    if not matches:
+        raise FileNotFoundError(f"Skill source path not found for '{skill_name}'")
+    skill_path = matches[0]
+    skill_path_str = str(skill_path)
+    if skill_path_str not in sys.path:
+        sys.path.insert(0, skill_path_str)
+    return skill_path
+
+
+_ensure_skill_path("farm-intelligence-reporting")
 sys.path.insert(0, str(_SCRIPTS))
 sys.path.insert(0, str(_LIB))
 
@@ -38,15 +51,26 @@ _DEFAULT_GROWER = os.environ.get("AG_GROWER_SLUG", "iowa-demo-grower")
 _DEFAULT_FARM = os.environ.get("AG_FARM_SLUG", "iowa-demo-farm")
 
 
-def plot_soil_properties_card(field_data: pd.DataFrame, field_id: str, output_path: Path) -> None:
+def plot_soil_properties_card(
+    field_data: pd.DataFrame, field_id: str, output_path: Path
+) -> None:
     """Generate soil properties visualization card."""
     fig, axes = plt.subplots(2, 2, figsize=(12, 10))
     fig.patch.set_facecolor("#fafaf9")
 
     if field_data.empty:
         for ax in axes.flat:
-            ax.text(0.5, 0.5, "No soil data", ha="center", va="center", transform=ax.transAxes)
-        plt.savefig(output_path, dpi=150, bbox_inches="tight", facecolor=fig.get_facecolor())
+            ax.text(
+                0.5,
+                0.5,
+                "No soil data",
+                ha="center",
+                va="center",
+                transform=ax.transAxes,
+            )
+        plt.savefig(
+            output_path, dpi=150, bbox_inches="tight", facecolor=fig.get_facecolor()
+        )
         plt.close(fig)
         return
 
@@ -70,7 +94,11 @@ def plot_soil_properties_card(field_data: pd.DataFrame, field_id: str, output_pa
     # Add value labels
     for bar, val in zip(bars, values):
         ax.text(
-            val + 0.1, bar.get_y() + bar.get_height() / 2, f"{val:.1f}", va="center", fontsize=9
+            val + 0.1,
+            bar.get_y() + bar.get_height() / 2,
+            f"{val:.1f}",
+            va="center",
+            fontsize=9,
         )
 
     # Plot 2: Water Storage and CEC
@@ -83,7 +111,13 @@ def plot_soil_properties_card(field_data: pd.DataFrame, field_id: str, output_pa
     ax.set_title("Water & CEC", fontsize=11, fontweight="bold")
     # Add value labels
     for bar, val in zip(bars2, values2):
-        ax.text(bar.get_x() + bar.get_width() / 2, val + 0.5, f"{val:.1f}", ha="center", fontsize=9)
+        ax.text(
+            bar.get_x() + bar.get_width() / 2,
+            val + 0.5,
+            f"{val:.1f}",
+            ha="center",
+            fontsize=9,
+        )
 
     # Plot 3: Component and Horizon counts
     ax = axes[1, 0]
@@ -100,7 +134,11 @@ def plot_soil_properties_card(field_data: pd.DataFrame, field_id: str, output_pa
     # Add value labels
     for bar, val in zip(bars3, values3):
         ax.text(
-            bar.get_x() + bar.get_width() / 2, val + 0.2, f"{int(val)}", ha="center", fontsize=9
+            bar.get_x() + bar.get_width() / 2,
+            val + 0.2,
+            f"{int(val)}",
+            ha="center",
+            fontsize=9,
         )
 
     # Plot 4: Text summary
@@ -140,22 +178,35 @@ def plot_soil_properties_card(field_data: pd.DataFrame, field_id: str, output_pa
     )
     ax.set_title("Soil Summary", fontsize=11, fontweight="bold")
 
-    fig.suptitle(f"Soil Profile: {field_id[-8:]}", fontsize=14, fontweight="bold", y=0.98)
+    fig.suptitle(
+        f"Soil Profile: {field_id[-8:]}", fontsize=14, fontweight="bold", y=0.98
+    )
     plt.tight_layout()
-    plt.savefig(output_path, dpi=150, bbox_inches="tight", facecolor=fig.get_facecolor())
+    plt.savefig(
+        output_path, dpi=150, bbox_inches="tight", facecolor=fig.get_facecolor()
+    )
     plt.close(fig)
 
 
-def plot_texture_triangle_card(field_data: pd.DataFrame, field_id: str, output_path: Path) -> None:
+def plot_texture_triangle_card(
+    field_data: pd.DataFrame, field_id: str, output_path: Path
+) -> None:
     """Generate texture visualization card."""
     fig, ax = plt.subplots(figsize=(10, 10))
     fig.patch.set_facecolor("#fafaf9")
 
     if field_data.empty:
         ax.text(
-            0.5, 0.5, "No soil data available", ha="center", va="center", transform=ax.transAxes
+            0.5,
+            0.5,
+            "No soil data available",
+            ha="center",
+            va="center",
+            transform=ax.transAxes,
         )
-        plt.savefig(output_path, dpi=150, bbox_inches="tight", facecolor=fig.get_facecolor())
+        plt.savefig(
+            output_path, dpi=150, bbox_inches="tight", facecolor=fig.get_facecolor()
+        )
         plt.close(fig)
         return
 
@@ -171,7 +222,9 @@ def plot_texture_triangle_card(field_data: pd.DataFrame, field_id: str, output_p
     from matplotlib.patches import Polygon
 
     # Triangle vertices (Clay, Sand, Silt)
-    triangle = Polygon([[0, 0], [1, 0], [0.5, 0.866]], fill=False, edgecolor="black", linewidth=2)
+    triangle = Polygon(
+        [[0, 0], [1, 0], [0.5, 0.866]], fill=False, edgecolor="black", linewidth=2
+    )
     ax.add_patch(triangle)
 
     # Calculate position in triangle
@@ -187,7 +240,16 @@ def plot_texture_triangle_card(field_data: pd.DataFrame, field_id: str, output_p
         y = 0.866 * silt_pct / (clay_pct + sand_pct + silt_pct)
 
         # Plot the point
-        ax.scatter(x, y, s=500, c="#8B4513", marker="o", edgecolors="black", linewidths=2, zorder=5)
+        ax.scatter(
+            x,
+            y,
+            s=500,
+            c="#8B4513",
+            marker="o",
+            edgecolors="black",
+            linewidths=2,
+            zorder=5,
+        )
         ax.annotate(
             f"{field_id[-8:]}\nC:{clay:.0f}% S:{sand:.0f}% Si:{silt:.0f}%",
             (x, y),
@@ -210,11 +272,15 @@ def plot_texture_triangle_card(field_data: pd.DataFrame, field_id: str, output_p
     ax.set_title(f"Soil Texture: {field_id[-8:]}", fontsize=14, fontweight="bold")
 
     plt.tight_layout()
-    plt.savefig(output_path, dpi=150, bbox_inches="tight", facecolor=fig.get_facecolor())
+    plt.savefig(
+        output_path, dpi=150, bbox_inches="tight", facecolor=fig.get_facecolor()
+    )
     plt.close(fig)
 
 
-def plot_farm_comparison_card(all_fields_data: dict[str, pd.DataFrame], output_path: Path) -> None:
+def plot_farm_comparison_card(
+    all_fields_data: dict[str, pd.DataFrame], output_path: Path
+) -> None:
     """Generate farm-level soil comparison card."""
     fig, axes = plt.subplots(2, 2, figsize=(14, 12))
     fig.patch.set_facecolor("#fafaf9")
@@ -222,9 +288,16 @@ def plot_farm_comparison_card(all_fields_data: dict[str, pd.DataFrame], output_p
     if not all_fields_data:
         for ax in axes.flat:
             ax.text(
-                0.5, 0.5, "No soil data available", ha="center", va="center", transform=ax.transAxes
+                0.5,
+                0.5,
+                "No soil data available",
+                ha="center",
+                va="center",
+                transform=ax.transAxes,
             )
-        plt.savefig(output_path, dpi=150, bbox_inches="tight", facecolor=fig.get_facecolor())
+        plt.savefig(
+            output_path, dpi=150, bbox_inches="tight", facecolor=fig.get_facecolor()
+        )
         plt.close(fig)
         return
 
@@ -247,9 +320,16 @@ def plot_farm_comparison_card(all_fields_data: dict[str, pd.DataFrame], output_p
     if not field_ids:
         for ax in axes.flat:
             ax.text(
-                0.5, 0.5, "No valid soil data", ha="center", va="center", transform=ax.transAxes
+                0.5,
+                0.5,
+                "No valid soil data",
+                ha="center",
+                va="center",
+                transform=ax.transAxes,
             )
-        plt.savefig(output_path, dpi=150, bbox_inches="tight", facecolor=fig.get_facecolor())
+        plt.savefig(
+            output_path, dpi=150, bbox_inches="tight", facecolor=fig.get_facecolor()
+        )
         plt.close(fig)
         return
 
@@ -265,7 +345,11 @@ def plot_farm_comparison_card(all_fields_data: dict[str, pd.DataFrame], output_p
     ax.set_xticklabels(field_ids, rotation=45, ha="right")
     for bar, val in zip(bars, om_values):
         ax.text(
-            bar.get_x() + bar.get_width() / 2, val + 0.05, f"{val:.1f}", ha="center", fontsize=8
+            bar.get_x() + bar.get_width() / 2,
+            val + 0.05,
+            f"{val:.1f}",
+            ha="center",
+            fontsize=8,
         )
 
     # Plot 2: pH
@@ -278,7 +362,11 @@ def plot_farm_comparison_card(all_fields_data: dict[str, pd.DataFrame], output_p
     ax.axhline(y=7, color="red", linestyle="--", alpha=0.5, label="Neutral pH")
     for bar, val in zip(bars, ph_values):
         ax.text(
-            bar.get_x() + bar.get_width() / 2, val + 0.05, f"{val:.1f}", ha="center", fontsize=8
+            bar.get_x() + bar.get_width() / 2,
+            val + 0.05,
+            f"{val:.1f}",
+            ha="center",
+            fontsize=8,
         )
 
     # Plot 3: Available Water Storage
@@ -289,7 +377,13 @@ def plot_farm_comparison_card(all_fields_data: dict[str, pd.DataFrame], output_p
     ax.set_xticks(x_pos)
     ax.set_xticklabels(field_ids, rotation=45, ha="right")
     for bar, val in zip(bars, aws_values):
-        ax.text(bar.get_x() + bar.get_width() / 2, val + 0.5, f"{val:.0f}", ha="center", fontsize=8)
+        ax.text(
+            bar.get_x() + bar.get_width() / 2,
+            val + 0.5,
+            f"{val:.0f}",
+            ha="center",
+            fontsize=8,
+        )
 
     # Plot 4: Clay Content
     ax = axes[1, 1]
@@ -299,11 +393,19 @@ def plot_farm_comparison_card(all_fields_data: dict[str, pd.DataFrame], output_p
     ax.set_xticks(x_pos)
     ax.set_xticklabels(field_ids, rotation=45, ha="right")
     for bar, val in zip(bars, clay_values):
-        ax.text(bar.get_x() + bar.get_width() / 2, val + 0.5, f"{val:.0f}", ha="center", fontsize=8)
+        ax.text(
+            bar.get_x() + bar.get_width() / 2,
+            val + 0.5,
+            f"{val:.0f}",
+            ha="center",
+            fontsize=8,
+        )
 
     fig.suptitle("Farm Soil Comparison", fontsize=14, fontweight="bold", y=0.98)
     plt.tight_layout()
-    plt.savefig(output_path, dpi=150, bbox_inches="tight", facecolor=fig.get_facecolor())
+    plt.savefig(
+        output_path, dpi=150, bbox_inches="tight", facecolor=fig.get_facecolor()
+    )
     plt.close(fig)
 
 

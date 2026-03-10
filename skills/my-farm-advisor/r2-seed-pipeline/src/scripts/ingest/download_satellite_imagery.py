@@ -34,15 +34,29 @@ from lib.satellite_imagery import (  # noqa: E402
 )
 
 _REPO = Path(__file__).resolve().parents[4]
-_SKILLS = _REPO / ".opencode" / "skills"
 _FIELD_INVENTORY = _REPO / os.environ.get(
-    "AG_INVENTORY_CSV", "data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/manifests/field-inventory.csv"
+    "AG_INVENTORY_CSV",
+    "data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/manifests/field-inventory.csv",
 )
 _DEFAULT_GROWER = os.environ.get("AG_GROWER_SLUG", "iowa-demo-grower")
 _DEFAULT_FARM = os.environ.get("AG_FARM_SLUG", "iowa-demo-farm")
 _DEFAULT_FARM_NAME = os.environ.get("AG_FARM_NAME", "Iowa Demo Farm")
 
-sys.path.insert(0, str(_SKILLS / "farm-intelligence-reporting" / "src"))
+
+def _ensure_skill_path(skill_name: str) -> Path:
+    matches = sorted(
+        (_REPO / "skills" / "my-farm-advisor").glob(f"**/{skill_name}/src")
+    )
+    if not matches:
+        raise FileNotFoundError(f"Skill source path not found for '{skill_name}'")
+    skill_path = matches[0]
+    skill_path_str = str(skill_path)
+    if skill_path_str not in sys.path:
+        sys.path.insert(0, skill_path_str)
+    return skill_path
+
+
+_ensure_skill_path("farm-intelligence-reporting")
 
 from pipeline import FieldReportingConfig  # noqa: E402  # pyright: ignore[reportMissingImports]
 
@@ -67,10 +81,14 @@ def _write_json(path: Path, payload: dict[str, Any]) -> None:
 
 
 def _scene_dir(sensor_root: Path, scene_date: datetime, sensor: str) -> Path:
-    return sensor_root / f"{scene_date.year}" / f"{sensor}_{scene_date.strftime('%Y%m%d')}"
+    return (
+        sensor_root / f"{scene_date.year}" / f"{sensor}_{scene_date.strftime('%Y%m%d')}"
+    )
 
 
-def _scene_paths(sensor_root: Path, scene_date: datetime, sensor: str) -> dict[str, Path]:
+def _scene_paths(
+    sensor_root: Path, scene_date: datetime, sensor: str
+) -> dict[str, Path]:
     scene_dir = _scene_dir(sensor_root, scene_date, sensor)
     stamp = scene_date.strftime("%Y%m%d")
     if sensor == "sentinel":
@@ -107,7 +125,11 @@ def _relative_to_repo(path: Path) -> str:
 def _existing_entry_is_reusable(
     entry: dict[str, Any] | None, expected_id: str, paths: dict[str, Path]
 ) -> bool:
-    if not entry or entry.get("scene_id") != expected_id or entry.get("status") != "complete":
+    if (
+        not entry
+        or entry.get("scene_id") != expected_id
+        or entry.get("status") != "complete"
+    ):
         return False
     required = [path for key, path in paths.items() if key != "scene_dir"]
     return all(path.exists() for path in required)
@@ -131,7 +153,9 @@ def _normalize_year_entry(entry: dict[str, Any]) -> dict[str, Any]:
         ]
     else:
         normalized["scenes"] = []
-    normalized["scene_count"] = int(normalized.get("scene_count", len(normalized["scenes"])))
+    normalized["scene_count"] = int(
+        normalized.get("scene_count", len(normalized["scenes"]))
+    )
     normalized.setdefault("coverage_months", [])
     normalized.setdefault("missing_months", [])
     return normalized
@@ -166,7 +190,10 @@ def _select_scene_inventory(
 ) -> list[dict[str, Any]]:
     sorted_features = sorted(
         features,
-        key=lambda feature: (feature_cloud_cover(feature), -feature_datetime(feature).timestamp()),
+        key=lambda feature: (
+            feature_cloud_cover(feature),
+            -feature_datetime(feature).timestamp(),
+        ),
     )
     by_month: dict[int, list[dict[str, Any]]] = {}
     for feature in sorted_features:
@@ -193,17 +220,23 @@ def _download_sentinel_scene(
     asset_keys = sentinel_asset_keys(feature)
     assets = feature["assets"]
     red_path = clip_asset_to_field(
-        sign_planetary_computer_href(SENTINEL_COLLECTION, assets[asset_keys["red"]]["href"]),
+        sign_planetary_computer_href(
+            SENTINEL_COLLECTION, assets[asset_keys["red"]]["href"]
+        ),
         field_geom,
         paths["red"],
     )
     nir_path = clip_asset_to_field(
-        sign_planetary_computer_href(SENTINEL_COLLECTION, assets[asset_keys["nir"]]["href"]),
+        sign_planetary_computer_href(
+            SENTINEL_COLLECTION, assets[asset_keys["nir"]]["href"]
+        ),
         field_geom,
         paths["nir"],
     )
     scl_path = clip_asset_to_field(
-        sign_planetary_computer_href(SENTINEL_COLLECTION, assets[asset_keys["scl"]]["href"]),
+        sign_planetary_computer_href(
+            SENTINEL_COLLECTION, assets[asset_keys["scl"]]["href"]
+        ),
         field_geom,
         paths["scl"],
     )
@@ -230,17 +263,23 @@ def _download_landsat_scene(
     asset_keys = landsat_asset_keys(feature)
     assets = feature["assets"]
     red_path = clip_asset_to_field(
-        sign_planetary_computer_href(LANDSAT_COLLECTION, assets[asset_keys["red"]]["href"]),
+        sign_planetary_computer_href(
+            LANDSAT_COLLECTION, assets[asset_keys["red"]]["href"]
+        ),
         field_geom,
         paths["red"],
     )
     nir_path = clip_asset_to_field(
-        sign_planetary_computer_href(LANDSAT_COLLECTION, assets[asset_keys["nir"]]["href"]),
+        sign_planetary_computer_href(
+            LANDSAT_COLLECTION, assets[asset_keys["nir"]]["href"]
+        ),
         field_geom,
         paths["nir"],
     )
     qa_path = clip_asset_to_field(
-        sign_planetary_computer_href(LANDSAT_COLLECTION, assets[asset_keys["qa"]]["href"]),
+        sign_planetary_computer_href(
+            LANDSAT_COLLECTION, assets[asset_keys["qa"]]["href"]
+        ),
         field_geom,
         paths["qa"],
     )
@@ -291,7 +330,9 @@ def _download_sensor_archive(
 ) -> None:
     sensor_root = field_satellite_dir(grower_slug, farm_slug, field_slug) / sensor
     manifest_path = sensor_root / "manifest.json"
-    previous_manifest = _load_sensor_manifest(manifest_path, sensor, field_id, field_slug)
+    previous_manifest = _load_sensor_manifest(
+        manifest_path, sensor, field_id, field_slug
+    )
     previous_by_year = {
         int(entry["year"]): _normalize_year_entry(entry)
         for entry in previous_manifest.get("years", [])
@@ -313,7 +354,9 @@ def _download_sensor_archive(
                     }
                 )
                 missing_months = [
-                    month for month in _GROWING_SEASON_MONTHS if month not in coverage_months
+                    month
+                    for month in _GROWING_SEASON_MONTHS
+                    if month not in coverage_months
                 ]
                 year_entries.append(
                     {
@@ -326,11 +369,14 @@ def _download_sensor_archive(
                         "reused": True,
                         "api_skipped": True,
                         "scenes": sorted(
-                            reusable_scenes, key=lambda scene: str(scene.get("scene_date", ""))
+                            reusable_scenes,
+                            key=lambda scene: str(scene.get("scene_date", "")),
                         ),
                     }
                 )
-                print(f"skip  {field_id} {sensor} {year} (manifest+files reusable; API skipped)")
+                print(
+                    f"skip  {field_id} {sensor} {year} (manifest+files reusable; API skipped)"
+                )
                 continue
 
         features = search_features(
@@ -382,15 +428,29 @@ def _download_sensor_archive(
 
             all_reusable = False
             print(f"run   {field_id} {sensor} {year} {feature['id']}")
-            if sensor == "sentinel":
-                scenes.append(_download_sentinel_scene(feature, field_geom, sensor_root))
-            else:
-                scenes.append(_download_landsat_scene(feature, field_geom, sensor_root))
+            try:
+                if sensor == "sentinel":
+                    scenes.append(
+                        _download_sentinel_scene(feature, field_geom, sensor_root)
+                    )
+                else:
+                    scenes.append(
+                        _download_landsat_scene(feature, field_geom, sensor_root)
+                    )
+            except Exception as exc:
+                print(
+                    f"warn  {field_id} {sensor} {year} {feature['id']} skipped: {exc}"
+                )
 
         coverage_months = sorted(
-            {int(datetime.fromisoformat(str(scene["scene_date"])).month) for scene in scenes}
+            {
+                int(datetime.fromisoformat(str(scene["scene_date"])).month)
+                for scene in scenes
+            }
         )
-        missing_months = [month for month in _GROWING_SEASON_MONTHS if month not in coverage_months]
+        missing_months = [
+            month for month in _GROWING_SEASON_MONTHS if month not in coverage_months
+        ]
         year_entries.append(
             {
                 "year": year,
@@ -400,7 +460,9 @@ def _download_sensor_archive(
                 "missing_months": missing_months,
                 "coverage_status": "full" if not missing_months else "partial",
                 "reused": all_reusable,
-                "scenes": sorted(scenes, key=lambda scene: str(scene.get("scene_date", ""))),
+                "scenes": sorted(
+                    scenes, key=lambda scene: str(scene.get("scene_date", ""))
+                ),
             }
         )
 
@@ -410,7 +472,9 @@ def _download_sensor_archive(
         "field_slug": field_slug,
         "grower_slug": grower_slug,
         "farm_slug": farm_slug,
-        "generated_at": datetime.now(UTC).isoformat(timespec="seconds").replace("+00:00", "Z"),
+        "generated_at": datetime.now(UTC)
+        .isoformat(timespec="seconds")
+        .replace("+00:00", "Z"),
         "years": sorted(year_entries, key=lambda entry: entry["year"]),
     }
     _write_json(manifest_path, manifest)

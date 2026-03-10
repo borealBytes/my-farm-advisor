@@ -127,7 +127,12 @@ def _safe_float(value: Any) -> float | None:
 def _crop_focus(field_row: dict[str, Any]) -> str:
     text = " ".join(
         str(field_row.get(key, "")).lower()
-        for key in ("rotation_outlook", "rotation_sequence", "dominant_crop", "crop_label")
+        for key in (
+            "rotation_outlook",
+            "rotation_sequence",
+            "dominant_crop",
+            "crop_label",
+        )
     )
     if "soy" in text and "corn" not in text:
         return "soybean"
@@ -157,68 +162,115 @@ def generate_field_recommendations(
 ) -> dict[str, Any]:
     crop_focus = _crop_focus(field_row)
     guidance = _guidance_for_latitude(centroid_lat, crop_focus)
-    recommendations: list[str] = []
+    action_plan: list[str] = []
+    watchouts: list[str] = []
+    optimize_for_success: list[str] = []
 
-    recommendations.append(
+    action_plan.append(
         f"{guidance.label} planning window: target {guidance.planting_window} readiness for the 2026 season."
     )
 
     if crop_focus == "corn":
-        recommendations.append(
+        action_plan.append(
             f"For this latitude band, keep corn hybrid selection centered around RM {guidance.corn_rm_range}."
         )
     elif crop_focus == "soybean":
-        recommendations.append(
+        action_plan.append(
             f"For this latitude band, keep soybean maturity selection centered around MG {guidance.soybean_mg_range}."
         )
     else:
-        recommendations.append(
+        action_plan.append(
             f"Rotation signals are mixed, so compare both corn RM {guidance.corn_rm_range or 'regional'} and soybean MG {guidance.soybean_mg_range or 'regional'} options before locking the 2026 plan."
         )
+
+    ph = _safe_float(field_row.get("avg_ph"))
+    if ph is not None:
+        if ph < 6.0:
+            action_plan.append(
+                f"Average pH is {ph:.1f}; schedule lime planning before spring fieldwork and retest after amendment."
+            )
+            watchouts.append(
+                "Low pH can suppress nutrient uptake and early vigor if liming is delayed."
+            )
+        elif ph > 7.2:
+            watchouts.append(
+                "Higher pH can increase micronutrient tie-up risk; validate tissue tests early."
+            )
 
     aws = _safe_float(field_row.get("total_aws_inches"))
     if aws is not None:
         if aws < 4.0:
-            recommendations.append(
-                "Available water storage is light, so prioritize stress monitoring through rapid-growth and reproductive windows."
+            action_plan.append(
+                f"Available water storage is {aws:.1f} in; prioritize drought-response planning and tight in-season scouting intervals."
+            )
+            watchouts.append(
+                "Moisture stress risk is elevated around rapid growth and reproductive stages."
             )
         elif aws >= 6.0:
-            recommendations.append(
-                "Water-holding capacity is a strength here; use it to support higher-yield management where drainage stays workable."
+            optimize_for_success.append(
+                f"Water-holding capacity is strong ({aws:.1f} in); lean into higher-yield fertility and population where drainage allows."
             )
 
     drainage = str(field_row.get("drainage_class", "")).lower()
     if drainage:
         if "poorly" in drainage:
-            recommendations.append(
-                "Drainage is a likely limiter, so watch saturated periods closely before sidedress, fungicide, or post-emerge passes."
+            action_plan.append(
+                "Drainage is a likely limiter; prioritize trafficability checks before sidedress, fungicide, and post-emerge operations."
+            )
+            watchouts.append(
+                "Saturated windows can cause compaction and delayed passes."
             )
         elif "well drained" in drainage:
-            recommendations.append(
-                "Better drainage supports timely field operations, but track dry-down in hot windows to avoid hidden moisture stress."
+            optimize_for_success.append(
+                "Well-drained profile supports timely operations; use that advantage to execute narrower timing windows."
             )
 
     diversity = _safe_float(field_row.get("crop_diversity"))
     if diversity is not None and diversity <= 1.0:
-        recommendations.append(
+        action_plan.append(
             "Low recent rotation diversity raises disease and weed pressure, so keep scouting intensity high and preserve trait/chemistry flexibility."
         )
+        watchouts.append(
+            "Low diversity history increases disease carryover and herbicide-resistance pressure."
+        )
 
-    monitoring = [
-        f"Watch for {guidance.watchouts[0]}.",
-        f"Also monitor {guidance.watchouts[1]}.",
-    ]
+    headlands_pct = _safe_float(field_row.get("headlands_pct"))
+    if headlands_pct is not None and headlands_pct >= 18.0:
+        optimize_for_success.append(
+            f"Headlands are {headlands_pct:.1f}% of field area; pre-plan turn rows and pass sequence to reduce overlap and compaction."
+        )
+
+    if not optimize_for_success:
+        optimize_for_success.append(
+            "Use the field poster rankings to prioritize this field's strongest category and allocate inputs where return potential is highest."
+        )
+
+    watchouts.extend(
+        [
+            f"Regional watchout: {guidance.watchouts[0]}.",
+            f"Regional watchout: {guidance.watchouts[1]}.",
+        ]
+    )
+
+    dedup_action = list(dict.fromkeys(action_plan))
+    dedup_watchouts = list(dict.fromkeys(watchouts))
+    dedup_optimize = list(dict.fromkeys(optimize_for_success))
 
     return {
         "crop_focus": crop_focus,
         "region": guidance.label,
         "planting_window": guidance.planting_window,
-        "recommendations": recommendations[:4],
-        "monitoring": monitoring,
+        "recommendations": dedup_action[:5],
+        "monitoring": dedup_watchouts[:4],
+        "action_plan": dedup_action[:5],
+        "watchouts": dedup_watchouts[:4],
+        "optimize_for_success": dedup_optimize[:4],
     }
 
 
-def generate_farm_recommendations(field_df: pd.DataFrame, *, farm_name: str) -> dict[str, Any]:
+def generate_farm_recommendations(
+    field_df: pd.DataFrame, *, farm_name: str
+) -> dict[str, Any]:
     if field_df.empty:
         return {
             "title": f"{farm_name} 2026 strategy outlook",
@@ -233,17 +285,23 @@ def generate_farm_recommendations(field_df: pd.DataFrame, *, farm_name: str) -> 
         "soybean": sum(1 for row in row_dicts if _crop_focus(row) == "soybean"),
         "mixed": sum(1 for row in row_dicts if _crop_focus(row) == "mixed"),
     }
-    avg_aws = (
+    avg_aws_raw = (
         field_df["total_aws_inches"].dropna().mean()
         if "total_aws_inches" in field_df.columns
         else None
     )
-    avg_om = field_df["avg_om_pct"].dropna().mean() if "avg_om_pct" in field_df.columns else None
+    avg_om_raw = (
+        field_df["avg_om_pct"].dropna().mean()
+        if "avg_om_pct" in field_df.columns
+        else None
+    )
+    avg_aws = _safe_float(avg_aws_raw)
+    avg_om = _safe_float(avg_om_raw)
     low_diversity_fields = 0
     if "crop_diversity" in field_df.columns:
         low_diversity_fields = int((field_df["crop_diversity"].fillna(99) <= 1).sum())
 
-    lead_crop = max(focus_counts, key=focus_counts.get)
+    lead_crop = max(focus_counts.items(), key=lambda item: item[1])[0]
     lead_label = (
         "corn-heavy"
         if lead_crop == "corn"
@@ -254,11 +312,11 @@ def generate_farm_recommendations(field_df: pd.DataFrame, *, farm_name: str) -> 
     bullets = [
         f"{farm_name} reads as a {lead_label} portfolio for 2026, so keep whole-farm seed, fertility, and fungicide plans aligned around that bias.",
     ]
-    if avg_aws is not None and not pd.isna(avg_aws):
+    if avg_aws is not None:
         bullets.append(
             f"Average available water storage is {float(avg_aws):.1f} in across the farm; use that spread to rank which fields need the earliest stress scouting."
         )
-    if avg_om is not None and not pd.isna(avg_om):
+    if avg_om is not None:
         bullets.append(
             f"Average organic matter is {float(avg_om):.1f}%, which should shape residue, tillage, and nutrient timing decisions across the grower group."
         )

@@ -24,16 +24,30 @@ from rasterio.warp import Resampling, reproject
 matplotlib.use("Agg")
 
 _REPO = Path(__file__).resolve().parents[4]
-_SKILLS = _REPO / ".opencode" / "skills"
 _LIB = _REPO / "data" / "moltbot" / "scripts" / "lib"
 _FIELD_INVENTORY = _REPO / os.environ.get(
-    "AG_INVENTORY_CSV", "data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/manifests/field-inventory.csv"
+    "AG_INVENTORY_CSV",
+    "data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/manifests/field-inventory.csv",
 )
 _DEFAULT_GROWER = os.environ.get("AG_GROWER_SLUG", "iowa-demo-grower")
 _DEFAULT_FARM = os.environ.get("AG_FARM_SLUG", "iowa-demo-farm")
 _DEFAULT_FARM_NAME = os.environ.get("AG_FARM_NAME", "Iowa Demo Farm")
 
-sys.path.insert(0, str(_SKILLS / "farm-intelligence-reporting" / "src"))
+
+def _ensure_skill_path(skill_name: str) -> Path:
+    matches = sorted(
+        (_REPO / "skills" / "my-farm-advisor").glob(f"**/{skill_name}/src")
+    )
+    if not matches:
+        raise FileNotFoundError(f"Skill source path not found for '{skill_name}'")
+    skill_path = matches[0]
+    skill_path_str = str(skill_path)
+    if skill_path_str not in sys.path:
+        sys.path.insert(0, skill_path_str)
+    return skill_path
+
+
+_ensure_skill_path("farm-intelligence-reporting")
 sys.path.insert(0, str(_LIB))
 
 from pipeline import (  # noqa: E402
@@ -55,7 +69,11 @@ from satellite_imagery import write_single_band_raster  # noqa: E402
 
 _SCRIPT = Path(__file__)
 _CROP_CARD_SPECS = {
-    "corn": {"label": "Corn average NDVI", "crop_name": "Corn", "rollup": "ndvi_corn_rollup.tif"},
+    "corn": {
+        "label": "Corn average NDVI",
+        "crop_name": "Corn",
+        "rollup": "ndvi_corn_rollup.tif",
+    },
     "soybean": {
         "label": "Soybean average NDVI",
         "crop_name": "Soybeans",
@@ -98,6 +116,7 @@ def _field_root(field_slug: str) -> Path:
     return (
         _REPO
         / "data"
+        / "moltbot"
         / "growers"
         / _DEFAULT_GROWER
         / "farms"
@@ -130,7 +149,11 @@ def _field_array_stats(
     valid = array[np.isfinite(array)]
     if valid.size == 0:
         return None, None, None
-    return array, float(np.nanmean(valid)), (float(np.nanmin(valid)), float(np.nanmax(valid)))
+    return (
+        array,
+        float(np.nanmean(valid)),
+        (float(np.nanmin(valid)), float(np.nanmax(valid))),
+    )
 
 
 def _read_resampled_like(
@@ -215,7 +238,11 @@ def _collect_peak_scene_rows(
 def _compute_peak_percentile_array(
     scene_rows: list[dict[str, Any]], percentile: float = 95.0
 ) -> tuple[
-    np.ndarray | None, float | None, tuple[float, float] | None, Path | None, list[dict[str, Any]]
+    np.ndarray | None,
+    float | None,
+    tuple[float, float] | None,
+    Path | None,
+    list[dict[str, Any]],
 ]:
     if not scene_rows:
         return None, None, None, None, []
@@ -227,12 +254,18 @@ def _compute_peak_percentile_array(
     for row in scene_rows:
         ndvi_path = Path(row["ndvi_path"])
         crop_code = int(row["crop_code"])
-        ndvi_array = _read_resampled_like(ndvi_path, reference_path, resampling=Resampling.bilinear)
+        ndvi_array = _read_resampled_like(
+            ndvi_path, reference_path, resampling=Resampling.bilinear
+        )
         cdl_array = _read_resampled_like(
             Path(row["cdl_raster"]), reference_path, resampling=Resampling.nearest
         )
-        crop_mask = np.isfinite(cdl_array) & (np.rint(cdl_array).astype("int32") == crop_code)
-        masked = np.where(crop_mask & np.isfinite(ndvi_array), ndvi_array, np.nan).astype("float32")
+        crop_mask = np.isfinite(cdl_array) & (
+            np.rint(cdl_array).astype("int32") == crop_code
+        )
+        masked = np.where(
+            crop_mask & np.isfinite(ndvi_array), ndvi_array, np.nan
+        ).astype("float32")
         if np.isfinite(masked).any():
             masked_arrays.append(masked)
             used_rows.append(row)
@@ -245,9 +278,9 @@ def _compute_peak_percentile_array(
     valid_cols = np.any(np.isfinite(flat), axis=0)
     peak_flat = np.full(flat.shape[1], np.nan, dtype="float32")
     if valid_cols.any():
-        peak_flat[valid_cols] = np.nanpercentile(flat[:, valid_cols], percentile, axis=0).astype(
-            "float32"
-        )
+        peak_flat[valid_cols] = np.nanpercentile(
+            flat[:, valid_cols], percentile, axis=0
+        ).astype("float32")
     peak_array = peak_flat.reshape(stacked.shape[1:])
     valid = peak_array[np.isfinite(peak_array)]
     if valid.size == 0:
@@ -268,7 +301,13 @@ def _placeholder_card(
     fig.patch.set_facecolor("#fafaf9")
     ax.axis("off")
     ax.text(
-        0.04, 0.90, title, fontsize=14, fontweight="bold", color="#0f172a", transform=ax.transAxes
+        0.04,
+        0.90,
+        title,
+        fontsize=14,
+        fontweight="bold",
+        color="#0f172a",
+        transform=ax.transAxes,
     )
     ax.text(
         0.5,
@@ -305,7 +344,9 @@ def _placeholder_card(
             wrap=True,
         )
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(output_path, dpi=170, bbox_inches="tight", facecolor=fig.get_facecolor())
+    fig.savefig(
+        output_path, dpi=170, bbox_inches="tight", facecolor=fig.get_facecolor()
+    )
     plt.close(fig)
 
 
@@ -343,7 +384,9 @@ def _render_raster_card(
         va="bottom",
     )
 
-    image = image_ax.imshow(np.ma.masked_invalid(array), cmap="RdYlGn", vmin=vmin, vmax=vmax)
+    image = image_ax.imshow(
+        np.ma.masked_invalid(array), cmap="RdYlGn", vmin=vmin, vmax=vmax
+    )
     image_ax.axis("off")
     image_ax.text(
         0.02,
@@ -352,12 +395,18 @@ def _render_raster_card(
         transform=image_ax.transAxes,
         fontsize=8.5,
         color="#0f172a",
-        bbox={"boxstyle": "round,pad=0.25", "facecolor": "#f8fafc", "edgecolor": "#cbd5e1"},
+        bbox={
+            "boxstyle": "round,pad=0.25",
+            "facecolor": "#f8fafc",
+            "edgecolor": "#cbd5e1",
+        },
     )
     fig.colorbar(image, cax=color_ax, label="NDVI")
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(output_path, dpi=170, bbox_inches="tight", facecolor=fig.get_facecolor())
+    fig.savefig(
+        output_path, dpi=170, bbox_inches="tight", facecolor=fig.get_facecolor()
+    )
     plt.close(fig)
     return True
 
@@ -366,7 +415,9 @@ def _sensor_rank(sensor: str) -> int:
     return 0 if sensor == "sentinel" else 1
 
 
-def _select_current_season_scenes(scene_rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def _select_current_season_scenes(
+    scene_rows: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
     selected: dict[int, dict[str, Any]] = {}
     for row in scene_rows:
         scene_date = row.get("scene_date")
@@ -445,7 +496,9 @@ def _scene_metric_summary(
             invert=True,
             out_shape=(src.height, src.width),
         )
-    cdl_array = _read_resampled_like(cdl_raster, ndvi_path, resampling=Resampling.nearest)
+    cdl_array = _read_resampled_like(
+        cdl_raster, ndvi_path, resampling=Resampling.nearest
+    )
     valid_mask = (
         field_mask
         & np.isfinite(ndvi_array)
@@ -462,7 +515,9 @@ def _scene_metric_summary(
     }
 
 
-def _select_monthly_scene_rows(scene_rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def _select_monthly_scene_rows(
+    scene_rows: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
     by_year: dict[int, list[dict[str, Any]]] = {}
     for row in scene_rows:
         by_year.setdefault(int(row["year"]), []).append(row)
@@ -594,7 +649,9 @@ def _render_current_cumulative_card(
         x_min, x_max, y_max = 1, 366, 1.0
     for crop_name, ax in crop_axes.items():
         crop_groups = [
-            group for group in year_groups if str(group["crop_name"].iloc[0]) == crop_name
+            group
+            for group in year_groups
+            if str(group["crop_name"].iloc[0]) == crop_name
         ]
         ax.set_facecolor("#ffffff")
         ax.grid(True, alpha=0.25)
@@ -638,30 +695,51 @@ def _render_current_cumulative_card(
         ax.legend(title="Year", fontsize=9, title_fontsize=9, loc="upper left")
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(output_path, dpi=170, bbox_inches="tight", facecolor=fig.get_facecolor())
+    fig.savefig(
+        output_path, dpi=170, bbox_inches="tight", facecolor=fig.get_facecolor()
+    )
     plt.close(fig)
-    return True, None, {key: sorted(set(value)) for key, value in crop_years.items() if value}
+    return (
+        True,
+        None,
+        {key: sorted(set(value)) for key, value in crop_years.items() if value},
+    )
 
 
 def _join_rows(field_slug: str) -> pd.DataFrame:
     join_csv = (
-        field_tables_dir(_DEFAULT_GROWER, _DEFAULT_FARM, field_slug) / "ndvi_year_crop_join.csv"
+        field_tables_dir(_DEFAULT_GROWER, _DEFAULT_FARM, field_slug)
+        / "ndvi_year_crop_join.csv"
     )
     if not join_csv.exists():
         return pd.DataFrame()
-    return pd.read_csv(join_csv)
+    try:
+        return pd.read_csv(join_csv)
+    except pd.errors.EmptyDataError:
+        return pd.DataFrame()
 
 
 def _crop_years(join_df: pd.DataFrame, crop_name: str) -> list[int]:
-    if join_df.empty or "crop_name" not in join_df.columns or "year" not in join_df.columns:
+    if (
+        join_df.empty
+        or "crop_name" not in join_df.columns
+        or "year" not in join_df.columns
+    ):
         return []
-    years = join_df.loc[join_df["crop_name"] == crop_name, "year"].dropna().astype(int).tolist()
+    years = (
+        join_df.loc[join_df["crop_name"] == crop_name, "year"]
+        .dropna()
+        .astype(int)
+        .tolist()
+    )
     return sorted(years)
 
 
 def _card_outputs(field_slug: str) -> dict[str, Path]:
     return {
-        "corn": field_feature_path(_DEFAULT_GROWER, _DEFAULT_FARM, field_slug, "ndvi_corn.png"),
+        "corn": field_feature_path(
+            _DEFAULT_GROWER, _DEFAULT_FARM, field_slug, "ndvi_corn.png"
+        ),
         "soybean": field_feature_path(
             _DEFAULT_GROWER, _DEFAULT_FARM, field_slug, "ndvi_soybean.png"
         ),
@@ -716,7 +794,8 @@ def main() -> None:
         manifest_dir = field_manifest_dir(_DEFAULT_GROWER, _DEFAULT_FARM, field_slug)
         boundary_path = field_boundary_path(_DEFAULT_GROWER, _DEFAULT_FARM, field_slug)
         join_csv = (
-            field_tables_dir(_DEFAULT_GROWER, _DEFAULT_FARM, field_slug) / "ndvi_year_crop_join.csv"
+            field_tables_dir(_DEFAULT_GROWER, _DEFAULT_FARM, field_slug)
+            / "ndvi_year_crop_join.csv"
         )
         outputs = _card_outputs(field_slug)
 
@@ -749,7 +828,9 @@ def main() -> None:
         manifest = build_step_manifest(
             step_name=f"ndvi_card_render_{field_id}",
             input_paths=input_paths,
-            output_paths=[path for key, path in outputs.items() if not key.endswith("_tif")],
+            output_paths=[
+                path for key, path in outputs.items() if not key.endswith("_tif")
+            ],
             code_paths=[_SCRIPT],
             config=config,
         )
@@ -777,13 +858,17 @@ def main() -> None:
             reason = None
             if rollup_path.exists() and boundary_path.exists():
                 try:
-                    array, mean_ndvi, value_range = _field_array_stats(rollup_path, boundary_path)
+                    array, mean_ndvi, value_range = _field_array_stats(
+                        rollup_path, boundary_path
+                    )
                 except Exception as exc:
                     reason = f"failed to read rollup raster: {exc}"
             elif crop_years:
                 reason = f"missing rollup raster for {crop_name.lower()} years"
             else:
-                reason = f"no {crop_name.lower()} years in the available crop history window"
+                reason = (
+                    f"no {crop_name.lower()} years in the available crop history window"
+                )
 
             subtitle_lines = []
             if crop_years:
@@ -791,7 +876,9 @@ def main() -> None:
                     f"Years included: {', '.join(str(year) for year in crop_years)} ({len(crop_years)} total)"
                 )
             else:
-                subtitle_lines.append("Years included: none in the current 5-year crop window")
+                subtitle_lines.append(
+                    "Years included: none in the current 5-year crop window"
+                )
             subtitle_lines.append(
                 f"Source raster: {rollup_path.name if rollup_path.exists() else 'not available'}"
             )
@@ -815,7 +902,9 @@ def main() -> None:
                 "years": crop_years,
                 "year_count": len(crop_years),
                 "output_png": str(outputs[card_key].relative_to(_REPO)),
-                "rollup_tif": str(rollup_path.relative_to(_REPO)) if rollup_path.exists() else None,
+                "rollup_tif": str(rollup_path.relative_to(_REPO))
+                if rollup_path.exists()
+                else None,
                 "reason": reason,
                 "mean_ndvi": mean_ndvi,
             }
@@ -874,13 +963,18 @@ def main() -> None:
                 "years": sorted({int(row["year"]) for row in used_rows}),
                 "sources": sorted({str(row["sensor"]) for row in used_rows}),
                 "output_png": str(outputs[peak_key].relative_to(_REPO)),
-                "output_tif": str(tif_output.relative_to(_REPO)) if tif_output.exists() else None,
+                "output_tif": str(tif_output.relative_to(_REPO))
+                if tif_output.exists()
+                else None,
                 "reason": reason,
                 "mean_ndvi": peak_mean,
             }
 
         rendered_current, current_reason, crop_years = _render_current_cumulative_card(
-            outputs["current_season_cumulative"], selected_scene_rows, join_df, boundary_path
+            outputs["current_season_cumulative"],
+            selected_scene_rows,
+            join_df,
+            boundary_path,
         )
         summary_payload["cards"]["current_season_cumulative"] = {
             "status": "available" if rendered_current else "unavailable",

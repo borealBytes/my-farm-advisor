@@ -12,14 +12,27 @@ import geopandas as gpd
 import pandas as pd
 
 _REPO = Path(__file__).resolve().parents[4]
-_SKILLS = _REPO / ".opencode" / "skills"
 _LIB = _REPO / "data" / "moltbot" / "scripts" / "lib"
 
-sys.path.insert(0, str(_SKILLS / "farm-intelligence-reporting" / "src"))
-sys.path.insert(0, str(_SKILLS / "headlands-ring" / "src"))
-sys.path.insert(0, str(_SKILLS / "cdl-cropland" / "src"))
-sys.path.insert(0, str(_SKILLS / "crop-strategy" / "src"))
-sys.path.insert(0, str(_SKILLS / "nasa-power-weather" / "src"))
+
+def _ensure_skill_path(skill_name: str) -> Path:
+    matches = sorted(
+        (_REPO / "skills" / "my-farm-advisor").glob(f"**/{skill_name}/src")
+    )
+    if not matches:
+        raise FileNotFoundError(f"Skill source path not found for '{skill_name}'")
+    skill_path = matches[0]
+    skill_path_str = str(skill_path)
+    if skill_path_str not in sys.path:
+        sys.path.insert(0, skill_path_str)
+    return skill_path
+
+
+_FARM_INTEL_SKILL = _ensure_skill_path("farm-intelligence-reporting")
+_HEADLANDS_SKILL = _ensure_skill_path("headlands-ring")
+_CDL_SKILL = _ensure_skill_path("cdl-cropland")
+_CROP_STRATEGY_SKILL = _ensure_skill_path("crop-strategy")
+_WEATHER_SKILL = _ensure_skill_path("nasa-power-weather")
 sys.path.insert(0, str(_LIB))
 
 from cdl_reporting import summarize_crop_history
@@ -54,17 +67,18 @@ _DEFAULT_GROWER = os.environ.get("AG_GROWER_SLUG", "iowa-demo-grower")
 _DEFAULT_FARM = os.environ.get("AG_FARM_SLUG", "iowa-demo-farm")
 _DEFAULT_FARM_NAME = os.environ.get("AG_FARM_NAME", "Iowa Demo Farm")
 _FIELD_INVENTORY = _REPO / os.environ.get(
-    "AG_INVENTORY_CSV", "data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/manifests/field-inventory.csv"
+    "AG_INVENTORY_CSV",
+    "data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/manifests/field-inventory.csv",
 )
 _CDL_PRIMARY = farm_cdl_preferred_full_composition_path(_DEFAULT_GROWER, _DEFAULT_FARM)
 _CDL_FALLBACK = shared_cdl_preferred_full_composition_path()
 _CODE_PATHS = [
     _SCRIPT,
-    _SKILLS / "crop-strategy" / "src" / "crop_strategy.py",
-    _SKILLS / "farm-intelligence-reporting" / "src" / "reporting.py",
-    _SKILLS / "cdl-cropland" / "src" / "cdl_reporting.py",
-    _SKILLS / "headlands-ring" / "src" / "headlands_ring.py",
-    _SKILLS / "nasa-power-weather" / "src" / "weather_reporting.py",
+    _CROP_STRATEGY_SKILL / "crop_strategy.py",
+    _FARM_INTEL_SKILL / "reporting.py",
+    _CDL_SKILL / "cdl_reporting.py",
+    _HEADLANDS_SKILL / "headlands_ring.py",
+    _WEATHER_SKILL / "weather_reporting.py",
     _LIB / "paths.py",
 ]
 
@@ -108,6 +122,7 @@ def _ndvi_asset_links(field_slug: str | None) -> list[str]:
     feature_dir = (
         _REPO
         / "data"
+        / "moltbot"
         / "growers"
         / _DEFAULT_GROWER
         / "farms"
@@ -127,7 +142,9 @@ def _ndvi_asset_links(field_slug: str | None) -> list[str]:
     ]:
         path = feature_dir / filename
         if path.exists():
-            links.append(f"[{label}](../../fields/{field_slug}/derived/features/{filename})")
+            links.append(
+                f"[{label}](../../fields/{field_slug}/derived/features/{filename})"
+            )
     return links
 
 
@@ -140,7 +157,9 @@ def _field_centroid_latitude(fields: gpd.GeoDataFrame, row_index: int) -> float:
     if row.crs:
         projected = row.to_crs(_utm(row.iloc[0]))
         centroid = projected.geometry.centroid.iloc[0]
-        centroid_wgs84 = gpd.GeoSeries([centroid], crs=projected.crs).to_crs("EPSG:4326").iloc[0]
+        centroid_wgs84 = (
+            gpd.GeoSeries([centroid], crs=projected.crs).to_crs("EPSG:4326").iloc[0]
+        )
         return float(centroid_wgs84.y)
     return float(row.geometry.centroid.iloc[0].y)
 
@@ -230,7 +249,9 @@ def main() -> None:
         cdl_summary=crop_sum,
     )
     farm_df = build_farm_reporting_dataset(field_df)
-    farm_strategy = generate_farm_recommendations(field_df, farm_name=_DEFAULT_FARM_NAME)
+    farm_strategy = generate_farm_recommendations(
+        field_df, farm_name=_DEFAULT_FARM_NAME
+    )
 
     total_ac = float(farm_df.iloc[0].get("total_acres", 0))
     n_fields = int(farm_df.iloc[0].get("field_count", len(fields)))
@@ -321,7 +342,9 @@ def main() -> None:
             ("properties", "Soil Properties"),
             ("texture", "Texture RGB"),
         ]:
-            card_link = f"../../fields/{field_slug}/derived/summaries/soil_{card_type}.png"
+            card_link = (
+                f"../../fields/{field_slug}/derived/summaries/soil_{card_type}.png"
+            )
             card_path = output_path.parent / card_link
             if card_path.exists():
                 soil_cards_exist = True

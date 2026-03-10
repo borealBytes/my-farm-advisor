@@ -17,17 +17,31 @@ import rasterio
 from rasterio.warp import Resampling, reproject
 
 _REPO = Path(__file__).resolve().parents[4]
-_SKILLS = _REPO / ".opencode" / "skills"
 _LIB = _REPO / "data" / "moltbot" / "scripts" / "lib"
 _FIELD_INVENTORY = _REPO / os.environ.get(
-    "AG_INVENTORY_CSV", "data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/manifests/field-inventory.csv"
+    "AG_INVENTORY_CSV",
+    "data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/manifests/field-inventory.csv",
 )
 _DEFAULT_GROWER = os.environ.get("AG_GROWER_SLUG", "iowa-demo-grower")
 _DEFAULT_FARM = os.environ.get("AG_FARM_SLUG", "iowa-demo-farm")
 _DEFAULT_FARM_NAME = os.environ.get("AG_FARM_NAME", "Iowa Demo Farm")
 
-sys.path.insert(0, str(_SKILLS / "farm-intelligence-reporting" / "src"))
-sys.path.insert(0, str(_SKILLS / "cdl-cropland" / "src"))
+
+def _ensure_skill_path(skill_name: str) -> Path:
+    matches = sorted(
+        (_REPO / "skills" / "my-farm-advisor").glob(f"**/{skill_name}/src")
+    )
+    if not matches:
+        raise FileNotFoundError(f"Skill source path not found for '{skill_name}'")
+    skill_path = matches[0]
+    skill_path_str = str(skill_path)
+    if skill_path_str not in sys.path:
+        sys.path.insert(0, skill_path_str)
+    return skill_path
+
+
+_ensure_skill_path("farm-intelligence-reporting")
+_ensure_skill_path("cdl-cropland")
 sys.path.insert(0, str(_LIB))
 
 from cdl_reporting import (
@@ -72,6 +86,7 @@ def _sensor_manifest_paths(field_slug: str) -> list[Path]:
     base = (
         _REPO
         / "data"
+        / "moltbot"
         / "growers"
         / _DEFAULT_GROWER
         / "farms"
@@ -109,7 +124,9 @@ def _dominant_crop_lookup(cdl_path: Path) -> dict[tuple[str, int], str]:
     cdl = filter_cdl_categories(pd.read_csv(cdl_path))
     if cdl.empty:
         return {}
-    dominant = cdl.sort_values(["field_id", "year", "pct"], ascending=[True, True, False])
+    dominant = cdl.sort_values(
+        ["field_id", "year", "pct"], ascending=[True, True, False]
+    )
     dominant = dominant.groupby(["field_id", "year"], as_index=False).first()
     return {
         (str(row["field_id"]), int(row["year"])): str(row["crop_name"])
@@ -141,7 +158,9 @@ def _write_mean_raster(output_path: Path, raster_paths: list[Path]) -> Path:
     safe_sum = np.nansum(stacked, axis=0)
     mean_array = np.full(stacked.shape[1:], np.nan, dtype="float32")
     valid_mask = valid_counts > 0
-    mean_array[valid_mask] = (safe_sum[valid_mask] / valid_counts[valid_mask]).astype("float32")
+    mean_array[valid_mask] = (safe_sum[valid_mask] / valid_counts[valid_mask]).astype(
+        "float32"
+    )
     with rasterio.open(reference) as src:
         profile = src.profile.copy()
     profile.update(dtype=rasterio.float32, count=1, compress="lzw", nodata=np.nan)
@@ -157,19 +176,27 @@ def _output_paths(
     field_id: str,
 ) -> list[Path]:
     outputs: list[Path] = [
-        field_summary_path(_DEFAULT_GROWER, _DEFAULT_FARM, field_slug, "ndvi_yearly_summary.json"),
-        field_tables_dir(_DEFAULT_GROWER, _DEFAULT_FARM, field_slug) / "ndvi_year_crop_join.csv",
+        field_summary_path(
+            _DEFAULT_GROWER, _DEFAULT_FARM, field_slug, "ndvi_yearly_summary.json"
+        ),
+        field_tables_dir(_DEFAULT_GROWER, _DEFAULT_FARM, field_slug)
+        / "ndvi_year_crop_join.csv",
     ]
     for year in sorted(yearly_inputs):
         outputs.append(
             field_feature_path(
-                _DEFAULT_GROWER, _DEFAULT_FARM, field_slug, f"ndvi_year_{year}_composite.tif"
+                _DEFAULT_GROWER,
+                _DEFAULT_FARM,
+                field_slug,
+                f"ndvi_year_{year}_composite.tif",
             )
         )
     crops = {crop_lookup.get((field_id, year), "") for year in yearly_inputs}
     if "Corn" in crops:
         outputs.append(
-            field_feature_path(_DEFAULT_GROWER, _DEFAULT_FARM, field_slug, "ndvi_corn_rollup.tif")
+            field_feature_path(
+                _DEFAULT_GROWER, _DEFAULT_FARM, field_slug, "ndvi_corn_rollup.tif"
+            )
         )
     if "Soybeans" in crops:
         outputs.append(
@@ -233,7 +260,10 @@ def main() -> None:
             if not raster_paths:
                 continue
             composite_path = field_feature_path(
-                _DEFAULT_GROWER, _DEFAULT_FARM, field_slug, f"ndvi_year_{year}_composite.tif"
+                _DEFAULT_GROWER,
+                _DEFAULT_FARM,
+                field_slug,
+                f"ndvi_year_{year}_composite.tif",
             )
             _write_mean_raster(composite_path, raster_paths)
             crop_name = crop_lookup.get((field_id, year), "Unknown")
@@ -254,16 +284,21 @@ def main() -> None:
             if not paths:
                 continue
             target_name = (
-                "ndvi_corn_rollup.tif" if crop_name == "Corn" else "ndvi_soybean_rollup.tif"
+                "ndvi_corn_rollup.tif"
+                if crop_name == "Corn"
+                else "ndvi_soybean_rollup.tif"
             )
             _write_mean_raster(
-                field_feature_path(_DEFAULT_GROWER, _DEFAULT_FARM, field_slug, target_name),
+                field_feature_path(
+                    _DEFAULT_GROWER, _DEFAULT_FARM, field_slug, target_name
+                ),
                 paths,
             )
 
         summary_df = pd.DataFrame(summary_rows)
         join_csv = (
-            field_tables_dir(_DEFAULT_GROWER, _DEFAULT_FARM, field_slug) / "ndvi_year_crop_join.csv"
+            field_tables_dir(_DEFAULT_GROWER, _DEFAULT_FARM, field_slug)
+            / "ndvi_year_crop_join.csv"
         )
         join_csv.parent.mkdir(parents=True, exist_ok=True)
         summary_df.to_csv(join_csv, index=False)
@@ -273,7 +308,8 @@ def main() -> None:
         summary_json.parent.mkdir(parents=True, exist_ok=True)
         summary_json.write_text(
             json.dumps(
-                {"field_id": field_id, "field_slug": field_slug, "years": summary_rows}, indent=2
+                {"field_id": field_id, "field_slug": field_slug, "years": summary_rows},
+                indent=2,
             )
             + "\n",
             encoding="utf-8",

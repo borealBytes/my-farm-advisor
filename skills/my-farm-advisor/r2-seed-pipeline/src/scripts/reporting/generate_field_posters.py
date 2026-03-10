@@ -20,14 +20,27 @@ from matplotlib.patches import Rectangle
 matplotlib.use("Agg")
 
 _REPO = Path(__file__).resolve().parents[4]
-_SKILLS = _REPO / ".opencode" / "skills"
 _LIB = _REPO / "data" / "moltbot" / "scripts" / "lib"
 
-sys.path.insert(0, str(_SKILLS / "farm-intelligence-reporting" / "src"))
-sys.path.insert(0, str(_SKILLS / "headlands-ring" / "src"))
-sys.path.insert(0, str(_SKILLS / "ssurgo-soil" / "src"))
-sys.path.insert(0, str(_SKILLS / "cdl-cropland" / "src"))
-sys.path.insert(0, str(_SKILLS / "nasa-power-weather" / "src"))
+
+def _ensure_skill_path(skill_name: str) -> Path:
+    matches = sorted(
+        (_REPO / "skills" / "my-farm-advisor").glob(f"**/{skill_name}/src")
+    )
+    if not matches:
+        raise FileNotFoundError(f"Skill source path not found for '{skill_name}'")
+    skill_path = matches[0]
+    skill_path_str = str(skill_path)
+    if skill_path_str not in sys.path:
+        sys.path.insert(0, skill_path_str)
+    return skill_path
+
+
+_ensure_skill_path("farm-intelligence-reporting")
+_ensure_skill_path("headlands-ring")
+_ensure_skill_path("ssurgo-soil")
+_ensure_skill_path("cdl-cropland")
+_ensure_skill_path("nasa-power-weather")
 sys.path.insert(0, str(_LIB))
 
 import reporting as reporting_mod
@@ -72,7 +85,8 @@ _DEFAULT_GROWER = os.environ.get("AG_GROWER_SLUG", "iowa-demo-grower")
 _DEFAULT_FARM = os.environ.get("AG_FARM_SLUG", "iowa-demo-farm")
 _DEFAULT_FARM_NAME = os.environ.get("AG_FARM_NAME", "Iowa Demo Farm")
 _FIELD_INVENTORY = _REPO / os.environ.get(
-    "AG_INVENTORY_CSV", "data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/manifests/field-inventory.csv"
+    "AG_INVENTORY_CSV",
+    "data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/manifests/field-inventory.csv",
 )
 _CDL_PRIMARY = farm_cdl_preferred_full_composition_path(_DEFAULT_GROWER, _DEFAULT_FARM)
 _CDL_FALLBACK = shared_cdl_preferred_full_composition_path()
@@ -117,6 +131,7 @@ def _canonical_field_root(field_slug: str | None) -> Path | None:
     return (
         _REPO
         / "data"
+        / "moltbot"
         / "growers"
         / _DEFAULT_GROWER
         / "farms"
@@ -136,7 +151,9 @@ def _cached_ndvi_assets(field_slug: str | None) -> dict[str, Path | None]:
             "current_season_cumulative": None,
         }
     return {
-        "corn": field_feature_path(_DEFAULT_GROWER, _DEFAULT_FARM, field_slug, "ndvi_corn.png"),
+        "corn": field_feature_path(
+            _DEFAULT_GROWER, _DEFAULT_FARM, field_slug, "ndvi_corn.png"
+        ),
         "corn_peak_95": field_feature_path(
             _DEFAULT_GROWER, _DEFAULT_FARM, field_slug, "ndvi_corn_peak_95.png"
         ),
@@ -171,14 +188,22 @@ def _cached_soil_map_assets(field_slug: str | None) -> dict[str, Path | None]:
         "organic_matter": field_feature_path(
             _DEFAULT_GROWER, _DEFAULT_FARM, field_slug, "soil_organic_matter_map.png"
         ),
-        "ph": field_feature_path(_DEFAULT_GROWER, _DEFAULT_FARM, field_slug, "soil_ph_map.png"),
-        "awc": field_feature_path(_DEFAULT_GROWER, _DEFAULT_FARM, field_slug, "soil_awc_map.png"),
-        "cec": field_feature_path(_DEFAULT_GROWER, _DEFAULT_FARM, field_slug, "soil_cec_map.png"),
+        "ph": field_feature_path(
+            _DEFAULT_GROWER, _DEFAULT_FARM, field_slug, "soil_ph_map.png"
+        ),
+        "awc": field_feature_path(
+            _DEFAULT_GROWER, _DEFAULT_FARM, field_slug, "soil_awc_map.png"
+        ),
+        "cec": field_feature_path(
+            _DEFAULT_GROWER, _DEFAULT_FARM, field_slug, "soil_cec_map.png"
+        ),
     }
 
 
 def _ndvi_panel(ax, image_path: Path | None, title: str) -> None:
-    ax.set_title(title, fontsize=_PANEL_TITLE_SIZE, fontweight="bold", loc="left", pad=8)
+    ax.set_title(
+        title, fontsize=_PANEL_TITLE_SIZE, fontweight="bold", loc="left", pad=8
+    )
     if image_path is not None and image_path.exists():
         ax.imshow(mpimg.imread(image_path))
         ax.axis("off")
@@ -222,7 +247,9 @@ def _ndvi_panel(ax, image_path: Path | None, title: str) -> None:
     )
 
 
-def _field_identity_card(ax, field_row, hl_summary, crop_summary, wx_row, management_bullets):
+def _field_identity_card(
+    ax, field_row, hl_summary, crop_summary, wx_row, management_bullets
+):
     ax.axis("off")
     fid = str(field_row["field_id"])
     acres = float(field_row.get("area_acres", 0))
@@ -290,7 +317,10 @@ def _field_identity_card(ax, field_row, hl_summary, crop_summary, wx_row, manage
         fontsize=_BODY_TEXT_SIZE,
         transform=ax.transAxes,
         bbox=dict(
-            boxstyle="round,pad=0.5", facecolor="#f0f9ff", edgecolor="#2563eb", linewidth=1.2
+            boxstyle="round,pad=0.5",
+            facecolor="#f0f9ff",
+            edgecolor="#2563eb",
+            linewidth=1.2,
         ),
     )
     ax.set_title(
@@ -318,7 +348,9 @@ def _ranking_card(ax, field_reporting_df, field_id):
     labels = [c.replace("_pct_rank", "").replace("_", " ") for c in rank_cols]
     values = [float(r[c]) if pd.notna(r[c]) else 50.0 for c in rank_cols]
     y_pos = np.arange(len(labels))
-    colors = ["#22c55e" if v >= 66 else "#f59e0b" if v >= 33 else "#ef4444" for v in values]
+    colors = [
+        "#22c55e" if v >= 66 else "#f59e0b" if v >= 33 else "#ef4444" for v in values
+    ]
     ax_real = ax.inset_axes([0.05, 0.05, 0.90, 0.85])
     ax_real.barh(y_pos, values, color=colors, edgecolor="white", height=0.6)
     ax_real.set_yticks(y_pos)
@@ -328,11 +360,18 @@ def _ranking_card(ax, field_reporting_df, field_id):
     ax_real.tick_params(axis="x", labelsize=_PANEL_LABEL_SIZE)
     ax_real.axvline(50, color="gray", linestyle="--", linewidth=0.8, alpha=0.5)
     ax_real.grid(True, axis="x", alpha=0.25)
-    ax.set_title("Farm-relative standing", fontsize=_CARD_TITLE_SIZE, fontweight="bold", loc="left")
+    ax.set_title(
+        "Farm-relative standing",
+        fontsize=_CARD_TITLE_SIZE,
+        fontweight="bold",
+        loc="left",
+    )
 
 
 def _soil_map_panel(ax, image_path: Path | None, title: str, fallback_render) -> None:
-    ax.set_title(title, fontsize=_PANEL_TITLE_SIZE, fontweight="bold", loc="left", pad=8)
+    ax.set_title(
+        title, fontsize=_PANEL_TITLE_SIZE, fontweight="bold", loc="left", pad=8
+    )
     if image_path is not None and image_path.exists():
         ax.imshow(mpimg.imread(image_path))
         ax.axis("off")
@@ -425,27 +464,39 @@ def _render_field_poster(
 
     render_soil_horizon_table(fig.add_subplot(gs[2, 0:2]), detail_df)
     plot_temperature_doy_overlay(
-        fig.add_subplot(gs[2, 2:]), fw, title="Temperature by day-of-year with frost windows"
+        fig.add_subplot(gs[2, 2:]),
+        fw,
+        title="Temperature by day-of-year with frost windows",
     )
 
     plot_gdd_doy_overlay(
-        fig.add_subplot(gs[3, 0:2]), fw, title="Cumulative GDD by day-of-year with frost windows"
+        fig.add_subplot(gs[3, 0:2]),
+        fw,
+        title="Cumulative GDD by day-of-year with frost windows",
     )
     plot_precip_boxplot(
         fig.add_subplot(gs[3, 2:]), fw, title="Cumulative precipitation by day-of-year"
     )
 
     _ndvi_panel(fig.add_subplot(gs[4, 0]), ndvi_assets["corn"], "Corn average NDVI")
-    _ndvi_panel(fig.add_subplot(gs[4, 1]), ndvi_assets["soybean"], "Soybean average NDVI")
+    _ndvi_panel(
+        fig.add_subplot(gs[4, 1]), ndvi_assets["soybean"], "Soybean average NDVI"
+    )
     _ndvi_panel(
         fig.add_subplot(gs[4, 2:]),
         ndvi_assets["current_season_cumulative"],
         "Cumulative NDVI by crop and year",
     )
 
-    _ndvi_panel(fig.add_subplot(gs[5, 0]), ndvi_assets["corn_peak_95"], "Corn 95th %ile peak NDVI")
     _ndvi_panel(
-        fig.add_subplot(gs[5, 1]), ndvi_assets["soybean_peak_95"], "Soybean 95th %ile peak NDVI"
+        fig.add_subplot(gs[5, 0]),
+        ndvi_assets["corn_peak_95"],
+        "Corn 95th %ile peak NDVI",
+    )
+    _ndvi_panel(
+        fig.add_subplot(gs[5, 1]),
+        ndvi_assets["soybean_peak_95"],
+        "Soybean 95th %ile peak NDVI",
     )
     _ranking_card(fig.add_subplot(gs[5, 2:]), field_reporting_df, field_id)
 
@@ -459,7 +510,9 @@ def _render_field_poster(
         ax.tick_params(axis="both", labelsize=_PANEL_LABEL_SIZE)
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    plt.savefig(output_path, dpi=180, bbox_inches="tight", facecolor=fig.get_facecolor())
+    plt.savefig(
+        output_path, dpi=180, bbox_inches="tight", facecolor=fig.get_facecolor()
+    )
     plt.close(fig)
 
 
@@ -479,7 +532,9 @@ def main() -> None:
     fields = gpd.read_file(_REPO / config.field_boundary_path)
     soil_full = pd.read_csv(farm_ssurgo_full_path(_DEFAULT_GROWER, _DEFAULT_FARM))
     soil_summary = pd.read_csv(farm_ssurgo_summary_path(_DEFAULT_GROWER, _DEFAULT_FARM))
-    weather = pd.read_csv(farm_weather_path(_DEFAULT_GROWER, _DEFAULT_FARM), parse_dates=["date"])
+    weather = pd.read_csv(
+        farm_weather_path(_DEFAULT_GROWER, _DEFAULT_FARM), parse_dates=["date"]
+    )
     cdl_path = _cdl_csv_path()
     cdl = pd.read_csv(cdl_path)
     field_slug_lookup = _field_slug_lookup()
@@ -514,7 +569,9 @@ def main() -> None:
         output_path = field_report_path(
             _DEFAULT_GROWER, _DEFAULT_FARM, field_slug, "field_report.png"
         )
-        prior = load_manifest(manifest_dir / f"{STEP_FIELD_POSTER_RENDER}_{field_id}.json")
+        prior = load_manifest(
+            manifest_dir / f"{STEP_FIELD_POSTER_RENDER}_{field_id}.json"
+        )
 
         cache_path = field_soil_polygon_path(_DEFAULT_GROWER, _DEFAULT_FARM, field_slug)
         ndvi_asset_paths = [

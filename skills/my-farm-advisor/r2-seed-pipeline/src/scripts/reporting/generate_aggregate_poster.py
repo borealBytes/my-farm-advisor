@@ -17,13 +17,26 @@ import pandas as pd
 matplotlib.use("Agg")
 
 _REPO = Path(__file__).resolve().parents[4]
-_SKILLS = _REPO / ".opencode" / "skills"
 _LIB = _REPO / "data" / "moltbot" / "scripts" / "lib"
 
-sys.path.insert(0, str(_SKILLS / "farm-intelligence-reporting" / "src"))
-sys.path.insert(0, str(_SKILLS / "headlands-ring" / "src"))
-sys.path.insert(0, str(_SKILLS / "cdl-cropland" / "src"))
-sys.path.insert(0, str(_SKILLS / "nasa-power-weather" / "src"))
+
+def _ensure_skill_path(skill_name: str) -> Path:
+    matches = sorted(
+        (_REPO / "skills" / "my-farm-advisor").glob(f"**/{skill_name}/src")
+    )
+    if not matches:
+        raise FileNotFoundError(f"Skill source path not found for '{skill_name}'")
+    skill_path = matches[0]
+    skill_path_str = str(skill_path)
+    if skill_path_str not in sys.path:
+        sys.path.insert(0, skill_path_str)
+    return skill_path
+
+
+_ensure_skill_path("farm-intelligence-reporting")
+_ensure_skill_path("headlands-ring")
+_ensure_skill_path("cdl-cropland")
+_ensure_skill_path("nasa-power-weather")
 sys.path.insert(0, str(_LIB))
 
 from cdl_reporting import plot_crop_mix_stacked_100, summarize_crop_history
@@ -60,7 +73,8 @@ _SCRIPT = Path(__file__)
 _CDL_PRIMARY = farm_cdl_preferred_full_composition_path(_DEFAULT_GROWER, _DEFAULT_FARM)
 _CDL_FALLBACK = shared_cdl_preferred_full_composition_path()
 _FIELD_INVENTORY = _REPO / os.environ.get(
-    "AG_INVENTORY_CSV", "data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/manifests/field-inventory.csv"
+    "AG_INVENTORY_CSV",
+    "data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/manifests/field-inventory.csv",
 )
 
 
@@ -84,7 +98,9 @@ def _ranking_bars(ax, field_df, metric_col, title):
 
 
 def _risk_matrix(ax, field_df):
-    ax.set_title("Risk / opportunity matrix", fontsize=10, fontweight="bold", loc="left")
+    ax.set_title(
+        "Risk / opportunity matrix", fontsize=10, fontweight="bold", loc="left"
+    )
     cap_col = "total_aws_inches" if "total_aws_inches" in field_df.columns else None
     risk_col = "headlands_pct" if "headlands_pct" in field_df.columns else None
     if cap_col is None or risk_col is None:
@@ -130,7 +146,9 @@ def _spotlight_field_slug(fields: gpd.GeoDataFrame) -> tuple[str | None, str | N
     if fields.empty or "field_id" not in fields.columns:
         return None, None
     field_slug_lookup = _field_slug_lookup()
-    has_area = "area_acres" in fields.columns and bool(fields["area_acres"].notna().any())
+    has_area = "area_acres" in fields.columns and bool(
+        fields["area_acres"].notna().any()
+    )
     if has_area:
         row = fields.loc[fields["area_acres"].astype(float).idxmax()]
     else:
@@ -186,13 +204,19 @@ def main() -> None:
                 config.grower_slug, config.farm_slug, spotlight_slug, "ndvi_corn.png"
             ),
             "corn_peak_95": field_feature_path(
-                config.grower_slug, config.farm_slug, spotlight_slug, "ndvi_corn_peak_95.png"
+                config.grower_slug,
+                config.farm_slug,
+                spotlight_slug,
+                "ndvi_corn_peak_95.png",
             ),
             "soybean": field_feature_path(
                 config.grower_slug, config.farm_slug, spotlight_slug, "ndvi_soybean.png"
             ),
             "soybean_peak_95": field_feature_path(
-                config.grower_slug, config.farm_slug, spotlight_slug, "ndvi_soybean_peak_95.png"
+                config.grower_slug,
+                config.farm_slug,
+                spotlight_slug,
+                "ndvi_soybean_peak_95.png",
             ),
             "cumulative": field_feature_path(
                 config.grower_slug,
@@ -202,7 +226,9 @@ def main() -> None:
             ),
         }
         spotlight_inputs = [
-            str(path.relative_to(_REPO)) for path in spotlight_assets.values() if path.exists()
+            str(path.relative_to(_REPO))
+            for path in spotlight_assets.values()
+            if path.exists()
         ]
     manifest = build_step_manifest(
         step_name=STEP_FARM_POSTER_RENDER,
@@ -222,7 +248,9 @@ def main() -> None:
         return
 
     fields = gpd.read_file(_REPO / config.field_boundary_path)
-    soil_summary = pd.read_csv(farm_ssurgo_summary_path(config.grower_slug, config.farm_slug))
+    soil_summary = pd.read_csv(
+        farm_ssurgo_summary_path(config.grower_slug, config.farm_slug)
+    )
     weather = pd.read_csv(
         farm_weather_path(config.grower_slug, config.farm_slug),
         parse_dates=["date"],
@@ -270,11 +298,13 @@ def main() -> None:
     ax_map = fig.add_subplot(gs[0, 0:2])
     fields.boundary.plot(ax=ax_map, color="darkgreen", linewidth=1.5)
     projected_fields = fields.to_crs("EPSG:5070") if fields.crs else fields
-    centroids = gpd.GeoSeries(projected_fields.geometry.centroid, crs=projected_fields.crs).to_crs(
-        fields.crs or "EPSG:4326"
-    )
+    centroids = gpd.GeoSeries(
+        projected_fields.geometry.centroid, crs=projected_fields.crs
+    ).to_crs(fields.crs or "EPSG:4326")
     sz = (
-        fields["area_acres"].fillna(30).astype(float) * 6 if "area_acres" in fields.columns else 100
+        fields["area_acres"].fillna(30).astype(float) * 6
+        if "area_acres" in fields.columns
+        else 100
     )
     ax_map.scatter(centroids.x, centroids.y, s=sz, color="#2563eb", alpha=0.7, zorder=5)
     for _, frow in fields.iterrows():
@@ -321,15 +351,24 @@ def main() -> None:
         transform=ax_summary.transAxes,
         fontfamily="monospace",
         bbox=dict(
-            boxstyle="round,pad=0.5", facecolor="#f0f9ff", edgecolor="#2563eb", linewidth=1.2
+            boxstyle="round,pad=0.5",
+            facecolor="#f0f9ff",
+            edgecolor="#2563eb",
+            linewidth=1.2,
         ),
     )
     ax_summary.set_title("Farm overview", fontsize=11, fontweight="bold", loc="left")
 
-    plot_crop_mix_stacked_100(fig.add_subplot(gs[0, 3]), cdl, title="Farm crop composition by year")
+    plot_crop_mix_stacked_100(
+        fig.add_subplot(gs[0, 3]), cdl, title="Farm crop composition by year"
+    )
 
-    _ranking_bars(fig.add_subplot(gs[1, 0]), field_df, "area_acres", "Field size (acres)")
-    _ranking_bars(fig.add_subplot(gs[1, 1]), field_df, "total_aws_inches", "Total AWS (inches)")
+    _ranking_bars(
+        fig.add_subplot(gs[1, 0]), field_df, "area_acres", "Field size (acres)"
+    )
+    _ranking_bars(
+        fig.add_subplot(gs[1, 1]), field_df, "total_aws_inches", "Total AWS (inches)"
+    )
     _ranking_bars(fig.add_subplot(gs[1, 2]), field_df, "avg_om_pct", "Avg OM (%)")
     _ranking_bars(fig.add_subplot(gs[1, 3]), field_df, "headlands_pct", "Headlands (%)")
 
@@ -374,14 +413,20 @@ def main() -> None:
     )
 
     plot_temperature_doy_overlay(
-        fig.add_subplot(gs[3, 0:2]), weather, title="Farm temperature — all fields, by DOY"
+        fig.add_subplot(gs[3, 0:2]),
+        weather,
+        title="Farm temperature — all fields, by DOY",
     )
     plot_gdd_doy_overlay(
-        fig.add_subplot(gs[3, 2:]), weather, title="Farm cumulative GDD — all fields, by DOY"
+        fig.add_subplot(gs[3, 2:]),
+        weather,
+        title="Farm cumulative GDD — all fields, by DOY",
     )
 
     plot_precip_boxplot(
-        fig.add_subplot(gs[4, 0:2]), weather, title="Farm monthly precipitation distribution"
+        fig.add_subplot(gs[4, 0:2]),
+        weather,
+        title="Farm monthly precipitation distribution",
     )
     _risk_matrix(fig.add_subplot(gs[4, 2:]), field_df)
 
@@ -408,7 +453,9 @@ def main() -> None:
         for col in tdf.select_dtypes("float").columns:
             tdf[col] = tdf[col].round(2)
         tdf = tdf.fillna("—")
-        t = ax_table.table(cellText=tdf.values, colLabels=tdf.columns, loc="center", cellLoc="left")
+        t = ax_table.table(
+            cellText=tdf.values, colLabels=tdf.columns, loc="center", cellLoc="left"
+        )
         t.auto_set_font_size(False)
         t.set_fontsize(7.5)
         t.scale(1.0, 1.6)
@@ -420,10 +467,14 @@ def main() -> None:
             for col_idx in range(len(tdf.columns)):
                 t[(row_idx, col_idx)].set_facecolor(bg)
                 t[(row_idx, col_idx)].set_edgecolor("#e2e8f0")
-    ax_table.set_title("Field comparison", fontsize=11, fontweight="bold", pad=10, loc="left")
+    ax_table.set_title(
+        "Field comparison", fontsize=11, fontweight="bold", pad=10, loc="left"
+    )
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    plt.savefig(output_path, dpi=180, bbox_inches="tight", facecolor=fig.get_facecolor())
+    plt.savefig(
+        output_path, dpi=180, bbox_inches="tight", facecolor=fig.get_facecolor()
+    )
     plt.close(fig)
 
     manifest.status = "complete"
