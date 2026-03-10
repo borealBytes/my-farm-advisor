@@ -67,4 +67,36 @@ publicRoutes.get('/_admin/assets/*', async (c) => {
   return c.env.ASSETS.fetch(new Request(assetUrl.toString(), c.req.raw));
 });
 
+// Safe slug pattern: alphanumeric + hyphen only, prevents path traversal
+const SAFE_SLUG_PATTERN = /^[a-zA-Z0-9-]+$/;
+
+// GET /single-page-html/grower/:growerId/farm/:farmId - Public farm report
+publicRoutes.get('/single-page-html/grower/:growerId/farm/:farmId', async (c) => {
+  const { growerId, farmId } = c.req.param();
+
+  if (!SAFE_SLUG_PATTERN.test(growerId) || !SAFE_SLUG_PATTERN.test(farmId)) {
+    return c.json({ error: 'Invalid grower or farm ID' }, 400);
+  }
+
+  const r2Key = `growers/${growerId}/farms/${farmId}/derived/reports/report.html`;
+
+  try {
+    const object = await c.env.MOLTBOT_BUCKET.get(r2Key);
+
+    if (!object) {
+      return c.json({ error: 'Report not found' }, 404);
+    }
+
+    const headers = new Headers();
+    headers.set('Content-Type', 'text/html; charset=utf-8');
+    headers.set('X-Content-Type-Options', 'nosniff');
+    headers.set('Cache-Control', 'public, max-age=300');
+
+    return new Response(object.body, { headers });
+  } catch (err) {
+    console.error('[PUBLIC] Error fetching report:', err);
+    return c.json({ error: 'Failed to fetch report' }, 500);
+  }
+});
+
 export { publicRoutes };

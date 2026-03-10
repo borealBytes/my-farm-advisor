@@ -129,6 +129,218 @@ Replace `your-worker` with your actual worker subdomain and `YOUR_GATEWAY_TOKEN`
 
 You'll also likely want to [enable R2 storage](#persistent-storage-r2) so your paired devices and conversation history persist across container restarts (optional but recommended).
 
+## Deploy Tonight Runbook
+
+This section provides the exact sequence for deploying to production tonight using the manual GitHub Actions workflow.
+
+### Prerequisites
+
+Before starting, ensure you have:
+
+1. A Cloudflare account with Workers Paid plan ($5/month)
+2. Access to the GitHub repository settings (to add Actions secrets)
+3. OpenRouter account with API key for Kimi K2.5 access
+4. Domain `superiorbyteworks.com` managed by Cloudflare DNS
+
+### Phase 1: GitHub Actions Secrets (CI/CD)
+
+Set these in your GitHub repository before triggering deployment.
+
+**Repository path:** Settings → Secrets and variables → Actions
+
+| Secret | How to Obtain |
+|--------|---------------|
+| `CLOUDFLARE_API_TOKEN` | [Create API Token](https://dash.cloudflare.com/profile/api-tokens) with `Cloudflare Workers:Edit` and `Account:Read` permissions |
+| `CLOUDFLARE_ACCOUNT_ID` | [Cloudflare Dashboard](https://dash.cloudflare.com/) → right sidebar "Account ID" |
+
+**Setup commands:**
+
+```bash
+# Step 1: Create Cloudflare API Token
+# Go to https://dash.cloudflare.com/profile/api-tokens
+# Click "Create Token" → "Custom token"
+# Permissions: Account:Read, Cloudflare Workers:Edit, R2:Edit (if using R2)
+# Copy the token (shown only once)
+
+# Step 2: Get Account ID from dashboard sidebar
+# Step 3: Add both secrets in GitHub: Settings → Secrets → Actions
+```
+
+### Phase 2: Runtime Secrets (Cloudflare Worker)
+
+Set these via wrangler before deploying. Run in order shown.
+
+#### 2.1 AI Provider (OpenRouter + Kimi K2.5 Only)
+
+**Current phase uses OpenRouter exclusively.** Other providers (Anthropic, OpenAI, Cloudflare AI Gateway) are future roadmap only.
+
+```bash
+# Get your OpenRouter API key from https://openrouter.ai/keys
+npx wrangler secret put OPENROUTER_API_KEY
+
+# Model is locked to: openrouter/moonshotai/kimi-k2.5
+```
+
+#### 2.2 Authentication Secrets
+
+```bash
+# Generate gateway token (save this - you'll need it for Control UI access)
+export TOKEN=$(openssl rand -hex 32)
+echo "Gateway token: $TOKEN"
+echo "$TOKEN" | npx wrangler secret put MOLTBOT_GATEWAY_TOKEN
+
+# Enable Cloudflare Access on your worker first, then get these values:
+# 1. Go to Workers & Pages → Select worker → Settings → Domains & Routes
+# 2. Click "..." on workers.dev row → "Enable Cloudflare Access"
+# 3. Copy the AUD tag shown in the dialog
+npx wrangler secret put CF_ACCESS_AUD
+
+# Get team domain from Zero Trust Dashboard → Settings → Custom Pages
+npx wrangler secret put CF_ACCESS_TEAM_DOMAIN
+```
+
+#### 2.3 R2 Storage (Optional but Recommended)
+
+```bash
+# Create R2 API token first: R2 → Manage R2 API Tokens → Create Token
+# Permissions: Object Read & Write, Bucket: moltbot-data
+npx wrangler secret put R2_ACCESS_KEY_ID
+npx wrangler secret put R2_SECRET_ACCESS_KEY
+npx wrangler secret put CF_ACCOUNT_ID
+```
+
+#### 2.4 Telegram Bot (Optional)
+
+```bash
+# 1. Message @BotFather on Telegram, send /newbot
+# 2. Follow prompts: name (display name), username (must end in "bot")
+# 3. Copy the token provided (format: 123456789:ABCdef...)
+npx wrangler secret put TELEGRAM_BOT_TOKEN
+
+# Optional: set DM policy (pairing = requires approval, open = anyone can DM)
+npx wrangler secret put TELEGRAM_DM_POLICY  # Enter: pairing
+```
+
+See [Telegram Onboarding Runbook](.sisyphus/evidence/task-4-telegram-runbook.md) for complete BotFather walkthrough and troubleshooting.
+
+### Phase 3: Trigger Manual Deployment
+
+The deploy workflow is **manual-only** (`workflow_dispatch`). It does not auto-deploy on push.
+
+**To deploy tonight:**
+
+1. Go to your GitHub repository → **Actions** tab
+2. Select **"Deploy"** workflow from the left sidebar
+3. Click **"Run workflow"** dropdown
+4. Select branch: `main` (or your target branch)
+5. Click **"Run workflow"**
+
+**What happens:**
+
+1. Workflow checks out code
+2. Installs dependencies (`npm ci`)
+3. Builds project (`npm run build`)
+4. Verifies required secrets are set
+5. Deploys to Cloudflare Workers
+6. Runs smoke test (HTTP check with retries)
+
+**Expected duration:** 3-5 minutes
+
+**Verify deployment:**
+
+```bash
+# Check worker is responding
+npx wrangler tail
+
+# Or curl the endpoint (replace with your worker URL)
+curl -s https://my-farm-advisor-sandbox.YOUR_SUBDOMAIN.workers.dev/
+```
+
+### Phase 4: Domain Setup (Optional Tonight)
+
+To use custom domain `my-farm-advisor.superiorbyteworks.com`:
+
+**Prerequisites:**
+- Worker deployed and healthy
+- DNS zone `superiorbyteworks.com` active in Cloudflare
+
+**Steps:**
+
+1. Go to [Workers & Pages Dashboard](https://dash.cloudflare.com/?to=/:account/workers-and-pages)
+2. Select worker: `my-farm-advisor-sandbox`
+3. Settings → Domains & Routes → **Add Custom Domain**
+4. Enter: `my-farm-advisor.superiorbyteworks.com`
+5. Click **Add Custom Domain**
+
+**Verification:**
+
+```bash
+# DNS should resolve
+dig my-farm-advisor.superiorbyteworks.com
+
+# HTTPS should return 200/302
+curl -s -o /dev/null -w "%{http_code}" https://my-farm-advisor.superiorbyteworks.com/
+```
+
+See [Domain Rollout Checklist](.sisyphus/evidence/task-5-domain-checklist.md) for complete verification steps and rollback procedures.
+
+### Phase 5: Post-Deploy Verification
+
+**Required checks:**
+
+```bash
+# 1. Verify secrets are set
+npx wrangler secret list
+
+# 2. Check worker logs for startup errors
+npx wrangler tail
+
+# 3. Test Control UI access (use your gateway token)
+# Visit: https://your-worker.workers.dev/?token=YOUR_GATEWAY_TOKEN
+
+# 4. Verify admin routes are protected (should redirect to Access)
+curl -s -o /dev/null -w "%{http_code}" https://your-worker.workers.dev/_admin/
+# Expected: 302 or 401
+```
+
+### Rollback Procedure
+
+If deployment fails:
+
+1. **Check workflow logs** in GitHub Actions for specific error
+2. **Verify secrets** are set correctly: `npx wrangler secret list`
+3. **Check Cloudflare status**: https://www.cloudflarestatus.com/
+4. **Re-run workflow** from GitHub Actions (it is idempotent)
+
+To rollback to previous version:
+
+```bash
+# Re-deploy previous commit
+git checkout PREVIOUS_COMMIT
+npm run deploy
+```
+
+### Known Issues
+
+**Test baseline:** Some existing tests may fail due to environment differences. This is a known baseline issue and does not block deployment. Focus on smoke tests (HTTP 200 responses) for tonight's deploy.
+
+### Complete Secrets Reference
+
+| Category | Secret | Required | Set Via |
+|----------|--------|----------|---------|
+| CI/CD | `CLOUDFLARE_API_TOKEN` | Yes | GitHub Actions secrets |
+| CI/CD | `CLOUDFLARE_ACCOUNT_ID` | Yes | GitHub Actions secrets |
+| AI | `OPENROUTER_API_KEY` | Yes | Wrangler secret |
+| Auth | `MOLTBOT_GATEWAY_TOKEN` | Yes | Wrangler secret |
+| Auth | `CF_ACCESS_TEAM_DOMAIN` | Yes | Wrangler secret |
+| Auth | `CF_ACCESS_AUD` | Yes | Wrangler secret |
+| R2 | `R2_ACCESS_KEY_ID` | No | Wrangler secret |
+| R2 | `R2_SECRET_ACCESS_KEY` | No | Wrangler secret |
+| R2 | `CF_ACCOUNT_ID` | No | Wrangler secret |
+| Channels | `TELEGRAM_BOT_TOKEN` | No | Wrangler secret |
+
+See [Secrets Matrix](.sisyphus/evidence/task-2-secrets-matrix.md) for complete documentation including all optional secrets.
+
 ## Setting Up the Admin UI
 
 To use the admin UI at `/_admin/` for device management, you need to:

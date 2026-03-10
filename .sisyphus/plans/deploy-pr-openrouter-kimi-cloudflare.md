@@ -300,7 +300,7 @@ Critical Path: T1 → T6 → T8 → T10 → F1-F4
     Evidence: .sisyphus/evidence/task-3-scope-guard.txt
   ```
 
-- [ ] 4. Create Telegram onboarding steps for agent account setup
+- [x] 4. Create Telegram onboarding steps for agent account setup
 
   **What to do**:
   - Add step-by-step BotFather flow, token retrieval, and wrangler secret setup.
@@ -345,7 +345,7 @@ Critical Path: T1 → T6 → T8 → T10 → F1-F4
     Evidence: .sisyphus/evidence/task-4-no-token-leak.txt
   ```
 
-- [ ] 5. Define custom-domain rollout checklist for my-farm-advisor.superiorbyteworks.com
+- [x] 5. Define custom-domain rollout checklist for my-farm-advisor.superiorbyteworks.com
 
   **What to do**:
   - Document exact Cloudflare dashboard steps for worker custom domain binding.
@@ -390,7 +390,7 @@ Critical Path: T1 → T6 → T8 → T10 → F1-F4
     Evidence: .sisyphus/evidence/task-5-dns-fallback.md
   ```
 
-- [ ] 6. Add manual production deployment workflow (`workflow_dispatch`)
+- [x] 6. Add manual production deployment workflow (`workflow_dispatch`)
 
   **What to do**:
   - Create `.github/workflows/deploy.yml` with manual trigger only.
@@ -437,7 +437,7 @@ Critical Path: T1 → T6 → T8 → T10 → F1-F4
     Evidence: .sisyphus/evidence/task-6-secret-guard.txt
   ```
 
-- [ ] 7. Update README with exact “deploy tonight” runbook and secret setup order
+- [x] 7. Update README with exact “deploy tonight” runbook and secret setup order
 
   **What to do**:
   - Add a dedicated section: prerequisites, exact secret names, setup sequence, deploy sequence, and smoke tests.
@@ -482,7 +482,7 @@ Critical Path: T1 → T6 → T8 → T10 → F1-F4
     Evidence: .sisyphus/evidence/task-7-readme-workflow-sync.txt
   ```
 
-- [ ] 8. Implement constrained public report endpoint (canonical per farm)
+- [x] 8. Implement constrained public report endpoint (canonical per farm)
 
   **What to do**:
   - Add public route in `src/routes/public.ts` using canonical mapping:
@@ -535,7 +535,7 @@ Critical Path: T1 → T6 → T8 → T10 → F1-F4
     Evidence: .sisyphus/evidence/task-8-invalid-path-blocked.txt
   ```
 
-- [ ] 9. Add tests for public report route behavior and security boundaries
+- [x] 9. Add tests for public report route behavior and security boundaries
 
   **What to do**:
   - Add/extend Vitest cases for valid route, invalid IDs, traversal attempts, missing object, and header assertions.
