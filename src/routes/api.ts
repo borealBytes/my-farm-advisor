@@ -39,7 +39,18 @@ adminApi.get('/devices', async (c) => {
     const token = c.env.MOLTBOT_GATEWAY_TOKEN;
     const tokenArg = token ? ` --token ${token}` : '';
     const proc = await sandbox.startProcess(`openclaw devices list --json${tokenArg}`);
-    await waitForProcess(proc, CLI_TIMEOUT_MS);
+    const waitResult = await waitForProcess(proc, CLI_TIMEOUT_MS);
+    if (waitResult.timedOut) {
+      try {
+        await proc.kill();
+      } catch {}
+      return c.json(
+        {
+          error: `Device list command timed out after ${CLI_TIMEOUT_MS}ms`,
+        },
+        504,
+      );
+    }
 
     const logs = await proc.getLogs();
     const stdout = logs.stdout || '';
@@ -93,7 +104,18 @@ adminApi.post('/devices/:requestId/approve', async (c) => {
     const token = c.env.MOLTBOT_GATEWAY_TOKEN;
     const tokenArg = token ? ` --token ${token}` : '';
     const proc = await sandbox.startProcess(`openclaw devices approve ${requestId}${tokenArg}`);
-    await waitForProcess(proc, CLI_TIMEOUT_MS);
+    const waitResult = await waitForProcess(proc, CLI_TIMEOUT_MS);
+    if (waitResult.timedOut) {
+      try {
+        await proc.kill();
+      } catch {}
+      return c.json(
+        {
+          error: `Device approve command timed out after ${CLI_TIMEOUT_MS}ms`,
+        },
+        504,
+      );
+    }
 
     const logs = await proc.getLogs();
     const stdout = logs.stdout || '';
@@ -127,7 +149,18 @@ adminApi.post('/devices/approve-all', async (c) => {
     const token = c.env.MOLTBOT_GATEWAY_TOKEN;
     const tokenArg = token ? ` --token ${token}` : '';
     const listProc = await sandbox.startProcess(`openclaw devices list --json${tokenArg}`);
-    await waitForProcess(listProc, CLI_TIMEOUT_MS);
+    const listWaitResult = await waitForProcess(listProc, CLI_TIMEOUT_MS);
+    if (listWaitResult.timedOut) {
+      try {
+        await listProc.kill();
+      } catch {}
+      return c.json(
+        {
+          error: `Device list command timed out after ${CLI_TIMEOUT_MS}ms`,
+        },
+        504,
+      );
+    }
 
     const listLogs = await listProc.getLogs();
     const stdout = listLogs.stdout || '';
@@ -158,7 +191,18 @@ adminApi.post('/devices/approve-all', async (c) => {
           `openclaw devices approve ${device.requestId}${tokenArg}`,
         );
         // eslint-disable-next-line no-await-in-loop
-        await waitForProcess(approveProc, CLI_TIMEOUT_MS);
+        const approveWaitResult = await waitForProcess(approveProc, CLI_TIMEOUT_MS);
+        if (approveWaitResult.timedOut) {
+          try {
+            await approveProc.kill();
+          } catch {}
+          results.push({
+            requestId: device.requestId,
+            success: false,
+            error: `Approval timed out after ${CLI_TIMEOUT_MS}ms`,
+          });
+          continue;
+        }
 
         // eslint-disable-next-line no-await-in-loop
         const approveLogs = await approveProc.getLogs();

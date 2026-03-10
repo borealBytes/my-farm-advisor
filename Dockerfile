@@ -35,7 +35,7 @@ ARG BUILD_CACHE_BUST=2026-03-10-v32
 RUN test -n "$BUILD_CACHE_BUST"
 
 # Copy startup script
-# Build cache bust: 2026-03-10-v32-skills-sync
+# Build cache bust: 2026-03-10-v33-admin-timeout-fix
 COPY ["start-openclaw.sh", "/usr/local/bin/start-openclaw.sh"]
 RUN chmod +x /usr/local/bin/start-openclaw.sh && sha256sum /usr/local/bin/start-openclaw.sh
 

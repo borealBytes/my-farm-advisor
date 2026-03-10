@@ -13,7 +13,7 @@ export async function waitForProcess(
   proc: { status: string; getStatus?: () => Promise<string> },
   timeoutMs: number,
   pollIntervalMs: number = 500,
-): Promise<void> {
+): Promise<{ status: string; timedOut: boolean }> {
   const maxAttempts = Math.ceil(timeoutMs / pollIntervalMs);
   let attempts = 0;
   let currentStatus = proc.status;
@@ -24,4 +24,7 @@ export async function waitForProcess(
     currentStatus = proc.getStatus ? await proc.getStatus() : proc.status; // eslint-disable-line no-await-in-loop -- intentional sequential polling
     attempts++;
   }
+
+  const stillRunning = currentStatus === 'running' || currentStatus === 'starting';
+  return { status: currentStatus, timedOut: stillRunning };
 }
