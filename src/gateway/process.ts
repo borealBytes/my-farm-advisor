@@ -49,6 +49,37 @@ async function waitForGatewayProcessDetection(sandbox: Sandbox, timeoutMs: numbe
   return null;
 }
 
+async function findFallbackRunningProcess(sandbox: Sandbox): Promise<Process | null> {
+  try {
+    const processes = await sandbox.listProcesses();
+    for (const proc of processes) {
+      if (proc.status !== 'running' && proc.status !== 'starting') {
+        continue;
+      }
+      const command = proc.command || '';
+      const looksRelevant =
+        command.includes('openclaw') ||
+        command.includes('start-openclaw.sh') ||
+        command.includes('clawdbot') ||
+        command.includes('start-moltbot.sh');
+      const isCliCommand =
+        command.includes('openclaw devices') ||
+        command.includes('openclaw --version') ||
+        command.includes('openclaw onboard') ||
+        command.includes('clawdbot devices') ||
+        command.includes('clawdbot --version');
+
+      if (looksRelevant && !isCliCommand) {
+        return proc;
+      }
+    }
+  } catch {
+    return null;
+  }
+
+  return null;
+}
+
 /**
  * Find an existing OpenClaw gateway process
  *
@@ -147,13 +178,16 @@ export async function ensureMoltbotGateway(sandbox: Sandbox, env: MoltbotEnv): P
       );
     }
     console.log('Gateway port is already listening; waiting for process detection to avoid double spawn...');
-    const detectedProcess = await waitForGatewayProcessDetection(sandbox, 5000);
+    const detectedProcess = await waitForGatewayProcessDetection(sandbox, 15000);
     if (detectedProcess) {
       return detectedProcess;
     }
-    throw new Error(
-      `Gateway is already listening on port ${MOLTBOT_PORT} but no matching process was detected. Refusing to start a duplicate process.`,
-    );
+    const fallbackProcess = await findFallbackRunningProcess(sandbox);
+    if (fallbackProcess) {
+      console.log('Using fallback running process:', fallbackProcess.id, fallbackProcess.command);
+      return fallbackProcess;
+    }
+    throw new Error(`Gateway is listening on ${MOLTBOT_PORT} but process metadata is unavailable.`);
   }
 
   // Start a new OpenClaw gateway

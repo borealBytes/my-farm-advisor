@@ -373,6 +373,12 @@ adminApi.post('/gateway/restart', async (c) => {
       }
       // Wait a moment for the process to die
       await new Promise((r) => setTimeout(r, 2000));
+    } else {
+      try {
+        await sandbox.exec('pkill -f "openclaw gateway|start-openclaw.sh|start-moltbot.sh" || true');
+        await sandbox.exec('rm -f /tmp/openclaw-gateway.lock /root/.openclaw/gateway.lock || true');
+      } catch {}
+      await new Promise((r) => setTimeout(r, 1000));
     }
 
     // Start a new gateway in the background
