@@ -57,6 +57,25 @@ async function fetchGatewayHttpWithTimeout(request: Request, sandbox: Sandbox): 
   ]);
 }
 
+async function bootstrapGatewayForUi(
+  sandbox: Sandbox,
+  env: MoltbotEnv,
+  timeoutMs: number,
+): Promise<boolean> {
+  try {
+    await Promise.race([
+      ensureMoltbotGateway(sandbox, env),
+      new Promise<never>((_, reject) => {
+        setTimeout(() => reject(new Error(`Gateway bootstrap timeout after ${timeoutMs}ms`)), timeoutMs);
+      }),
+    ]);
+    return await isGatewayHttpReady(sandbox);
+  } catch (error) {
+    console.error('[PROXY] UI bootstrap failed:', error);
+    return false;
+  }
+}
+
 export { Sandbox };
 
 /**
@@ -249,13 +268,14 @@ app.all('*', async (c) => {
   const sandbox = c.get('sandbox');
   const request = c.req.raw;
   const url = new URL(request.url);
+  const uiBootstrapTimeoutMs = 20000;
 
   console.log('[PROXY] Handling request:', url.pathname);
 
   // Readiness check: Use HTTP probe, not process metadata.
   // Per Cloudflare guidance, process status 'running' and TCP port open
   // are both insufficient — only HTTP responsiveness means ready.
-  const gatewayReady = await isGatewayHttpReady(sandbox);
+  let gatewayReady = await isGatewayHttpReady(sandbox);
 
   const isWebSocketRequest = request.headers.get('Upgrade')?.toLowerCase() === 'websocket';
   const acceptsHtml = request.headers.get('Accept')?.includes('text/html');
@@ -269,6 +289,10 @@ app.all('*', async (c) => {
       }),
     );
   };
+
+  if (!gatewayReady && acceptsHtml && isGatewayUiPath) {
+    gatewayReady = await bootstrapGatewayForUi(sandbox, c.env, uiBootstrapTimeoutMs);
+  }
 
   // Case 1: Gateway not HTTP-ready and browser request — show loading page
   if (!gatewayReady && acceptsHtml && isGatewayUiPath) {

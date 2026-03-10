@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import type { AppEnv } from '../types';
 import { MOLTBOT_PORT } from '../config';
-import { probeGatewayHealth } from '../gateway';
+import { ensureMoltbotGateway, probeGatewayHealth } from '../gateway';
 
 /**
  * Public routes - NO Cloudflare Access authentication required
@@ -47,6 +47,12 @@ publicRoutes.get('/api/status', async (c) => {
         probeTimeMs: health.probeTimeMs,
       });
     }
+
+    c.executionCtx.waitUntil(
+      ensureMoltbotGateway(sandbox, c.env).catch((error: Error) => {
+        console.error('[STATUS] Background gateway bootstrap failed:', error);
+      }),
+    );
 
     // Map phase to a status the loading page understands
     const statusMap: Record<string, string> = {
