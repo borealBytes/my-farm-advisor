@@ -7,7 +7,7 @@
 # 4. Starts a background sync loop (rclone, watches for file changes)
 # 5. Starts the gateway
 
-set -euo pipefail
+set -e
 
 if pgrep -f "openclaw gateway" > /dev/null 2>&1; then
     echo "OpenClaw gateway is already running, exiting."
@@ -468,7 +468,7 @@ rm -f "$CONFIG_DIR/gateway.lock" 2>/dev/null || true
 
 echo "Dev mode: ${OPENCLAW_DEV_MODE:-false}"
 
-gateway_args=(gateway --port 18789 --verbose --allow-unconfigured --bind loopback)
+gateway_args=(gateway --port 18789 --verbose --allow-unconfigured --bind lan)
 
 if [ -n "$OPENCLAW_GATEWAY_TOKEN" ]; then
     echo "Starting gateway with token auth..."
