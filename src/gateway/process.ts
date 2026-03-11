@@ -44,8 +44,7 @@ export interface GatewayHealthStatus {
 
 /** Timeout for the HTTP readiness probe (ms). */
 const HTTP_PROBE_TIMEOUT_MS = 5000;
-const TEARDOWN_SETTLE_TIMEOUT_MS = 5000;
-const TEARDOWN_SETTLE_POLL_MS = 250;
+let inFlightBootstrap: Promise<Process> | null = null;
 
 function isManagedGatewayCommand(command: string): boolean {
   const isGatewayProcess =
@@ -62,38 +61,6 @@ function isManagedGatewayCommand(command: string): boolean {
     command.includes('clawdbot --version');
 
   return isGatewayProcess && !isCliCommand;
-}
-
-async function forceGatewayTeardown(sandbox: Sandbox, reason: string): Promise<void> {
-  console.warn('[Gateway] Forcing deterministic teardown:', reason);
-
-  const teardownCommand =
-    "sh -lc \"pkill -f '[o]penclaw gateway' || true; " +
-    "pkill -f '[s]tart-openclaw.sh' || true; " +
-    "pkill -f '[c]lawdbot gateway' || true; " +
-    "pkill -f '[s]tart-moltbot.sh' || true\"";
-
-  try {
-    await sandbox.startProcess(teardownCommand);
-  } catch (error) {
-    console.warn('[Gateway] Teardown command failed to start:', error);
-  }
-
-  const deadline = Date.now() + TEARDOWN_SETTLE_TIMEOUT_MS;
-  while (Date.now() < deadline) {
-    // eslint-disable-next-line no-await-in-loop -- intentional polling during teardown
-    const httpReady = await isGatewayHttpReady(sandbox);
-    if (!httpReady) {
-      return;
-    }
-    // eslint-disable-next-line no-await-in-loop -- intentional polling during teardown
-    await new Promise((resolve) => setTimeout(resolve, TEARDOWN_SETTLE_POLL_MS));
-  }
-
-  throw new Error(
-    `Gateway remained HTTP-responsive after forced teardown (${TEARDOWN_SETTLE_TIMEOUT_MS}ms). ` +
-      'Refusing speculative recovery while ownership is unknown.',
-  );
 }
 
 /**
@@ -247,6 +214,22 @@ export async function findExistingMoltbotProcess(sandbox: Sandbox): Promise<Proc
  * @returns The running gateway process
  */
 export async function ensureMoltbotGateway(sandbox: Sandbox, env: MoltbotEnv): Promise<Process> {
+  if (inFlightBootstrap) {
+    return inFlightBootstrap;
+  }
+
+  const bootstrapPromise = ensureGatewayInternal(sandbox, env);
+  inFlightBootstrap = bootstrapPromise;
+  try {
+    return await bootstrapPromise;
+  } finally {
+    if (inFlightBootstrap === bootstrapPromise) {
+      inFlightBootstrap = null;
+    }
+  }
+}
+
+async function ensureGatewayInternal(sandbox: Sandbox, env: MoltbotEnv): Promise<Process> {
   // Configure rclone for R2 persistence (non-blocking if not configured).
   // The startup script uses rclone to restore data from R2 on boot.
   await ensureRcloneConfig(sandbox, env);
@@ -274,13 +257,13 @@ export async function ensureMoltbotGateway(sandbox: Sandbox, env: MoltbotEnv): P
   }
 
   if (health.phase === 'unknown' && health.detail.includes('process metadata is unavailable')) {
-    await forceGatewayTeardown(sandbox, health.detail);
+    console.warn('[Gateway] Metadata unavailable; starting startup script directly without teardown');
   }
 
   // Start a new OpenClaw gateway
   console.log('Starting new OpenClaw gateway...');
   const envVars = buildEnvVars(env);
-  const command = '/usr/local/bin/start-openclaw.sh';
+  const command = "sh -lc '/usr/local/bin/start-openclaw.sh 2>&1'";
 
   console.log('Starting process with command:', command);
   console.log('Environment vars being passed:', Object.keys(envVars));
