@@ -211,13 +211,39 @@ config.skills.entries['superior-byte-works-wrighter'] = {
 
 const skillsRoot = '/root/clawd/skills';
 if (fs.existsSync(skillsRoot)) {
-    const skillDirs = fs
-        .readdirSync(skillsRoot, { withFileTypes: true })
-        .filter((entry) => entry.isDirectory())
-        .map((entry) => entry.name)
-        .filter((name) => fs.existsSync(path.join(skillsRoot, name, 'SKILL.md')));
+    const discoveredKeys = new Set();
 
-    for (const skillName of skillDirs) {
+    function walkSkills(dir) {
+        const entries = fs.readdirSync(dir, { withFileTypes: true });
+        for (const entry of entries) {
+            const fullPath = path.join(dir, entry.name);
+            if (!entry.isDirectory()) continue;
+            if (entry.name === 'node_modules' || entry.name.startsWith('.')) continue;
+
+            const skillFile = path.join(fullPath, 'SKILL.md');
+            if (fs.existsSync(skillFile)) {
+                const relPath = path.relative(skillsRoot, fullPath).replace(/\\/g, '/');
+                if (relPath) discoveredKeys.add(relPath);
+                discoveredKeys.add(path.basename(fullPath));
+
+                const marker = '/skills/';
+                const markerIdx = relPath.indexOf(marker);
+                if (markerIdx >= 0) {
+                    const nestedRel = relPath.slice(markerIdx + marker.length);
+                    if (nestedRel) discoveredKeys.add(nestedRel);
+                    if (nestedRel.includes('/')) {
+                        discoveredKeys.add(nestedRel.split('/').pop());
+                    }
+                }
+            }
+
+            walkSkills(fullPath);
+        }
+    }
+
+    walkSkills(skillsRoot);
+
+    for (const skillName of discoveredKeys) {
         config.skills.entries[skillName] = {
             ...(config.skills.entries[skillName] || {}),
             enabled: true,
