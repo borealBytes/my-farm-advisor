@@ -439,16 +439,21 @@ adminApi.post('/gateway/restart', async (c) => {
       const stillAlive = await isGatewayHttpReady(sandbox);
       if (stillAlive) {
         console.warn('[Restart] Gateway survived teardown via', teardownMethod);
+        const recycled = await recycleSandboxIfSupported(sandbox);
         return c.json(
           {
-            success: false,
-            error:
-              'Gateway remained HTTP-responsive after teardown. ' +
-              'Container may need recycling.',
+            success: recycled,
+            error: recycled
+              ? undefined
+              : 'Gateway remained HTTP-responsive after teardown. Container may need recycling.',
+            message: recycled
+              ? 'Gateway remained alive after teardown, so sandbox was recycled. Retry the request to start fresh.'
+              : undefined,
             preHealth: { phase: preHealth.phase, detail: preHealth.detail },
             teardownMethod,
+            recycled,
           },
-          500,
+          recycled ? 202 : 500,
         );
       }
     }
@@ -533,6 +538,23 @@ async function teardownGateway(
 
   console.log('[Restart] No gateway detected. Starting fresh.');
   return 'none';
+}
+
+async function recycleSandboxIfSupported(
+  sandbox: import('@cloudflare/sandbox').Sandbox,
+): Promise<boolean> {
+  const maybeDestroy = (sandbox as unknown as { destroy?: () => Promise<void> }).destroy;
+  if (!maybeDestroy) {
+    return false;
+  }
+
+  try {
+    await maybeDestroy.call(sandbox);
+    return true;
+  } catch (error) {
+    console.warn('[Restart] sandbox.destroy() failed:', error);
+    return false;
+  }
 }
 
 async function pkillGateway(sandbox: import('@cloudflare/sandbox').Sandbox, reason: string): Promise<string> {
