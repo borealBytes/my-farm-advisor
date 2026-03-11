@@ -556,9 +556,12 @@ debug.get('/startup-phases', async (c) => {
         setTimeout(() => reject(new Error('TCP probe timeout (3s)')), 3000),
       ),
     ]);
+    const bodySnippet = (await response.text()).slice(0, 200);
+    const proxyNotListening = bodySnippet.includes('The container is not listening in the TCP address');
+    const tcpPass = response.status > 0 && !proxyNotListening;
     return {
-      status: response.status > 0 ? ('pass' as const) : ('fail' as const),
-      detail: `Port ${MOLTBOT_PORT} responded with HTTP status ${response.status}`,
+      status: tcpPass ? ('pass' as const) : ('fail' as const),
+      detail: `Port ${MOLTBOT_PORT} probe status=${response.status} body="${bodySnippet.replace(/"/g, "'")}"`,
     };
   });
   phases.push(tcpPhase);
@@ -684,13 +687,15 @@ debug.get('/restart-phases', async (c) => {
     }
     // Also check TCP
     let portStillOpen = false;
-    try {
-      const resp = await Promise.race([
-        sandbox.containerFetch(new Request(`http://localhost:${MOLTBOT_PORT}/`), MOLTBOT_PORT),
-        new Promise<never>((_, reject) => setTimeout(() => reject(new Error('timeout')), 2000)),
-      ]);
-      portStillOpen = resp.status > 0;
-    } catch { /* port closed = good */ }
+      try {
+        const resp = await Promise.race([
+          sandbox.containerFetch(new Request(`http://localhost:${MOLTBOT_PORT}/`), MOLTBOT_PORT),
+          new Promise<never>((_, reject) => setTimeout(() => reject(new Error('timeout')), 2000)),
+        ]);
+        const bodySnippet = (await resp.text()).slice(0, 200);
+        const proxyNotListening = bodySnippet.includes('The container is not listening in the TCP address');
+        portStillOpen = resp.status > 0 && !proxyNotListening;
+      } catch { /* port closed = good */ }
 
     return {
       status: 'pass' as const,
