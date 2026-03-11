@@ -76,6 +76,12 @@ async function bootstrapGatewayForUi(
   }
 }
 
+function withGatewayToken(request: Request, token: string): Request {
+  const tokenUrl = new URL(request.url);
+  tokenUrl.searchParams.set('token', token);
+  return new Request(tokenUrl.toString(), request);
+}
+
 export { Sandbox };
 
 /**
@@ -350,10 +356,8 @@ app.all('*', async (c) => {
     // CF Access redirects strip query params, so authenticated users lose ?token=.
     // Since the user already passed CF Access auth, we inject the token server-side.
     let wsRequest = request;
-    if (c.env.MOLTBOT_GATEWAY_TOKEN && !url.searchParams.has('token')) {
-      const tokenUrl = new URL(url.toString());
-      tokenUrl.searchParams.set('token', c.env.MOLTBOT_GATEWAY_TOKEN);
-      wsRequest = new Request(tokenUrl.toString(), request);
+    if (c.env.MOLTBOT_GATEWAY_TOKEN) {
+      wsRequest = withGatewayToken(request, c.env.MOLTBOT_GATEWAY_TOKEN);
     }
 
     const wsHeaders = new Headers(wsRequest.headers);
@@ -489,10 +493,15 @@ app.all('*', async (c) => {
     });
   }
 
+  let httpRequest = request;
+  if (c.env.MOLTBOT_GATEWAY_TOKEN) {
+    httpRequest = withGatewayToken(request, c.env.MOLTBOT_GATEWAY_TOKEN);
+  }
+
   console.log('[HTTP] Proxying:', url.pathname + url.search);
   let httpResponse: Response;
   try {
-    httpResponse = await fetchGatewayHttpWithTimeout(request, sandbox);
+    httpResponse = await fetchGatewayHttpWithTimeout(httpRequest, sandbox);
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Gateway HTTP proxy failed';
     console.error('[HTTP] Proxy error:', errorMessage);
