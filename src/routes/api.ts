@@ -444,33 +444,22 @@ adminApi.post('/gateway/restart', async (c) => {
           HEALTH_PROBE_TIMEOUT_MS,
           'Health probe after failed teardown',
         );
-        if (aliveHealth.ready) {
-          return c.json({
+        const recycled = aliveHealth.ready ? false : await recycleSandboxIfSupported(sandbox);
+        return c.json(
+          {
             success: true,
-            message:
-              'Restart skipped: existing gateway remained healthy after teardown attempt. Reusing current gateway.',
+            message: aliveHealth.ready
+              ? 'Restart skipped: existing gateway remained healthy after teardown attempt. Reusing current gateway.'
+              : recycled
+                ? 'Gateway remained alive after teardown, so sandbox was recycled. Retry the request to start fresh.'
+                : 'Restart fallback: gateway stayed responsive and recycle was unavailable. Reusing current gateway.',
             preHealth: { phase: preHealth.phase, detail: preHealth.detail },
             postHealth: { phase: aliveHealth.phase, detail: aliveHealth.detail },
             teardownMethod,
-            reusedExistingGateway: true,
-          });
-        }
-
-        const recycled = await recycleSandboxIfSupported(sandbox);
-        return c.json(
-          {
-            success: recycled,
-            error: recycled
-              ? undefined
-              : 'Gateway remained HTTP-responsive after teardown. Container may need recycling.',
-            message: recycled
-              ? 'Gateway remained alive after teardown, so sandbox was recycled. Retry the request to start fresh.'
-              : undefined,
-            preHealth: { phase: preHealth.phase, detail: preHealth.detail },
-            teardownMethod,
             recycled,
+            reusedExistingGateway: !recycled,
           },
-          recycled ? 202 : 500,
+          recycled ? 202 : 200,
         );
       }
     }
