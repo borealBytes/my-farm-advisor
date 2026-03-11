@@ -439,6 +439,23 @@ adminApi.post('/gateway/restart', async (c) => {
       const stillAlive = await isGatewayHttpReady(sandbox);
       if (stillAlive) {
         console.warn('[Restart] Gateway survived teardown via', teardownMethod);
+        const aliveHealth = await withTimeout(
+          probeGatewayHealth(sandbox),
+          HEALTH_PROBE_TIMEOUT_MS,
+          'Health probe after failed teardown',
+        );
+        if (aliveHealth.ready) {
+          return c.json({
+            success: true,
+            message:
+              'Restart skipped: existing gateway remained healthy after teardown attempt. Reusing current gateway.',
+            preHealth: { phase: preHealth.phase, detail: preHealth.detail },
+            postHealth: { phase: aliveHealth.phase, detail: aliveHealth.detail },
+            teardownMethod,
+            reusedExistingGateway: true,
+          });
+        }
+
         const recycled = await recycleSandboxIfSupported(sandbox);
         return c.json(
           {

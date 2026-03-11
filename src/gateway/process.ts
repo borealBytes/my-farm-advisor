@@ -244,10 +244,35 @@ async function ensureGatewayInternal(sandbox: Sandbox, env: MoltbotEnv): Promise
     }
   }
 
-  if (health.phase === 'process_found' || health.phase === 'tcp_ready') {
+  if (health.phase === 'process_found') {
     const existingProcess = await findExistingMoltbotProcess(sandbox);
     if (existingProcess) {
-      console.log('[Gateway] Found unhealthy/partial gateway process, recreating:', existingProcess.id);
+      console.log(
+        '[Gateway] Found in-progress startup process, waiting for readiness instead of killing:',
+        existingProcess.id,
+      );
+      try {
+        await existingProcess.waitForPort(MOLTBOT_PORT, { mode: 'tcp', timeout: STARTUP_TIMEOUT_MS });
+        const httpReady = await isGatewayHttpReady(sandbox);
+        if (httpReady) {
+          return existingProcess;
+        }
+      } catch {
+        console.warn('[Gateway] Existing startup process did not become ready in time; restarting');
+      }
+
+      try {
+        await existingProcess.kill();
+      } catch (killError) {
+        console.log('Failed to kill process:', killError);
+      }
+    }
+  }
+
+  if (health.phase === 'tcp_ready') {
+    const existingProcess = await findExistingMoltbotProcess(sandbox);
+    if (existingProcess) {
+      console.log('[Gateway] Found tcp-only process, recreating:', existingProcess.id);
       try {
         await existingProcess.kill();
       } catch (killError) {
