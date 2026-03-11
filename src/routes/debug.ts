@@ -663,7 +663,7 @@ debug.get('/restart-phases', async (c) => {
         const msg = err instanceof Error ? err.message : 'Unknown error';
         // Also try pkill as fallback
         try {
-          await sandbox.exec('pkill -f "openclaw gateway|start-openclaw.sh" || true');
+    await sandbox.exec('pkill -f "[o]penclaw gateway|[s]tart-openclaw.sh" || true');
           await new Promise((r) => setTimeout(r, 1000));
         } catch { /* ignore */ }
         return { status: 'pass' as const, detail: `Kill via metadata failed (${msg}), used pkill fallback` };

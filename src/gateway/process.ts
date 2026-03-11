@@ -68,10 +68,10 @@ async function forceGatewayTeardown(sandbox: Sandbox, reason: string): Promise<v
   console.warn('[Gateway] Forcing deterministic teardown:', reason);
 
   const teardownCommand =
-    "sh -lc \"pkill -f 'openclaw gateway' || true; " +
-    "pkill -f 'start-openclaw.sh' || true; " +
-    "pkill -f 'clawdbot gateway' || true; " +
-    "pkill -f 'start-moltbot.sh' || true\"";
+    "sh -lc \"pkill -f '[o]penclaw gateway' || true; " +
+    "pkill -f '[s]tart-openclaw.sh' || true; " +
+    "pkill -f '[c]lawdbot gateway' || true; " +
+    "pkill -f '[s]tart-moltbot.sh' || true\"";
 
   try {
     await sandbox.startProcess(teardownCommand);

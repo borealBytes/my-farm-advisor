@@ -22,7 +22,7 @@ const HEALTH_PROBE_TIMEOUT_MS = 15000;
 const RESTART_TIMEOUT_MS = 90_000;
 const RESTART_SETTLE_MS = 2000;
 const GATEWAY_PKILL_PATTERN =
-  'openclaw gateway|start-openclaw.sh|start-moltbot.sh|clawdbot gateway';
+  '[o]penclaw gateway|[s]tart-openclaw.sh|[s]tart-moltbot.sh|[c]lawdbot gateway';
 
 function scheduleGatewayBootstrap(c: { executionCtx: ExecutionContext; env: AppEnv['Bindings'] }, sandbox: import('@cloudflare/sandbox').Sandbox): void {
   c.executionCtx.waitUntil(
