@@ -449,20 +449,27 @@ if r2_configured; then
         MARKER=/tmp/.last-sync-marker
         LOGFILE=/tmp/r2-sync.log
         touch "$MARKER"
+        FORCE_SYNC=1
 
         while true; do
             sleep 30
 
             CHANGED=/tmp/.changed-files
-            {
-                find "$CONFIG_DIR" -newer "$MARKER" -type f -printf '%P\n' 2>/dev/null
-                find "$WORKSPACE_DIR" -newer "$MARKER" \
-                    -not -path '*/node_modules/*' \
-                    -not -path '*/.git/*' \
-                    -type f -printf '%P\n' 2>/dev/null
-            } > "$CHANGED"
+            if [ "$FORCE_SYNC" -eq 1 ]; then
+                COUNT=1
+                : > "$CHANGED"
+                echo "[sync] Initial sync requested" >> "$LOGFILE"
+            else
+                {
+                    find "$CONFIG_DIR" -newer "$MARKER" -type f -printf '%P\n' 2>/dev/null
+                    find "$WORKSPACE_DIR" -newer "$MARKER" \
+                        -not -path '*/node_modules/*' \
+                        -not -path '*/.git/*' \
+                        -type f -printf '%P\n' 2>/dev/null
+                } > "$CHANGED"
 
-            COUNT=$(wc -l < "$CHANGED" 2>/dev/null || echo 0)
+                COUNT=$(wc -l < "$CHANGED" 2>/dev/null || echo 0)
+            fi
 
             if [ "$COUNT" -gt 0 ]; then
                 echo "[sync] Uploading changes ($COUNT files) at $(date)" >> "$LOGFILE"
@@ -478,6 +485,7 @@ if r2_configured; then
                 fi
                 date -Iseconds > "$LAST_SYNC_FILE"
                 touch "$MARKER"
+                FORCE_SYNC=0
                 echo "[sync] Complete at $(date)" >> "$LOGFILE"
             fi
         done
