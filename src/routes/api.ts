@@ -53,7 +53,6 @@ const api = new Hono<AppEnv>();
  * Admin API routes - all protected by Cloudflare Access
  */
 const adminApi = new Hono<AppEnv>();
-const shouldUseGatewayToken = (env: AppEnv['Bindings']) => env.ENABLE_GATEWAY_TOKEN_AUTH !== 'false';
 
 // Middleware: Verify Cloudflare Access JWT for all admin routes
 adminApi.use('*', createAccessMiddleware({ type: 'json' }));
@@ -87,9 +86,7 @@ adminApi.get('/devices', async (c) => {
       );
     }
 
-    const token = shouldUseGatewayToken(c.env)
-      ? c.env.MOLTBOT_GATEWAY_TOKEN || c.env.OPENCLAW_GATEWAY_TOKEN
-      : undefined;
+    const token = c.env.MOLTBOT_GATEWAY_TOKEN || c.env.OPENCLAW_GATEWAY_TOKEN;
     const tokenArg = token ? ` --token ${token}` : '';
     const proc = await withTimeout(
       sandbox.startProcess(`openclaw devices list --json${tokenArg}`),
@@ -177,9 +174,7 @@ adminApi.post('/devices/:requestId/approve', async (c) => {
       );
     }
 
-    const token = shouldUseGatewayToken(c.env)
-      ? c.env.MOLTBOT_GATEWAY_TOKEN || c.env.OPENCLAW_GATEWAY_TOKEN
-      : undefined;
+    const token = c.env.MOLTBOT_GATEWAY_TOKEN || c.env.OPENCLAW_GATEWAY_TOKEN;
     const tokenArg = token ? ` --token ${token}` : '';
     const proc = await withTimeout(
       sandbox.startProcess(`openclaw devices approve ${requestId}${tokenArg}`),
@@ -249,9 +244,7 @@ adminApi.post('/devices/approve-all', async (c) => {
       );
     }
 
-    const token = shouldUseGatewayToken(c.env)
-      ? c.env.MOLTBOT_GATEWAY_TOKEN || c.env.OPENCLAW_GATEWAY_TOKEN
-      : undefined;
+    const token = c.env.MOLTBOT_GATEWAY_TOKEN || c.env.OPENCLAW_GATEWAY_TOKEN;
     const tokenArg = token ? ` --token ${token}` : '';
     const listProc = await withTimeout(
       sandbox.startProcess(`openclaw devices list --json${tokenArg}`),
