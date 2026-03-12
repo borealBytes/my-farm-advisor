@@ -124,6 +124,10 @@ export function createAccessMiddleware(options: AccessMiddlewareOptions) {
     } catch (err) {
       console.error('Access JWT verification failed:', err);
 
+      if (type === 'html' && redirectOnMissing) {
+        return c.redirect(`https://${teamDomain}`, 302);
+      }
+
       if (type === 'json') {
         return c.json(
           {
