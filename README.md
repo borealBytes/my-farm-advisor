@@ -103,21 +103,23 @@ npx wrangler secret put ANTHROPIC_API_KEY
 # npx wrangler secret put CF_AI_GATEWAY_ACCOUNT_ID
 # npx wrangler secret put CF_AI_GATEWAY_GATEWAY_ID
 
-# Generate and set a gateway token (required for worker-to-gateway auth)
+# Generate and set a gateway token (required for remote access)
+# Save this token - you'll need it to access the Control UI
 export MOLTBOT_GATEWAY_TOKEN=$(openssl rand -hex 32)
+echo "Your gateway token: $MOLTBOT_GATEWAY_TOKEN"
 echo "$MOLTBOT_GATEWAY_TOKEN" | npx wrangler secret put MOLTBOT_GATEWAY_TOKEN
 
 # Deploy
 npm run deploy
 ```
 
-After deploying, open the Control UI:
+After deploying, open the Control UI with your token:
 
 ```
-https://your-worker.workers.dev/
+https://your-worker.workers.dev/?token=YOUR_GATEWAY_TOKEN
 ```
 
-Replace `your-worker` with your actual worker subdomain.
+Replace `your-worker` with your actual worker subdomain and `YOUR_GATEWAY_TOKEN` with the token you generated above.
 
 **Note:** The first request may take 1-2 minutes while the container starts.
 
@@ -182,8 +184,9 @@ npx wrangler secret put OPENROUTER_API_KEY
 #### 2.2 Authentication Secrets
 
 ```bash
-# Generate gateway token (used internally by the worker when proxying to OpenClaw)
+# Generate gateway token (save this - you'll need it for Control UI access)
 export TOKEN=$(openssl rand -hex 32)
+echo "Gateway token: $TOKEN"
 echo "$TOKEN" | npx wrangler secret put MOLTBOT_GATEWAY_TOKEN
 
 # Enable Cloudflare Access on your worker first, then get these values:
@@ -292,8 +295,8 @@ npx wrangler secret list
 # 2. Check worker logs for startup errors
 npx wrangler tail
 
-# 3. Test Control UI access (Cloudflare Access login should handle auth)
-# Visit: https://your-worker.workers.dev/
+# 3. Test Control UI access (use your gateway token)
+# Visit: https://your-worker.workers.dev/?token=YOUR_GATEWAY_TOKEN
 
 # 4. Verify admin routes are protected (should redirect to Access)
 curl -s -o /dev/null -w "%{http_code}" https://your-worker.workers.dev/_admin/
@@ -416,11 +419,14 @@ This is the most secure option as it requires explicit approval for each device.
 
 ### Gateway Token (Required)
 
-`MOLTBOT_GATEWAY_TOKEN` is used internally by the worker when proxying HTTP/WebSocket traffic to the OpenClaw gateway.
+A gateway token is required to access the Control UI when hosted remotely. Pass it as a query parameter:
 
-Do not pass this token in browser URLs. Browser access should use Cloudflare Access at `https://your-worker.workers.dev/`.
+```
+https://your-worker.workers.dev/?token=YOUR_TOKEN
+wss://your-worker.workers.dev/ws?token=YOUR_TOKEN
+```
 
-Even with valid Cloudflare Access, new devices still require approval via the admin UI at `/_admin/` (see Device Pairing above).
+**Note:** Even with a valid token, new devices still require approval via the admin UI at `/_admin/` (see Device Pairing above).
 
 For local development only, set `DEV_MODE=true` in `.dev.vars` to skip Cloudflare Access authentication and enable `allowInsecureAuth` (bypasses device pairing entirely).
 
@@ -662,8 +668,7 @@ The previous `AI_GATEWAY_API_KEY` + `AI_GATEWAY_BASE_URL` approach is still supp
 | `AI_GATEWAY_BASE_URL` | No | Legacy AI Gateway endpoint URL (deprecated) |
 | `CF_ACCESS_TEAM_DOMAIN` | Yes* | Cloudflare Access team domain (required for admin UI) |
 | `CF_ACCESS_AUD` | Yes* | Cloudflare Access application audience (required for admin UI) |
-| `MOLTBOT_GATEWAY_TOKEN` | Yes | Internal gateway auth token used by the worker proxy (do not pass in browser URLs) |
-| `ALLOW_BROWSER_QUERY_TOKEN_AUTH` | No | Legacy testing toggle. Set to `true` to allow browser `?token=` query auth again (not recommended). |
+| `MOLTBOT_GATEWAY_TOKEN` | Yes | Gateway token for authentication (pass via `?token=` query param) |
 | `DEV_MODE` | No | Set to `true` to skip CF Access auth + device pairing (local dev only) |
 | `DEBUG_ROUTES` | No | Set to `true` to enable `/debug/*` routes |
 | `SANDBOX_SLEEP_AFTER` | No | Container sleep timeout: `never` (default) or duration like `10m`, `1h` |
@@ -687,9 +692,7 @@ OpenClaw in Cloudflare Sandbox uses multiple authentication layers:
 
 1. **Cloudflare Access** - Protects admin routes (`/_admin/`, `/api/*`, `/debug/*`). Only authenticated users can manage devices.
 
-2. **Gateway Token** - Internal worker-to-gateway auth. Store as a Wrangler secret and never pass it in browser URLs.
-
-   - Legacy testing fallback: set `ALLOW_BROWSER_QUERY_TOKEN_AUTH=true` only for short-lived troubleshooting.
+2. **Gateway Token** - Required to access the Control UI. Pass via `?token=` query parameter. Keep this secret.
 
 3. **Device Pairing** - Each device (browser, CLI, chat platform DM) must be explicitly approved via the admin UI before it can interact with the assistant. This is the default "pairing" DM policy.
 

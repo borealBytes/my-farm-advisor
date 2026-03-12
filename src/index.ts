@@ -35,20 +35,9 @@ import configErrorHtml from './assets/config-error.html';
 /**
  * Transform error messages from the gateway to be more user-friendly.
  */
-function transformErrorMessage(
-  message: string,
-  host: string,
-  allowBrowserQueryTokenAuth: boolean,
-): string {
+function transformErrorMessage(message: string, host: string): string {
   if (message.includes('gateway token missing') || message.includes('gateway token mismatch')) {
-    if (allowBrowserQueryTokenAuth) {
-      return `Invalid or missing token. Visit https://${host}?token={REPLACE_WITH_YOUR_TOKEN}`;
-    }
-    return `Gateway auth failed. Re-authenticate via Cloudflare Access at https://${host}/`;
-  }
-
-  if (message.includes('device token mismatch')) {
-    return `Browser device token is stale. Re-pair this browser at https://${host}/_admin/`;
+    return `Invalid or missing token. Visit https://${host}?token={REPLACE_WITH_YOUR_TOKEN}`;
   }
 
   if (message.includes('pairing required')) {
@@ -56,42 +45,6 @@ function transformErrorMessage(
   }
 
   return message;
-}
-
-const DEVICE_TOKEN_RESET_COOKIE = 'mfadv_device_reset_epoch';
-const DEVICE_TOKEN_RESET_EPOCH = 'openclaw-2026.3.11';
-
-function parseCookieHeader(cookieHeader: string | null): Record<string, string> {
-  if (!cookieHeader) {
-    return {};
-  }
-
-  const parsed: Record<string, string> = {};
-  for (const pair of cookieHeader.split(';')) {
-    const [rawName, ...rawValueParts] = pair.trim().split('=');
-    if (!rawName || rawValueParts.length === 0) {
-      continue;
-    }
-    parsed[rawName] = rawValueParts.join('=');
-  }
-  return parsed;
-}
-
-function shouldInjectBrowserTokenReset(request: Request): boolean {
-  const cookies = parseCookieHeader(request.headers.get('Cookie'));
-  return cookies[DEVICE_TOKEN_RESET_COOKIE] !== DEVICE_TOKEN_RESET_EPOCH;
-}
-
-function getBrowserTokenResetScript(origin: string): string {
-  return `<script>(async function(){try{const keys=[];for(let i=0;i<localStorage.length;i++){const key=localStorage.key(i);if(key)keys.push(key);}for(const key of keys){const lowered=key.toLowerCase();if(lowered.includes('openclaw')||lowered.includes('clawdbot')||lowered.includes('moltbot')||lowered.includes('device')||lowered.includes('token')){localStorage.removeItem(key);}}sessionStorage.clear();if(indexedDB&&typeof indexedDB.databases==='function'){const dbs=await indexedDB.databases();for(const db of dbs){if(db&&db.name){indexedDB.deleteDatabase(db.name);}}}}catch(e){console.warn('Device token reset skipped',e);}document.cookie='${DEVICE_TOKEN_RESET_COOKIE}=${DEVICE_TOKEN_RESET_EPOCH}; Max-Age=31536000; Path=/; SameSite=Lax';window.location.replace('${origin}/_admin/');})();</script>`;
-}
-
-function injectIntoHtmlHead(html: string, injection: string): string {
-  const closingHead = html.search(/<\/head>/i);
-  if (closingHead >= 0) {
-    return `${html.slice(0, closingHead)}${injection}${html.slice(closingHead)}`;
-  }
-  return `${injection}${html}`;
 }
 
 async function fetchGatewayHttpWithTimeout(request: Request, sandbox: Sandbox): Promise<Response> {
@@ -123,21 +76,9 @@ async function bootstrapGatewayForUi(
   }
 }
 
-function withGatewayToken(
-  request: Request,
-  token: string,
-  allowBrowserQueryTokenAuth: boolean,
-): Request {
+function withGatewayToken(request: Request, token: string): Request {
   const tokenUrl = new URL(request.url);
-
-  if (!allowBrowserQueryTokenAuth) {
-    tokenUrl.searchParams.delete('token');
-  }
-
-  if (!tokenUrl.searchParams.get('token')) {
-    tokenUrl.searchParams.set('token', token);
-  }
-
+  tokenUrl.searchParams.set('token', token);
   return new Request(tokenUrl.toString(), request);
 }
 
@@ -344,7 +285,6 @@ app.all('*', async (c) => {
 
   const isWebSocketRequest = request.headers.get('Upgrade')?.toLowerCase() === 'websocket';
   const acceptsHtml = request.headers.get('Accept')?.includes('text/html');
-  const allowBrowserQueryTokenAuth = c.env.ALLOW_BROWSER_QUERY_TOKEN_AUTH === 'true';
   const isGatewayUiPath =
     url.pathname === '/' || url.pathname === '/chat' || url.pathname.startsWith('/chat/');
 
@@ -412,9 +352,12 @@ app.all('*', async (c) => {
       console.log('[WS] URL:', url.pathname + redactedSearch);
     }
 
+    // Inject gateway token into WebSocket request if not already present.
+    // CF Access redirects strip query params, so authenticated users lose ?token=.
+    // Since the user already passed CF Access auth, we inject the token server-side.
     let wsRequest = request;
     if (c.env.MOLTBOT_GATEWAY_TOKEN) {
-      wsRequest = withGatewayToken(request, c.env.MOLTBOT_GATEWAY_TOKEN, allowBrowserQueryTokenAuth);
+      wsRequest = withGatewayToken(request, c.env.MOLTBOT_GATEWAY_TOKEN);
     }
 
     const wsHeaders = new Headers(wsRequest.headers);
@@ -487,11 +430,7 @@ app.all('*', async (c) => {
             if (debugLogs) {
               console.log('[WS] Original error.message:', parsed.error.message);
             }
-            parsed.error.message = transformErrorMessage(
-              parsed.error.message,
-              url.host,
-              allowBrowserQueryTokenAuth,
-            );
+            parsed.error.message = transformErrorMessage(parsed.error.message, url.host);
             if (debugLogs) {
               console.log('[WS] Transformed error.message:', parsed.error.message);
             }
@@ -524,7 +463,7 @@ app.all('*', async (c) => {
         console.log('[WS] Container closed:', event.code, event.reason);
       }
       // Transform the close reason (truncate to 123 bytes max for WebSocket spec)
-      let reason = transformErrorMessage(event.reason, url.host, allowBrowserQueryTokenAuth);
+      let reason = transformErrorMessage(event.reason, url.host);
       if (reason.length > 123) {
         reason = reason.slice(0, 120) + '...';
       }
@@ -556,10 +495,10 @@ app.all('*', async (c) => {
 
   let httpRequest = request;
   if (c.env.MOLTBOT_GATEWAY_TOKEN) {
-    httpRequest = withGatewayToken(request, c.env.MOLTBOT_GATEWAY_TOKEN, allowBrowserQueryTokenAuth);
+    httpRequest = withGatewayToken(request, c.env.MOLTBOT_GATEWAY_TOKEN);
   }
 
-  console.log('[HTTP] Proxying:', url.pathname + redactSensitiveParams(url));
+  console.log('[HTTP] Proxying:', url.pathname + url.search);
   let httpResponse: Response;
   try {
     httpResponse = await fetchGatewayHttpWithTimeout(httpRequest, sandbox);
@@ -583,26 +522,6 @@ app.all('*', async (c) => {
     );
   }
   console.log('[HTTP] Response status:', httpResponse.status);
-
-  const responseContentType = httpResponse.headers.get('content-type') || '';
-  const isGatewayHtml = responseContentType.includes('text/html');
-
-  if (isGatewayHtml && shouldInjectBrowserTokenReset(request)) {
-    console.log('[HTTP] Injecting one-time browser token reset helper');
-    const html = await httpResponse.text();
-    const injectedHtml = injectIntoHtmlHead(html, getBrowserTokenResetScript(url.origin));
-    const injectedHeaders = new Headers(httpResponse.headers);
-    injectedHeaders.delete('content-length');
-    injectedHeaders.set('Cache-Control', 'no-store');
-    injectedHeaders.set('X-Worker-Debug', 'proxy-to-moltbot');
-    injectedHeaders.set('X-Debug-Path', url.pathname);
-
-    return new Response(injectedHtml, {
-      status: httpResponse.status,
-      statusText: httpResponse.statusText,
-      headers: injectedHeaders,
-    });
-  }
 
   // Add debug header to verify worker handled the request
   const newHeaders = new Headers(httpResponse.headers);
