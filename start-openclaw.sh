@@ -256,11 +256,22 @@ config.gateway.port = 18789;
 config.gateway.mode = 'local';
 config.gateway.trustedProxies = ['127.0.0.1/32', '::1/128', '10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16'];
 
-if (process.env.OPENCLAW_GATEWAY_TOKEN) {
+const gatewayTokenAuthEnabled = process.env.OPENCLAW_ENABLE_GATEWAY_TOKEN_AUTH !== 'false';
+
+if (gatewayTokenAuthEnabled && process.env.OPENCLAW_GATEWAY_TOKEN) {
     config.gateway.auth = config.gateway.auth || {};
     config.gateway.auth.token = process.env.OPENCLAW_GATEWAY_TOKEN;
     config.gateway.remote = config.gateway.remote || {};
     config.gateway.remote.token = process.env.OPENCLAW_GATEWAY_TOKEN;
+} else {
+    if (config.gateway.auth) {
+        delete config.gateway.auth.token;
+        if (Object.keys(config.gateway.auth).length === 0) delete config.gateway.auth;
+    }
+    if (config.gateway.remote) {
+        delete config.gateway.remote.token;
+        if (Object.keys(config.gateway.remote).length === 0) delete config.gateway.remote;
+    }
 }
 
 config.gateway.controlUi = config.gateway.controlUi || {};
@@ -506,7 +517,7 @@ echo "Dev mode: ${OPENCLAW_DEV_MODE:-false}"
 
 gateway_args=(gateway --port 18789 --verbose --allow-unconfigured --bind lan)
 
-if [ -n "$OPENCLAW_GATEWAY_TOKEN" ]; then
+if [ "${OPENCLAW_ENABLE_GATEWAY_TOKEN_AUTH:-true}" != "false" ] && [ -n "$OPENCLAW_GATEWAY_TOKEN" ]; then
     echo "Starting gateway with token auth..."
     gateway_args+=(--token "$OPENCLAW_GATEWAY_TOKEN")
 else

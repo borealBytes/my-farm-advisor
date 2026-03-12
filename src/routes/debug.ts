@@ -424,6 +424,7 @@ debug.get('/env', async (c) => {
     has_openrouter_key: !!c.env.OPENROUTER_API_KEY,
     preferred_provider: c.env.PREFERRED_PROVIDER || 'auto',
     has_gateway_token: !!(c.env.MOLTBOT_GATEWAY_TOKEN || c.env.OPENCLAW_GATEWAY_TOKEN),
+    gateway_token_auth_enabled: c.env.ENABLE_GATEWAY_TOKEN_AUTH !== 'false',
     has_r2_access_key: !!c.env.R2_ACCESS_KEY_ID,
     has_r2_secret_key: !!c.env.R2_SECRET_ACCESS_KEY,
     has_cf_account_id: !!c.env.CF_ACCOUNT_ID,

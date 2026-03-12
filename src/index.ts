@@ -91,8 +91,9 @@ export { Sandbox };
 function validateRequiredEnv(env: MoltbotEnv): string[] {
   const missing: string[] = [];
   const isTestMode = env.DEV_MODE === 'true' || env.E2E_TEST_MODE === 'true';
+  const enableGatewayTokenAuth = env.ENABLE_GATEWAY_TOKEN_AUTH !== 'false';
 
-  if (!env.MOLTBOT_GATEWAY_TOKEN && !env.OPENCLAW_GATEWAY_TOKEN) {
+  if (enableGatewayTokenAuth && !env.MOLTBOT_GATEWAY_TOKEN && !env.OPENCLAW_GATEWAY_TOKEN) {
     missing.push('MOLTBOT_GATEWAY_TOKEN');
   }
 
@@ -275,6 +276,7 @@ app.all('*', async (c) => {
   const request = c.req.raw;
   const url = new URL(request.url);
   const uiBootstrapTimeoutMs = 20000;
+  const enableGatewayTokenAuth = c.env.ENABLE_GATEWAY_TOKEN_AUTH !== 'false';
 
   console.log('[PROXY] Handling request:', url.pathname);
 
@@ -357,7 +359,7 @@ app.all('*', async (c) => {
     // Since the user already passed CF Access auth, we inject the token server-side.
     let wsRequest = request;
     const gatewayToken = c.env.MOLTBOT_GATEWAY_TOKEN || c.env.OPENCLAW_GATEWAY_TOKEN;
-    if (gatewayToken) {
+    if (enableGatewayTokenAuth && gatewayToken) {
       wsRequest = withGatewayToken(request, gatewayToken);
     }
 
@@ -496,7 +498,7 @@ app.all('*', async (c) => {
 
   let httpRequest = request;
   const gatewayToken = c.env.MOLTBOT_GATEWAY_TOKEN || c.env.OPENCLAW_GATEWAY_TOKEN;
-  if (gatewayToken) {
+  if (enableGatewayTokenAuth && gatewayToken) {
     httpRequest = withGatewayToken(request, gatewayToken);
   }
 

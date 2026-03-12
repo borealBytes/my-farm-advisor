@@ -6,7 +6,7 @@ describe('buildEnvVars', () => {
   it('returns empty object when no env vars set', () => {
     const env = createMockEnv();
     const result = buildEnvVars(env);
-    expect(result).toEqual({});
+    expect(result).toEqual({ OPENCLAW_ENABLE_GATEWAY_TOKEN_AUTH: 'true' });
   });
 
   it('includes ANTHROPIC_API_KEY when set directly', () => {
@@ -135,6 +135,16 @@ describe('buildEnvVars', () => {
     expect(result.OPENCLAW_GATEWAY_TOKEN).toBe('alias-token');
   });
 
+  it('disables gateway token auth when ENABLE_GATEWAY_TOKEN_AUTH is false', () => {
+    const env = createMockEnv({
+      MOLTBOT_GATEWAY_TOKEN: 'my-token',
+      ENABLE_GATEWAY_TOKEN_AUTH: 'false',
+    });
+    const result = buildEnvVars(env);
+    expect(result.OPENCLAW_ENABLE_GATEWAY_TOKEN_AUTH).toBe('false');
+    expect(result.OPENCLAW_GATEWAY_TOKEN).toBeUndefined();
+  });
+
   // Channel tokens
   it('includes all channel tokens when set', () => {
     const env = createMockEnv({
@@ -188,6 +198,7 @@ describe('buildEnvVars', () => {
 
     expect(result).toEqual({
       ANTHROPIC_API_KEY: 'sk-key',
+      OPENCLAW_ENABLE_GATEWAY_TOKEN_AUTH: 'true',
       OPENCLAW_GATEWAY_TOKEN: 'token',
       TELEGRAM_BOT_TOKEN: 'tg',
     });

@@ -9,6 +9,7 @@ import type { MoltbotEnv } from '../types';
 export function buildEnvVars(env: MoltbotEnv): Record<string, string> {
   const envVars: Record<string, string> = {};
   const gatewayToken = env.MOLTBOT_GATEWAY_TOKEN || env.OPENCLAW_GATEWAY_TOKEN;
+  const enableGatewayTokenAuth = env.ENABLE_GATEWAY_TOKEN_AUTH !== 'false';
 
   // Cloudflare AI Gateway configuration (new native provider)
   if (env.CLOUDFLARE_AI_GATEWAY_API_KEY) {
@@ -46,7 +47,8 @@ export function buildEnvVars(env: MoltbotEnv): Record<string, string> {
     envVars.ANTHROPIC_BASE_URL = env.ANTHROPIC_BASE_URL;
   }
 
-  if (gatewayToken) envVars.OPENCLAW_GATEWAY_TOKEN = gatewayToken;
+  envVars.OPENCLAW_ENABLE_GATEWAY_TOKEN_AUTH = enableGatewayTokenAuth ? 'true' : 'false';
+  if (enableGatewayTokenAuth && gatewayToken) envVars.OPENCLAW_GATEWAY_TOKEN = gatewayToken;
   if (env.DEV_MODE) envVars.OPENCLAW_DEV_MODE = env.DEV_MODE;
   if (env.TELEGRAM_BOT_TOKEN) envVars.TELEGRAM_BOT_TOKEN = env.TELEGRAM_BOT_TOKEN;
   if (env.TELEGRAM_DM_POLICY) envVars.TELEGRAM_DM_POLICY = env.TELEGRAM_DM_POLICY;
