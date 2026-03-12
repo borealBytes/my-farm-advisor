@@ -1,0 +1,10 @@
+{
+  "dataset_name": "daily_weather",
+  "source": "nasa-power",
+  "spatial_scope": "field",
+  "grower_slug": "ks-grower-01",
+  "farm_slug": "demo-farm",
+  "field_slug": "osm-1177630014",
+  "format": "csv",
+  "crs": "EPSG:4326"
+}

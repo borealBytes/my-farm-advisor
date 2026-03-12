@@ -27,20 +27,36 @@ RUN npm install -g openclaw@2026.3.8 \
 
 # Create OpenClaw directories
 # Legacy .clawdbot paths are kept for R2 backup migration
-RUN mkdir -p /root/.openclaw \
+RUN mkdir -p /root/.openclaw/workspace \
     && mkdir -p /root/clawd \
     && mkdir -p /root/clawd/skills
 
-ARG BUILD_CACHE_BUST=2026-03-10-v32
+ARG BUILD_CACHE_BUST=2026-03-11-v5-fix-paths
 RUN test -n "$BUILD_CACHE_BUST"
 
 # Copy startup script
-# Build cache bust: 2026-03-10-v33-admin-timeout-fix
+# Build cache bust: 2026-03-11-v5-fix-paths
 COPY ["start-openclaw.sh", "/usr/local/bin/start-openclaw.sh"]
 RUN chmod +x /usr/local/bin/start-openclaw.sh && sha256sum /usr/local/bin/start-openclaw.sh
 
-# Copy custom skills
-COPY skills/ /root/clawd/skills/
+# Copy SOUL.md, AGENTS.md, and USER.md to OpenClaw workspace directory
+COPY SOUL.md /root/.openclaw/workspace/SOUL.md
+COPY AGENTS.md /root/.openclaw/workspace/AGENTS.md
+COPY USER.md /root/.openclaw/workspace/USER.md
+
+# Copy custom skills to OpenClaw's skills directory
+# OpenClaw looks for skills in /usr/local/lib/node_modules/openclaw/skills/
+COPY skills/ /tmp/skills-nested/
+RUN find /tmp/skills-nested -name "SKILL.md" -type f | while read skillfile; do \
+        skilldir=$(dirname "$skillfile"); \
+        skillname=$(basename "$skilldir"); \
+        target="/usr/local/lib/node_modules/openclaw/skills/$skillname"; \
+        if [ ! -d "$target" ]; then \
+            cp -r "$skilldir" "$target"; \
+            echo "Copied skill: $skillname"; \
+        fi; \
+    done && \
+    rm -rf /tmp/skills-nested
 
 # Set working directory
 WORKDIR /root/clawd

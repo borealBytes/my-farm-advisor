@@ -1,0 +1,7 @@
+{
+  "dataset_name": "geoadmin_states",
+  "source": "census-tiger-line",
+  "spatial_scope": "usa-state",
+  "format": "geojson-or-parquet",
+  "notes": "Shared Level 1 admin root for annual maturity and geoadmin workflows"
+}

@@ -1,0 +1,586 @@
+{
+  "dataset_name": "landsat",
+  "field_id": "osm-1423087101",
+  "field_slug": "osm-1423087101",
+  "grower_slug": "ks-grower-02",
+  "farm_slug": "prairie-farm",
+  "generated_at": "2026-03-10T23:59:57Z",
+  "years": [
+    {
+      "year": 2021,
+      "status": "complete",
+      "scene_count": 5,
+      "coverage_months": [
+        3,
+        7,
+        8,
+        9,
+        10
+      ],
+      "missing_months": [
+        4,
+        5,
+        6,
+        11
+      ],
+      "coverage_status": "partial",
+      "reused": false,
+      "scenes": [
+        {
+          "scene_id": "LC08_L2SP_028034_20210321_02_T1",
+          "scene_date": "2021-03-21",
+          "cloud_cover": 3.78,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2021/landsat_20210321/landsat_20210321_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2021/landsat_20210321/landsat_20210321_nir_epsg4326.tif",
+            "qa_pixel": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2021/landsat_20210321/landsat_20210321_qa_pixel_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2021/landsat_20210321/landsat_20210321_ndvi.tif"
+        },
+        {
+          "scene_id": "LC08_L2SP_028034_20210727_02_T1",
+          "scene_date": "2021-07-27",
+          "cloud_cover": 1.92,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2021/landsat_20210727/landsat_20210727_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2021/landsat_20210727/landsat_20210727_nir_epsg4326.tif",
+            "qa_pixel": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2021/landsat_20210727/landsat_20210727_qa_pixel_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2021/landsat_20210727/landsat_20210727_ndvi.tif"
+        },
+        {
+          "scene_id": "LC08_L2SP_028034_20210828_02_T1",
+          "scene_date": "2021-08-28",
+          "cloud_cover": 13.51,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2021/landsat_20210828/landsat_20210828_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2021/landsat_20210828/landsat_20210828_nir_epsg4326.tif",
+            "qa_pixel": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2021/landsat_20210828/landsat_20210828_qa_pixel_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2021/landsat_20210828/landsat_20210828_ndvi.tif"
+        },
+        {
+          "scene_id": "LC08_L2SP_028034_20210913_02_T1",
+          "scene_date": "2021-09-13",
+          "cloud_cover": 1.17,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2021/landsat_20210913/landsat_20210913_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2021/landsat_20210913/landsat_20210913_nir_epsg4326.tif",
+            "qa_pixel": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2021/landsat_20210913/landsat_20210913_qa_pixel_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2021/landsat_20210913/landsat_20210913_ndvi.tif"
+        },
+        {
+          "scene_id": "LC08_L2SP_028034_20211031_02_T1",
+          "scene_date": "2021-10-31",
+          "cloud_cover": 1.33,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2021/landsat_20211031/landsat_20211031_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2021/landsat_20211031/landsat_20211031_nir_epsg4326.tif",
+            "qa_pixel": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2021/landsat_20211031/landsat_20211031_qa_pixel_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2021/landsat_20211031/landsat_20211031_ndvi.tif"
+        }
+      ]
+    },
+    {
+      "year": 2022,
+      "status": "complete",
+      "scene_count": 8,
+      "coverage_months": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "missing_months": [
+        3
+      ],
+      "coverage_status": "partial",
+      "reused": false,
+      "scenes": [
+        {
+          "scene_id": "LC08_L2SP_028034_20220425_02_T1",
+          "scene_date": "2022-04-25",
+          "cloud_cover": 0.03,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2022/landsat_20220425/landsat_20220425_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2022/landsat_20220425/landsat_20220425_nir_epsg4326.tif",
+            "qa_pixel": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2022/landsat_20220425/landsat_20220425_qa_pixel_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2022/landsat_20220425/landsat_20220425_ndvi.tif"
+        },
+        {
+          "scene_id": "LC08_L2SP_028034_20220527_02_T1",
+          "scene_date": "2022-05-27",
+          "cloud_cover": 0.01,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2022/landsat_20220527/landsat_20220527_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2022/landsat_20220527/landsat_20220527_nir_epsg4326.tif",
+            "qa_pixel": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2022/landsat_20220527/landsat_20220527_qa_pixel_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2022/landsat_20220527/landsat_20220527_ndvi.tif"
+        },
+        {
+          "scene_id": "LC09_L2SP_028034_20220620_02_T1",
+          "scene_date": "2022-06-20",
+          "cloud_cover": 0.21,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2022/landsat_20220620/landsat_20220620_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2022/landsat_20220620/landsat_20220620_nir_epsg4326.tif",
+            "qa_pixel": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2022/landsat_20220620/landsat_20220620_qa_pixel_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2022/landsat_20220620/landsat_20220620_ndvi.tif"
+        },
+        {
+          "scene_id": "LC09_L2SP_028034_20220706_02_T1",
+          "scene_date": "2022-07-06",
+          "cloud_cover": 1.5,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2022/landsat_20220706/landsat_20220706_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2022/landsat_20220706/landsat_20220706_nir_epsg4326.tif",
+            "qa_pixel": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2022/landsat_20220706/landsat_20220706_qa_pixel_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2022/landsat_20220706/landsat_20220706_ndvi.tif"
+        },
+        {
+          "scene_id": "LC08_L2SP_028034_20220831_02_T1",
+          "scene_date": "2022-08-31",
+          "cloud_cover": 4.18,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2022/landsat_20220831/landsat_20220831_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2022/landsat_20220831/landsat_20220831_nir_epsg4326.tif",
+            "qa_pixel": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2022/landsat_20220831/landsat_20220831_qa_pixel_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2022/landsat_20220831/landsat_20220831_ndvi.tif"
+        },
+        {
+          "scene_id": "LC09_L2SP_028034_20220908_02_T1",
+          "scene_date": "2022-09-08",
+          "cloud_cover": 0.0,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2022/landsat_20220908/landsat_20220908_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2022/landsat_20220908/landsat_20220908_nir_epsg4326.tif",
+            "qa_pixel": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2022/landsat_20220908/landsat_20220908_qa_pixel_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2022/landsat_20220908/landsat_20220908_ndvi.tif"
+        },
+        {
+          "scene_id": "LC08_L2SP_028034_20221018_02_T1",
+          "scene_date": "2022-10-18",
+          "cloud_cover": 0.02,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2022/landsat_20221018/landsat_20221018_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2022/landsat_20221018/landsat_20221018_nir_epsg4326.tif",
+            "qa_pixel": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2022/landsat_20221018/landsat_20221018_qa_pixel_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2022/landsat_20221018/landsat_20221018_ndvi.tif"
+        },
+        {
+          "scene_id": "LC08_L2SP_028034_20221119_02_T1",
+          "scene_date": "2022-11-19",
+          "cloud_cover": 0.04,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2022/landsat_20221119/landsat_20221119_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2022/landsat_20221119/landsat_20221119_nir_epsg4326.tif",
+            "qa_pixel": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2022/landsat_20221119/landsat_20221119_qa_pixel_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2022/landsat_20221119/landsat_20221119_ndvi.tif"
+        }
+      ]
+    },
+    {
+      "year": 2023,
+      "status": "complete",
+      "scene_count": 9,
+      "coverage_months": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "missing_months": [],
+      "coverage_status": "full",
+      "reused": false,
+      "scenes": [
+        {
+          "scene_id": "LC09_L2SP_028034_20230319_02_T1",
+          "scene_date": "2023-03-19",
+          "cloud_cover": 0.08,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2023/landsat_20230319/landsat_20230319_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2023/landsat_20230319/landsat_20230319_nir_epsg4326.tif",
+            "qa_pixel": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2023/landsat_20230319/landsat_20230319_qa_pixel_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2023/landsat_20230319/landsat_20230319_ndvi.tif"
+        },
+        {
+          "scene_id": "LC08_L2SP_028034_20230412_02_T1",
+          "scene_date": "2023-04-12",
+          "cloud_cover": 0.09,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2023/landsat_20230412/landsat_20230412_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2023/landsat_20230412/landsat_20230412_nir_epsg4326.tif",
+            "qa_pixel": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2023/landsat_20230412/landsat_20230412_qa_pixel_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2023/landsat_20230412/landsat_20230412_ndvi.tif"
+        },
+        {
+          "scene_id": "LC09_L2SP_028034_20230506_02_T1",
+          "scene_date": "2023-05-06",
+          "cloud_cover": 0.0,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2023/landsat_20230506/landsat_20230506_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2023/landsat_20230506/landsat_20230506_nir_epsg4326.tif",
+            "qa_pixel": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2023/landsat_20230506/landsat_20230506_qa_pixel_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2023/landsat_20230506/landsat_20230506_ndvi.tif"
+        },
+        {
+          "scene_id": "LC09_L2SP_028034_20230607_02_T1",
+          "scene_date": "2023-06-07",
+          "cloud_cover": 1.34,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2023/landsat_20230607/landsat_20230607_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2023/landsat_20230607/landsat_20230607_nir_epsg4326.tif",
+            "qa_pixel": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2023/landsat_20230607/landsat_20230607_qa_pixel_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2023/landsat_20230607/landsat_20230607_ndvi.tif"
+        },
+        {
+          "scene_id": "LC09_L2SP_028034_20230709_02_T1",
+          "scene_date": "2023-07-09",
+          "cloud_cover": 3.65,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2023/landsat_20230709/landsat_20230709_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2023/landsat_20230709/landsat_20230709_nir_epsg4326.tif",
+            "qa_pixel": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2023/landsat_20230709/landsat_20230709_qa_pixel_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2023/landsat_20230709/landsat_20230709_ndvi.tif"
+        },
+        {
+          "scene_id": "LC08_L2SP_028034_20230818_02_T1",
+          "scene_date": "2023-08-18",
+          "cloud_cover": 0.04,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2023/landsat_20230818/landsat_20230818_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2023/landsat_20230818/landsat_20230818_nir_epsg4326.tif",
+            "qa_pixel": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2023/landsat_20230818/landsat_20230818_qa_pixel_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2023/landsat_20230818/landsat_20230818_ndvi.tif"
+        },
+        {
+          "scene_id": "LC08_L2SP_028034_20230903_02_T1",
+          "scene_date": "2023-09-03",
+          "cloud_cover": 0.0,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2023/landsat_20230903/landsat_20230903_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2023/landsat_20230903/landsat_20230903_nir_epsg4326.tif",
+            "qa_pixel": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2023/landsat_20230903/landsat_20230903_qa_pixel_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2023/landsat_20230903/landsat_20230903_ndvi.tif"
+        },
+        {
+          "scene_id": "LC08_L2SP_028034_20231005_02_T1",
+          "scene_date": "2023-10-05",
+          "cloud_cover": 0.01,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2023/landsat_20231005/landsat_20231005_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2023/landsat_20231005/landsat_20231005_nir_epsg4326.tif",
+            "qa_pixel": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2023/landsat_20231005/landsat_20231005_qa_pixel_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2023/landsat_20231005/landsat_20231005_ndvi.tif"
+        },
+        {
+          "scene_id": "LC09_L2SP_028034_20231114_02_T1",
+          "scene_date": "2023-11-14",
+          "cloud_cover": 0.11,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2023/landsat_20231114/landsat_20231114_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2023/landsat_20231114/landsat_20231114_nir_epsg4326.tif",
+            "qa_pixel": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2023/landsat_20231114/landsat_20231114_qa_pixel_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2023/landsat_20231114/landsat_20231114_ndvi.tif"
+        }
+      ]
+    },
+    {
+      "year": 2024,
+      "status": "complete",
+      "scene_count": 9,
+      "coverage_months": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "missing_months": [],
+      "coverage_status": "full",
+      "reused": false,
+      "scenes": [
+        {
+          "scene_id": "LC09_L2SP_028034_20240305_02_T1",
+          "scene_date": "2024-03-05",
+          "cloud_cover": 13.99,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2024/landsat_20240305/landsat_20240305_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2024/landsat_20240305/landsat_20240305_nir_epsg4326.tif",
+            "qa_pixel": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2024/landsat_20240305/landsat_20240305_qa_pixel_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2024/landsat_20240305/landsat_20240305_ndvi.tif"
+        },
+        {
+          "scene_id": "LC08_L2SP_028034_20240414_02_T1",
+          "scene_date": "2024-04-14",
+          "cloud_cover": 0.01,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2024/landsat_20240414/landsat_20240414_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2024/landsat_20240414/landsat_20240414_nir_epsg4326.tif",
+            "qa_pixel": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2024/landsat_20240414/landsat_20240414_qa_pixel_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2024/landsat_20240414/landsat_20240414_ndvi.tif"
+        },
+        {
+          "scene_id": "LC09_L2SP_028034_20240508_02_T1",
+          "scene_date": "2024-05-08",
+          "cloud_cover": 0.01,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2024/landsat_20240508/landsat_20240508_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2024/landsat_20240508/landsat_20240508_nir_epsg4326.tif",
+            "qa_pixel": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2024/landsat_20240508/landsat_20240508_qa_pixel_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2024/landsat_20240508/landsat_20240508_ndvi.tif"
+        },
+        {
+          "scene_id": "LC08_L2SP_028034_20240617_02_T1",
+          "scene_date": "2024-06-17",
+          "cloud_cover": 7.17,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2024/landsat_20240617/landsat_20240617_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2024/landsat_20240617/landsat_20240617_nir_epsg4326.tif",
+            "qa_pixel": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2024/landsat_20240617/landsat_20240617_qa_pixel_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2024/landsat_20240617/landsat_20240617_ndvi.tif"
+        },
+        {
+          "scene_id": "LC09_L2SP_028034_20240711_02_T1",
+          "scene_date": "2024-07-11",
+          "cloud_cover": 0.03,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2024/landsat_20240711/landsat_20240711_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2024/landsat_20240711/landsat_20240711_nir_epsg4326.tif",
+            "qa_pixel": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2024/landsat_20240711/landsat_20240711_qa_pixel_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2024/landsat_20240711/landsat_20240711_ndvi.tif"
+        },
+        {
+          "scene_id": "LC08_L2SP_028034_20240804_02_T1",
+          "scene_date": "2024-08-04",
+          "cloud_cover": 0.0,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2024/landsat_20240804/landsat_20240804_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2024/landsat_20240804/landsat_20240804_nir_epsg4326.tif",
+            "qa_pixel": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2024/landsat_20240804/landsat_20240804_qa_pixel_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2024/landsat_20240804/landsat_20240804_ndvi.tif"
+        },
+        {
+          "scene_id": "LC09_L2SP_028034_20240929_02_T1",
+          "scene_date": "2024-09-29",
+          "cloud_cover": 0.01,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2024/landsat_20240929/landsat_20240929_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2024/landsat_20240929/landsat_20240929_nir_epsg4326.tif",
+            "qa_pixel": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2024/landsat_20240929/landsat_20240929_qa_pixel_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2024/landsat_20240929/landsat_20240929_ndvi.tif"
+        },
+        {
+          "scene_id": "LC08_L2SP_028034_20241023_02_T1",
+          "scene_date": "2024-10-23",
+          "cloud_cover": 0.03,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2024/landsat_20241023/landsat_20241023_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2024/landsat_20241023/landsat_20241023_nir_epsg4326.tif",
+            "qa_pixel": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2024/landsat_20241023/landsat_20241023_qa_pixel_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2024/landsat_20241023/landsat_20241023_ndvi.tif"
+        },
+        {
+          "scene_id": "LC08_L2SP_028034_20241124_02_T1",
+          "scene_date": "2024-11-24",
+          "cloud_cover": 13.68,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2024/landsat_20241124/landsat_20241124_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2024/landsat_20241124/landsat_20241124_nir_epsg4326.tif",
+            "qa_pixel": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2024/landsat_20241124/landsat_20241124_qa_pixel_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2024/landsat_20241124/landsat_20241124_ndvi.tif"
+        }
+      ]
+    },
+    {
+      "year": 2025,
+      "status": "complete",
+      "scene_count": 8,
+      "coverage_months": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        10,
+        11
+      ],
+      "missing_months": [
+        9
+      ],
+      "coverage_status": "partial",
+      "reused": false,
+      "scenes": [
+        {
+          "scene_id": "LC08_L2SP_028034_20250316_02_T1",
+          "scene_date": "2025-03-16",
+          "cloud_cover": 3.14,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2025/landsat_20250316/landsat_20250316_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2025/landsat_20250316/landsat_20250316_nir_epsg4326.tif",
+            "qa_pixel": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2025/landsat_20250316/landsat_20250316_qa_pixel_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2025/landsat_20250316/landsat_20250316_ndvi.tif"
+        },
+        {
+          "scene_id": "LC08_L2SP_028034_20250417_02_T1",
+          "scene_date": "2025-04-17",
+          "cloud_cover": 0.14,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2025/landsat_20250417/landsat_20250417_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2025/landsat_20250417/landsat_20250417_nir_epsg4326.tif",
+            "qa_pixel": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2025/landsat_20250417/landsat_20250417_qa_pixel_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2025/landsat_20250417/landsat_20250417_ndvi.tif"
+        },
+        {
+          "scene_id": "LC09_L2SP_028034_20250511_02_T1",
+          "scene_date": "2025-05-11",
+          "cloud_cover": 2.9,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2025/landsat_20250511/landsat_20250511_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2025/landsat_20250511/landsat_20250511_nir_epsg4326.tif",
+            "qa_pixel": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2025/landsat_20250511/landsat_20250511_qa_pixel_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2025/landsat_20250511/landsat_20250511_ndvi.tif"
+        },
+        {
+          "scene_id": "LC08_L2SP_028034_20250620_02_T1",
+          "scene_date": "2025-06-20",
+          "cloud_cover": 0.01,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2025/landsat_20250620/landsat_20250620_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2025/landsat_20250620/landsat_20250620_nir_epsg4326.tif",
+            "qa_pixel": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2025/landsat_20250620/landsat_20250620_qa_pixel_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2025/landsat_20250620/landsat_20250620_ndvi.tif"
+        },
+        {
+          "scene_id": "LC08_L2SP_028034_20250722_02_T1",
+          "scene_date": "2025-07-22",
+          "cloud_cover": 3.02,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2025/landsat_20250722/landsat_20250722_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2025/landsat_20250722/landsat_20250722_nir_epsg4326.tif",
+            "qa_pixel": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2025/landsat_20250722/landsat_20250722_qa_pixel_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2025/landsat_20250722/landsat_20250722_ndvi.tif"
+        },
+        {
+          "scene_id": "LC09_L2SP_028034_20250815_02_T1",
+          "scene_date": "2025-08-15",
+          "cloud_cover": 0.42,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2025/landsat_20250815/landsat_20250815_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2025/landsat_20250815/landsat_20250815_nir_epsg4326.tif",
+            "qa_pixel": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2025/landsat_20250815/landsat_20250815_qa_pixel_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2025/landsat_20250815/landsat_20250815_ndvi.tif"
+        },
+        {
+          "scene_id": "LC08_L2SP_028034_20251010_02_T1",
+          "scene_date": "2025-10-10",
+          "cloud_cover": 4.76,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2025/landsat_20251010/landsat_20251010_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2025/landsat_20251010/landsat_20251010_nir_epsg4326.tif",
+            "qa_pixel": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2025/landsat_20251010/landsat_20251010_qa_pixel_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2025/landsat_20251010/landsat_20251010_ndvi.tif"
+        },
+        {
+          "scene_id": "LC09_L2SP_028034_20251103_02_T1",
+          "scene_date": "2025-11-03",
+          "cloud_cover": 0.04,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2025/landsat_20251103/landsat_20251103_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2025/landsat_20251103/landsat_20251103_nir_epsg4326.tif",
+            "qa_pixel": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2025/landsat_20251103/landsat_20251103_qa_pixel_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1423087101/satellite/landsat/2025/landsat_20251103/landsat_20251103_ndvi.tif"
+        }
+      ]
+    }
+  ]
+}

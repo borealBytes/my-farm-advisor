@@ -1,0 +1,12 @@
+{
+  "grower_slug": "ks-grower-02",
+  "farm_slug": "prairie-farm",
+  "field_slug": "osm-666033354",
+  "display_name": "osm-666033354",
+  "field_id": "OSM_666033354",
+  "boundary_file": "boundary/field_boundary.geojson",
+  "soil_file": "soil/ssurgo_soil_types.geojson",
+  "weather_file": "weather/daily_weather.csv",
+  "satellite_dir": "satellite/",
+  "notes": "Canonical field metadata"
+}

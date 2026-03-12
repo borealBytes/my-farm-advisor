@@ -1,0 +1,9 @@
+{
+  "grower_slug": "ks-grower-02",
+  "farm_slug": "prairie-farm",
+  "display_name": "Iowa Demo Farm",
+  "state": "IA",
+  "country": "US",
+  "default_crs": "EPSG:4326",
+  "notes": "Canonical farm metadata"
+}

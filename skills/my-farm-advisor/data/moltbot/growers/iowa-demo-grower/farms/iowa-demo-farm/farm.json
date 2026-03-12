@@ -1,0 +1,9 @@
+{
+  "grower_slug": "iowa-demo-grower",
+  "farm_slug": "iowa-demo-farm",
+  "display_name": "Iowa Demo Farm",
+  "state": "IA",
+  "country": "US",
+  "default_crs": "EPSG:4326",
+  "notes": "Canonical farm metadata"
+}

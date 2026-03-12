@@ -1,0 +1,7 @@
+{
+  "dataset_name": "geoadmin_counties",
+  "source": "census-tiger-line",
+  "spatial_scope": "usa-county",
+  "format": "geojson-or-parquet",
+  "notes": "Shared county and FIPS root for annual maturity and geoadmin workflows"
+}

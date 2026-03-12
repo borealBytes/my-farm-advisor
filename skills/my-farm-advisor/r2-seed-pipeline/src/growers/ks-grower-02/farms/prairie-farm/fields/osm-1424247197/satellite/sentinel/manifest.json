@@ -1,0 +1,621 @@
+{
+  "dataset_name": "sentinel",
+  "field_id": "osm-1424247197",
+  "field_slug": "osm-1424247197",
+  "grower_slug": "ks-grower-02",
+  "farm_slug": "prairie-farm",
+  "generated_at": "2026-03-11T00:05:16Z",
+  "years": [
+    {
+      "year": 2021,
+      "status": "complete",
+      "scene_count": 8,
+      "coverage_months": [
+        3,
+        4,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "missing_months": [
+        5
+      ],
+      "coverage_status": "partial",
+      "reused": false,
+      "scenes": [
+        {
+          "scene_id": "S2A_MSIL2A_20210320T171011_R112_T14SQH_20210321T163759",
+          "scene_date": "2021-03-20",
+          "cloud_cover": 1.173,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2021/sentinel_20210320/sentinel_20210320_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2021/sentinel_20210320/sentinel_20210320_nir_epsg4326.tif",
+            "scl": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2021/sentinel_20210320/sentinel_20210320_scl_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2021/sentinel_20210320/sentinel_20210320_ndvi.tif"
+        },
+        {
+          "scene_id": "S2B_MSIL2A_20210404T170849_R112_T14SQH_20210405T114602",
+          "scene_date": "2021-04-04",
+          "cloud_cover": 0.022,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2021/sentinel_20210404/sentinel_20210404_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2021/sentinel_20210404/sentinel_20210404_nir_epsg4326.tif",
+            "scl": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2021/sentinel_20210404/sentinel_20210404_scl_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2021/sentinel_20210404/sentinel_20210404_ndvi.tif"
+        },
+        {
+          "scene_id": "S2A_MSIL2A_20210618T170851_R112_T14SQH_20210619T023957",
+          "scene_date": "2021-06-18",
+          "cloud_cover": 1.236,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2021/sentinel_20210618/sentinel_20210618_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2021/sentinel_20210618/sentinel_20210618_nir_epsg4326.tif",
+            "scl": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2021/sentinel_20210618/sentinel_20210618_scl_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2021/sentinel_20210618/sentinel_20210618_ndvi.tif"
+        },
+        {
+          "scene_id": "S2A_MSIL2A_20210708T170851_R112_T14SQH_20210709T145803",
+          "scene_date": "2021-07-08",
+          "cloud_cover": 0.045,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2021/sentinel_20210708/sentinel_20210708_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2021/sentinel_20210708/sentinel_20210708_nir_epsg4326.tif",
+            "scl": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2021/sentinel_20210708/sentinel_20210708_scl_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2021/sentinel_20210708/sentinel_20210708_ndvi.tif"
+        },
+        {
+          "scene_id": "S2A_MSIL2A_20210827T170851_R112_T14SQH_20210828T035602",
+          "scene_date": "2021-08-27",
+          "cloud_cover": 0.089,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2021/sentinel_20210827/sentinel_20210827_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2021/sentinel_20210827/sentinel_20210827_nir_epsg4326.tif",
+            "scl": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2021/sentinel_20210827/sentinel_20210827_scl_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2021/sentinel_20210827/sentinel_20210827_ndvi.tif"
+        },
+        {
+          "scene_id": "S2B_MSIL2A_20210911T170849_R112_T14SQH_20210912T070752",
+          "scene_date": "2021-09-11",
+          "cloud_cover": 0.014,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2021/sentinel_20210911/sentinel_20210911_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2021/sentinel_20210911/sentinel_20210911_nir_epsg4326.tif",
+            "scl": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2021/sentinel_20210911/sentinel_20210911_scl_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2021/sentinel_20210911/sentinel_20210911_ndvi.tif"
+        },
+        {
+          "scene_id": "S2B_MSIL2A_20211011T171139_R112_T14SQH_20211012T004504",
+          "scene_date": "2021-10-11",
+          "cloud_cover": 1.833,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2021/sentinel_20211011/sentinel_20211011_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2021/sentinel_20211011/sentinel_20211011_nir_epsg4326.tif",
+            "scl": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2021/sentinel_20211011/sentinel_20211011_scl_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2021/sentinel_20211011/sentinel_20211011_ndvi.tif"
+        },
+        {
+          "scene_id": "S2A_MSIL2A_20211125T171641_R112_T14SQH_20211126T044954",
+          "scene_date": "2021-11-25",
+          "cloud_cover": 0.105,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2021/sentinel_20211125/sentinel_20211125_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2021/sentinel_20211125/sentinel_20211125_nir_epsg4326.tif",
+            "scl": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2021/sentinel_20211125/sentinel_20211125_scl_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2021/sentinel_20211125/sentinel_20211125_ndvi.tif"
+        }
+      ]
+    },
+    {
+      "year": 2022,
+      "status": "complete",
+      "scene_count": 9,
+      "coverage_months": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "missing_months": [],
+      "coverage_status": "full",
+      "reused": false,
+      "scenes": [
+        {
+          "scene_id": "S2A_MSIL2A_20220315T171051_R112_T14SQH_20220316T063932",
+          "scene_date": "2022-03-15",
+          "cloud_cover": 0.001,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2022/sentinel_20220315/sentinel_20220315_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2022/sentinel_20220315/sentinel_20220315_nir_epsg4326.tif",
+            "scl": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2022/sentinel_20220315/sentinel_20220315_scl_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2022/sentinel_20220315/sentinel_20220315_ndvi.tif"
+        },
+        {
+          "scene_id": "S2A_MSIL2A_20220414T170851_R112_T14SQH_20220415T100037",
+          "scene_date": "2022-04-14",
+          "cloud_cover": 0.578,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2022/sentinel_20220414/sentinel_20220414_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2022/sentinel_20220414/sentinel_20220414_nir_epsg4326.tif",
+            "scl": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2022/sentinel_20220414/sentinel_20220414_scl_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2022/sentinel_20220414/sentinel_20220414_ndvi.tif"
+        },
+        {
+          "scene_id": "S2B_MSIL2A_20220509T170849_R112_T14SQH_20220510T185931",
+          "scene_date": "2022-05-09",
+          "cloud_cover": 0.061,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2022/sentinel_20220509/sentinel_20220509_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2022/sentinel_20220509/sentinel_20220509_nir_epsg4326.tif",
+            "scl": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2022/sentinel_20220509/sentinel_20220509_scl_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2022/sentinel_20220509/sentinel_20220509_ndvi.tif"
+        },
+        {
+          "scene_id": "S2B_MSIL2A_20220628T170859_R112_T14SQH_20240630T082017",
+          "scene_date": "2022-06-28",
+          "cloud_cover": 0.0,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2022/sentinel_20220628/sentinel_20220628_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2022/sentinel_20220628/sentinel_20220628_nir_epsg4326.tif",
+            "scl": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2022/sentinel_20220628/sentinel_20220628_scl_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2022/sentinel_20220628/sentinel_20220628_ndvi.tif"
+        },
+        {
+          "scene_id": "S2A_MSIL2A_20220723T170901_R112_T14SQH_20220725T182614",
+          "scene_date": "2022-07-23",
+          "cloud_cover": 0.001,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2022/sentinel_20220723/sentinel_20220723_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2022/sentinel_20220723/sentinel_20220723_nir_epsg4326.tif",
+            "scl": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2022/sentinel_20220723/sentinel_20220723_scl_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2022/sentinel_20220723/sentinel_20220723_ndvi.tif"
+        },
+        {
+          "scene_id": "S2A_MSIL2A_20220812T170901_R112_T14SQH_20220813T062951",
+          "scene_date": "2022-08-12",
+          "cloud_cover": 4.672,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2022/sentinel_20220812/sentinel_20220812_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2022/sentinel_20220812/sentinel_20220812_nir_epsg4326.tif",
+            "scl": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2022/sentinel_20220812/sentinel_20220812_scl_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2022/sentinel_20220812/sentinel_20220812_ndvi.tif"
+        },
+        {
+          "scene_id": "S2A_MSIL2A_20220911T170911_R112_T14SQH_20220913T000125",
+          "scene_date": "2022-09-11",
+          "cloud_cover": 0.002,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2022/sentinel_20220911/sentinel_20220911_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2022/sentinel_20220911/sentinel_20220911_nir_epsg4326.tif",
+            "scl": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2022/sentinel_20220911/sentinel_20220911_scl_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2022/sentinel_20220911/sentinel_20220911_ndvi.tif"
+        },
+        {
+          "scene_id": "S2B_MSIL2A_20221006T171159_R112_T14SQH_20240801T201540",
+          "scene_date": "2022-10-06",
+          "cloud_cover": 11.932,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2022/sentinel_20221006/sentinel_20221006_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2022/sentinel_20221006/sentinel_20221006_nir_epsg4326.tif",
+            "scl": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2022/sentinel_20221006/sentinel_20221006_scl_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2022/sentinel_20221006/sentinel_20221006_ndvi.tif"
+        },
+        {
+          "scene_id": "S2B_MSIL2A_20221125T171639_R112_T14SQH_20221202T060705",
+          "scene_date": "2022-11-25",
+          "cloud_cover": 0.006,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2022/sentinel_20221125/sentinel_20221125_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2022/sentinel_20221125/sentinel_20221125_nir_epsg4326.tif",
+            "scl": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2022/sentinel_20221125/sentinel_20221125_scl_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2022/sentinel_20221125/sentinel_20221125_ndvi.tif"
+        }
+      ]
+    },
+    {
+      "year": 2023,
+      "status": "complete",
+      "scene_count": 7,
+      "coverage_months": [
+        4,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "missing_months": [
+        3,
+        5
+      ],
+      "coverage_status": "partial",
+      "reused": false,
+      "scenes": [
+        {
+          "scene_id": "S2A_MSIL2A_20230429T170851_R112_T14SQH_20230430T022235",
+          "scene_date": "2023-04-29",
+          "cloud_cover": 0.0,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2023/sentinel_20230429/sentinel_20230429_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2023/sentinel_20230429/sentinel_20230429_nir_epsg4326.tif",
+            "scl": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2023/sentinel_20230429/sentinel_20230429_scl_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2023/sentinel_20230429/sentinel_20230429_ndvi.tif"
+        },
+        {
+          "scene_id": "S2B_MSIL2A_20230613T170859_R112_T14SQH_20240928T175109",
+          "scene_date": "2023-06-13",
+          "cloud_cover": 1.26,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2023/sentinel_20230613/sentinel_20230613_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2023/sentinel_20230613/sentinel_20230613_nir_epsg4326.tif",
+            "scl": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2023/sentinel_20230613/sentinel_20230613_scl_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2023/sentinel_20230613/sentinel_20230613_ndvi.tif"
+        },
+        {
+          "scene_id": "S2B_MSIL2A_20230723T170859_R112_T14SQH_20230723T235951",
+          "scene_date": "2023-07-23",
+          "cloud_cover": 0.002,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2023/sentinel_20230723/sentinel_20230723_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2023/sentinel_20230723/sentinel_20230723_nir_epsg4326.tif",
+            "scl": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2023/sentinel_20230723/sentinel_20230723_scl_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2023/sentinel_20230723/sentinel_20230723_ndvi.tif"
+        },
+        {
+          "scene_id": "S2A_MSIL2A_20230817T170901_R112_T14SQH_20230818T021911",
+          "scene_date": "2023-08-17",
+          "cloud_cover": 11.319,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2023/sentinel_20230817/sentinel_20230817_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2023/sentinel_20230817/sentinel_20230817_nir_epsg4326.tif",
+            "scl": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2023/sentinel_20230817/sentinel_20230817_scl_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2023/sentinel_20230817/sentinel_20230817_ndvi.tif"
+        },
+        {
+          "scene_id": "S2B_MSIL2A_20230901T170859_R112_T14SQH_20241104T181118",
+          "scene_date": "2023-09-01",
+          "cloud_cover": 0.0,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2023/sentinel_20230901/sentinel_20230901_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2023/sentinel_20230901/sentinel_20230901_nir_epsg4326.tif",
+            "scl": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2023/sentinel_20230901/sentinel_20230901_scl_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2023/sentinel_20230901/sentinel_20230901_ndvi.tif"
+        },
+        {
+          "scene_id": "S2B_MSIL2A_20231021T171339_R112_T14SQH_20241030T151626",
+          "scene_date": "2023-10-21",
+          "cloud_cover": 0.0,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2023/sentinel_20231021/sentinel_20231021_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2023/sentinel_20231021/sentinel_20231021_nir_epsg4326.tif",
+            "scl": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2023/sentinel_20231021/sentinel_20231021_scl_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2023/sentinel_20231021/sentinel_20231021_ndvi.tif"
+        },
+        {
+          "scene_id": "S2B_MSIL2A_20231110T171539_R112_T14SQH_20231110T214833",
+          "scene_date": "2023-11-10",
+          "cloud_cover": 0.005,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2023/sentinel_20231110/sentinel_20231110_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2023/sentinel_20231110/sentinel_20231110_nir_epsg4326.tif",
+            "scl": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2023/sentinel_20231110/sentinel_20231110_scl_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2023/sentinel_20231110/sentinel_20231110_ndvi.tif"
+        }
+      ]
+    },
+    {
+      "year": 2024,
+      "status": "complete",
+      "scene_count": 9,
+      "coverage_months": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "missing_months": [],
+      "coverage_status": "full",
+      "reused": false,
+      "scenes": [
+        {
+          "scene_id": "S2B_MSIL2A_20240319T170919_R112_T14SQH_20240319T223454",
+          "scene_date": "2024-03-19",
+          "cloud_cover": 0.004,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2024/sentinel_20240319/sentinel_20240319_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2024/sentinel_20240319/sentinel_20240319_nir_epsg4326.tif",
+            "scl": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2024/sentinel_20240319/sentinel_20240319_scl_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2024/sentinel_20240319/sentinel_20240319_ndvi.tif"
+        },
+        {
+          "scene_id": "S2A_MSIL2A_20240413T170851_R112_T14SQH_20240414T012029",
+          "scene_date": "2024-04-13",
+          "cloud_cover": 5.586,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2024/sentinel_20240413/sentinel_20240413_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2024/sentinel_20240413/sentinel_20240413_nir_epsg4326.tif",
+            "scl": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2024/sentinel_20240413/sentinel_20240413_scl_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2024/sentinel_20240413/sentinel_20240413_ndvi.tif"
+        },
+        {
+          "scene_id": "S2B_MSIL2A_20240508T170849_R112_T14SQH_20240508T221303",
+          "scene_date": "2024-05-08",
+          "cloud_cover": 0.0,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2024/sentinel_20240508/sentinel_20240508_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2024/sentinel_20240508/sentinel_20240508_nir_epsg4326.tif",
+            "scl": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2024/sentinel_20240508/sentinel_20240508_scl_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2024/sentinel_20240508/sentinel_20240508_ndvi.tif"
+        },
+        {
+          "scene_id": "S2A_MSIL2A_20240612T170901_R112_T14SQH_20240613T011338",
+          "scene_date": "2024-06-12",
+          "cloud_cover": 0.232,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2024/sentinel_20240612/sentinel_20240612_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2024/sentinel_20240612/sentinel_20240612_nir_epsg4326.tif",
+            "scl": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2024/sentinel_20240612/sentinel_20240612_scl_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2024/sentinel_20240612/sentinel_20240612_ndvi.tif"
+        },
+        {
+          "scene_id": "S2B_MSIL2A_20240717T170849_R112_T14SQH_20240717T231653",
+          "scene_date": "2024-07-17",
+          "cloud_cover": 0.626,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2024/sentinel_20240717/sentinel_20240717_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2024/sentinel_20240717/sentinel_20240717_nir_epsg4326.tif",
+            "scl": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2024/sentinel_20240717/sentinel_20240717_scl_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2024/sentinel_20240717/sentinel_20240717_ndvi.tif"
+        },
+        {
+          "scene_id": "S2A_MSIL2A_20240801T170851_R112_T14SQH_20240802T002152",
+          "scene_date": "2024-08-01",
+          "cloud_cover": 1.37,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2024/sentinel_20240801/sentinel_20240801_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2024/sentinel_20240801/sentinel_20240801_nir_epsg4326.tif",
+            "scl": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2024/sentinel_20240801/sentinel_20240801_scl_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2024/sentinel_20240801/sentinel_20240801_ndvi.tif"
+        },
+        {
+          "scene_id": "S2A_MSIL2A_20240910T170901_R112_T14SQH_20240911T000605",
+          "scene_date": "2024-09-10",
+          "cloud_cover": 0.002,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2024/sentinel_20240910/sentinel_20240910_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2024/sentinel_20240910/sentinel_20240910_nir_epsg4326.tif",
+            "scl": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2024/sentinel_20240910/sentinel_20240910_scl_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2024/sentinel_20240910/sentinel_20240910_ndvi.tif"
+        },
+        {
+          "scene_id": "S2B_MSIL2A_20241005T171109_R112_T14SQH_20241005T213906",
+          "scene_date": "2024-10-05",
+          "cloud_cover": 0.0,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2024/sentinel_20241005/sentinel_20241005_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2024/sentinel_20241005/sentinel_20241005_nir_epsg4326.tif",
+            "scl": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2024/sentinel_20241005/sentinel_20241005_scl_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2024/sentinel_20241005/sentinel_20241005_ndvi.tif"
+        },
+        {
+          "scene_id": "S2A_MSIL2A_20241109T171531_R112_T14SQH_20241109T205648",
+          "scene_date": "2024-11-09",
+          "cloud_cover": 0.0,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2024/sentinel_20241109/sentinel_20241109_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2024/sentinel_20241109/sentinel_20241109_nir_epsg4326.tif",
+            "scl": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2024/sentinel_20241109/sentinel_20241109_scl_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2024/sentinel_20241109/sentinel_20241109_ndvi.tif"
+        }
+      ]
+    },
+    {
+      "year": 2025,
+      "status": "complete",
+      "scene_count": 9,
+      "coverage_months": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "missing_months": [],
+      "coverage_status": "full",
+      "reused": false,
+      "scenes": [
+        {
+          "scene_id": "S2B_MSIL2A_20250314T170959_R112_T14SQH_20250314T224528",
+          "scene_date": "2025-03-14",
+          "cloud_cover": 0.04,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2025/sentinel_20250314/sentinel_20250314_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2025/sentinel_20250314/sentinel_20250314_nir_epsg4326.tif",
+            "scl": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2025/sentinel_20250314/sentinel_20250314_scl_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2025/sentinel_20250314/sentinel_20250314_ndvi.tif"
+        },
+        {
+          "scene_id": "S2A_MSIL2A_20250410T171711_R112_T14SQH_20250411T014725",
+          "scene_date": "2025-04-10",
+          "cloud_cover": 0.009,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2025/sentinel_20250410/sentinel_20250410_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2025/sentinel_20250410/sentinel_20250410_nir_epsg4326.tif",
+            "scl": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2025/sentinel_20250410/sentinel_20250410_scl_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2025/sentinel_20250410/sentinel_20250410_ndvi.tif"
+        },
+        {
+          "scene_id": "S2B_MSIL2A_20250513T170849_R112_T14SQH_20250513T211256",
+          "scene_date": "2025-05-13",
+          "cloud_cover": 0.745,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2025/sentinel_20250513/sentinel_20250513_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2025/sentinel_20250513/sentinel_20250513_nir_epsg4326.tif",
+            "scl": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2025/sentinel_20250513/sentinel_20250513_scl_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2025/sentinel_20250513/sentinel_20250513_ndvi.tif"
+        },
+        {
+          "scene_id": "S2B_MSIL2A_20250622T170849_R112_T14SQH_20250622T204748",
+          "scene_date": "2025-06-22",
+          "cloud_cover": 0.065,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2025/sentinel_20250622/sentinel_20250622_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2025/sentinel_20250622/sentinel_20250622_nir_epsg4326.tif",
+            "scl": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2025/sentinel_20250622/sentinel_20250622_scl_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2025/sentinel_20250622/sentinel_20250622_ndvi.tif"
+        },
+        {
+          "scene_id": "S2C_MSIL2A_20250727T170911_R112_T14SQH_20250727T205109",
+          "scene_date": "2025-07-27",
+          "cloud_cover": 0.089,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2025/sentinel_20250727/sentinel_20250727_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2025/sentinel_20250727/sentinel_20250727_nir_epsg4326.tif",
+            "scl": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2025/sentinel_20250727/sentinel_20250727_scl_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2025/sentinel_20250727/sentinel_20250727_ndvi.tif"
+        },
+        {
+          "scene_id": "S2A_MSIL2A_20250808T171721_R112_T14SQH_20250808T224020",
+          "scene_date": "2025-08-08",
+          "cloud_cover": 0.391,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2025/sentinel_20250808/sentinel_20250808_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2025/sentinel_20250808/sentinel_20250808_nir_epsg4326.tif",
+            "scl": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2025/sentinel_20250808/sentinel_20250808_scl_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2025/sentinel_20250808/sentinel_20250808_ndvi.tif"
+        },
+        {
+          "scene_id": "S2C_MSIL2A_20250925T171101_R112_T14SQH_20250925T223314",
+          "scene_date": "2025-09-25",
+          "cloud_cover": 11.68,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2025/sentinel_20250925/sentinel_20250925_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2025/sentinel_20250925/sentinel_20250925_nir_epsg4326.tif",
+            "scl": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2025/sentinel_20250925/sentinel_20250925_scl_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2025/sentinel_20250925/sentinel_20250925_ndvi.tif"
+        },
+        {
+          "scene_id": "S2B_MSIL2A_20251020T171239_R112_T14SQH_20251020T203840",
+          "scene_date": "2025-10-20",
+          "cloud_cover": 0.0,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2025/sentinel_20251020/sentinel_20251020_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2025/sentinel_20251020/sentinel_20251020_nir_epsg4326.tif",
+            "scl": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2025/sentinel_20251020/sentinel_20251020_scl_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2025/sentinel_20251020/sentinel_20251020_ndvi.tif"
+        },
+        {
+          "scene_id": "S2B_MSIL2A_20251109T171439_R112_T14SQH_20251109T202951",
+          "scene_date": "2025-11-09",
+          "cloud_cover": 0.612,
+          "status": "complete",
+          "raw_tiffs": {
+            "red": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2025/sentinel_20251109/sentinel_20251109_red_epsg4326.tif",
+            "nir": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2025/sentinel_20251109/sentinel_20251109_nir_epsg4326.tif",
+            "scl": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2025/sentinel_20251109/sentinel_20251109_scl_epsg4326.tif"
+          },
+          "ndvi_tif": "data/moltbot/growers/ks-grower-02/farms/prairie-farm/fields/osm-1424247197/satellite/sentinel/2025/sentinel_20251109/sentinel_20251109_ndvi.tif"
+        }
+      ]
+    }
+  ]
+}
