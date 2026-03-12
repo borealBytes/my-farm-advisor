@@ -129,6 +129,12 @@ describe('buildEnvVars', () => {
     expect(result.OPENCLAW_GATEWAY_TOKEN).toBe('my-token');
   });
 
+  it('uses OPENCLAW_GATEWAY_TOKEN alias when MOLTBOT_GATEWAY_TOKEN is missing', () => {
+    const env = createMockEnv({ OPENCLAW_GATEWAY_TOKEN: 'alias-token' });
+    const result = buildEnvVars(env);
+    expect(result.OPENCLAW_GATEWAY_TOKEN).toBe('alias-token');
+  });
+
   // Channel tokens
   it('includes all channel tokens when set', () => {
     const env = createMockEnv({

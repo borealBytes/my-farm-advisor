@@ -86,7 +86,7 @@ adminApi.get('/devices', async (c) => {
       );
     }
 
-    const token = c.env.MOLTBOT_GATEWAY_TOKEN;
+    const token = c.env.MOLTBOT_GATEWAY_TOKEN || c.env.OPENCLAW_GATEWAY_TOKEN;
     const tokenArg = token ? ` --token ${token}` : '';
     const proc = await withTimeout(
       sandbox.startProcess(`openclaw devices list --json${tokenArg}`),
@@ -174,7 +174,7 @@ adminApi.post('/devices/:requestId/approve', async (c) => {
       );
     }
 
-    const token = c.env.MOLTBOT_GATEWAY_TOKEN;
+    const token = c.env.MOLTBOT_GATEWAY_TOKEN || c.env.OPENCLAW_GATEWAY_TOKEN;
     const tokenArg = token ? ` --token ${token}` : '';
     const proc = await withTimeout(
       sandbox.startProcess(`openclaw devices approve ${requestId}${tokenArg}`),
@@ -244,7 +244,7 @@ adminApi.post('/devices/approve-all', async (c) => {
       );
     }
 
-    const token = c.env.MOLTBOT_GATEWAY_TOKEN;
+    const token = c.env.MOLTBOT_GATEWAY_TOKEN || c.env.OPENCLAW_GATEWAY_TOKEN;
     const tokenArg = token ? ` --token ${token}` : '';
     const listProc = await withTimeout(
       sandbox.startProcess(`openclaw devices list --json${tokenArg}`),

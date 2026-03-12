@@ -92,7 +92,7 @@ function validateRequiredEnv(env: MoltbotEnv): string[] {
   const missing: string[] = [];
   const isTestMode = env.DEV_MODE === 'true' || env.E2E_TEST_MODE === 'true';
 
-  if (!env.MOLTBOT_GATEWAY_TOKEN) {
+  if (!env.MOLTBOT_GATEWAY_TOKEN && !env.OPENCLAW_GATEWAY_TOKEN) {
     missing.push('MOLTBOT_GATEWAY_TOKEN');
   }
 
@@ -356,8 +356,9 @@ app.all('*', async (c) => {
     // CF Access redirects strip query params, so authenticated users lose ?token=.
     // Since the user already passed CF Access auth, we inject the token server-side.
     let wsRequest = request;
-    if (c.env.MOLTBOT_GATEWAY_TOKEN) {
-      wsRequest = withGatewayToken(request, c.env.MOLTBOT_GATEWAY_TOKEN);
+    const gatewayToken = c.env.MOLTBOT_GATEWAY_TOKEN || c.env.OPENCLAW_GATEWAY_TOKEN;
+    if (gatewayToken) {
+      wsRequest = withGatewayToken(request, gatewayToken);
     }
 
     const wsHeaders = new Headers(wsRequest.headers);
@@ -494,8 +495,9 @@ app.all('*', async (c) => {
   }
 
   let httpRequest = request;
-  if (c.env.MOLTBOT_GATEWAY_TOKEN) {
-    httpRequest = withGatewayToken(request, c.env.MOLTBOT_GATEWAY_TOKEN);
+  const gatewayToken = c.env.MOLTBOT_GATEWAY_TOKEN || c.env.OPENCLAW_GATEWAY_TOKEN;
+  if (gatewayToken) {
+    httpRequest = withGatewayToken(request, gatewayToken);
   }
 
   console.log('[HTTP] Proxying:', url.pathname + url.search);

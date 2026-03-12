@@ -259,6 +259,8 @@ config.gateway.trustedProxies = ['127.0.0.1/32', '::1/128', '10.0.0.0/8', '172.1
 if (process.env.OPENCLAW_GATEWAY_TOKEN) {
     config.gateway.auth = config.gateway.auth || {};
     config.gateway.auth.token = process.env.OPENCLAW_GATEWAY_TOKEN;
+    config.gateway.remote = config.gateway.remote || {};
+    config.gateway.remote.token = process.env.OPENCLAW_GATEWAY_TOKEN;
 }
 
 config.gateway.controlUi = config.gateway.controlUi || {};

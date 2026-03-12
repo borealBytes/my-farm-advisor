@@ -423,7 +423,7 @@ debug.get('/env', async (c) => {
     has_nvidia_key: !!c.env.NVIDIA_API_KEY,
     has_openrouter_key: !!c.env.OPENROUTER_API_KEY,
     preferred_provider: c.env.PREFERRED_PROVIDER || 'auto',
-    has_gateway_token: !!c.env.MOLTBOT_GATEWAY_TOKEN,
+    has_gateway_token: !!(c.env.MOLTBOT_GATEWAY_TOKEN || c.env.OPENCLAW_GATEWAY_TOKEN),
     has_r2_access_key: !!c.env.R2_ACCESS_KEY_ID,
     has_r2_secret_key: !!c.env.R2_SECRET_ACCESS_KEY,
     has_cf_account_id: !!c.env.CF_ACCOUNT_ID,
