@@ -1,0 +1,8 @@
+{
+"type": "FeatureCollection",
+"name": "field_boundary",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "field_id": "osm-1423190763", "source": "OpenStreetMap/Overpass", "crop_name": "meadow", "state_fips": "20", "county_fips": "173", "county_name": "Sedgwick", "area_acres": 57.548889712834757 }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -97.2902906, 37.8901982 ], [ -97.2903093, 37.8831806 ], [ -97.2991823, 37.8830184 ], [ -97.2991823, 37.8863651 ], [ -97.2983357, 37.8863476 ], [ -97.298331, 37.8848542 ], [ -97.2929512, 37.8848247 ], [ -97.2928951, 37.8864317 ], [ -97.2910832, 37.886417 ], [ -97.2910832, 37.890191 ], [ -97.2902906, 37.8901982 ] ] ] } }
+]
+}

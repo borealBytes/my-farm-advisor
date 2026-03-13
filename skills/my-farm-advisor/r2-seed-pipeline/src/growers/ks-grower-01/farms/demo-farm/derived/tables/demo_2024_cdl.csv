@@ -1,0 +1,12 @@
+field_id,year,crop_code,crop_name,pixel_count,pct
+osm-1177630014,2024,1,Corn,649,95.02
+osm-1177630014,2024,176,Grass/Pasture,34,4.98
+osm-1423190763,2024,176,Grass/Pasture,210,85.02
+osm-1423190763,2024,24,Winter Wheat,29,11.74
+osm-1469813297,2024,5,Soybeans,21,70.0
+osm-1469813297,2024,176,Grass/Pasture,8,26.67
+osm-1476586502,2024,176,Grass/Pasture,42,5.3
+osm-1476586502,2024,5,Soybeans,30,3.79
+osm-637503855,2024,5,Soybeans,242,40.6
+osm-637503855,2024,24,Winter Wheat,223,37.42
+osm-637503855,2024,176,Grass/Pasture,86,14.43

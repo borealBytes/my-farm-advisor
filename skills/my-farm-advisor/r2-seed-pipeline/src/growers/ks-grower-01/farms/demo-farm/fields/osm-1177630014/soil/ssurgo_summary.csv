@@ -1,0 +1,2 @@
+field_id,n_mukeys,n_components,n_horizons,avg_om_pct,avg_ph,total_aws_inches,avg_cec,avg_clay_pct,avg_sand_pct,dominant_soil,drainage_class,ph_constraint,erosion_risk
+osm-1177630014,5,3,8,1.8125,6.575,1.58,16.175,21.25,15.25,Vanoss,Well drained,none,moderate

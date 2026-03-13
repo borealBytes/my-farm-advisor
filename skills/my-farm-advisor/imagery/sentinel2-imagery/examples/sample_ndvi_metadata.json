@@ -1,0 +1,48 @@
+{
+  "source": "Sentinel-2 Level-2A",
+  "processor": "Copernicus Data Space",
+  "date_range": "2023-01-01 to 2024-12-31",
+  "aoi_source": "field-boundaries/examples/real_10_fields_iowa.geojson",
+  "scenes": [
+    {
+      "product_id": "S2B_MSIL2A_20230715T155919_N0509_R097_T17TKL_20230715T212530",
+      "satellite": "Sentinel-2B",
+      "acquisition_date": "2023-07-15",
+      "cloud_cover": 2,
+      "tile": "17TKL",
+      "bounds": {
+        "west": -93.95,
+        "east": -93.4,
+        "north": 40.9,
+        "south": 40.45
+      }
+    },
+    {
+      "product_id": "S2A_MSIL2A_20230816T155921_N0509_R097_T17TKL_20230816T212529",
+      "satellite": "Sentinel-2A",
+      "acquisition_date": "2023-08-16",
+      "cloud_cover": 5,
+      "tile": "17TKL",
+      "bounds": {
+        "west": -93.95,
+        "east": -93.4,
+        "north": 40.9,
+        "south": 40.45
+      }
+    },
+    {
+      "product_id": "S2B_MSIL2A_20240618T155919_N0509_R097_T17TKL_20240618T212530",
+      "satellite": "Sentinel-2B",
+      "acquisition_date": "2024-06-18",
+      "cloud_cover": 1,
+      "tile": "17TKL",
+      "bounds": {
+        "west": -93.95,
+        "east": -93.4,
+        "north": 40.9,
+        "south": 40.45
+      }
+    }
+  ],
+  "note": "Sample metadata for Iowa corn belt fields. Requires Copernicus Data Space credentials for actual download."
+}
