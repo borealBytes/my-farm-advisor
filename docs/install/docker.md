@@ -302,6 +302,60 @@ Notes:
   extra compose file.
 - The named volume persists until removed with `docker volume rm <name>`.
 
+### Data directory mounting (dual-mode: local vs S3FS/R2)
+
+The gateway supports two modes for the `/data` directory:
+
+**Local mode (default):** Bind mount a local directory into the container.
+**S3FS mode:** Mount a Cloudflare R2 bucket via S3FS for shared, persistent storage.
+
+#### Local mode (default)
+
+By default, the local `./data` directory is bind-mounted to `/data` in the container:
+
+```bash
+# This is the default - no extra configuration needed
+docker compose up -d openclaw-gateway
+```
+
+Configure the path in `.env`:
+
+```bash
+DATA_MODE=local
+DATA_VOLUME_SOURCE=./data
+DATA_VOLUME_TYPE=bind
+```
+
+#### S3FS mode (Cloudflare R2)
+
+For production or shared data across multiple instances, mount an R2 bucket via S3FS:
+
+1. Set your R2 credentials in `.env`:
+
+```bash
+DATA_MODE=s3fs
+R2_ACCESS_KEY_ID=your_r2_access_key
+R2_SECRET_ACCESS_KEY=your_r2_secret_key
+R2_BUCKET_NAME=your-bucket-name
+R2_ENDPOINT=https://your-account-id.r2.cloudflarestorage.com
+```
+
+2. Start with the S3FS profile:
+
+```bash
+DATA_MODE=s3fs docker compose --profile s3fs up -d
+```
+
+This starts an S3FS sidecar container that mounts your R2 bucket to a shared volume, which is then mounted at `/data` in the gateway container.
+
+**Notes:**
+
+- S3FS requires `privileged: true` for FUSE mounting.
+- The S3FS container has a healthcheck to ensure the mount is ready before the gateway starts.
+- Data written to `/data` in S3FS mode is persisted to your R2 bucket.
+- For local development, use local mode (faster, no network dependency).
+- For production or multi-instance setups, use S3FS mode (shared, persistent).
+
 ### Install extra apt packages (optional)
 
 If you need system packages inside the image (for example, build tools or media
