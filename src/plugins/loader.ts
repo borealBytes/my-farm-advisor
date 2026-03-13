@@ -119,9 +119,6 @@ const resolvePluginSdkAliasFile = (params: {
   return null;
 };
 
-const resolvePluginSdkAlias = (): string | null =>
-  resolvePluginSdkAliasFile({ srcFile: "root-alias.cjs", distFile: "root-alias.cjs" });
-
 const cachedPluginSdkExportedSubpaths = new Map<string, string[]>();
 
 function listPluginSdkExportedSubpaths(params: { modulePath?: string } = {}): string[] {
@@ -616,11 +613,10 @@ export function loadOpenClawPlugins(options: PluginLoadOptions = {}): PluginRegi
     if (jitiLoader) {
       return jitiLoader;
     }
-    const pluginSdkAlias = resolvePluginSdkAlias();
-    const aliasMap = {
-      ...(pluginSdkAlias ? { "openclaw/plugin-sdk": pluginSdkAlias } : {}),
-      ...resolvePluginSdkScopedAliasMap(),
-    };
+    // Use scoped aliases for specific subpaths to avoid prefix matching issues
+    // The root "openclaw/plugin-sdk" alias is intentionally omitted to ensure
+    // subpath imports like "openclaw/plugin-sdk/core" resolve correctly
+    const aliasMap = resolvePluginSdkScopedAliasMap();
     jitiLoader = createJiti(import.meta.url, {
       interopDefault: true,
       extensions: [".ts", ".tsx", ".mts", ".cts", ".mtsx", ".ctsx", ".js", ".mjs", ".cjs", ".json"],
