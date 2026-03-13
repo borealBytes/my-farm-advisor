@@ -1,19 +1,26 @@
 {
-  "name": "openclaw",
+  "name": "my-farm-adviser",
   "version": "2026.3.13",
-  "description": "Multi-channel AI gateway with extensible messaging integrations",
-  "keywords": [],
-  "homepage": "https://github.com/openclaw/openclaw#readme",
+  "description": "Farm intelligence and research assistant built on upstream OpenClaw",
+  "keywords": [
+    "agriculture",
+    "farm",
+    "openclaw",
+    "research",
+    "skills"
+  ],
+  "homepage": "https://github.com/borealBytes/my-farm-advisor#readme",
   "bugs": {
-    "url": "https://github.com/openclaw/openclaw/issues"
+    "url": "https://github.com/borealBytes/my-farm-advisor/issues"
   },
   "license": "MIT",
-  "author": "",
+  "author": "Superior Byte Works",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/openclaw/openclaw.git"
+    "url": "git+https://github.com/borealBytes/my-farm-advisor.git"
   },
   "bin": {
+    "my-farm-adviser": "openclaw.mjs",
     "openclaw": "openclaw.mjs"
   },
   "directories": {
