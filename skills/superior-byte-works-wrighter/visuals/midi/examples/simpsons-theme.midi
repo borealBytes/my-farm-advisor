@@ -1,0 +1,61 @@
+# The Simpsons Theme - Opening
+# Danny Elfman, 1989
+# Simplified arrangement for documentation
+
+Track: Piano
+Tempo: 160
+Time: 4/4
+Key: C Major
+
+# The iconic ascending perfect fourth
+Measure 1:
+C4 eighth velocity=100
+E4 eighth velocity=100
+G4 eighth velocity=100
+C5 eighth velocity=100
+
+# Descending pattern
+Measure 2:
+B4 eighth velocity=100
+G4 eighth velocity=100
+E4 eighth velocity=100
+C4 eighth velocity=100
+
+# Chromatic run up
+Measure 3:
+C#4 eighth velocity=100
+D4 eighth velocity=100
+D#4 eighth velocity=100
+E4 eighth velocity=100
+
+# Resolution
+Measure 4:
+C4 quarter velocity=120
+G3 quarter velocity=100
+C3 half velocity=100
+
+# Simpsons main motif
+Measure 5:
+C4 eighth velocity=110
+F#4 eighth velocity=110
+A4 eighth velocity=110
+C5 eighth velocity=110
+
+Measure 6:
+B4 eighth velocity=100
+G4 eighth velocity=100
+E4 eighth velocity=100
+C4 eighth velocity=100
+
+Measure 7:
+A4 eighth velocity=110
+C5 eighth velocity=110
+E5 eighth velocity=110
+G5 eighth velocity=110
+
+Measure 8:
+F#5 quarter velocity=120
+D5 quarter velocity=100
+A4 half velocity=100
+
+End

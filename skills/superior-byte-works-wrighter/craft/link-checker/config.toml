@@ -1,0 +1,28 @@
+verbose = true
+no_progress = true
+max_concurrency = 16
+timeout = 20
+retry_wait_time = 2
+max_retries = 2
+require_https = false
+insecure = false
+include_fragments = true
+scheme = ["https", "http", "mailto", "file"]
+
+exclude = [
+  "http://localhost",
+  "http://127.0.0.1",
+  "https://localhost",
+  "mailto:example@example.com",
+  "https://example.com"
+]
+
+exclude_path = [
+  "node_modules",
+  ".git",
+  "dist",
+  "build",
+  ".next",
+  ".venv",
+  "venv"
+]
