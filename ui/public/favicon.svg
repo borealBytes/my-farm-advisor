@@ -1,22 +1,18 @@
-<svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="lobster-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#ff4d4d"/>
-      <stop offset="100%" stop-color="#991b1b"/>
-    </linearGradient>
-  </defs>
-  <!-- Body -->
-  <path d="M60 10 C30 10 15 35 15 55 C15 75 30 95 45 100 L45 110 L55 110 L55 100 C55 100 60 102 65 100 L65 110 L75 110 L75 100 C90 95 105 75 105 55 C105 35 90 10 60 10Z" fill="url(#lobster-gradient)"/>
-  <!-- Left Claw -->
-  <path d="M20 45 C5 40 0 50 5 60 C10 70 20 65 25 55 C28 48 25 45 20 45Z" fill="url(#lobster-gradient)"/>
-  <!-- Right Claw -->
-  <path d="M100 45 C115 40 120 50 115 60 C110 70 100 65 95 55 C92 48 95 45 100 45Z" fill="url(#lobster-gradient)"/>
-  <!-- Antenna -->
-  <path d="M45 15 Q35 5 30 8" stroke="#ff4d4d" stroke-width="3" stroke-linecap="round"/>
-  <path d="M75 15 Q85 5 90 8" stroke="#ff4d4d" stroke-width="3" stroke-linecap="round"/>
-  <!-- Eyes -->
-  <circle cx="45" cy="35" r="6" fill="#050810"/>
-  <circle cx="75" cy="35" r="6" fill="#050810"/>
-  <circle cx="46" cy="34" r="2.5" fill="#00e5cc"/>
-  <circle cx="76" cy="34" r="2.5" fill="#00e5cc"/>
+<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="My Farm Adviser emblem">
+  <rect x="6" y="6" width="116" height="116" rx="28" fill="#fff7e8"/>
+  <rect x="6" y="6" width="116" height="116" rx="28" fill="none" stroke="#d7e7cb" stroke-width="3"/>
+  <circle cx="64" cy="56" r="40" fill="#ffffff"/>
+  <circle cx="64" cy="38" r="14" fill="#f5c768"/>
+  <path d="M33 62c7-18 20-27 31-27s24 9 31 27" fill="none" stroke="#9ed8ff" stroke-width="6" stroke-linecap="round"/>
+  <path d="M64 56v18" stroke="#2f8f4c" stroke-width="6" stroke-linecap="round"/>
+  <path d="M61 54c-4-13-19-18-28-11 4-14 16-20 27-13 4 3 6 7 8 10-1 4-3 8-7 14z" fill="#50b86b"/>
+  <path d="M67 54c4-13 19-18 28-11-4-14-16-20-27-13-4 3-6 7-8 10 1 4 3 8 7 14z" fill="#2f8f4c"/>
+  <rect x="25" y="73" width="78" height="9" rx="4.5" fill="#9b6a43"/>
+  <path d="M64 78v15" stroke="#6f4a2e" stroke-width="6" stroke-linecap="round"/>
+  <path d="M64 79c-12 8-18 18-21 31" fill="none" stroke="#6f4a2e" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M64 79c12 8 18 18 21 31" fill="none" stroke="#6f4a2e" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M64 86c-5 7-8 14-10 24" fill="none" stroke="#6f4a2e" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M64 86c5 7 8 14 10 24" fill="none" stroke="#6f4a2e" stroke-width="3.5" stroke-linecap="round"/>
+  <circle cx="43" cy="110" r="3.2" fill="#6f4a2e"/><circle cx="85" cy="110" r="3.2" fill="#6f4a2e"/>
+  <circle cx="54" cy="110" r="2.4" fill="#6f4a2e"/><circle cx="74" cy="110" r="2.4" fill="#6f4a2e"/>
 </svg>

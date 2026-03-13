@@ -1,60 +1,18 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 16 16" role="img" aria-label="Pixel lobster">
-  <rect width="16" height="16" fill="none"/>
-  <!-- outline -->
-  <g fill="#3a0a0d">
-    <rect x="1" y="5" width="1" height="3"/>
-    <rect x="2" y="4" width="1" height="1"/>
-    <rect x="2" y="8" width="1" height="1"/>
-    <rect x="3" y="3" width="1" height="1"/>
-    <rect x="3" y="9" width="1" height="1"/>
-    <rect x="4" y="2" width="1" height="1"/>
-    <rect x="4" y="10" width="1" height="1"/>
-    <rect x="5" y="2" width="6" height="1"/>
-    <rect x="11" y="2" width="1" height="1"/>
-    <rect x="12" y="3" width="1" height="1"/>
-    <rect x="12" y="9" width="1" height="1"/>
-    <rect x="13" y="4" width="1" height="1"/>
-    <rect x="13" y="8" width="1" height="1"/>
-    <rect x="14" y="5" width="1" height="3"/>
-    <rect x="5" y="11" width="6" height="1"/>
-    <rect x="4" y="12" width="1" height="1"/>
-    <rect x="11" y="12" width="1" height="1"/>
-    <rect x="3" y="13" width="1" height="1"/>
-    <rect x="12" y="13" width="1" height="1"/>
-    <rect x="5" y="14" width="6" height="1"/>
-  </g>
-
-  <!-- body -->
-  <g fill="#ff4f40">
-    <rect x="5" y="3" width="6" height="1"/>
-    <rect x="4" y="4" width="8" height="1"/>
-    <rect x="3" y="5" width="10" height="1"/>
-    <rect x="3" y="6" width="10" height="1"/>
-    <rect x="3" y="7" width="10" height="1"/>
-    <rect x="4" y="8" width="8" height="1"/>
-    <rect x="5" y="9" width="6" height="1"/>
-    <rect x="5" y="12" width="6" height="1"/>
-    <rect x="6" y="13" width="4" height="1"/>
-  </g>
-
-  <!-- claws -->
-  <g fill="#ff775f">
-    <rect x="1" y="6" width="2" height="1"/>
-    <rect x="2" y="5" width="1" height="1"/>
-    <rect x="2" y="7" width="1" height="1"/>
-    <rect x="13" y="6" width="2" height="1"/>
-    <rect x="13" y="5" width="1" height="1"/>
-    <rect x="13" y="7" width="1" height="1"/>
-  </g>
-
-  <!-- eyes -->
-  <g fill="#081016">
-    <rect x="6" y="5" width="1" height="1"/>
-    <rect x="9" y="5" width="1" height="1"/>
-  </g>
-  <g fill="#f5fbff">
-    <rect x="6" y="4" width="1" height="1"/>
-    <rect x="9" y="4" width="1" height="1"/>
-  </g>
+<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="My Farm Adviser root-sprout emblem">
+  <rect x="6" y="6" width="116" height="116" rx="28" fill="#fff7e8"/>
+  <rect x="6" y="6" width="116" height="116" rx="28" fill="none" stroke="#d7e7cb" stroke-width="3"/>
+  <circle cx="64" cy="56" r="40" fill="#ffffff"/>
+  <circle cx="64" cy="38" r="14" fill="#f5c768"/>
+  <path d="M33 62c7-18 20-27 31-27s24 9 31 27" fill="none" stroke="#9ed8ff" stroke-width="6" stroke-linecap="round"/>
+  <path d="M64 56v18" stroke="#2f8f4c" stroke-width="6" stroke-linecap="round"/>
+  <path d="M61 54c-4-13-19-18-28-11 4-14 16-20 27-13 4 3 6 7 8 10-1 4-3 8-7 14z" fill="#50b86b"/>
+  <path d="M67 54c4-13 19-18 28-11-4-14-16-20-27-13-4 3-6 7-8 10 1 4 3 8 7 14z" fill="#2f8f4c"/>
+  <rect x="25" y="73" width="78" height="9" rx="4.5" fill="#9b6a43"/>
+  <path d="M64 78v15" stroke="#6f4a2e" stroke-width="6" stroke-linecap="round"/>
+  <path d="M64 79c-12 8-18 18-21 31" fill="none" stroke="#6f4a2e" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M64 79c12 8 18 18 21 31" fill="none" stroke="#6f4a2e" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M64 86c-5 7-8 14-10 24" fill="none" stroke="#6f4a2e" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M64 86c5 7 8 14 10 24" fill="none" stroke="#6f4a2e" stroke-width="3.5" stroke-linecap="round"/>
+  <circle cx="43" cy="110" r="3.2" fill="#6f4a2e"/><circle cx="85" cy="110" r="3.2" fill="#6f4a2e"/>
+  <circle cx="54" cy="110" r="2.4" fill="#6f4a2e"/><circle cx="74" cy="110" r="2.4" fill="#6f4a2e"/>
 </svg>
-

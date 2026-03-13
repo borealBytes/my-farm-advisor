@@ -1,32 +1,40 @@
 ---
-summary: "OpenClaw is a multi-channel gateway for AI agents that runs on any OS."
+summary: "My Farm Adviser is a rooted farm intelligence workspace built on upstream OpenClaw."
 read_when:
-  - Introducing OpenClaw to newcomers
-title: "OpenClaw"
+  - Introducing My Farm Adviser to newcomers
+title: "My Farm Adviser"
 ---
 
-# OpenClaw 🦞
+# My Farm Adviser
 
 <p align="center">
     <img
-        src="/assets/openclaw-logo-text-dark.png"
-        alt="OpenClaw"
+        src="/assets/my-farm-adviser-logo-text-dark.png"
+        alt="My Farm Adviser"
         width="500"
         class="dark:hidden"
     />
     <img
-        src="/assets/openclaw-logo-text.png"
-        alt="OpenClaw"
+        src="/assets/my-farm-adviser-logo-text.png"
+        alt="My Farm Adviser"
         width="500"
         class="hidden dark:block"
     />
 </p>
 
-> _"EXFOLIATE! EXFOLIATE!"_ — A space lobster, probably
+> _"Above the surface, below the surface, all the way to action."_
 
 <p align="center">
-  <strong>Any OS gateway for AI agents across WhatsApp, Telegram, Discord, iMessage, and more.</strong><br />
-  Send a message, get an agent response from your pocket. Plugins add Mattermost and more.
+    <img
+        src="/assets/my-farm-adviser-hero.png"
+        alt="My Farm Adviser rooted farm intelligence hero"
+        width="900"
+    />
+</p>
+
+<p align="center">
+  <strong>Farm intelligence built for the real world: field decisions above ground, data structure below ground.</strong><br />
+  My Farm Adviser keeps the OpenClaw runtime while focusing the product around field operations, research, and practical farm action.
 </p>
 
 <Columns>
