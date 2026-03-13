@@ -59,14 +59,10 @@ Runtime baseline: Node `22+`.
 
 ### Docker deployment
 
-This is the default deployment path.
+This is the default local development path.
 
 ```bash
 cp .env.example .env
-
-# set these to real host paths
-export OPENCLAW_CONFIG_DIR="$HOME/.openclaw"
-export OPENCLAW_WORKSPACE_DIR="$HOME/.openclaw/workspace"
 
 pnpm install
 pnpm build
@@ -77,6 +73,9 @@ docker compose up -d
 ```
 
 Open the gateway on the configured port, default `18789`.
+
+For a deployment-oriented compose file that uses a persistent volume at `/data`,
+see `docs/install/docker.md` and `docker-compose.coolify.yml`.
 
 Useful follow-up commands:
 
