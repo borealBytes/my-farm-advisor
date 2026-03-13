@@ -147,7 +147,8 @@ COPY --from=runtime-assets --chown=node:node /app/docs ./docs
 
 # Create symlink for openclaw -> my-farm-adviser to support extensions importing from openclaw/plugin-sdk
 # This allows the branded distribution to maintain compatibility with upstream OpenClaw extensions
-RUN ln -s /app/node_modules/my-farm-adviser /app/node_modules/openclaw 2>/dev/null || true
+# The package is installed at /app (root), not in node_modules, so symlink points to /app
+RUN ln -s /app /app/node_modules/openclaw 2>/dev/null || true
 
 # Keep pnpm available in the runtime image for container-local workflows.
 # Use a shared Corepack home so the non-root `node` user does not need a
