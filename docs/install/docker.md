@@ -302,12 +302,16 @@ Notes:
   extra compose file.
 - The named volume persists until removed with `docker volume rm <name>`.
 
-### Data directory mounting (dual-mode: local vs S3FS/R2)
+### Data directory mounting (Milestone 1: local vs deployed volume)
 
-The gateway supports two modes for the `/data` directory:
+Milestone 1 uses `/data` for OpenClaw runtime persistence. That includes state,
+config, workspace, logs, and related runtime files. It does not make `/data` a
+native Cloudflare R2-backed runtime store yet.
 
-**Local mode (default):** Bind mount a local directory into the container.
-**S3FS mode:** Mount a Cloudflare R2 bucket via S3FS for shared, persistent storage.
+The supported modes are:
+
+**Local mode (default):** Bind mount a local repo directory into the container.
+**Volume mode:** Mount a persistent deployment volume at `/data` (for example in Coolify).
 
 #### Local mode (default)
 
@@ -318,43 +322,45 @@ By default, the local `./data` directory is bind-mounted to `/data` in the conta
 docker compose up -d openclaw-gateway
 ```
 
+On first boot, the local compose file seeds a minimal `openclaw.json` in `/data` if
+one does not exist yet. That seed allows local HTTP access from
+`http://127.0.0.1:18789` and `http://localhost:18789` without requiring you to hand-edit
+Control UI origin settings before the gateway can start.
+
 Configure the path in `.env`:
 
 ```bash
 DATA_MODE=local
 DATA_VOLUME_SOURCE=./data
-DATA_VOLUME_TYPE=bind
 ```
 
-#### S3FS mode (Cloudflare R2)
+#### Volume mode (Coolify or another deployed environment)
 
-For production or shared data across multiple instances, mount an R2 bucket via S3FS:
+For deployment, use `docker-compose.coolify.yml` and mount a persistent volume at `/data`.
 
-1. Set your R2 credentials in `.env`:
+Use these environment variables:
 
 ```bash
-DATA_MODE=s3fs
-R2_ACCESS_KEY_ID=your_r2_access_key
-R2_SECRET_ACCESS_KEY=your_r2_secret_key
-R2_BUCKET_NAME=your-bucket-name
-R2_ENDPOINT=https://your-account-id.r2.cloudflarestorage.com
+DATA_MODE=volume
+OPENCLAW_STATE_DIR=/data
+OPENCLAW_GATEWAY_TOKEN=change-me-to-a-long-random-token
 ```
 
-2. Start with the S3FS profile:
+Start the deployment-oriented compose file:
 
 ```bash
-DATA_MODE=s3fs docker compose --profile s3fs up -d
+docker compose -f docker-compose.coolify.yml up -d
 ```
 
-This starts an S3FS sidecar container that mounts your R2 bucket to a shared volume, which is then mounted at `/data` in the gateway container.
+This keeps runtime persistence on a normal filesystem-backed volume, which matches
+the current OpenClaw runtime assumptions.
 
 **Notes:**
 
-- S3FS requires `privileged: true` for FUSE mounting.
-- The S3FS container has a healthcheck to ensure the mount is ready before the gateway starts.
-- Data written to `/data` in S3FS mode is persisted to your R2 bucket.
-- For local development, use local mode (faster, no network dependency).
-- For production or multi-instance setups, use S3FS mode (shared, persistent).
+- For local development, use local mode.
+- For Coolify or similar deployments, use a persistent volume mounted at `/data`.
+- Cloudflare R2 is deferred to a later milestone as a farm-data sync/import layer,
+  not as the backing store for the whole runtime state directory.
 
 ### Install extra apt packages (optional)
 
