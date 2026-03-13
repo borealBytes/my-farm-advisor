@@ -1,0 +1,33 @@
+{
+  "grower_slug": "ks-grower-01",
+  "manifest_version": 1,
+  "updated_at": "2026-03-10T23:45:02Z",
+  "farms": [
+    {
+      "farm_slug": "demo-farm",
+      "farm_name": "Kansas Demo Farm",
+      "last_run_started": "2026-03-10T23:43:22Z",
+      "last_run_finished": null,
+      "last_run_status": "running",
+      "active_step": "ingest/download_satellite_imagery.py",
+      "step_results": [
+        {
+          "step": "ingest/download_fields.py",
+          "status": "ok"
+        },
+        {
+          "step": "ingest/download_soil.py",
+          "status": "ok"
+        },
+        {
+          "step": "ingest/download_weather.py",
+          "status": "ok"
+        },
+        {
+          "step": "ingest/download_cdl.py",
+          "status": "ok"
+        }
+      ]
+    }
+  ]
+}

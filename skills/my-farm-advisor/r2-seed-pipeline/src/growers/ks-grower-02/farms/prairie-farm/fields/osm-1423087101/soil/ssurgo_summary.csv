@@ -1,0 +1,2 @@
+field_id,n_mukeys,n_components,n_horizons,avg_om_pct,avg_ph,total_aws_inches,avg_cec,avg_clay_pct,avg_sand_pct,dominant_soil,drainage_class,ph_constraint,erosion_risk
+osm-1423087101,1,1,2,2.5,6.75,0.30000000000000004,33.65,44.0,5.0,Rosehill,Well drained,none,moderate

@@ -1,0 +1,8 @@
+{
+  "weather_source": "nasa-power",
+  "year": 2025,
+  "base_temp_c": 10.0,
+  "max_temp_c": 30.0,
+  "county_count": 1250,
+  "coverage_policy": "GDD is computed only for counties present in the canonical county weather table."
+}

@@ -1,0 +1,1 @@
+Review the 2026-usa-corn.md or 2026-usa-soybean.md guides for more info on corn and soy crop strategy in 2026. key equations. critical knowledge. don't skip this before providing final ai summaries. consult this when developing new cards and strategies for these skills. Use them as ideas to make new skills and functionality.

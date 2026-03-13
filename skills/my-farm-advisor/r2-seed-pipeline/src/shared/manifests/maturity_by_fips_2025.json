@@ -1,0 +1,69 @@
+{
+  "year": 2025,
+  "weather_source": "nasa-power",
+  "updated_at": "2026-03-09T05:39:38Z",
+  "steps": {
+    "geoadmin": {
+      "status": "skipped",
+      "output_path": "data/moltbot/shared/geoadmin/l2_counties/metadata.json",
+      "updated_at": "2026-03-09T05:39:38Z",
+      "output_paths": ["data/moltbot/shared/geoadmin/l2_counties/metadata.json"]
+    },
+    "field-fips": {
+      "status": "skipped",
+      "output_path": "data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/summaries/field_fips_mapping_summary.json",
+      "updated_at": "2026-03-09T05:39:38Z",
+      "output_paths": [
+        "data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/summaries/field_fips_mapping_summary.json"
+      ]
+    },
+    "county-weather": {
+      "status": "skipped",
+      "output_path": "data/moltbot/shared/weather/nasa-power/2025/daily_weather_by_fips.parquet",
+      "updated_at": "2026-03-09T05:39:38Z",
+      "output_paths": [
+        "data/moltbot/shared/weather/nasa-power/2025/daily_weather_by_fips.parquet",
+        "data/moltbot/shared/weather/nasa-power/2025/county_weather_coverage_summary.json"
+      ]
+    },
+    "county-gdd": {
+      "status": "skipped",
+      "output_path": "data/moltbot/shared/corn_maturity/tables/gdd_by_fips_2025.parquet",
+      "updated_at": "2026-03-09T05:39:38Z",
+      "output_paths": [
+        "data/moltbot/shared/corn_maturity/tables/gdd_by_fips_2025.parquet",
+        "data/moltbot/shared/corn_maturity/metadata/moltbot/gdd_by_fips_2025.json"
+      ]
+    },
+    "corn-rm": {
+      "status": "skipped",
+      "output_path": "data/moltbot/shared/corn_maturity/tables/rm_by_fips_2025.parquet",
+      "updated_at": "2026-03-09T05:39:38Z",
+      "output_paths": [
+        "data/moltbot/shared/corn_maturity/tables/rm_by_fips_2025.parquet",
+        "data/moltbot/shared/corn_maturity/tables/rm_by_fips_2025.csv",
+        "data/moltbot/shared/corn_maturity/metadata/moltbot/rm_by_fips_2025.json"
+      ]
+    },
+    "soybean-mg": {
+      "status": "skipped",
+      "output_path": "data/moltbot/shared/soybean_maturity/tables/mg_by_fips_2025.parquet",
+      "updated_at": "2026-03-09T05:39:38Z",
+      "output_paths": [
+        "data/moltbot/shared/soybean_maturity/tables/mg_by_fips_2025.parquet",
+        "data/moltbot/shared/soybean_maturity/tables/mg_by_fips_2025.csv",
+        "data/moltbot/shared/soybean_maturity/metadata/moltbot/mg_by_fips_2025.json"
+      ]
+    },
+    "maps": {
+      "status": "skipped",
+      "output_path": "data/moltbot/shared/corn_maturity/reports/rm_by_fips_2025.png",
+      "updated_at": "2026-03-09T05:39:38Z",
+      "output_paths": [
+        "data/moltbot/shared/corn_maturity/reports/rm_by_fips_2025.png",
+        "data/moltbot/shared/soybean_maturity/reports/mg_by_fips_2025.png"
+      ]
+    }
+  },
+  "coverage": "traditional-corn-belt"
+}

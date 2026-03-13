@@ -1,0 +1,15 @@
+field_id,year,crop_code,crop_name,pixel_count,pct
+osm-1423087101,2023,24,Winter Wheat,161,36.59
+osm-1423087101,2023,176,Grass/Pasture,11,2.5
+osm-1423087101,2023,5,Soybeans,3,0.68
+osm-1423087101,2023,36,Forest,1,0.23
+osm-1423116261,2023,176,Grass/Pasture,741,97.89
+osm-1423116261,2023,24,Winter Wheat,1,0.13
+osm-1424247197,2023,176,Grass/Pasture,17947,97.4
+osm-1424247197,2023,5,Soybeans,51,0.28
+osm-1424247197,2023,1,Corn,8,0.04
+osm-1424247197,2023,24,Winter Wheat,4,0.02
+osm-1424247197,2023,36,Forest,3,0.02
+osm-666033354,2023,1,Corn,16,66.67
+osm-666033354,2023,176,Grass/Pasture,7,29.17
+osm-667302408,2023,24,Winter Wheat,36,90.0

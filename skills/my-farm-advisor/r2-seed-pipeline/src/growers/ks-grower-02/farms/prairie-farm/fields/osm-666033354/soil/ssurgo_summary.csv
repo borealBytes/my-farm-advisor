@@ -1,0 +1,2 @@
+field_id,n_mukeys,n_components,n_horizons,avg_om_pct,avg_ph,total_aws_inches,avg_cec,avg_clay_pct,avg_sand_pct,dominant_soil,drainage_class,ph_constraint,erosion_risk
+osm-666033354,2,2,4,2.375,6.25,0.85,16.925,24.75,16.5,Norge,Well drained,none,moderate

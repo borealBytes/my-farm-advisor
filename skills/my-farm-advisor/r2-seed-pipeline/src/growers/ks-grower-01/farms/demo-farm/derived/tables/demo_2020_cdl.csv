@@ -1,0 +1,14 @@
+field_id,year,crop_code,crop_name,pixel_count,pct
+osm-1177630014,2020,1,Corn,546,79.94
+osm-1177630014,2020,5,Soybeans,106,15.52
+osm-1177630014,2020,24,Winter Wheat,4,0.59
+osm-1177630014,2020,176,Grass/Pasture,2,0.29
+osm-1177630014,2020,28,Alfalfa,1,0.15
+osm-1423190763,2020,176,Grass/Pasture,195,78.95
+osm-1423190763,2020,5,Soybeans,26,10.53
+osm-1423190763,2020,1,Corn,3,1.21
+osm-1469813297,2020,24,Winter Wheat,26,86.67
+osm-1469813297,2020,176,Grass/Pasture,4,13.33
+osm-1476586502,2020,24,Winter Wheat,792,100.0
+osm-637503855,2020,24,Winter Wheat,433,72.65
+osm-637503855,2020,5,Soybeans,14,2.35

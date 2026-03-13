@@ -1,0 +1,10 @@
+{
+  "dataset_name": "ssurgo_soil_types",
+  "source": "usda-sda",
+  "spatial_scope": "field",
+  "grower_slug": "ks-grower-01",
+  "farm_slug": "demo-farm",
+  "field_slug": "osm-1423190763",
+  "format": "geojson",
+  "crs": "EPSG:4326"
+}

@@ -1,0 +1,12 @@
+{
+  "grower_slug": "ks-grower-01",
+  "farm_slug": "demo-farm",
+  "field_slug": "osm-1423190763",
+  "display_name": "osm-1423190763",
+  "field_id": "OSM_1423190763",
+  "boundary_file": "boundary/field_boundary.geojson",
+  "soil_file": "soil/ssurgo_soil_types.geojson",
+  "weather_file": "weather/daily_weather.csv",
+  "satellite_dir": "satellite/",
+  "notes": "Canonical field metadata"
+}

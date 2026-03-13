@@ -1,0 +1,5 @@
+{
+  "dataset_name": "soybean_maturity",
+  "status": "planned",
+  "notes": "Annual heuristic soybean maturity-group outputs by FIPS live here"
+}
