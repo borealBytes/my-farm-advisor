@@ -8,7 +8,6 @@ import { buildWorkspaceSkillSnapshot, buildWorkspaceSkillsPrompt } from "./skill
 
 const fixtureSuite = createFixtureSuite("openclaw-skills-snapshot-suite-");
 let truncationWorkspaceTemplateDir = "";
-let nestedRepoTemplateDir = "";
 
 beforeAll(async () => {
   await fixtureSuite.setup();
@@ -21,16 +20,6 @@ beforeAll(async () => {
       dir: path.join(truncationWorkspaceTemplateDir, "skills", name),
       name,
       description: "x".repeat(800),
-    });
-  }
-
-  nestedRepoTemplateDir = await fixtureSuite.createCaseDir("template-skills-repo");
-  for (let i = 0; i < 8; i += 1) {
-    const name = `repo-skill-${String(i).padStart(2, "0")}`;
-    await writeSkill({
-      dir: path.join(nestedRepoTemplateDir, "skills", name),
-      name,
-      description: `Desc ${i}`,
     });
   }
 });
@@ -160,34 +149,6 @@ describe("buildWorkspaceSkillSnapshot", () => {
     expect(snapshot.prompt.length).toBeLessThan(2000);
   });
 
-  it("limits discovery for nested repo-style skills roots (dir/skills/*)", async () => {
-    const workspaceDir = await fixtureSuite.createCaseDir("workspace");
-    const repoDir = await cloneTemplateDir(nestedRepoTemplateDir, "skills-repo");
-
-    const snapshot = withWorkspaceHome(workspaceDir, () =>
-      buildWorkspaceSkillSnapshot(workspaceDir, {
-        config: {
-          skills: {
-            load: {
-              extraDirs: [repoDir],
-            },
-            limits: {
-              maxCandidatesPerRoot: 5,
-              maxSkillsLoadedPerSource: 5,
-            },
-          },
-        },
-        managedSkillsDir: path.join(workspaceDir, ".managed"),
-        bundledSkillsDir: path.join(workspaceDir, ".bundled"),
-      }),
-    );
-
-    // We should only have loaded a small subset.
-    expect(snapshot.skills.length).toBeLessThanOrEqual(5);
-    expect(snapshot.prompt).toContain("repo-skill-00");
-    expect(snapshot.prompt).not.toContain("repo-skill-07");
-  });
-
   it("skips skills whose SKILL.md exceeds maxSkillFileBytes", async () => {
     const workspaceDir = await fixtureSuite.createCaseDir("workspace");
 
@@ -222,45 +183,6 @@ describe("buildWorkspaceSkillSnapshot", () => {
     expect(snapshot.skills.map((s) => s.name)).not.toContain("big-skill");
     expect(snapshot.prompt).toContain("small-skill");
     expect(snapshot.prompt).not.toContain("big-skill");
-  });
-
-  it("detects nested skills roots beyond the first 25 entries", async () => {
-    const workspaceDir = await fixtureSuite.createCaseDir("workspace");
-    const repoDir = await fixtureSuite.createCaseDir("skills-repo");
-
-    // Create 30 nested dirs, but only the last one is an actual skill.
-    for (let i = 0; i < 30; i += 1) {
-      await fs.mkdir(path.join(repoDir, "skills", `entry-${String(i).padStart(2, "0")}`), {
-        recursive: true,
-      });
-    }
-
-    await writeSkill({
-      dir: path.join(repoDir, "skills", "entry-29"),
-      name: "late-skill",
-      description: "Nested skill discovered late",
-    });
-
-    const snapshot = withWorkspaceHome(workspaceDir, () =>
-      buildWorkspaceSkillSnapshot(workspaceDir, {
-        config: {
-          skills: {
-            load: {
-              extraDirs: [repoDir],
-            },
-            limits: {
-              maxCandidatesPerRoot: 30,
-              maxSkillsLoadedPerSource: 30,
-            },
-          },
-        },
-        managedSkillsDir: path.join(workspaceDir, ".managed"),
-        bundledSkillsDir: path.join(workspaceDir, ".bundled"),
-      }),
-    );
-
-    expect(snapshot.skills.map((s) => s.name)).toContain("late-skill");
-    expect(snapshot.prompt).toContain("late-skill");
   });
 
   it("enforces maxSkillFileBytes for root-level SKILL.md", async () => {

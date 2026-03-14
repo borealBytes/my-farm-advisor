@@ -1,25 +1,17 @@
-<!-- Copyright 2026 Clayton Young (borealBytes / Superior Byte Works, LLC) -->
-<!-- Licensed under the Apache License, Version 2.0. -->
-
 ---
-
 name: qtl-analysis
 description: >
-Comprehensive QTL (Quantitative Trait Loci) analysis toolkit — GWAS, eQTL mapping,
-classical LOD scans, kinship matrices, population structure, and genomic prediction.
-Matches commercial QTLmax capabilities using open-source tools: tensorQTL (GPU-accelerated
-eQTL), GEMMA (LMM-GWAS), PLINK (GWAS/population structure), and R/qtl2 (classical QTL).
-Use for experimental crosses (F2, BC, RIL, DO), association mapping, expression QTLs,
-and breeding applications.
+  Comprehensive QTL (Quantitative Trait Loci) analysis toolkit — GWAS, eQTL mapping,
+  classical LOD scans, kinship matrices, population structure, and genomic prediction.
+  Matches commercial QTLmax capabilities using open-source tools: tensorQTL (GPU-accelerated
+  eQTL), GEMMA (LMM-GWAS), PLINK (GWAS/population structure), and R/qtl2 (classical QTL).
+  Use for experimental crosses (F2, BC, RIL, DO), association mapping, expression QTLs,
+  and breeding applications.
+allowed-tools: Read Write Edit Bash
 license: Apache-2.0
 metadata:
-author: Clayton Young (borealBytes / Superior Byte Works, LLC)
-contact: Clayton@SuperiorByteWorks.com
-linkedin: https://linkedin.com/in/claytoneyoung/
-version: "1.0.0"
-category: genomics
-tools: [tensorQTL, GEMMA, PLINK, R/qtl2, pyQTL]
-
+  skill-author: Clayton Young / Superior Byte Works, LLC (@borealBytes)
+  skill-version: "1.0.0"
 ---
 
 # QTL Analysis

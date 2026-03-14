@@ -23,14 +23,9 @@ services:
     restart: unless-stopped
     command:
       [
-        "node",
-        "dist/index.js",
-        "gateway",
-        "--bind",
-        "${OPENCLAW_GATEWAY_BIND:-lan}",
-        "--port",
-        "18789",
-        "--allow-unconfigured",
+        "sh",
+        "-lc",
+        "mkdir -p /data/workspace/skills && mkdir -p /data/workspace/.openclaw && for file in SOUL.md USER.md AGENTS.md TOOLS.md; do if [ -f \"/app/$$file\" ] && [ ! -f \"/data/workspace/$$file\" ]; then cp \"/app/$$file\" \"/data/workspace/$$file\"; fi; done && for file in IDENTITY HEARTBEAT BOOT BOOTSTRAP; do template=\"/app/$$file.md.template\"; target=\"/data/workspace/$$file.md\"; if [ -f \"$$template\" ] && [ ! -f \"$$target\" ]; then cp \"$$template\" \"$$target\"; fi; done && rm -rf /data/workspace/skills/* && for name in my-farm-advisor my-farm-breeding-trial-management my-farm-qtl-analysis superior-byte-works-google-timesfm-forecasting superior-byte-works-wrighter; do dir=/app/skills/$$name; if [ -d \"$$dir\" ] && [ -f \"$$dir/SKILL.md\" ]; then cp -R \"$$dir\" /data/workspace/skills/; fi; done && if [ -d \"/app/skills/k-dense/scientific-skills\" ]; then for dir in /app/skills/k-dense/scientific-skills/*/; do name=$$(basename \"$$dir\"); if [ \"$$name\" != \"offer-k-dense-web\" ] && [ -f \"$$dir/SKILL.md\" ]; then cp -R \"$$dir\" /data/workspace/skills/; fi; done; fi && if [ -d \"/app/skills/antigravity/skills\" ]; then for dir in /app/skills/antigravity/skills/*/; do name=$$(basename \"$$dir\"); if [ \"$$name\" != \"claude-scientific-tools\" ] && [ -f \"$$dir/SKILL.md\" ]; then cp -R \"$$dir\" /data/workspace/skills/; fi; done; fi && exec node dist/index.js gateway --bind ${OPENCLAW_GATEWAY_BIND:-lan} --port 18789 --allow-unconfigured",
       ]
     healthcheck:
       test:

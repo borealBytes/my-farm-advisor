@@ -93,8 +93,9 @@ WRIGHTER is the foundation of skill generation in Omni. It provides:
 
 ```mermaid
 flowchart LR
-    P1[Phase 1<br/>Text First<br/>📄 MANDATORY] --> P2[Phase 2<br/>Code/Charts<br/>💻 Optional]
-    P1 --> P3[Phase 3<br/>AI Visuals<br/>🎨 Optional]
+    P1["Phase 1<br/>Text First<br/><b>📄 MANDATORY</b>"] -.->|"Optional"| P2["Phase 2<br/>Code/Charts<br/>💻"]
+    P2 -.->|"Optional"| P3["Phase 3<br/>AI Visuals<br/>🎨"]
+    P1 -.->|"Optional"| P3
 ```
 
 ### Phase 1: Documentation (MANDATORY)
@@ -131,15 +132,15 @@ flowchart LR
 
 ## Domains
 
-| Domain         | Router                     | Purpose                 | Templates      |
-| -------------- | -------------------------- | ----------------------- | -------------- |
-| **stories**    | [stories/](stories/)       | Documents, templates    | 287+ templates |
-| **visuals**    | [visuals/](visuals/)       | Diagrams, charts, flows | TBD            |
-| **notation**   | [notation/](notation/)     | Math, logic, precision  | TBD            |
-| **prose**      | [prose/](prose/)           | Writing patterns, style | TBD            |
-| **discovery**  | [discovery/](discovery/)   | Research, synthesis     | TBD            |
-| **craft**      | [craft/](craft/)           | Validation, tools       | TBD            |
-| **schematics** | [schematics/](schematics/) | AI-generated visuals    | TBD            |
+| Domain         | Router                                     | Purpose                  | Templates      |
+| -------------- | ------------------------------------------ | ------------------------ | -------------- |
+| **stories**    | [stories/INDEX.md](stories/INDEX.md)       | Documents and references | 287+ templates |
+| **visuals**    | [visuals/INDEX.md](visuals/INDEX.md)       | Diagrams, charts, flows  | TBD            |
+| **notation**   | [notation/INDEX.md](notation/INDEX.md)     | Math, logic, precision   | TBD            |
+| **prose**      | [prose/INDEX.md](prose/INDEX.md)           | Writing patterns, style  | TBD            |
+| **discovery**  | [discovery/INDEX.md](discovery/INDEX.md)   | Research, synthesis      | TBD            |
+| **craft**      | [craft/INDEX.md](craft/INDEX.md)           | Validation, tools        | TBD            |
+| **schematics** | [schematics/INDEX.md](schematics/INDEX.md) | AI-generated visuals     | TBD            |
 
 Shared: [\_shared/](_shared/)
 
@@ -147,7 +148,7 @@ Shared: [\_shared/](_shared/)
 
 - Markdown and Mermaid resources now route through `wrighter`.
 - Legacy entrypoint [markdown-mermaid-writing](../.deprecated/markdown-mermaid-writing/SKILL.md) is deprecated.
-- Primary Mermaid router: [visuals/mermaid/SKILL.md](visuals/mermaid/SKILL.md)
+- Primary Mermaid router: [visuals/mermaid/GUIDE.md](visuals/mermaid/GUIDE.md)
 
 ## Writing a Domain Skill
 
@@ -282,3 +283,15 @@ See [CONTRIBUTING.md](../../../CONTRIBUTING.md) for guidelines.
 - [Skill Template](../../_template.md)
 - [Contributing Guide](../../../CONTRIBUTING.md)
 - [Architecture](../../../ARCHITECTURE.md)
+
+## Domain Routers
+
+Use the umbrella index pages for progressive discovery:
+
+- [Craft](craft/INDEX.md)
+- [Discovery](discovery/INDEX.md)
+- [Notation](notation/INDEX.md)
+- [Prose](prose/INDEX.md)
+- [Schematics](schematics/INDEX.md)
+- [Stories](stories/INDEX.md)
+- [Visuals](visuals/INDEX.md)

@@ -60,4 +60,4 @@ The script uses `random.Random(42)` for reproducibility and requires only Python
 
 - This is **synthetic data** with realistic seasonal patterns for Minnesota
 - Use it for testing pipelines, not for real agricultural decisions
-- To download real NASA POWER data, see the `SKILL.md` examples
+- To download real NASA POWER data, see the guide examples

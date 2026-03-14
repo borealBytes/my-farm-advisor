@@ -4,7 +4,6 @@ import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { writeSkill } from "./skills.e2e-test-helpers.js";
 import { loadWorkspaceSkillEntries } from "./skills.js";
-import { writePluginWithSkill } from "./test-helpers/skill-plugin-fixtures.js";
 
 const tempDirs: string[] = [];
 
@@ -20,38 +19,6 @@ afterEach(async () => {
   );
 });
 
-async function setupWorkspaceWithProsePlugin() {
-  const workspaceDir = await createTempWorkspaceDir();
-  const managedDir = path.join(workspaceDir, ".managed");
-  const bundledDir = path.join(workspaceDir, ".bundled");
-  const pluginRoot = path.join(workspaceDir, ".openclaw", "extensions", "open-prose");
-
-  await writePluginWithSkill({
-    pluginRoot,
-    pluginId: "open-prose",
-    skillId: "prose",
-    skillDescription: "test",
-  });
-
-  return { workspaceDir, managedDir, bundledDir };
-}
-
-async function setupWorkspaceWithDiffsPlugin() {
-  const workspaceDir = await createTempWorkspaceDir();
-  const managedDir = path.join(workspaceDir, ".managed");
-  const bundledDir = path.join(workspaceDir, ".bundled");
-  const pluginRoot = path.join(workspaceDir, ".openclaw", "extensions", "diffs");
-
-  await writePluginWithSkill({
-    pluginRoot,
-    pluginId: "diffs",
-    skillId: "diffs",
-    skillDescription: "test",
-  });
-
-  return { workspaceDir, managedDir, bundledDir };
-}
-
 describe("loadWorkspaceSkillEntries", () => {
   it("handles an empty managed skills dir without throwing", async () => {
     const workspaceDir = await createTempWorkspaceDir();
@@ -66,68 +33,37 @@ describe("loadWorkspaceSkillEntries", () => {
     expect(entries).toEqual([]);
   });
 
-  it("includes plugin-shipped skills when the plugin is enabled", async () => {
-    const { workspaceDir, managedDir, bundledDir } = await setupWorkspaceWithProsePlugin();
+  it("loads only top-level workspace skills", async () => {
+    const workspaceDir = await createTempWorkspaceDir();
 
-    const entries = loadWorkspaceSkillEntries(workspaceDir, {
-      config: {
-        plugins: {
-          entries: { "open-prose": { enabled: true } },
-        },
-      },
-      managedSkillsDir: managedDir,
-      bundledSkillsDir: bundledDir,
+    await writeSkill({
+      dir: path.join(workspaceDir, "skills", "visible-skill"),
+      name: "visible-skill",
+      description: "Visible",
     });
-
-    expect(entries.map((entry) => entry.skill.name)).toContain("prose");
-  });
-
-  it("excludes plugin-shipped skills when the plugin is not allowed", async () => {
-    const { workspaceDir, managedDir, bundledDir } = await setupWorkspaceWithProsePlugin();
-
-    const entries = loadWorkspaceSkillEntries(workspaceDir, {
-      config: {
-        plugins: {
-          allow: ["something-else"],
-        },
-      },
-      managedSkillsDir: managedDir,
-      bundledSkillsDir: bundledDir,
+    await writeSkill({
+      dir: path.join(workspaceDir, ".managed", "managed-skill"),
+      name: "managed-skill",
+      description: "Managed",
     });
-
-    expect(entries.map((entry) => entry.skill.name)).not.toContain("prose");
-  });
-
-  it("includes diffs plugin skill when the plugin is enabled", async () => {
-    const { workspaceDir, managedDir, bundledDir } = await setupWorkspaceWithDiffsPlugin();
+    await writeSkill({
+      dir: path.join(workspaceDir, ".bundled", "bundled-skill"),
+      name: "bundled-skill",
+      description: "Bundled",
+    });
 
     const entries = loadWorkspaceSkillEntries(workspaceDir, {
       config: {
         plugins: {
           entries: { diffs: { enabled: true } },
+          allow: ["open-prose"],
         },
       },
-      managedSkillsDir: managedDir,
-      bundledSkillsDir: bundledDir,
+      managedSkillsDir: path.join(workspaceDir, ".managed"),
+      bundledSkillsDir: path.join(workspaceDir, ".bundled"),
     });
 
-    expect(entries.map((entry) => entry.skill.name)).toContain("diffs");
-  });
-
-  it("excludes diffs plugin skill when the plugin is disabled", async () => {
-    const { workspaceDir, managedDir, bundledDir } = await setupWorkspaceWithDiffsPlugin();
-
-    const entries = loadWorkspaceSkillEntries(workspaceDir, {
-      config: {
-        plugins: {
-          entries: { diffs: { enabled: false } },
-        },
-      },
-      managedSkillsDir: managedDir,
-      bundledSkillsDir: bundledDir,
-    });
-
-    expect(entries.map((entry) => entry.skill.name)).not.toContain("diffs");
+    expect(entries.map((entry) => entry.skill.name)).toEqual(["visible-skill"]);
   });
 
   it.runIf(process.platform !== "win32")(

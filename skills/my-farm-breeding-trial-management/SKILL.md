@@ -1,18 +1,13 @@
-<!-- Copyright 2026 Clayton Young (borealBytes / Superior Byte Works, LLC) -->
-<!-- Licensed under the Apache License, Version 2.0. -->
-
 ---
-
 name: breeding-trial-management
 description: >
-Breeding trial management toolkit for design, fieldbook generation, germplasm workflows,
-selection, and crossing decisions. Complements qtl-analysis for end-to-end breeding genomics.
+  Breeding trial management toolkit for design, fieldbook generation, germplasm workflows,
+  selection, and crossing decisions. Complements qtl-analysis for end-to-end breeding genomics.
+allowed-tools: Read Write Edit Bash
 license: Apache-2.0
 metadata:
-author: Clayton Young (borealBytes / Superior Byte Works, LLC)
-version: "0.1.0"
-category: breeding-genomics
-
+  skill-author: Clayton Young / Superior Byte Works, LLC (@borealBytes)
+  skill-version: "1.0.0"
 ---
 
 # Breeding Trial Management
@@ -57,6 +52,6 @@ python scripts/breeding_cli.py cross --help
 - Selection and crossing: `examples/selection-index/`, `examples/breeding-value-ranking/`, `examples/crossing-plan/`, `examples/data-import/`
 - Field systems integration: `examples/iot-field-sync/`
 
-## Nested Modules
+## Examples and Support Docs
 
-- `breeding-simulation/`: AlphaSimR-style forward breeding simulation workflows
+- `examples/breeding-simulation/README.md`: AlphaSimR-style forward breeding simulation workflow notes

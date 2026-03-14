@@ -4,7 +4,7 @@ This directory contains a `lychee`-based link checker for `wrighter` markdown co
 
 ## Files
 
-- `SKILL.md`: skill-level contract and workflow integration.
+- `GUIDE.md`: skill-level contract and workflow integration.
 - `link-checker.sh`: script wrapper for scanning, reporting, and manual overrides.
 - `config.toml`: shared lychee configuration.
 
