@@ -30,8 +30,12 @@ else
 fi
 
 echo "Setting up workspace..."
-mkdir -p /data/workspace/skills
-mkdir -p /data/workspace/.openclaw
+if ! mkdir -p /data/workspace/skills /data/workspace/.openclaw; then
+    echo "Primary data path unavailable, falling back to local volume"
+    fusermount -u /data 2>/dev/null || true
+    mkdir -p /data
+    mkdir -p /data/workspace/skills /data/workspace/.openclaw
+fi
 
 for file in SOUL.md USER.md AGENTS.md TOOLS.md; do
     if [ -f "/app/$file" ] && [ ! -f "/data/workspace/$file" ]; then
@@ -48,7 +52,9 @@ for file in IDENTITY HEARTBEAT BOOT BOOTSTRAP; do
 done
 
 echo "Copying skills to workspace..."
-rm -rf /data/workspace/skills/*
+if ! rm -rf /data/workspace/skills/* 2>/dev/null; then
+    echo "Failed to clear workspace skills directory; continuing"
+fi
 
 for name in my-farm-advisor my-farm-breeding-trial-management my-farm-qtl-analysis superior-byte-works-google-timesfm-forecasting superior-byte-works-wrighter; do
     dir=/app/skills/$name
