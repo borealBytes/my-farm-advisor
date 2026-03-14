@@ -1,11 +1,23 @@
 services:
   openclaw-gateway:
+    user: "0:0"
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        OPENCLAW_DOCKER_APT_PACKAGES: ${OPENCLAW_DOCKER_APT_PACKAGES:-s3fs fuse}
     image: ${OPENCLAW_IMAGE:-openclaw:local}
+    privileged: true
+    cap_add:
+      - SYS_ADMIN
+      - DAC_READ_SEARCH
     env_file:
       - .env
     environment:
       HOME: /home/node
       TERM: xterm-256color
+      NODE_ENV: production
+      OPENCLAW_GATEWAY_BIND: lan
       OPENCLAW_STATE_DIR: /data
       OPENCLAW_WORKSPACE_DIR: /data/workspace
       OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN:-}
@@ -13,8 +25,21 @@ services:
       CLAUDE_AI_SESSION_KEY: ${CLAUDE_AI_SESSION_KEY:-}
       CLAUDE_WEB_SESSION_KEY: ${CLAUDE_WEB_SESSION_KEY:-}
       CLAUDE_WEB_COOKIE: ${CLAUDE_WEB_COOKIE:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      NVIDIA_API_KEY: ${NVIDIA_API_KEY:-}
+      NVIDIA_BASE_URL: ${NVIDIA_BASE_URL:-https://integrate.api.nvidia.com/v1}
+      PRIMARY_MODEL: ${PRIMARY_MODEL:-nvidia/stepfun-ai/step-3.5-flash}
+      FALLBACK_MODELS: ${FALLBACK_MODELS:-nvidia/qwen/qwen3.5-397b-a17b,nvidia/moonshotai/kimi-k2.5,openrouter/openrouter/free,openrouter/openai/gpt-5.4,openrouter/google/gemini-3.1-flash-lite-preview,openrouter/anthropic/claude-sonnet-4.6}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      TELEGRAM_ALLOWED_USERS: ${TELEGRAM_ALLOWED_USERS:-}
+      R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID:-}
+      R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY:-}
+      R2_BUCKET_NAME: ${R2_BUCKET_NAME:-my-farm-advisor}
+      R2_ENDPOINT: ${R2_ENDPOINT:-}
+      CF_ACCOUNT_ID: ${CF_ACCOUNT_ID:-}
       TZ: ${OPENCLAW_TZ:-UTC}
-      DATA_MODE: ${DATA_MODE:-local}
+      DATA_MODE: ${DATA_MODE:-r2}
     volumes:
       - ${DATA_VOLUME_SOURCE:-./data}:/data
       ## Uncomment the lines below to enable sandbox isolation
@@ -30,12 +55,7 @@ services:
       - "${OPENCLAW_BRIDGE_PORT:-18790}:18790"
     init: true
     restart: unless-stopped
-    command:
-      [
-        "sh",
-        "-lc",
-        "mkdir -p /data /data/workspace/skills && mkdir -p /data/workspace/.openclaw && if [ ! -f /data/openclaw.json ]; then cat > /data/openclaw.json <<'EOF'\n{\n  \"gateway\": {\n    \"controlUi\": {\n      \"allowedOrigins\": [\"http://127.0.0.1:18789\", \"http://localhost:18789\"],\n      \"allowInsecureAuth\": true\n    }\n  },\n  \"agents\": {\n    \"defaults\": {\n      \"workspace\": \"/data/workspace\"\n    }\n  }\n}\nEOF\nfi && for file in SOUL.md USER.md AGENTS.md TOOLS.md; do if [ -f \"/app/$$file\" ] && [ ! -f \"/data/workspace/$$file\" ]; then cp \"/app/$$file\" \"/data/workspace/$$file\"; fi; done && for file in IDENTITY HEARTBEAT BOOT BOOTSTRAP; do template=\"/app/$$file.md.template\"; target=\"/data/workspace/$$file.md\"; if [ -f \"$$template\" ] && [ ! -f \"$$target\" ]; then cp \"$$template\" \"$$target\"; fi; done && rm -rf /data/workspace/skills/* && for name in my-farm-advisor my-farm-breeding-trial-management my-farm-qtl-analysis superior-byte-works-google-timesfm-forecasting superior-byte-works-wrighter; do dir=/app/skills/$$name; if [ -d \"$$dir\" ] && [ -f \"$$dir/SKILL.md\" ]; then cp -R \"$$dir\" /data/workspace/skills/; fi; done && if [ -d \"/app/skills/k-dense/scientific-skills\" ]; then for dir in /app/skills/k-dense/scientific-skills/*/; do name=$$(basename \"$$dir\"); if [ \"$$name\" != \"offer-k-dense-web\" ] && [ -f \"$$dir/SKILL.md\" ]; then cp -R \"$$dir\" /data/workspace/skills/; fi; done; fi && if [ -d \"/app/skills/antigravity/skills\" ]; then for dir in /app/skills/antigravity/skills/*/; do name=$$(basename \"$$dir\"); if [ \"$$name\" != \"claude-scientific-tools\" ] && [ -f \"$$dir/SKILL.md\" ]; then cp -R \"$$dir\" /data/workspace/skills/; fi; done; fi && exec node dist/index.js gateway --bind ${OPENCLAW_GATEWAY_BIND:-lan} --port 18789 --allow-unconfigured",
-      ]
+    command: ["/app/scripts/entrypoint.sh"]
     healthcheck:
       test:
         [
