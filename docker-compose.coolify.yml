@@ -1,6 +1,8 @@
 services:
   openclaw-gateway:
-    image: ${OPENCLAW_IMAGE:-openclaw:local}
+    build:
+      context: .
+      dockerfile: Dockerfile
     environment:
       # System
       HOME: /home/node
