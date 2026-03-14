@@ -14,6 +14,7 @@ services:
       HOME: /home/node
       TERM: xterm-256color
       NODE_ENV: production
+      OPENCLAW_GATEWAY_BIND: lan
       TZ: ${TZ:-UTC}
       OPENCLAW_STATE_DIR: /data
       OPENCLAW_WORKSPACE_DIR: /data/workspace
