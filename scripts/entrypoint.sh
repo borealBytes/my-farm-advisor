@@ -11,12 +11,13 @@ fi
 
 if [ -n "$R2_ACCESS_KEY_ID" ] && [ -n "$R2_SECRET_ACCESS_KEY" ] && [ -n "$CF_ACCOUNT_ID" ]; then
     echo "Mounting R2 bucket: $R2_BUCKET_NAME"
+    fusermount -u /data 2>/dev/null || true
+    fusermount -uz /data 2>/dev/null || true
     mkdir -p /data /tmp/s3fs-cache
     
     export AWS_ACCESS_KEY_ID="$R2_ACCESS_KEY_ID"
     export AWS_SECRET_ACCESS_KEY="$R2_SECRET_ACCESS_KEY"
     
-    fusermount -u /data 2>/dev/null || true
     if ! s3fs "$R2_BUCKET_NAME" /data \
         -o url="https://${CF_ACCOUNT_ID}.r2.cloudflarestorage.com" \
         -o use_path_request_style \
@@ -35,6 +36,14 @@ if [ -n "$R2_ACCESS_KEY_ID" ] && [ -n "$R2_SECRET_ACCESS_KEY" ] && [ -n "$CF_ACC
             exit 1
         fi
         echo "continuing with local storage"
+    elif ! ls /data >/dev/null 2>&1; then
+        echo "R2 mount is unhealthy right after mount"
+        if [ "$REQUIRE_R2" -eq 1 ]; then
+            echo "DATA_MODE=$DATA_MODE requires healthy R2; exiting"
+            exit 1
+        fi
+        fusermount -u /data 2>/dev/null || true
+        fusermount -uz /data 2>/dev/null || true
     fi
     echo "R2 mount complete"
 else
