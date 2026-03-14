@@ -1,0 +1,65 @@
+# Playbook Schema v0.1.0
+# Superior Byte Works LLC
+
+$schema: https://superiorbytewords.io/schemas/playbook/v0.1.0
+id:
+  type: string
+  pattern: "^sbw-pb-[a-z0-9\\-]+$"
+title:
+  type: string
+type:
+  type: string
+  enum:
+    - seasonal-runbook
+    - incident-response
+    - field-sop
+    - equipment-checklist
+    - crop-rotation-plan
+version:
+  type: string
+authored:
+  type: string
+  format: date
+context:
+  farm_id: string
+  fields: array
+  crops: array
+  season: string
+  location: string
+preconditions:
+  type: array
+  items:
+    condition: string
+    verification_method: string
+phases:
+  type: array
+  items:
+    name: string
+    trigger:
+      type: string  # date | threshold | manual
+      value: string
+    steps:
+      type: array
+      items:
+        id: string
+        action: string
+        responsible_party: string
+        tools_required: array
+        expected_duration: string
+        success_criteria: string
+        contingency: string
+    exit_criteria: string
+rollback:
+  type: string
+references:
+  type: array
+  items:
+    title: string
+    url: string
+changelog:
+  type: array
+  items:
+    version: string
+    date: string
+    author: string
+    notes: string
