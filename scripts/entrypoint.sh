@@ -4,13 +4,18 @@ set -e
 echo "Starting OpenClaw Gateway..."
 
 DATA_MODE="${DATA_MODE:-r2}"
+R2_ENDPOINT="${R2_ENDPOINT:-}"
+if [ -z "$R2_ENDPOINT" ] && [ -n "$CF_ACCOUNT_ID" ]; then
+    R2_ENDPOINT="https://${CF_ACCOUNT_ID}.r2.cloudflarestorage.com"
+fi
 REQUIRE_R2=0
 if [ "$DATA_MODE" != "local" ]; then
     REQUIRE_R2=1
 fi
 
-if [ -n "$R2_ACCESS_KEY_ID" ] && [ -n "$R2_SECRET_ACCESS_KEY" ] && [ -n "$CF_ACCOUNT_ID" ]; then
+if [ -n "$R2_ACCESS_KEY_ID" ] && [ -n "$R2_SECRET_ACCESS_KEY" ] && [ -n "$R2_ENDPOINT" ]; then
     echo "Mounting R2 bucket: $R2_BUCKET_NAME"
+    echo "R2 endpoint: $R2_ENDPOINT"
     fusermount -u /data 2>/dev/null || true
     fusermount -uz /data 2>/dev/null || true
     mkdir -p /data /tmp/s3fs-cache
@@ -19,7 +24,7 @@ if [ -n "$R2_ACCESS_KEY_ID" ] && [ -n "$R2_SECRET_ACCESS_KEY" ] && [ -n "$CF_ACC
     export AWS_SECRET_ACCESS_KEY="$R2_SECRET_ACCESS_KEY"
     
     if ! s3fs "$R2_BUCKET_NAME" /data \
-        -o url="https://${CF_ACCOUNT_ID}.r2.cloudflarestorage.com" \
+        -o url="$R2_ENDPOINT" \
         -o use_path_request_style \
         -o allow_other \
         -o uid=1000,gid=1000 \
@@ -48,7 +53,7 @@ if [ -n "$R2_ACCESS_KEY_ID" ] && [ -n "$R2_SECRET_ACCESS_KEY" ] && [ -n "$CF_ACC
     echo "R2 mount complete"
 else
     if [ "$REQUIRE_R2" -eq 1 ]; then
-        echo "R2 credentials missing and DATA_MODE=$DATA_MODE requires R2; exiting"
+        echo "R2 config missing (R2_ACCESS_KEY_ID/R2_SECRET_ACCESS_KEY/R2_ENDPOINT) and DATA_MODE=$DATA_MODE requires R2; exiting"
         exit 1
     fi
     echo "R2 credentials not set, using local volume"
