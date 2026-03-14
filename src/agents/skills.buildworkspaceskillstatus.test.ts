@@ -108,6 +108,22 @@ describe("buildWorkspaceSkillStatus", () => {
     expect(skill?.bundled).toBe(true);
   });
 
+  it("does not mark workspace skills as bundled when names overlap bundled skills", async () => {
+    const entry = makeEntry({
+      name: "peekaboo",
+      source: "openclaw-workspace",
+    });
+
+    const report = buildWorkspaceSkillStatus("/tmp/ws", {
+      entries: [entry],
+    });
+    const skill = report.skills.find((reportEntry) => reportEntry.name === "peekaboo");
+
+    expect(skill).toBeDefined();
+    expect(skill?.bundled).toBe(false);
+    expect(skill?.source).toBe("openclaw-workspace");
+  });
+
   it("filters install options by OS", async () => {
     const entry = makeEntry({
       name: "install-skill",

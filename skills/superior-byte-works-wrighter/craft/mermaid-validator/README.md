@@ -4,7 +4,7 @@ This directory contains a Mermaid diagram validator for `wrighter` markdown cont
 
 ## Files
 
-- `SKILL.md`: Skill-level contract and workflow integration
+- `GUIDE.md`: Skill-level contract and workflow integration
 - `mermaid-validator.sh`: Python-based validation script
 - `README.md`: This file
 

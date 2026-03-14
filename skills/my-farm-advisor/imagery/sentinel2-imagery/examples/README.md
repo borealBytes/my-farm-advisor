@@ -62,6 +62,6 @@ print(stats[['field_id', 'acquisition_date', 'mean_ndvi', 'crop_name']])
 
 - These are small example metadata/moltbot/stat files for testing and development
 - Actual Sentinel-2 imagery must be downloaded from Copernicus
-- Use the main SKILL.md for complete download instructions
+- Use the main guide for complete download instructions
 - Field IDs correspond to the field-boundaries skill examples
 - The AOI geometry covers ~2km x 2km around field 271623002471299 in Minnesota

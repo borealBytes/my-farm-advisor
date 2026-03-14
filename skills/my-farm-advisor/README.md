@@ -1,49 +1,24 @@
 # MY Farm Advisor
 
-A hierarchical collection of agricultural data science skills for farm management and analysis.
+A hierarchical agricultural workflow library organized around one umbrella skill and subordinate guides, playbooks, and reference materials.
 
 ## Overview
 
-This skill collection provides tools for agricultural data analysis, field management, satellite imagery processing, and strategic crop planning. Organized into domain-specific categories for easy discovery and use.
+Use `SKILL.md` as the orchestration entrypoint, then move into the relevant subtree `INDEX.md` for progressive discovery. Each subtree points to focused `GUIDE.md` or `PLAYBOOK.md` documents.
 
-## Structure
+## Subtrees
 
-### EDA
-
-Exploratory data analysis tools for understanding farm data patterns and relationships.
-
-### Data Sources
-
-Farm data management and intelligence reporting capabilities.
-
-### Field Management
-
-Field operations including sampling, boundary management, and headland calculations.
-
-### Imagery
-
-Satellite imagery processing from Landsat and Sentinel-2 sources.
-
-### Soil
-
-Soil and cropland analysis using CDL and SSURGO datasets.
-
-### Strategy
-
-Crop planning and maturity analysis tools.
-
-### Admin
-
-Administrative tools for geodata management and interactive mapping.
-
-### Weather
-
-Weather data integration and analysis.
+- [Admin](admin/INDEX.md)
+- [Data Sources](data-sources/INDEX.md)
+- [EDA](eda/INDEX.md)
+- [Field Management](field-management/INDEX.md)
+- [Imagery](imagery/INDEX.md)
+- [Soil](soil/INDEX.md)
+- [Strategy](strategy/INDEX.md)
+- [Weather](weather/INDEX.md)
 
 ## Quick Start
 
-Navigate to the specific skill directory for detailed usage instructions. Each skill contains its own SKILL.md with complete documentation.
-
-## License
-
-Apache-2.0 © Superior Byte Works LLC / borealBytes
+1. Start with [SKILL.md](SKILL.md) for orchestration.
+2. Open the matching subtree [INDEX.md](INDEX.md) page.
+3. Follow the linked `GUIDE.md` or `PLAYBOOK.md` for the actual workflow.

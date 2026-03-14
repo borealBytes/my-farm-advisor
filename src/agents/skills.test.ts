@@ -155,7 +155,7 @@ describe("buildWorkspaceSkillsPrompt", () => {
     expect(prompt).toBe("");
   });
 
-  it("loads bundled skills when present", async () => {
+  it("does not load bundled skills when present", async () => {
     const workspaceDir = await makeWorkspace();
     const bundledDir = path.join(workspaceDir, ".bundled");
     const bundledSkillDir = path.join(bundledDir, "peekaboo");
@@ -171,12 +171,12 @@ describe("buildWorkspaceSkillsPrompt", () => {
       managedSkillsDir: path.join(workspaceDir, ".managed"),
       bundledSkillsDir: bundledDir,
     });
-    expect(prompt).toContain("peekaboo");
-    expect(prompt).toContain("Capture UI");
-    expect(prompt).toContain(path.join(bundledSkillDir, "SKILL.md"));
+    expect(prompt).not.toContain("peekaboo");
+    expect(prompt).not.toContain("Capture UI");
+    expect(prompt).not.toContain(path.join(bundledSkillDir, "SKILL.md"));
   });
 
-  it("loads extra skill folders from config (lowest precedence)", async () => {
+  it("ignores extra, bundled, and managed skills outside workspace root", async () => {
     const workspaceDir = await makeWorkspace();
     const extraDir = path.join(workspaceDir, ".extra");
     const bundledDir = path.join(workspaceDir, ".bundled");

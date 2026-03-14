@@ -171,7 +171,6 @@ function buildSkillStatus(
   config?: OpenClawConfig,
   prefs?: SkillsInstallPreferences,
   eligibility?: SkillEligibilityContext,
-  bundledNames?: Set<string>,
 ): SkillStatusEntry {
   const skillKey = resolveSkillKey(entry);
   const skillConfig = resolveSkillConfig(config, skillKey);
@@ -186,10 +185,7 @@ function buildSkillStatus(
       (skillConfig?.apiKey && entry.metadata?.primaryEnv === envName),
     );
   const isConfigSatisfied = (pathStr: string) => isConfigPathTruthy(config, pathStr);
-  const bundled =
-    bundledNames && bundledNames.size > 0
-      ? bundledNames.has(entry.skill.name)
-      : entry.skill.source === "openclaw-bundled";
+  const bundled = entry.skill.source === "openclaw-bundled";
 
   const { emoji, homepage, required, missing, requirementsSatisfied, configChecks } =
     evaluateEntryRequirementsForCurrentPlatform({
@@ -234,20 +230,19 @@ export function buildWorkspaceSkillStatus(
   },
 ): SkillStatusReport {
   const managedSkillsDir = opts?.managedSkillsDir ?? path.join(CONFIG_DIR, "skills");
-  const bundledContext = resolveBundledSkillsContext();
   const skillEntries =
     opts?.entries ??
     loadWorkspaceSkillEntries(workspaceDir, {
       config: opts?.config,
       managedSkillsDir,
-      bundledSkillsDir: bundledContext.dir,
+      bundledSkillsDir: resolveBundledSkillsContext().dir,
     });
   const prefs = resolveSkillsInstallPreferences(opts?.config);
   return {
     workspaceDir,
     managedSkillsDir,
     skills: skillEntries.map((entry) =>
-      buildSkillStatus(entry, opts?.config, prefs, opts?.eligibility, bundledContext.names),
+      buildSkillStatus(entry, opts?.config, prefs, opts?.eligibility),
     ),
   };
 }

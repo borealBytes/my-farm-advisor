@@ -145,6 +145,14 @@ COPY --from=runtime-assets --chown=node:node /app/extensions ./extensions
 COPY --from=runtime-assets --chown=node:node /app/skills ./skills
 COPY --from=runtime-assets --chown=node:node /app/docs ./docs
 
+# Copy identity/bootstrap files to app root so they're available for workspace initialization
+# Only copy files that exist - the bootstrap script will skip missing ones
+COPY --chown=node:node SOUL.md USER.md AGENTS.md TOOLS.md ./
+COPY --chown=node:node docs/reference/templates/IDENTITY.md ./IDENTITY.md.template
+COPY --chown=node:node docs/reference/templates/HEARTBEAT.md ./HEARTBEAT.md.template
+COPY --chown=node:node docs/reference/templates/BOOT.md ./BOOT.md.template
+COPY --chown=node:node docs/reference/templates/BOOTSTRAP.md ./BOOTSTRAP.md.template
+
 # Create symlink for openclaw -> my-farm-adviser to support extensions importing from openclaw/plugin-sdk
 # This allows the branded distribution to maintain compatibility with upstream OpenClaw extensions
 # The package is installed at /app (root), not in node_modules, so symlink points to /app

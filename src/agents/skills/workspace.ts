@@ -9,9 +9,8 @@ import {
 import type { OpenClawConfig } from "../../config/config.js";
 import { isPathInside } from "../../infra/path-guards.js";
 import { createSubsystemLogger } from "../../logging/subsystem.js";
-import { CONFIG_DIR, resolveUserPath } from "../../utils.js";
+import { resolveUserPath } from "../../utils.js";
 import { resolveSandboxPath } from "../sandbox-paths.js";
-import { resolveBundledSkillsDir } from "./bundled-dir.js";
 import { shouldIncludeSkill } from "./config.js";
 import { normalizeSkillFilter } from "./filter.js";
 import {
@@ -19,7 +18,6 @@ import {
   resolveOpenClawMetadata,
   resolveSkillInvocationPolicy,
 } from "./frontmatter.js";
-import { resolvePluginSkillDirs } from "./plugin-skills.js";
 import { serializeByKey } from "./serialize.js";
 import type {
   ParsedSkillFrontmatter,
@@ -246,36 +244,6 @@ function filterLoadedSkillsInsideRoot(params: {
   });
 }
 
-function resolveNestedSkillsRoot(
-  dir: string,
-  opts?: {
-    maxEntriesToScan?: number;
-  },
-): { baseDir: string; note?: string } {
-  const nested = path.join(dir, "skills");
-  try {
-    if (!fs.existsSync(nested) || !fs.statSync(nested).isDirectory()) {
-      return { baseDir: dir };
-    }
-  } catch {
-    return { baseDir: dir };
-  }
-
-  // Heuristic: if `dir/skills/*/SKILL.md` exists for any entry, treat `dir/skills` as the real root.
-  // Note: don't stop at 25, but keep a cap to avoid pathological scans.
-  const nestedDirs = listChildDirectories(nested);
-  const scanLimit = Math.max(0, opts?.maxEntriesToScan ?? 100);
-  const toScan = scanLimit === 0 ? [] : nestedDirs.slice(0, Math.min(nestedDirs.length, scanLimit));
-
-  for (const name of toScan) {
-    const skillMd = path.join(nested, name, "SKILL.md");
-    if (fs.existsSync(skillMd)) {
-      return { baseDir: nested, note: `Detected nested skills root at ${nested}` };
-    }
-  }
-  return { baseDir: dir };
-}
-
 function unwrapLoadedSkills(loaded: unknown): Skill[] {
   if (Array.isArray(loaded)) {
     return loaded as Skill[];
@@ -302,10 +270,7 @@ function loadSkillEntries(
   const loadSkills = (params: { dir: string; source: string }): Skill[] => {
     const rootDir = path.resolve(params.dir);
     const rootRealPath = tryRealpath(rootDir) ?? rootDir;
-    const resolved = resolveNestedSkillsRoot(params.dir, {
-      maxEntriesToScan: limits.maxCandidatesPerRoot,
-    });
-    const baseDir = resolved.baseDir;
+    const baseDir = params.dir;
     const baseDirRealPath = resolveContainedSkillPath({
       source: params.source,
       rootDir,
@@ -442,68 +407,13 @@ function loadSkillEntries(
     return loadedSkills;
   };
 
-  const managedSkillsDir = opts?.managedSkillsDir ?? path.join(CONFIG_DIR, "skills");
   const workspaceSkillsDir = path.resolve(workspaceDir, "skills");
-  const bundledSkillsDir = opts?.bundledSkillsDir ?? resolveBundledSkillsDir();
-  const extraDirsRaw = opts?.config?.skills?.load?.extraDirs ?? [];
-  const extraDirs = extraDirsRaw
-    .map((d) => (typeof d === "string" ? d.trim() : ""))
-    .filter(Boolean);
-  const pluginSkillDirs = resolvePluginSkillDirs({
-    workspaceDir,
-    config: opts?.config,
-  });
-  const mergedExtraDirs = [...extraDirs, ...pluginSkillDirs];
-
-  const bundledSkills = bundledSkillsDir
-    ? loadSkills({
-        dir: bundledSkillsDir,
-        source: "openclaw-bundled",
-      })
-    : [];
-  const extraSkills = mergedExtraDirs.flatMap((dir) => {
-    const resolved = resolveUserPath(dir);
-    return loadSkills({
-      dir: resolved,
-      source: "openclaw-extra",
-    });
-  });
-  const managedSkills = loadSkills({
-    dir: managedSkillsDir,
-    source: "openclaw-managed",
-  });
-  const personalAgentsSkillsDir = path.resolve(os.homedir(), ".agents", "skills");
-  const personalAgentsSkills = loadSkills({
-    dir: personalAgentsSkillsDir,
-    source: "agents-skills-personal",
-  });
-  const projectAgentsSkillsDir = path.resolve(workspaceDir, ".agents", "skills");
-  const projectAgentsSkills = loadSkills({
-    dir: projectAgentsSkillsDir,
-    source: "agents-skills-project",
-  });
   const workspaceSkills = loadSkills({
     dir: workspaceSkillsDir,
     source: "openclaw-workspace",
   });
 
   const merged = new Map<string, Skill>();
-  // Precedence: extra < bundled < managed < agents-skills-personal < agents-skills-project < workspace
-  for (const skill of extraSkills) {
-    merged.set(skill.name, skill);
-  }
-  for (const skill of bundledSkills) {
-    merged.set(skill.name, skill);
-  }
-  for (const skill of managedSkills) {
-    merged.set(skill.name, skill);
-  }
-  for (const skill of personalAgentsSkills) {
-    merged.set(skill.name, skill);
-  }
-  for (const skill of projectAgentsSkills) {
-    merged.set(skill.name, skill);
-  }
   for (const skill of workspaceSkills) {
     merged.set(skill.name, skill);
   }

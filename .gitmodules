@@ -1,0 +1,8 @@
+[submodule "skills/k-dense"]
+	path = skills/k-dense
+	url = https://github.com/K-Dense-AI/claude-scientific-skills.git
+	sparsecheckout = true
+[submodule "skills/antigravity"]
+	path = skills/antigravity
+	url = https://github.com/sickn33/antigravity-awesome-skills.git
+	sparsecheckout = true

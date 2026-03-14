@@ -4,9 +4,9 @@
 
 ## Primary Routes
 
-- [Mermaid Visuals](../visuals/mermaid/SKILL.md)
-- [SVG Visuals](../visuals/svg/SKILL.md)
-- [MIDI Visuals](../visuals/midi/SKILL.md)
+- [Mermaid Visuals](../visuals/mermaid/GUIDE.md)
+- [SVG Visuals](../visuals/svg/GUIDE.md)
+- [MIDI Visuals](../visuals/midi/GUIDE.md)
 
 ## Notes
 
