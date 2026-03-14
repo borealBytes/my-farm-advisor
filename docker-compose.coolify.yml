@@ -1,8 +1,56 @@
 services:
+  r2-mount:
+    image: alpine/s3fs:latest
+    container_name: r2-mount
+    privileged: true
+    environment:
+      R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID:-}
+      R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY:-}
+      R2_BUCKET_NAME: ${R2_BUCKET_NAME:-openclaw-data}
+      CF_ACCOUNT_ID: ${CF_ACCOUNT_ID:-}
+    volumes:
+      - r2-cache:/cache
+      - r2-data:/data:shared
+    restart: unless-stopped
+    command: >
+      sh -c "
+        echo \"$${R2_ACCESS_KEY_ID}:$${R2_SECRET_ACCESS_KEY}\" > /etc/passwd-s3fs &&
+        chmod 600 /etc/passwd-s3fs &&
+        mkdir -p /cache &&
+        s3fs $${R2_BUCKET_NAME} /data \
+          -o url=https://$${CF_ACCOUNT_ID}.r2.cloudflarestorage.com \
+          -o use_path_request_style \
+          -o allow_other \
+          -o uid=1000,gid=1000 \
+          -o umask=0022 \
+          -o nonempty \
+          -o max_cache_size=10000 \
+          -o cache=/cache \
+          -o use_cache=/cache \
+          -o ensure_diskfree=5000 \
+          -o multipart_size=50 \
+          -o parallel_count=8 \
+          -o dbglevel=info \
+          -o logfile=/var/log/s3fs.log &&
+        tail -f /dev/null
+      "
+    healthcheck:
+      test: ["CMD", "mountpoint", "-q", "/data"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
   openclaw-gateway:
     build:
       context: .
       dockerfile: Dockerfile
+    container_name: openclaw-gateway
     environment:
       # System
       HOME: /home/node
@@ -39,12 +87,15 @@ services:
       DATA_MODE: ${DATA_MODE:-volume}
 
     volumes:
-      - openclaw-data:/data
+      - r2-data:/data:shared
     ports:
       - "${OPENCLAW_GATEWAY_PORT:-18789}:18789"
       - "${OPENCLAW_BRIDGE_PORT:-18790}:18790"
     init: true
     restart: unless-stopped
+    depends_on:
+      r2-mount:
+        condition: service_healthy
     command:
       [
         "sh",
@@ -65,4 +116,11 @@ services:
       start_period: 20s
 
 volumes:
-  openclaw-data:
+  r2-data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /tmp/r2-shared
+  r2-cache:
+    driver: local
