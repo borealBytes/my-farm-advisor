@@ -18,7 +18,6 @@ if [ -n "$R2_ACCESS_KEY_ID" ] && [ -n "$R2_SECRET_ACCESS_KEY" ] && [ -n "$CF_ACC
         -o uid=1000,gid=1000 \
         -o umask=0022 \
         -o nonempty \
-        -o max_cache_size=10000 \
         -o use_cache=/tmp/s3fs-cache \
         -o ensure_diskfree=5000 \
         -o parallel_count=8 \
