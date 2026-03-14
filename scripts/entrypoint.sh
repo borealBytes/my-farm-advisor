@@ -7,11 +7,8 @@ if [ -n "$R2_ACCESS_KEY_ID" ] && [ -n "$R2_SECRET_ACCESS_KEY" ] && [ -n "$CF_ACC
     echo "Mounting R2 bucket: $R2_BUCKET_NAME"
     mkdir -p /data /tmp/s3fs-cache
     
-    PASSWD_FILE="$HOME/.passwd-s3fs"
-    mkdir -p "$HOME"
-    touch "$PASSWD_FILE"
-    chmod 600 "$PASSWD_FILE"
-    echo "$R2_ACCESS_KEY_ID:$R2_SECRET_ACCESS_KEY" > "$PASSWD_FILE"
+    export AWS_ACCESS_KEY_ID="$R2_ACCESS_KEY_ID"
+    export AWS_SECRET_ACCESS_KEY="$R2_SECRET_ACCESS_KEY"
     
     fusermount -u /data 2>/dev/null || true
     s3fs "$R2_BUCKET_NAME" /data \
@@ -25,7 +22,6 @@ if [ -n "$R2_ACCESS_KEY_ID" ] && [ -n "$R2_SECRET_ACCESS_KEY" ] && [ -n "$CF_ACC
         -o use_cache=/tmp/s3fs-cache \
         -o ensure_diskfree=5000 \
         -o parallel_count=8 \
-        -o passwd_file="$PASSWD_FILE" \
         -o dbglevel=info \
         2>&1 || { echo "s3fs mount failed, continuing with local storage"; }
     echo "R2 mount complete"
