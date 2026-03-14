@@ -153,6 +153,10 @@ COPY --chown=node:node docs/reference/templates/HEARTBEAT.md ./HEARTBEAT.md.temp
 COPY --chown=node:node docs/reference/templates/BOOT.md ./BOOT.md.template
 COPY --chown=node:node docs/reference/templates/BOOTSTRAP.md ./BOOTSTRAP.md.template
 
+# Copy entrypoint script for R2 mounting
+COPY --chown=node:node scripts/entrypoint.sh /app/scripts/entrypoint.sh
+RUN chmod +x /app/scripts/entrypoint.sh
+
 # Create symlink for openclaw -> my-farm-adviser to support extensions importing from openclaw/plugin-sdk
 # This allows the branded distribution to maintain compatibility with upstream OpenClaw extensions
 # The package is installed at /app (root), not in node_modules, so symlink points to /app
