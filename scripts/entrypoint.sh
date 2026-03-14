@@ -7,7 +7,8 @@ if [ -n "$R2_ACCESS_KEY_ID" ] && [ -n "$R2_SECRET_ACCESS_KEY" ] && [ -n "$CF_ACC
     echo "Mounting R2 bucket: $R2_BUCKET_NAME"
     mkdir -p /data /tmp/s3fs-cache
     
-    PASSWD_FILE="/root/.passwd-s3fs"
+    PASSWD_FILE="$HOME/.passwd-s3fs"
+    mkdir -p "$HOME"
     touch "$PASSWD_FILE"
     chmod 600 "$PASSWD_FILE"
     echo "$R2_ACCESS_KEY_ID:$R2_SECRET_ACCESS_KEY" > "$PASSWD_FILE"
