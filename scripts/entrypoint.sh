@@ -3,6 +3,12 @@ set -e
 
 echo "Starting OpenClaw Gateway..."
 
+DATA_MODE="${DATA_MODE:-r2}"
+REQUIRE_R2=0
+if [ "$DATA_MODE" != "local" ]; then
+    REQUIRE_R2=1
+fi
+
 if [ -n "$R2_ACCESS_KEY_ID" ] && [ -n "$R2_SECRET_ACCESS_KEY" ] && [ -n "$CF_ACCOUNT_ID" ]; then
     echo "Mounting R2 bucket: $R2_BUCKET_NAME"
     mkdir -p /data /tmp/s3fs-cache
@@ -11,7 +17,7 @@ if [ -n "$R2_ACCESS_KEY_ID" ] && [ -n "$R2_SECRET_ACCESS_KEY" ] && [ -n "$CF_ACC
     export AWS_SECRET_ACCESS_KEY="$R2_SECRET_ACCESS_KEY"
     
     fusermount -u /data 2>/dev/null || true
-    s3fs "$R2_BUCKET_NAME" /data \
+    if ! s3fs "$R2_BUCKET_NAME" /data \
         -o url="https://${CF_ACCOUNT_ID}.r2.cloudflarestorage.com" \
         -o use_path_request_style \
         -o allow_other \
@@ -22,15 +28,30 @@ if [ -n "$R2_ACCESS_KEY_ID" ] && [ -n "$R2_SECRET_ACCESS_KEY" ] && [ -n "$CF_ACC
         -o ensure_diskfree=5000 \
         -o parallel_count=8 \
         -o dbglevel=info \
-        2>&1 || { echo "s3fs mount failed, continuing with local storage"; }
+        2>&1; then
+        echo "s3fs mount failed"
+        if [ "$REQUIRE_R2" -eq 1 ]; then
+            echo "DATA_MODE=$DATA_MODE requires R2; exiting"
+            exit 1
+        fi
+        echo "continuing with local storage"
+    fi
     echo "R2 mount complete"
 else
+    if [ "$REQUIRE_R2" -eq 1 ]; then
+        echo "R2 credentials missing and DATA_MODE=$DATA_MODE requires R2; exiting"
+        exit 1
+    fi
     echo "R2 credentials not set, using local volume"
     mkdir -p /data
 fi
 
 echo "Setting up workspace..."
 if ! mkdir -p /data/workspace/skills /data/workspace/.openclaw; then
+    if [ "$REQUIRE_R2" -eq 1 ]; then
+        echo "Primary data path unavailable and DATA_MODE=$DATA_MODE requires R2; exiting"
+        exit 1
+    fi
     echo "Primary data path unavailable, falling back to local volume"
     fusermount -u /data 2>/dev/null || true
     mkdir -p /data
