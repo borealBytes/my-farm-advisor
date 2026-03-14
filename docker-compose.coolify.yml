@@ -1,126 +1,49 @@
 services:
-  r2-mount:
-    image: alpine/s3fs:latest
-    container_name: r2-mount
-    privileged: true
-    environment:
-      R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID:-}
-      R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY:-}
-      R2_BUCKET_NAME: ${R2_BUCKET_NAME:-openclaw-data}
-      CF_ACCOUNT_ID: ${CF_ACCOUNT_ID:-}
-    volumes:
-      - r2-cache:/cache
-      - r2-data:/data:shared
-    restart: unless-stopped
-    command: >
-      sh -c "
-        echo \"$${R2_ACCESS_KEY_ID}:$${R2_SECRET_ACCESS_KEY}\" > /etc/passwd-s3fs &&
-        chmod 600 /etc/passwd-s3fs &&
-        mkdir -p /cache &&
-        s3fs $${R2_BUCKET_NAME} /data \
-          -o url=https://$${CF_ACCOUNT_ID}.r2.cloudflarestorage.com \
-          -o use_path_request_style \
-          -o allow_other \
-          -o uid=1000,gid=1000 \
-          -o umask=0022 \
-          -o nonempty \
-          -o max_cache_size=10000 \
-          -o cache=/cache \
-          -o use_cache=/cache \
-          -o ensure_diskfree=5000 \
-          -o multipart_size=50 \
-          -o parallel_count=8 \
-          -o dbglevel=info \
-          -o logfile=/var/log/s3fs.log &&
-        tail -f /dev/null
-      "
-    healthcheck:
-      test: ["CMD", "mountpoint", "-q", "/data"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 10s
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-
   openclaw-gateway:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: openclaw-gateway
+      args:
+        OPENCLAW_DOCKER_APT_PACKAGES: "s3fs fuse"
+    privileged: true
+    cap_add:
+      - SYS_ADMIN
+      - DAC_READ_SEARCH
     environment:
-      # System
       HOME: /home/node
       TERM: xterm-256color
       NODE_ENV: production
       TZ: ${TZ:-UTC}
-
-      # Paths
       OPENCLAW_STATE_DIR: /data
       OPENCLAW_WORKSPACE_DIR: /data/workspace
-
-      # Gateway Auth (required)
       OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN:-}
-
-      # AI Providers
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
       NVIDIA_API_KEY: ${NVIDIA_API_KEY:-}
       NVIDIA_BASE_URL: https://integrate.api.nvidia.com/v1
-
-      # Model Configuration
       PRIMARY_MODEL: nvidia/stepfun-ai/step-3.5-flash
       FALLBACK_MODELS: nvidia/qwen/qwen3.5-397b-a17b,nvidia/moonshotai/kimi-k2.5,openrouter/openrouter/free,openrouter/openai/gpt-5.4,openrouter/google/gemini-3.1-flash-lite-preview,openrouter/anthropic/claude-sonnet-4.6
-
-      # Channels
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
       TELEGRAM_ALLOWED_USERS: ${TELEGRAM_ALLOWED_USERS:-}
-
-      # R2 Data Persistence
       R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID:-}
       R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY:-}
       R2_BUCKET_NAME: ${R2_BUCKET_NAME:-openclaw-data}
       CF_ACCOUNT_ID: ${CF_ACCOUNT_ID:-}
       DATA_MODE: ${DATA_MODE:-volume}
-
     volumes:
-      - r2-data:/data:shared
+      - openclaw-data:/data
     ports:
       - "${OPENCLAW_GATEWAY_PORT:-18789}:18789"
       - "${OPENCLAW_BRIDGE_PORT:-18790}:18790"
     init: true
     restart: unless-stopped
-    depends_on:
-      r2-mount:
-        condition: service_healthy
-    command:
-      [
-        "sh",
-        "-lc",
-        "mkdir -p /data/workspace/skills && mkdir -p /data/workspace/.openclaw && for file in SOUL.md USER.md AGENTS.md TOOLS.md; do if [ -f \"/app/$$file\" ] && [ ! -f \"/data/workspace/$$file\" ]; then cp \"/app/$$file\" \"/data/workspace/$$file\"; fi; done && for file in IDENTITY HEARTBEAT BOOT BOOTSTRAP; do template=\"/app/$$file.md.template\"; target=\"/data/workspace/$$file.md\"; if [ -f \"$$template\" ] && [ ! -f \"$$target\" ]; then cp \"$$template\" \"$$target\"; fi; done && rm -rf /data/workspace/skills/* && for name in my-farm-advisor my-farm-breeding-trial-management my-farm-qtl-analysis superior-byte-works-google-timesfm-forecasting superior-byte-works-wrighter; do dir=/app/skills/$$name; if [ -d \"$$dir\" ] && [ -f \"$$dir/SKILL.md\" ]; then cp -R \"$$dir\" /data/workspace/skills/; fi; done && if [ -d \"/app/skills/k-dense/scientific-skills\" ]; then for dir in /app/skills/k-dense/scientific-skills/*/; do name=$$(basename \"$$dir\"); if [ \"$$name\" != \"offer-k-dense-web\" ] && [ -f \"$$dir/SKILL.md\" ]; then cp -R \"$$dir\" /data/workspace/skills/; fi; done; fi && if [ -d \"/app/skills/antigravity/skills\" ]; then for dir in /app/skills/antigravity/skills/*/; do name=$$(basename \"$$dir\"); if [ \"$$name\" != \"claude-scientific-tools\" ] && [ -f \"$$dir/SKILL.md\" ]; then cp -R \"$$dir\" /data/workspace/skills/; fi; done; fi && exec node dist/index.js gateway --bind ${OPENCLAW_GATEWAY_BIND:-lan} --port 18789 --allow-unconfigured",
-      ]
+    command: ["/app/scripts/entrypoint.sh"]
     healthcheck:
-      test:
-        [
-          "CMD",
-          "node",
-          "-e",
-          "fetch('http://127.0.0.1:18789/healthz').then((r)=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
-        ]
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:18789/healthz').then((r)=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
       interval: 30s
       timeout: 5s
       retries: 5
       start_period: 20s
 
 volumes:
-  r2-data:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /tmp/r2-shared
-  r2-cache:
-    driver: local
+  openclaw-data:

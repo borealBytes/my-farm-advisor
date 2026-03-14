@@ -1,0 +1,76 @@
+#!/bin/bash
+set -e
+
+echo "Starting OpenClaw Gateway..."
+
+if [ -n "$R2_ACCESS_KEY_ID" ] && [ -n "$R2_SECRET_ACCESS_KEY" ] && [ -n "$CF_ACCOUNT_ID" ]; then
+    echo "Mounting R2 bucket: $R2_BUCKET_NAME"
+    mkdir -p /data /tmp/s3fs-cache
+    echo "$R2_ACCESS_KEY_ID:$R2_SECRET_ACCESS_KEY" > /root/.passwd-s3fs
+    chmod 600 /root/.passwd-s3fs
+    fusermount -u /data 2>/dev/null || true
+    s3fs "$R2_BUCKET_NAME" /data \
+        -o url="https://${CF_ACCOUNT_ID}.r2.cloudflarestorage.com" \
+        -o use_path_request_style \
+        -o allow_other \
+        -o uid=1000,gid=1000 \
+        -o umask=0022 \
+        -o nonempty \
+        -o max_cache_size=10000 \
+        -o use_cache=/tmp/s3fs-cache \
+        -o ensure_diskfree=5000 \
+        -o parallel_count=8 \
+        -o dbglevel=info
+    echo "R2 mounted successfully"
+else
+    echo "R2 credentials not set, using local volume"
+fi
+
+echo "Setting up workspace..."
+mkdir -p /data/workspace/skills
+mkdir -p /data/workspace/.openclaw
+
+for file in SOUL.md USER.md AGENTS.md TOOLS.md; do
+    if [ -f "/app/$file" ] && [ ! -f "/data/workspace/$file" ]; then
+        cp "/app/$file" "/data/workspace/$file"
+    fi
+done
+
+for file in IDENTITY HEARTBEAT BOOT BOOTSTRAP; do
+    template="/app/$file.md.template"
+    target="/data/workspace/$file.md"
+    if [ -f "$template" ] && [ ! -f "$target" ]; then
+        cp "$template" "$target"
+    fi
+done
+
+echo "Copying skills to workspace..."
+rm -rf /data/workspace/skills/*
+
+for name in my-farm-advisor my-farm-breeding-trial-management my-farm-qtl-analysis superior-byte-works-google-timesfm-forecasting superior-byte-works-wrighter; do
+    dir=/app/skills/$name
+    if [ -d "$dir" ] && [ -f "$dir/SKILL.md" ]; then
+        cp -R "$dir" /data/workspace/skills/
+    fi
+done
+
+if [ -d "/app/skills/k-dense/scientific-skills" ]; then
+    for dir in /app/skills/k-dense/scientific-skills/*/; do
+        name=$(basename "$dir")
+        if [ "$name" != "offer-k-dense-web" ] && [ -f "$dir/SKILL.md" ]; then
+            cp -R "$dir" /data/workspace/skills/
+        fi
+    done
+fi
+
+if [ -d "/app/skills/antigravity/skills" ]; then
+    for dir in /app/skills/antigravity/skills/*/; do
+        name=$(basename "$dir")
+        if [ "$name" != "claude-scientific-tools" ] && [ -f "$dir/SKILL.md" ]; then
+            cp -R "$dir" /data/workspace/skills/
+        fi
+    done
+fi
+
+echo "Starting gateway..."
+exec node dist/index.js gateway --bind ${OPENCLAW_GATEWAY_BIND:-lan} --port 18789 --allow-unconfigured
