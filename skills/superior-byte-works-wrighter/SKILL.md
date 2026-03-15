@@ -21,6 +21,11 @@ input_schema:
       type: string
       enum: [1, 2, 3]
       description: Which phase to execute (1=mandatory, 2=code/charts, 3=AI visuals)
+    delivery_format:
+      type: string
+      enum: [markdown, telegram, gdocs]
+      default: markdown
+      description: Output format for delivery (markdown=standard, telegram=Telegram HTML with inline images, gdocs=Google Docs)
     context:
       type: object
       description: Additional context for the task
@@ -32,6 +37,23 @@ output_schema:
     content:
       type: string
       description: Generated content
+    delivery_format:
+      type: string
+      enum: [markdown, telegram, gdocs]
+      description: Format used for delivery
+    telegram_messages:
+      type: array
+      items:
+        type: object
+        properties:
+          text:
+            type: string
+          images:
+            type: array
+            items:
+              type: string
+              description: Base64 or path to PNG images for inline display
+      description: Pre-split messages for Telegram delivery
     artifacts:
       type: array
       items:
