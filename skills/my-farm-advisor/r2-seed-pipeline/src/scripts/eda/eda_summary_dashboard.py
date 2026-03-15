@@ -5,7 +5,7 @@
 Creates a multi-panel dashboard combining all key visualizations.
 
 Input:  All data and EDA outputs
-Output: data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports/iowa_summary_dashboard.png
+Output: data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports/iowa_summary_dashboard.png
 """
 
 import os
@@ -24,21 +24,21 @@ def main():
     print("Step 10: Summary Dashboard")
     print("=" * 60)
 
-    os.makedirs("data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports", exist_ok=True)
+    os.makedirs("data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports", exist_ok=True)
 
     # Load data
     fields = gpd.read_file(
-        "data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/boundary/field_boundaries.geojson"
+        "data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/boundary/field_boundaries.geojson"
     )
     soil = pd.read_csv(
-        "data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/tables/iowa_10_fields_soil.csv"
+        "data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/tables/iowa_10_fields_soil.csv"
     )
     weather = pd.read_csv(
-        "data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/tables/iowa_weather_2021_2025.csv",
+        "data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/tables/iowa_weather_2021_2025.csv",
         parse_dates=["date"],
     )
-    cdl_2023 = pd.read_csv("data/moltbot/shared/cdl/derived/tables/iowa_2023_cdl.csv")
-    cdl_2024 = pd.read_csv("data/moltbot/shared/cdl/derived/tables/iowa_2024_cdl.csv")
+    cdl_2023 = pd.read_csv("data/my-farm-advisor/shared/cdl/derived/tables/iowa_2023_cdl.csv")
+    cdl_2024 = pd.read_csv("data/my-farm-advisor/shared/cdl/derived/tables/iowa_2024_cdl.csv")
 
     weather["month"] = weather["date"].dt.month
     weather["year"] = weather["date"].dt.year
@@ -175,13 +175,13 @@ def main():
     ax8.set_xlabel("Count")
 
     plt.savefig(
-        "data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports/iowa_summary_dashboard.png",
+        "data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports/iowa_summary_dashboard.png",
         dpi=150,
         bbox_inches="tight",
     )
     plt.close()
     print(
-        "✓ Saved: data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports/iowa_summary_dashboard.png"
+        "✓ Saved: data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports/iowa_summary_dashboard.png"
     )
 
     print("\n✓ Summary dashboard complete")

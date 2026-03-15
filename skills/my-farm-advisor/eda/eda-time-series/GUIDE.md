@@ -28,10 +28,10 @@ from skills.eda_time_series import EDATimeSeriesSkill
 
 skill = EDATimeSeriesSkill()
 skill.plot_time_series(
-    data_path='data/moltbot/weather.csv',
+    data_path='data/my-farm-advisor/weather.csv',
     date_column='date',
     value_columns=['temperature', 'precipitation'],
-    output_path='data/moltbot/viz/weather_trends.png',
+    output_path='data/my-farm-advisor/viz/weather_trends.png',
     title='Weather Over Time'
 )
 ```
@@ -50,11 +50,11 @@ Calculate moving averages to smooth trends.
 
 ```python
 rolling_avg = skill.calculate_rolling_average(
-    data_path='data/moltbot/weather.csv',
+    data_path='data/my-farm-advisor/weather.csv',
     date_column='date',
     value_column='temperature',
     window=7,  # 7-day rolling average
-    output_path='data/moltbot/analysis/rolling_temp.csv'
+    output_path='data/my-farm-advisor/analysis/rolling_temp.csv'
 )
 ```
 
@@ -76,11 +76,11 @@ Identify unusual values or outliers in time series.
 
 ```python
 anomalies = skill.detect_anomalies(
-    data_path='data/moltbot/weather.csv',
+    data_path='data/my-farm-advisor/weather.csv',
     date_column='date',
     value_column='temperature',
     method='iqr',  # Options: 'iqr', 'zscore', 'rolling'
-    output_path='data/moltbot/analysis/anomalies.csv'
+    output_path='data/my-farm-advisor/analysis/anomalies.csv'
 )
 ```
 
@@ -102,11 +102,11 @@ Compare different time periods (e.g., years, seasons).
 
 ```python
 comparison = skill.compare_periods(
-    data_path='data/moltbot/weather.csv',
+    data_path='data/my-farm-advisor/weather.csv',
     date_column='date',
     value_column='precipitation',
     period_column='year',  # Groups to compare
-    output_path='data/moltbot/analysis/yearly_comparison.csv'
+    output_path='data/my-farm-advisor/analysis/yearly_comparison.csv'
 )
 ```
 
@@ -133,10 +133,10 @@ skill = EDATimeSeriesSkill()
 
 # Plot temperature over growing season
 skill.plot_time_series(
-    data_path='data/moltbot/daily_weather_2023.csv',
+    data_path='data/my-farm-advisor/daily_weather_2023.csv',
     date_column='date',
     value_columns=['temperature', 'temperature_max', 'temperature_min'],
-    output_path='data/moltbot/viz/temperature_trends.png',
+    output_path='data/my-farm-advisor/viz/temperature_trends.png',
     title='Temperature Trends During Growing Season'
 )
 
@@ -153,20 +153,20 @@ skill = EDATimeSeriesSkill()
 # Calculate 7-day and 30-day rolling averages
 for window in [7, 30]:
     rolling = skill.calculate_rolling_average(
-        data_path='data/moltbot/daily_weather.csv',
+        data_path='data/my-farm-advisor/daily_weather.csv',
         date_column='date',
         value_column='precipitation',
         window=window,
-        output_path=f'data/moltbot/analysis/rolling_{window}day_precip.csv'
+        output_path=f'data/my-farm-advisor/analysis/rolling_{window}day_precip.csv'
     )
     print(f"Created {window}-day rolling average")
 
 # Create plot with rolling averages
 skill.plot_time_series(
-    data_path='data/moltbot/analysis/rolling_7day_precip.csv',
+    data_path='data/my-farm-advisor/analysis/rolling_7day_precip.csv',
     date_column='date',
     value_columns=['precipitation', 'rolling_avg'],
-    output_path='data/moltbot/viz/precipitation_with_rolling.png',
+    output_path='data/my-farm-advisor/viz/precipitation_with_rolling.png',
     title='Precipitation with 7-Day Rolling Average'
 )
 ```
@@ -180,11 +180,11 @@ skill = EDATimeSeriesSkill()
 
 # Find unusual weather events
 anomalies = skill.detect_anomalies(
-    data_path='data/moltbot/hourly_weather.csv',
+    data_path='data/my-farm-advisor/hourly_weather.csv',
     date_column='timestamp',
     value_column='temperature',
     method='rolling',
-    output_path='data/moltbot/analysis/temp_anomalies.csv'
+    output_path='data/my-farm-advisor/analysis/temp_anomalies.csv'
 )
 
 print(f"Found {len(anomalies)} temperature anomalies")
@@ -205,11 +205,11 @@ skill = EDATimeSeriesSkill()
 
 # Compare precipitation across years
 comparison = skill.compare_periods(
-    data_path='data/moltbot/weather_2020_2024.csv',
+    data_path='data/my-farm-advisor/weather_2020_2024.csv',
     date_column='date',
     value_column='precipitation',
     period_column='year',
-    output_path='data/moltbot/analysis/yearly_precipitation.csv'
+    output_path='data/my-farm-advisor/analysis/yearly_precipitation.csv'
 )
 
 print("Year-over-Year Precipitation Comparison:")
@@ -228,14 +228,14 @@ from skills.eda_time_series import EDATimeSeriesSkill
 skill = EDATimeSeriesSkill()
 
 # Full growing season analysis
-data_path = 'data/moltbot/growing_season_2023.csv'
+data_path = 'data/my-farm-advisor/growing_season_2023.csv'
 
 # 1. Plot raw time series
 skill.plot_time_series(
     data_path=data_path,
     date_column='date',
     value_columns=['temperature', 'precipitation', 'humidity'],
-    output_path='data/moltbot/viz/growing_season_overview.png',
+    output_path='data/my-farm-advisor/viz/growing_season_overview.png',
     title='Growing Season Conditions 2023'
 )
 
@@ -245,7 +245,7 @@ skill.calculate_rolling_average(
     date_column='date',
     value_column='temperature',
     window=7,
-    output_path='data/moltbot/analysis/temp_rolling.csv'
+    output_path='data/my-farm-advisor/analysis/temp_rolling.csv'
 )
 
 # 3. Detect weather anomalies
@@ -254,7 +254,7 @@ anomalies = skill.detect_anomalies(
     date_column='date',
     value_column='precipitation',
     method='iqr',
-    output_path='data/moltbot/analysis/rainfall_anomalies.csv'
+    output_path='data/my-farm-advisor/analysis/rainfall_anomalies.csv'
 )
 
 print(f"Analysis complete: {len(anomalies)} anomalies detected")

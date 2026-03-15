@@ -20,7 +20,7 @@ from matplotlib.patches import Rectangle
 matplotlib.use("Agg")
 
 _REPO = Path(__file__).resolve().parents[4]
-_LIB = _REPO / "data" / "moltbot" / "scripts" / "lib"
+_LIB = _REPO / "data" / "my-farm-advisor" / "scripts" / "lib"
 
 
 def _ensure_skill_path(skill_name: str) -> Path:
@@ -86,7 +86,7 @@ _DEFAULT_FARM = os.environ.get("AG_FARM_SLUG", "iowa-demo-farm")
 _DEFAULT_FARM_NAME = os.environ.get("AG_FARM_NAME", "Iowa Demo Farm")
 _FIELD_INVENTORY = _REPO / os.environ.get(
     "AG_INVENTORY_CSV",
-    "data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/manifests/field-inventory.csv",
+    "data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/manifests/field-inventory.csv",
 )
 _CDL_PRIMARY = farm_cdl_preferred_full_composition_path(_DEFAULT_GROWER, _DEFAULT_FARM)
 _CDL_FALLBACK = shared_cdl_preferred_full_composition_path()
@@ -131,7 +131,7 @@ def _canonical_field_root(field_slug: str | None) -> Path | None:
     return (
         _REPO
         / "data"
-        / "moltbot"
+        / "my-farm-advisor"
         / "growers"
         / _DEFAULT_GROWER
         / "farms"

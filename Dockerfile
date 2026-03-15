@@ -89,6 +89,7 @@ RUN pnpm canvas:a2ui:bundle || \
      echo "stub" > src/canvas-host/a2ui/.bundle.hash && \
      rm -rf vendor/a2ui apps/shared/OpenClawKit/Tools/CanvasA2UI)
 RUN NODE_OPTIONS=--max-old-space-size=1536 pnpm build:docker:runtime
+RUN node --import tsx scripts/build-skills-manifest.ts
 # Force pnpm for UI build (Bun may fail on ARM/Synology architectures)
 ENV OPENCLAW_PREFER_PNPM=1
 RUN pnpm ui:build
@@ -147,10 +148,12 @@ COPY --from=runtime-assets --chown=node:node /app/openclaw.mjs .
 COPY --from=runtime-assets --chown=node:node /app/extensions ./extensions
 COPY --from=runtime-assets --chown=node:node /app/skills ./skills
 COPY --from=runtime-assets --chown=node:node /app/docs ./docs
+COPY --from=runtime-assets --chown=node:node /app/skills-manifest.json ./skills-manifest.json
 
 # Copy identity/bootstrap files to app root so they're available for workspace initialization
 # Only copy files that exist - the bootstrap script will skip missing ones
 COPY --chown=node:node SOUL.md USER.md AGENTS.md TOOLS.md ./
+COPY --chown=node:node IDENTITY.md ./IDENTITY.md
 COPY --chown=node:node docs/reference/templates/IDENTITY.md ./IDENTITY.md.template
 COPY --chown=node:node docs/reference/templates/HEARTBEAT.md ./HEARTBEAT.md.template
 COPY --chown=node:node docs/reference/templates/BOOT.md ./BOOT.md.template

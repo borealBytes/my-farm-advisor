@@ -38,7 +38,7 @@ REPO_ROOT = Path(__file__).resolve().parents[4]
 COUNTIES_PATH = (
     REPO_ROOT
     / "data"
-    / "moltbot"
+    / "my-farm-advisor"
     / "shared"
     / "geoadmin"
     / "l2_counties"
@@ -67,7 +67,7 @@ def _ensure_counties_layer() -> None:
         return
     cmd = [
         "python",
-        "data/moltbot/scripts/ingest/download_geoadmin.py",
+        "data/my-farm-advisor/scripts/ingest/download_geoadmin.py",
         "--levels",
         "l2_counties",
     ]
@@ -255,7 +255,7 @@ def _merge_with_existing(
 def _run_farm_pipeline(args, boundary_path: Path, inventory_path: Path) -> None:
     cmd = [
         "python",
-        "data/moltbot/scripts/run_farm_pipeline.py",
+        "data/my-farm-advisor/scripts/run_farm_pipeline.py",
         "--boundaries",
         str(boundary_path.relative_to(REPO_ROOT)),
         "--grower-slug",
@@ -295,7 +295,7 @@ def main() -> None:
         default=None,
         help=(
             "Inventory output path. Defaults to "
-            "data/moltbot/growers/<grower>/farms/<farm>/manifests/field-inventory.csv"
+            "data/my-farm-advisor/growers/<grower>/farms/<farm>/manifests/field-inventory.csv"
         ),
     )
     parser.add_argument(
@@ -335,7 +335,7 @@ def main() -> None:
     default_inventory = (
         REPO_ROOT
         / "data"
-        / "moltbot"
+        / "my-farm-advisor"
         / "growers"
         / args.grower_slug
         / "farms"

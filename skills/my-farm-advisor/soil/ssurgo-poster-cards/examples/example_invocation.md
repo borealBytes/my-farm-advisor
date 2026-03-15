@@ -11,11 +11,11 @@ Use dominant components only, max 6 profiles.
 
 ```bash
 # Basic usage with defaults
-python scripts/build_ssurgo_poster_cards.py --db data/moltbot/raw/ssurgo.sqlite
+python scripts/build_ssurgo_poster_cards.py --db data/my-farm-advisor/raw/ssurgo.sqlite
 
 # With all options
 python scripts/build_ssurgo_poster_cards.py \
-  --db data/moltbot/raw/ssurgo.sqlite \
+  --db data/my-farm-advisor/raw/ssurgo.sqlite \
   --out outputs/cards \
   --dominant-only \
   --max-profiles 6 \

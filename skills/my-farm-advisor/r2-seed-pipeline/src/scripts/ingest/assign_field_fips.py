@@ -29,7 +29,7 @@ def parse_args() -> argparse.Namespace:
         "--inventory-path",
         type=Path,
         default=Path(
-            "data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/manifests/field-inventory.csv"
+            "data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/manifests/field-inventory.csv"
         ),
         help="Optional inventory CSV used to map field IDs to canonical field slugs",
     )

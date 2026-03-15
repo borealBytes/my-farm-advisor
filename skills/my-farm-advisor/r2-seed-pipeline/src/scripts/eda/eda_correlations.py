@@ -4,12 +4,12 @@
 
 Creates correlation matrix and XY plots for soil properties.
 
-Input:  data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/boundary/field_boundaries.geojson
-data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/tables/iowa_10_fields_soil.csv
-data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/tables/iowa_weather_2021_2025.csv
-Output: data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/summaries/iowa_correlation_matrix.csv
-data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports/iowa_correlation_heatmap.png
-data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports/iowa_xy_plots.png
+Input:  data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/boundary/field_boundaries.geojson
+data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/tables/iowa_10_fields_soil.csv
+data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/tables/iowa_weather_2021_2025.csv
+Output: data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/summaries/iowa_correlation_matrix.csv
+data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports/iowa_correlation_heatmap.png
+data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports/iowa_xy_plots.png
 """
 
 import os
@@ -28,19 +28,19 @@ def main():
     print("Step 8: Correlation Analysis")
     print("=" * 60)
 
-    os.makedirs("data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports", exist_ok=True)
+    os.makedirs("data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports", exist_ok=True)
     os.makedirs(
-        "data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/summaries", exist_ok=True
+        "data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/summaries", exist_ok=True
     )
 
     fields = gpd.read_file(
-        "data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/boundary/field_boundaries.geojson"
+        "data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/boundary/field_boundaries.geojson"
     )
     soil = pd.read_csv(
-        "data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/tables/iowa_10_fields_soil.csv"
+        "data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/tables/iowa_10_fields_soil.csv"
     )
     weather = pd.read_csv(
-        "data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/tables/iowa_weather_2021_2025.csv",
+        "data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/tables/iowa_weather_2021_2025.csv",
         parse_dates=["date"],
     )
 
@@ -105,21 +105,21 @@ def main():
 
     plt.tight_layout()
     plt.savefig(
-        "data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports/iowa_correlation_heatmap.png",
+        "data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports/iowa_correlation_heatmap.png",
         dpi=150,
         bbox_inches="tight",
     )
     plt.close()
     print(
-        "✓ Saved: data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports/iowa_correlation_heatmap.png"
+        "✓ Saved: data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports/iowa_correlation_heatmap.png"
     )
 
     # Save correlation matrix
     corr_matrix.to_csv(
-        "data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/summaries/iowa_correlation_matrix.csv"
+        "data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/summaries/iowa_correlation_matrix.csv"
     )
     print(
-        "✓ Saved: data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/summaries/iowa_correlation_matrix.csv"
+        "✓ Saved: data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/summaries/iowa_correlation_matrix.csv"
     )
 
     # ===============================
@@ -182,13 +182,13 @@ def main():
     plt.suptitle("XY Plots: Soil & Weather Relationships", fontsize=14, fontweight="bold", y=1.02)
     plt.tight_layout()
     plt.savefig(
-        "data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports/iowa_xy_plots.png",
+        "data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports/iowa_xy_plots.png",
         dpi=150,
         bbox_inches="tight",
     )
     plt.close()
     print(
-        "✓ Saved: data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports/iowa_xy_plots.png"
+        "✓ Saved: data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports/iowa_xy_plots.png"
     )
 
     print("\n✓ Correlation analysis complete")

@@ -122,7 +122,7 @@ def main() -> int:
             [geoadmin_output],
             [
                 sys.executable,
-                "data/moltbot/scripts/ingest/download_geoadmin.py",
+                "data/my-farm-advisor/scripts/ingest/download_geoadmin.py",
                 "--levels",
                 "l0_countries",
                 "l1_states",
@@ -132,7 +132,7 @@ def main() -> int:
         (
             "field-fips",
             [field_fips_output],
-            [sys.executable, "data/moltbot/scripts/ingest/assign_field_fips.py"],
+            [sys.executable, "data/my-farm-advisor/scripts/ingest/assign_field_fips.py"],
         ),
         (
             "county-weather",
@@ -142,7 +142,7 @@ def main() -> int:
             ],
             [
                 sys.executable,
-                "data/moltbot/scripts/ingest/aggregate_weather_by_fips.py",
+                "data/my-farm-advisor/scripts/ingest/aggregate_weather_by_fips.py",
                 "--year",
                 str(args.year),
                 "--weather-source",
@@ -160,11 +160,11 @@ def main() -> int:
             [
                 Path(output_index["corn_gdd"]),
                 _REPO_ROOT
-                / f"data/moltbot/shared/corn_maturity/metadata/moltbot/gdd_by_fips_{args.year}.json",
+                / f"data/my-farm-advisor/shared/corn_maturity/metadata/my-farm-advisor/gdd_by_fips_{args.year}.json",
             ],
             [
                 sys.executable,
-                "data/moltbot/scripts/ingest/calculate_gdd_by_fips.py",
+                "data/my-farm-advisor/scripts/ingest/calculate_gdd_by_fips.py",
                 "--year",
                 str(args.year),
                 "--weather-source",
@@ -177,11 +177,11 @@ def main() -> int:
                 Path(output_index["corn_rm"]),
                 Path(output_index["corn_rm_csv"]),
                 _REPO_ROOT
-                / f"data/moltbot/shared/corn_maturity/metadata/moltbot/rm_by_fips_{args.year}.json",
+                / f"data/my-farm-advisor/shared/corn_maturity/metadata/my-farm-advisor/rm_by_fips_{args.year}.json",
             ],
             [
                 sys.executable,
-                "data/moltbot/scripts/ingest/calculate_corn_rm_by_fips.py",
+                "data/my-farm-advisor/scripts/ingest/calculate_corn_rm_by_fips.py",
                 "--year",
                 str(args.year),
             ],
@@ -192,11 +192,11 @@ def main() -> int:
                 Path(output_index["soybean_mg"]),
                 Path(output_index["soybean_mg_csv"]),
                 _REPO_ROOT
-                / f"data/moltbot/shared/soybean_maturity/metadata/moltbot/mg_by_fips_{args.year}.json",
+                / f"data/my-farm-advisor/shared/soybean_maturity/metadata/my-farm-advisor/mg_by_fips_{args.year}.json",
             ],
             [
                 sys.executable,
-                "data/moltbot/scripts/ingest/calculate_soybean_mg_by_fips.py",
+                "data/my-farm-advisor/scripts/ingest/calculate_soybean_mg_by_fips.py",
                 "--year",
                 str(args.year),
             ],
@@ -209,7 +209,7 @@ def main() -> int:
             ],
             [
                 sys.executable,
-                "data/moltbot/scripts/reporting/generate_maturity_maps.py",
+                "data/my-farm-advisor/scripts/reporting/generate_maturity_maps.py",
                 "--year",
                 str(args.year),
             ],

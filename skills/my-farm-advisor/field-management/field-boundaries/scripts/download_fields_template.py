@@ -12,8 +12,8 @@ Usage:
     python download_fields_template.py
 
 Output:
-    - ../data/moltbot/fields_{region}_{date}.geojson
-    - ../data/moltbot/fields_{region}_{date}.parquet
+    - ../data/my-farm-advisor/fields_{region}_{date}.geojson
+    - ../data/my-farm-advisor/fields_{region}_{date}.parquet
 """
 
 import sys

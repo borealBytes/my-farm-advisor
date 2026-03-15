@@ -157,7 +157,7 @@ if scenes:
     # Sort by cloud cover, pick clearest
     best = sorted(scenes, key=lambda s: s['cloud_cover'])[0]
     print(f"Downloading: {best['display_id']} (cloud: {best['cloud_cover']}%)")
-    ee.download(best['entity_id'], output_dir='data/moltbot/landsat/')
+    ee.download(best['entity_id'], output_dir='data/my-farm-advisor/landsat/')
 
 api.logout()
 ee.logout()
@@ -178,7 +178,7 @@ fields = gpd.read_file(
 )
 
 # Path to a downloaded Landsat band (e.g., B4 Red)
-band_path = 'data/moltbot/landsat/LC09_L2SP_029029_20240715_20240716_02_T1_SR_B4.TIF'
+band_path = 'data/my-farm-advisor/landsat/LC09_L2SP_029029_20240715_20240716_02_T1_SR_B4.TIF'
 
 for idx, field in fields.iterrows():
     field_id = field['field_id']
@@ -197,7 +197,7 @@ for idx, field in fields.iterrows():
         'compress': 'lzw'
     })
 
-    out_path = Path(f'data/moltbot/landsat/clipped_{field_id}_B4_EPSG4326.tif')
+    out_path = Path(f'data/my-farm-advisor/landsat/clipped_{field_id}_B4_EPSG4326.tif')
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
     with rasterio.open(out_path, 'w', **out_meta) as dst:
@@ -247,9 +247,9 @@ def calculate_ndvi(red_path: str, nir_path: str, output_path: str) -> str:
 
 # Usage — after clipping B4 and B5 to a field
 ndvi_path = calculate_ndvi(
-    red_path='data/moltbot/landsat/clipped_271623002471299_B4_EPSG4326.tif',
-    nir_path='data/moltbot/landsat/clipped_271623002471299_B5_EPSG4326.tif',
-    output_path='data/moltbot/landsat/clipped_271623002471299_NDVI_EPSG4326.tif'
+    red_path='data/my-farm-advisor/landsat/clipped_271623002471299_B4_EPSG4326.tif',
+    nir_path='data/my-farm-advisor/landsat/clipped_271623002471299_B5_EPSG4326.tif',
+    output_path='data/my-farm-advisor/landsat/clipped_271623002471299_NDVI_EPSG4326.tif'
 )
 ```
 
@@ -348,7 +348,7 @@ def zonal_stats(raster_path: str, fields_path: str) -> pd.DataFrame:
 
 # Usage
 stats = zonal_stats(
-    'data/moltbot/landsat/clipped_271623002471299_NDVI_EPSG4326.tif',
+    'data/my-farm-advisor/landsat/clipped_271623002471299_NDVI_EPSG4326.tif',
     '.skills/field-boundaries/examples/sample_2_fields.geojson'
 )
 print(stats)

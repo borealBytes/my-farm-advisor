@@ -1,7 +1,0 @@
-field_id,mukey,compname,comppct_r,drainagecl,hzdept_r,hzdepb_r,om_r,ph1to1h2o_r,awc_r,claytotal_r,sandtotal_r,silttotal_r,dbthirdbar_r,cec7_r
-osm-1469813297,1443950,Clime,80,Well drained,0,25,3.0,7.5,0.16,44.0,7.0,49.0,1.36,23.7
-osm-1469813297,1443950,Clime,80,Well drained,25,48,2.0,7.9,0.11,48.0,9.0,43.0,1.34,25.7
-osm-1469813297,1444023,Vernon,85,Well drained,0,20,1.0,7.0,0.14,12.0,68.0,20.0,1.4,6.5
-osm-1469813297,1444023,Vernon,85,Well drained,20,33,1.0,7.9,0.15,30.0,55.0,15.0,1.5,16.0
-osm-1469813297,2478810,Nalim,75,Well drained,0,25,2.0,6.4,0.21,15.0,49.0,36.0,1.58,13.2
-osm-1469813297,2478810,Nalim,75,Well drained,25,37,2.0,6.1,0.16,30.0,39.0,31.0,1.56,24.6

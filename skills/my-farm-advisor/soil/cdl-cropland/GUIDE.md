@@ -76,7 +76,7 @@ state_fips = '29'  # Example only; set this to the farm state FIPS
 cdl_url = (
     f'https://nassgeodata.gmu.edu/nass_data_cache/byfips/CDL_{year}_{state_fips}.tif'
 )
-cdl_path = Path(f'data/moltbot/CDL_{year}_{state_fips}.tif')
+cdl_path = Path(f'data/my-farm-advisor/CDL_{year}_{state_fips}.tif')
 cdl_path.parent.mkdir(parents=True, exist_ok=True)
 
 if not cdl_path.exists():
@@ -124,7 +124,7 @@ for r in results:
 import pandas as pd
 df = pd.DataFrame(results)
 print(df[['field_id', 'year', 'crop_code', 'crop_name', 'dominant_pct']])
-df.to_csv(f'data/moltbot/shared/cdl/derived/tables/cdl_{year}_fields.csv', index=False)
+df.to_csv(f'data/my-farm-advisor/shared/cdl/derived/tables/cdl_{year}_fields.csv', index=False)
 EOF
 ```
 
@@ -191,7 +191,7 @@ from pathlib import Path
 fields = gpd.read_file('.skills/field-boundaries/examples/sample_2_fields.geojson')
 
 year = 2023
-cdl_path = Path(f'data/moltbot/CDL_{year}_27.tif')
+cdl_path = Path(f'data/my-farm-advisor/CDL_{year}_27.tif')
 
 with rasterio.open(cdl_path) as src:
     fields_proj = fields.to_crs(src.crs)
@@ -216,7 +216,7 @@ years = [2020, 2021, 2022, 2023, 2024]
 all_results = []
 
 for year in years:
-    cdl_path = f'data/moltbot/CDL_{year}_27.tif'
+    cdl_path = f'data/my-farm-advisor/CDL_{year}_27.tif'
     # ... extract crops per field (see Quick Start) ...
     # all_results.extend(year_results)
 
@@ -236,7 +236,7 @@ import geopandas as gpd
 from rasterstats import zonal_stats
 
 fields = gpd.read_file('.skills/field-boundaries/examples/sample_2_fields.geojson')
-cdl_path = 'data/moltbot/CDL_2023_27.tif'
+cdl_path = 'data/my-farm-advisor/CDL_2023_27.tif'
 
 # Get pixel counts per crop code within each field
 stats = zonal_stats(

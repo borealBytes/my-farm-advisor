@@ -3,8 +3,8 @@
 run_farm_pipeline.py — Master pipeline entrypoint.
 
 Usage:
-    python data/moltbot/scripts/run_farm_pipeline.py \\
-        --boundaries data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/boundary/field_boundaries.geojson \\
+    python data/my-farm-advisor/scripts/run_farm_pipeline.py \\
+        --boundaries data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/boundary/field_boundaries.geojson \\
         [--farm-name "Iowa Demo Farm"] \\
         [--force]
 
@@ -13,9 +13,9 @@ boundaries GeoJSON file.  Each step is idempotent and will be skipped if
 inputs, code, and config are unchanged since the last run.
 
 Outputs:
-    data/moltbot/growers/.../fields/.../derived/reports/    — one per field
-    data/moltbot/growers/.../derived/reports/               — farm poster, HTML, and Markdown
-    data/moltbot/growers/.../manifests/                     — canonical per-step manifests
+    data/my-farm-advisor/growers/.../fields/.../derived/reports/    — one per field
+    data/my-farm-advisor/growers/.../derived/reports/               — farm poster, HTML, and Markdown
+    data/my-farm-advisor/growers/.../manifests/                     — canonical per-step manifests
 """
 
 from __future__ import annotations
@@ -149,7 +149,7 @@ def main() -> None:
     parser.add_argument("--farm-slug", default="iowa-demo-farm")
     parser.add_argument(
         "--inventory-csv",
-        default="data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/manifests/field-inventory.csv",
+        default="data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/manifests/field-inventory.csv",
         help="Path to field inventory CSV with field_id,field_slug",
     )
     parser.add_argument(

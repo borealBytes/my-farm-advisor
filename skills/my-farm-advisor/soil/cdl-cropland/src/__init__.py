@@ -175,7 +175,7 @@ class CDLCroplandSkill:
         Example:
             >>> skill = CDLCroplandSkill()
             >>> cdl = skill.download_for_fields(
-            ...     fields_geojson='data/moltbot/fields.geojson',
+            ...     fields_geojson='data/my-farm-advisor/fields.geojson',
             ...     years=[2020, 2021, 2022, 2023, 2024]
             ... )
         """
