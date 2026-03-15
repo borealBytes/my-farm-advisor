@@ -4,8 +4,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      args:
-        OPENCLAW_DOCKER_APT_PACKAGES: '${OPENCLAW_DOCKER_APT_PACKAGES:-rclone fuse rsync awscli}'
     image: ${OPENCLAW_IMAGE:-openclaw:local}
     privileged: true
     cap_add:
