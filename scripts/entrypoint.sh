@@ -204,6 +204,60 @@ config.agents ??= {};
 config.agents.defaults ??= {};
 config.agents.defaults.workspace ??= '/data/workspace';
 
+config.agents.list ??= [];
+
+const ensureAgent = (id, baseConfig) => {
+  const list = config.agents.list ?? [];
+  const index = list.findIndex(entry => entry && typeof entry === 'object' && entry.id === id);
+  const normalizeIdentity = (defaults, existing) => {
+    const merged = { ...(defaults ?? {}), ...(existing ?? {}) };
+    const keys = Object.keys(merged);
+    if (keys.length === 0) {
+      return undefined;
+    }
+    return merged;
+  };
+
+  if (index === -1) {
+    const created = {
+      ...baseConfig,
+      identity: normalizeIdentity(baseConfig.identity, undefined),
+    };
+    config.agents.list.push(created);
+    return created;
+  }
+
+  const existing = list[index] ?? {};
+  const merged = {
+    ...baseConfig,
+    ...existing,
+  };
+  merged.workspace = existing.workspace ?? baseConfig.workspace;
+  merged.name = existing.name ?? baseConfig.name;
+  merged.default = existing.default ?? baseConfig.default;
+  merged.identity = normalizeIdentity(baseConfig.identity, existing.identity);
+  merged.model = existing.model ?? baseConfig.model;
+  config.agents.list[index] = merged;
+  return merged;
+};
+
+ensureAgent('main', {
+  id: 'main',
+  default: true,
+  name: 'Field Operations Agent',
+  workspace: '/data/workspace',
+});
+
+ensureAgent('data-pipeline', {
+  id: 'data-pipeline',
+  name: 'Data Pipeline Agent',
+  workspace: '/data/workspace-data-pipeline',
+  identity: {
+    name: 'My Farm Advisor – Data Pipeline Agent',
+    emoji: '🔄',
+  },
+});
+
 const primaryModel = process.env.PRIMARY_MODEL?.trim();
 const fallbackModels = process.env.FALLBACK_MODELS?.trim();
 const allModels = [];
@@ -317,8 +371,9 @@ if (primaryModel) {
 }
 
 if (Array.isArray(config.agents?.list) && primaryModel) {
+  const TARGET_AGENT_IDS = new Set(['main', 'data-pipeline']);
   config.agents.list = config.agents.list.map(entry => {
-    if (entry && typeof entry === 'object' && entry.id === 'main') {
+    if (entry && typeof entry === 'object' && TARGET_AGENT_IDS.has(entry.id)) {
       return { ...entry, model: primaryModel };
     }
     return entry;
@@ -328,11 +383,22 @@ if (Array.isArray(config.agents?.list) && primaryModel) {
 fs.writeFileSync(configPath, `${JSON.stringify(config, null, 2)}\n`);
 EOF
 
-for file in SOUL.md USER.md AGENTS.md TOOLS.md IDENTITY.md; do
+for file in SOUL.md USER.md AGENTS.md TOOLS.md IDENTITY.md IDENTITY.data-pipeline.md; do
     if [ -f "/app/$file" ] && [ ! -e "/data/workspace/$file" ]; then
         cp "/app/$file" "/data/workspace/$file"
     fi
 done
+
+PIPELINE_WORKSPACE="/data/workspace-data-pipeline"
+mkdir -p "$PIPELINE_WORKSPACE"
+for file in SOUL.md USER.md AGENTS.md TOOLS.md; do
+    if [ -f "/app/$file" ] && [ ! -e "$PIPELINE_WORKSPACE/$file" ]; then
+        cp "/app/$file" "$PIPELINE_WORKSPACE/$file"
+    fi
+done
+if [ -f "/app/IDENTITY.data-pipeline.md" ] && [ ! -e "$PIPELINE_WORKSPACE/IDENTITY.md" ]; then
+    cp "/app/IDENTITY.data-pipeline.md" "$PIPELINE_WORKSPACE/IDENTITY.md"
+fi
 
 for file in IDENTITY HEARTBEAT BOOT BOOTSTRAP; do
     template="/app/$file.md.template"

@@ -31,6 +31,15 @@ My Farm Adviser assumes multiple roles may use the same system:
 
 The guiding rule is simple: one field-level source of truth, many ways to summarize it.
 
+## Agents
+
+My Farm Adviser runs two personas that share the same soul, user, and tool context:
+
+- **Field Operations Agent** (`IDENTITY.md`, workspace `/data/workspace`) — focuses on day-of field work, scouting, and application plans.
+- **Data Pipeline Agent** (`IDENTITY.data-pipeline.md`, workspace `/data/workspace-data-pipeline`) — maintains ingestion jobs, validations, and lineage so every recommendation remains reproducible.
+
+Both agents follow the evidence-first, test-before-scaling practices defined in `SOUL.md` and coordinate via the shared `AGENTS.md` guide.
+
 ## Farm Skills Included
 
 The active custom layer currently keeps these skills:

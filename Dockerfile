@@ -154,6 +154,7 @@ COPY --from=runtime-assets --chown=node:node /app/skills-manifest.json ./skills-
 # Only copy files that exist - the bootstrap script will skip missing ones
 COPY --chown=node:node SOUL.md USER.md AGENTS.md TOOLS.md ./
 COPY --chown=node:node IDENTITY.md ./IDENTITY.md
+COPY --chown=node:node IDENTITY.data-pipeline.md ./IDENTITY.data-pipeline.md
 COPY --chown=node:node docs/reference/templates/IDENTITY.md ./IDENTITY.md.template
 COPY --chown=node:node docs/reference/templates/HEARTBEAT.md ./HEARTBEAT.md.template
 COPY --chown=node:node docs/reference/templates/BOOT.md ./BOOT.md.template

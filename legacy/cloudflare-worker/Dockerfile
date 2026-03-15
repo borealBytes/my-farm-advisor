@@ -44,6 +44,7 @@ COPY SOUL.md /root/.openclaw/workspace/SOUL.md
 COPY AGENTS.md /root/.openclaw/workspace/AGENTS.md
 COPY USER.md /root/.openclaw/workspace/USER.md
 COPY IDENTITY.md /root/.openclaw/workspace/IDENTITY.md
+COPY IDENTITY.data-pipeline.md /root/.openclaw/workspace/IDENTITY.data-pipeline.md
 
 # Copy custom skills to OpenClaw's skills directory
 # OpenClaw looks for skills in /usr/local/lib/node_modules/openclaw/skills/
