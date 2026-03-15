@@ -35,6 +35,7 @@ export interface TelegramPhotoMessage extends BaseTelegramMessage {
   height?: number;
   sizeBytes?: number;
   role?: "mermaid" | "math" | "image" | "table";
+  mimeType?: string;
 }
 
 export interface TelegramDocumentMessage extends BaseTelegramMessage {

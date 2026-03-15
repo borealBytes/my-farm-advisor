@@ -178,6 +178,7 @@ export async function buildTelegramDelivery(
             captionLength: processed.caption ? plainTextLength(processed.caption) : undefined,
             sizeBytes: asset.sizeBytes,
             role: "mermaid",
+            mimeType: "image/png",
           });
         } else {
           pushText(renderCodeBlock(codeNode));
@@ -207,6 +208,7 @@ export async function buildTelegramDelivery(
           captionLength: processed.caption ? plainTextLength(processed.caption) : undefined,
           sizeBytes: asset.sizeBytes,
           role: "math",
+          mimeType: "image/png",
         });
         break;
       }

@@ -1,5 +1,9 @@
 declare module "unified" {
-  export function unified(): any;
+  interface Processor {
+    use: (...args: any[]) => Processor;
+    process: (value: any) => Promise<any>;
+  }
+  export function unified(): Processor;
 }
 
 declare module "remark-parse" {
