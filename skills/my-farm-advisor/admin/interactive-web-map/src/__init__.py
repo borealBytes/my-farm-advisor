@@ -22,9 +22,9 @@ class InteractiveWebMapSkill:
     Example:
         >>> skill = InteractiveWebMapSkill()
         >>> map_path = skill.create_map(
-        ...     fields_geojson='data/moltbot/fields_EPSG4326.geojson',
-        ...     soil_csv='data/moltbot/soil_EPSG4326.csv',
-        ...     output_path='data/moltbot/map.html'
+        ...     fields_geojson='data/my-farm-advisor/fields_EPSG4326.geojson',
+        ...     soil_csv='data/my-farm-advisor/soil_EPSG4326.csv',
+        ...     output_path='data/my-farm-advisor/map.html'
         ... )
     """
 

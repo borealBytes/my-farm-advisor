@@ -8,13 +8,13 @@ import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
-DATA_ROOT = REPO_ROOT / "data" / "moltbot"
+DATA_ROOT = REPO_ROOT / "data" / "my-farm-advisor"
 DEFAULT_GROWER = os.environ.get("AG_GROWER_SLUG", "iowa-demo-grower")
 DEFAULT_FARM = os.environ.get("AG_FARM_SLUG", "iowa-demo-farm")
 DEFAULT_INVENTORY = Path(
     os.environ.get(
         "AG_INVENTORY_CSV",
-        f"data/moltbot/growers/{DEFAULT_GROWER}/farms/{DEFAULT_FARM}/manifests/field-inventory.csv",
+        f"data/my-farm-advisor/growers/{DEFAULT_GROWER}/farms/{DEFAULT_FARM}/manifests/field-inventory.csv",
     )
 )
 

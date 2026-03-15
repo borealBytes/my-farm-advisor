@@ -37,6 +37,6 @@ Compose field boundaries, headlands, soils, weather, crop history, and remote se
 
 ## Output Conventions
 
-- Canonical reporting datasets live under `data/moltbot/growers/<grower>/farms/<farm>/derived/` and `data/moltbot/shared/`
-- Static posters and report outputs live under `data/moltbot/growers/<grower>/farms/<farm>/derived/reports/`
+- Canonical reporting datasets live under `data/my-farm-advisor/growers/<grower>/farms/<farm>/derived/` and `data/my-farm-advisor/shared/`
+- Static posters and report outputs live under `data/my-farm-advisor/growers/<grower>/farms/<farm>/derived/reports/`
 - Self-contained HTML should embed report data so it can be opened without a backing server

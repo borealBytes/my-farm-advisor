@@ -79,5 +79,5 @@ tags: [agriculture, soil, ssurgo, visualization, poster]
 Run:
 
 ```bash
-python scripts/build_ssurgo_poster_cards.py --db data/moltbot/raw/ssurgo.sqlite --out outputs/cards --dominant-only --max-profiles 6
+python scripts/build_ssurgo_poster_cards.py --db data/my-farm-advisor/raw/ssurgo.sqlite --out outputs/cards --dominant-only --max-profiles 6
 ```

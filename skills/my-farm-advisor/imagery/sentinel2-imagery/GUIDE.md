@@ -124,7 +124,7 @@ title = df.loc[product_id, 'title']
 cloud = df.loc[product_id].get('cloudcoverpercentage', None)
 
 print(f"Selected: {title} (cloud={cloud}%)")
-download = api.download(product_id, directory_path='data/moltbot/sentinel2')
+download = api.download(product_id, directory_path='data/my-farm-advisor/sentinel2')
 print(f"Saved: {download['path']}")
 PY
 ```
@@ -210,10 +210,10 @@ df = df.sort_values(['cloudcoverpercentage', 'beginposition'])
 product_id = df.index[0]
 title = df.loc[product_id, 'title']
 
-download = api.download(product_id, directory_path='data/moltbot/sentinel2')
+download = api.download(product_id, directory_path='data/my-farm-advisor/sentinel2')
 zip_path = Path(download['path'])
 
-extract_root = Path('data/moltbot/sentinel2/extracted') / zip_path.stem
+extract_root = Path('data/my-farm-advisor/sentinel2/extracted') / zip_path.stem
 extract_root.mkdir(parents=True, exist_ok=True)
 with zipfile.ZipFile(zip_path) as zf:
     zf.extractall(extract_root)
@@ -229,7 +229,7 @@ nir_path = find_band_jp2(safe_dir, 'B08', '10m')
 ndvi_path = write_ndvi(
     red_path,
     nir_path,
-    Path('data/moltbot/sentinel2/ndvi') / f"{title}_NDVI.tif",
+    Path('data/my-farm-advisor/sentinel2/ndvi') / f"{title}_NDVI.tif",
 )
 
 fields = gpd.read_file('../field-boundaries/examples/sample_2_fields.geojson')
@@ -257,7 +257,7 @@ with rasterio.open(ndvi_path) as src:
         })
 
 stats = pd.DataFrame(rows)
-out_csv = Path('data/moltbot/sentinel2/field_ndvi_stats.csv')
+out_csv = Path('data/my-farm-advisor/sentinel2/field_ndvi_stats.csv')
 out_csv.parent.mkdir(parents=True, exist_ok=True)
 stats.to_csv(out_csv, index=False)
 print(f"Wrote: {out_csv}")

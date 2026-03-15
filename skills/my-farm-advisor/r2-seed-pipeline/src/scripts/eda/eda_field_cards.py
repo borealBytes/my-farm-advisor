@@ -5,7 +5,7 @@
 Creates individual poster cards for each field showing comprehensive agronomic data.
 
 Input:  All downloaded data
-Output: data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/fields/.../derived/reports/iowa_field_card_01.png through iowa_field_card_10.png
+Output: data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/fields/.../derived/reports/iowa_field_card_01.png through iowa_field_card_10.png
 """
 
 import os
@@ -24,21 +24,21 @@ def main():
     print("Step 9: Per-Field Poster Cards")
     print("=" * 60)
 
-    os.makedirs("data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports", exist_ok=True)
+    os.makedirs("data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports", exist_ok=True)
 
     # Load all data
     fields = gpd.read_file(
-        "data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/boundary/field_boundaries.geojson"
+        "data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/boundary/field_boundaries.geojson"
     )
     soil = pd.read_csv(
-        "data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/tables/iowa_10_fields_soil.csv"
+        "data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/tables/iowa_10_fields_soil.csv"
     )
     weather = pd.read_csv(
-        "data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/tables/iowa_weather_2021_2025.csv",
+        "data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/tables/iowa_weather_2021_2025.csv",
         parse_dates=["date"],
     )
-    cdl_2023 = pd.read_csv("data/moltbot/shared/cdl/derived/tables/iowa_2023_cdl.csv")
-    cdl_2024 = pd.read_csv("data/moltbot/shared/cdl/derived/tables/iowa_2024_cdl.csv")
+    cdl_2023 = pd.read_csv("data/my-farm-advisor/shared/cdl/derived/tables/iowa_2023_cdl.csv")
+    cdl_2024 = pd.read_csv("data/my-farm-advisor/shared/cdl/derived/tables/iowa_2024_cdl.csv")
 
     # Get dominant soil per field
     dominant_soil = (
@@ -277,7 +277,7 @@ def main():
         # Save card
         card_num = idx + 1
         plt.savefig(
-            f"data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports/iowa_field_card_{card_num:02d}.png",
+            f"data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports/iowa_field_card_{card_num:02d}.png",
             dpi=150,
             bbox_inches="tight",
         )
@@ -286,7 +286,7 @@ def main():
         print(f"✓ Card {card_num}/10: {field['field_id'][-6:]}")
 
     print(
-        "\n✓ All 10 field cards saved to: data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports/"
+        "\n✓ All 10 field cards saved to: data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports/"
     )
 
     return field_data

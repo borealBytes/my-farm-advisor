@@ -5,7 +5,7 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        OPENCLAW_DOCKER_APT_PACKAGES: ${OPENCLAW_DOCKER_APT_PACKAGES:-s3fs fuse}
+        OPENCLAW_DOCKER_APT_PACKAGES: '${OPENCLAW_DOCKER_APT_PACKAGES:-rclone fuse rsync awscli}'
     image: ${OPENCLAW_IMAGE:-openclaw:local}
     privileged: true
     cap_add:
@@ -22,6 +22,7 @@ services:
       OPENCLAW_WORKSPACE_DIR: /data/workspace
       OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN:-}
       OPENCLAW_ALLOW_INSECURE_PRIVATE_WS: ${OPENCLAW_ALLOW_INSECURE_PRIVATE_WS:-}
+      OPENCLAW_BROWSER_CONTROL_BIND: ${OPENCLAW_BROWSER_CONTROL_BIND:-}
       CLAUDE_AI_SESSION_KEY: ${CLAUDE_AI_SESSION_KEY:-}
       CLAUDE_WEB_SESSION_KEY: ${CLAUDE_WEB_SESSION_KEY:-}
       CLAUDE_WEB_COOKIE: ${CLAUDE_WEB_COOKIE:-}
@@ -32,14 +33,16 @@ services:
       PRIMARY_MODEL: ${PRIMARY_MODEL:-nvidia/stepfun-ai/step-3.5-flash}
       FALLBACK_MODELS: ${FALLBACK_MODELS:-nvidia/qwen/qwen3.5-397b-a17b,nvidia/moonshotai/kimi-k2.5,openrouter/openrouter/free,openrouter/openai/gpt-5.4,openrouter/google/gemini-3.1-flash-lite-preview,openrouter/anthropic/claude-sonnet-4.6}
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      TELEGRAM_ACCOUNT_ID: ${TELEGRAM_ACCOUNT_ID:-}
       TELEGRAM_ALLOWED_USERS: ${TELEGRAM_ALLOWED_USERS:-}
+      OPENCLAW_TELEGRAM_GROUP_POLICY: ${OPENCLAW_TELEGRAM_GROUP_POLICY:-}
       R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID:-}
       R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY:-}
       R2_BUCKET_NAME: ${R2_BUCKET_NAME:-my-farm-advisor}
       R2_ENDPOINT: ${R2_ENDPOINT:-}
       CF_ACCOUNT_ID: ${CF_ACCOUNT_ID:-}
       TZ: ${OPENCLAW_TZ:-UTC}
-      DATA_MODE: ${DATA_MODE:-r2}
+      DATA_MODE: ${DATA_MODE:-local}
     volumes:
       - ${DATA_VOLUME_SOURCE:-./data}:/data
       ## Uncomment the lines below to enable sandbox isolation
@@ -53,17 +56,13 @@ services:
     ports:
       - "${OPENCLAW_GATEWAY_PORT:-18789}:18789"
       - "${OPENCLAW_BRIDGE_PORT:-18790}:18790"
+      - "${OPENCLAW_BROWSER_CONTROL_HOST:-127.0.0.1}:${OPENCLAW_BROWSER_CONTROL_PORT:-18791}:18791"
+    network_mode: host
     init: true
     restart: unless-stopped
     command: ["/app/scripts/entrypoint.sh"]
     healthcheck:
-      test:
-        [
-          "CMD",
-          "node",
-          "-e",
-          "fetch('http://127.0.0.1:18789/healthz').then((r)=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
-        ]
+      test: ["CMD-SHELL", "pgrep -f openclaw-gateway >/dev/null"]
       interval: 30s
       timeout: 5s
       retries: 5

@@ -25,8 +25,8 @@ from shapely import wkt
 matplotlib.use("Agg")
 
 _REPO = Path(__file__).resolve().parents[4]
-_SCRIPTS = _REPO / "data" / "moltbot" / "scripts"
-_LIB = _REPO / "data" / "moltbot" / "scripts" / "lib"
+_SCRIPTS = _REPO / "data" / "my-farm-advisor" / "scripts"
+_LIB = _REPO / "data" / "my-farm-advisor" / "scripts" / "lib"
 sys.path.insert(0, str(_SCRIPTS))
 sys.path.insert(0, str(_LIB))
 

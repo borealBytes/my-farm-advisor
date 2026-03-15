@@ -62,7 +62,7 @@ fields = download_fields(
     count=20,
     regions=['corn_belt'],
     crops=['corn', 'soybeans'],
-    output_path='data/moltbot/fields_EPSG4326.geojson'
+    output_path='data/my-farm-advisor/fields_EPSG4326.geojson'
 )
 
 # Get summary
@@ -97,7 +97,7 @@ fields = download_fields(
     count=20,
     regions=['corn_belt'],
     crops=['corn', 'soybeans'],
-    output_path='data/moltbot/my_fields.geojson'
+    output_path='data/my-farm-advisor/my_fields.geojson'
 )
 
 # Get summary
@@ -110,7 +110,7 @@ plot_fields(
     fields,
     title="Sample Corn and Soybean Fields",
     color_by='crop_name',
-    save_path='data/moltbot/fields_map.png'
+    save_path='data/my-farm-advisor/fields_map.png'
 )
 ```
 
@@ -127,8 +127,8 @@ large_fields = filter_by_size(fields, min_acres=100)
 print(f"Large fields: {len(large_fields)}")
 
 # Export in multiple formats
-export_fields(large_fields, 'data/moltbot/large_fields.geojson', 'geojson')
-export_fields(large_fields, 'data/moltbot/large_fields.parquet', 'geoparquet')
+export_fields(large_fields, 'data/my-farm-advisor/large_fields.geojson', 'geojson')
+export_fields(large_fields, 'data/my-farm-advisor/large_fields.parquet', 'geoparquet')
 ```
 
 ## Python API Reference
@@ -199,7 +199,7 @@ Export fields to file.
 ## Composable onboarding notes
 
 - For county-specific onboarding anywhere in the U.S., use the canonical bootstrap script:
-  `python data/moltbot/scripts/ingest/bootstrap_farm_from_county.py --state-fips <SS> --county-name "<County>" ...`
+  `python data/my-farm-advisor/scripts/ingest/bootstrap_farm_from_county.py --state-fips <SS> --county-name "<County>" ...`
 - To add fields to an existing grower/farm, use the same script with `--append` and rerun the pipeline.
 
 ## Output Files
@@ -223,8 +223,8 @@ Always save the Python script that downloads your data:
 """Download field boundaries for my analysis.
 
 Creates:
-- data/moltbot/fields_cornbelt_2024.geojson
-- data/moltbot/fields_cornbelt_2024.parquet
+- data/my-farm-advisor/fields_cornbelt_2024.geojson
+- data/my-farm-advisor/fields_cornbelt_2024.parquet
 """
 
 from field_boundaries import download_fields
@@ -238,19 +238,19 @@ fields = download_fields(
     count=50,
     regions=['corn_belt'],
     crops=['corn', 'soybeans'],
-    output_path='data/moltbot/fields_cornbelt_2024.geojson'
+    output_path='data/my-farm-advisor/fields_cornbelt_2024.geojson'
 )
 
 print(f"Downloaded {len(fields)} fields")
 print(f"Total area: {fields['area_acres'].sum():.1f} acres")
-print(f"Saved to: data/moltbot/fields_cornbelt_2024.geojson")
+print(f"Saved to: data/my-farm-advisor/fields_cornbelt_2024.geojson")
 ```
 
 ### Output Directory Structure
 
 ```
 field-boundaries/
-├── data/moltbot/                           # Gitignored
+├── data/my-farm-advisor/                           # Gitignored
 │   ├── fields_cornbelt_2024.geojson
 │   ├── fields_cornbelt_2024.parquet
 │   └── README.md                   # Document your downloads
@@ -261,7 +261,7 @@ field-boundaries/
 └── GUIDE.md
 ```
 
-### README Template for data/moltbot/
+### README Template for data/my-farm-advisor/
 
 ````markdown
 # Field Boundary Downloads

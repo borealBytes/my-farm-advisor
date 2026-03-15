@@ -5,7 +5,7 @@
 Creates an overview of all downloaded data and saves summary statistics.
 
 Input:  All downloaded data (fields, soil, weather, CDL)
-Output: data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/summaries/iowa_field_summary.csv, summary stats
+Output: data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/summaries/iowa_field_summary.csv, summary stats
 """
 
 import os
@@ -20,22 +20,22 @@ def main():
     print("=" * 60)
 
     os.makedirs(
-        "data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/summaries", exist_ok=True
+        "data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/summaries", exist_ok=True
     )
 
     # Load all data
     fields = gpd.read_file(
-        "data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/boundary/field_boundaries.geojson"
+        "data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/boundary/field_boundaries.geojson"
     )
     soil = pd.read_csv(
-        "data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/tables/iowa_10_fields_soil.csv"
+        "data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/tables/iowa_10_fields_soil.csv"
     )
     weather = pd.read_csv(
-        "data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/tables/iowa_weather_2021_2025.csv",
+        "data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/tables/iowa_weather_2021_2025.csv",
         parse_dates=["date"],
     )
-    cdl_2023 = pd.read_csv("data/moltbot/shared/cdl/derived/tables/iowa_2023_cdl.csv")
-    cdl_2024 = pd.read_csv("data/moltbot/shared/cdl/derived/tables/iowa_2024_cdl.csv")
+    cdl_2023 = pd.read_csv("data/my-farm-advisor/shared/cdl/derived/tables/iowa_2023_cdl.csv")
+    cdl_2024 = pd.read_csv("data/my-farm-advisor/shared/cdl/derived/tables/iowa_2024_cdl.csv")
 
     print("\n=== Data Summary ===")
     print(f"Fields: {len(fields)} Iowa corn belt fields")
@@ -81,11 +81,11 @@ def main():
     )
 
     summary.to_csv(
-        "data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/summaries/iowa_field_summary.csv",
+        "data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/summaries/iowa_field_summary.csv",
         index=False,
     )
     print(
-        "\n✓ Saved: data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/summaries/iowa_field_summary.csv"
+        "\n✓ Saved: data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/summaries/iowa_field_summary.csv"
     )
 
     return summary

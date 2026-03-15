@@ -17,8 +17,8 @@ import pandas as pd
 matplotlib.use("Agg")
 
 _REPO = Path(__file__).resolve().parents[4]
-_SCRIPTS = _REPO / "data" / "moltbot" / "scripts"
-_LIB = _REPO / "data" / "moltbot" / "scripts" / "lib"
+_SCRIPTS = _REPO / "data" / "my-farm-advisor" / "scripts"
+_LIB = _REPO / "data" / "my-farm-advisor" / "scripts" / "lib"
 
 
 def _ensure_skill_path(skill_name: str) -> Path:

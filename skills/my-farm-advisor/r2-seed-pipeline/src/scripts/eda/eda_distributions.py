@@ -4,10 +4,10 @@
 
 Creates histograms, bar charts, and distribution plots for soil and crop data.
 
-Input:  data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/tables/iowa_10_fields_soil.csv
-data/moltbot/shared/cdl/derived/tables/iowa_2023_cdl.csv, data/moltbot/shared/cdl/derived/tables/iowa_2024_cdl.csv
-Output: data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports/iowa_soil_distributions.png
-data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports/iowa_cdl_distributions.png
+Input:  data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/tables/iowa_10_fields_soil.csv
+data/my-farm-advisor/shared/cdl/derived/tables/iowa_2023_cdl.csv, data/my-farm-advisor/shared/cdl/derived/tables/iowa_2024_cdl.csv
+Output: data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports/iowa_soil_distributions.png
+data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports/iowa_cdl_distributions.png
 """
 
 import os
@@ -24,13 +24,13 @@ def main():
     print("Step 7: Distribution Analysis")
     print("=" * 60)
 
-    os.makedirs("data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports", exist_ok=True)
+    os.makedirs("data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports", exist_ok=True)
 
     soil = pd.read_csv(
-        "data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/tables/iowa_10_fields_soil.csv"
+        "data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/tables/iowa_10_fields_soil.csv"
     )
-    cdl_2023 = pd.read_csv("data/moltbot/shared/cdl/derived/tables/iowa_2023_cdl.csv")
-    cdl_2024 = pd.read_csv("data/moltbot/shared/cdl/derived/tables/iowa_2024_cdl.csv")
+    cdl_2023 = pd.read_csv("data/my-farm-advisor/shared/cdl/derived/tables/iowa_2023_cdl.csv")
+    cdl_2024 = pd.read_csv("data/my-farm-advisor/shared/cdl/derived/tables/iowa_2024_cdl.csv")
 
     # ===============================
     # Plot 1: Soil Property Distributions
@@ -109,13 +109,13 @@ def main():
     )
     plt.tight_layout()
     plt.savefig(
-        "data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports/iowa_soil_distributions.png",
+        "data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports/iowa_soil_distributions.png",
         dpi=150,
         bbox_inches="tight",
     )
     plt.close()
     print(
-        "✓ Saved: data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports/iowa_soil_distributions.png"
+        "✓ Saved: data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports/iowa_soil_distributions.png"
     )
 
     # ===============================
@@ -153,13 +153,13 @@ def main():
 
     plt.tight_layout()
     plt.savefig(
-        "data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports/iowa_cdl_distributions.png",
+        "data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports/iowa_cdl_distributions.png",
         dpi=150,
         bbox_inches="tight",
     )
     plt.close()
     print(
-        "✓ Saved: data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports/iowa_cdl_distributions.png"
+        "✓ Saved: data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports/iowa_cdl_distributions.png"
     )
 
     print("\n✓ Distribution analysis complete")

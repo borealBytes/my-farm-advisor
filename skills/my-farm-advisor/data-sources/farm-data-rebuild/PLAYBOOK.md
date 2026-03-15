@@ -10,7 +10,7 @@ tags: [agriculture, pipeline, rebuild, deterministic, data-tree]
 
 ## Use this skill when
 
-- You want one command/skill to recreate `data/moltbot/` from scratch.
+- You want one command/skill to recreate `data/my-farm-advisor/` from scratch.
 - You have any field-boundary GeoJSON input and need canonical outputs.
 - You want deterministic field slug ordering and canonical folder layout.
 
@@ -25,7 +25,7 @@ tags: [agriculture, pipeline, rebuild, deterministic, data-tree]
 
 ### County bootstrap companion
 
-Use `data/moltbot/scripts/ingest/bootstrap_farm_from_county.py` to create or append
+Use `data/my-farm-advisor/scripts/ingest/bootstrap_farm_from_county.py` to create or append
 field boundaries and inventory mappings for any U.S. county before running
 this rebuild skill.
 
@@ -50,6 +50,6 @@ python scripts/rebuild_data_folder.py --boundaries path/to/fields.geojson
 ## Output guarantee
 
 - Canonical outputs are verified under:
-  - `data/moltbot/scripts/`
-  - `data/moltbot/shared/`
-  - `data/moltbot/growers/<grower_slug>/farms/<farm_slug>/fields/<field_slug>/...`
+  - `data/my-farm-advisor/scripts/`
+  - `data/my-farm-advisor/shared/`
+  - `data/my-farm-advisor/growers/<grower_slug>/farms/<farm_slug>/fields/<field_slug>/...`

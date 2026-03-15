@@ -76,7 +76,7 @@ class FieldBoundariesSkill:
             ...     count=50,  # Small for local machine
             ...     regions=['corn_belt'],
             ...     crops=['corn', 'soybeans'],
-            ...     output_path='data/moltbot/fields_EPSG4326.geojson'
+            ...     output_path='data/my-farm-advisor/fields_EPSG4326.geojson'
             ... )
         """
         fields = self.downloader.download(
@@ -214,7 +214,7 @@ class FieldBoundariesSkill:
             >>> skill = FieldBoundariesSkill()
             >>> fields = skill.download(count=50)
             >>> # CRS automatically included in filename
-            >>> skill.export(fields, 'data/moltbot/fields_EPSG4326.geojson')
+            >>> skill.export(fields, 'data/my-farm-advisor/fields_EPSG4326.geojson')
         """
         # Get CRS info for filename
         crs = fields.crs.to_string() if fields.crs else "EPSG4326"

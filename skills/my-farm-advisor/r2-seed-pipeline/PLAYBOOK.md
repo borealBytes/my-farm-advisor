@@ -10,7 +10,7 @@
 
 Keep this skill tiny and operational:
 
-- Seed baseline files from this skill’s `src/` into live storage at `data/moltbot/`
+- Seed baseline files from this skill’s `src/` into live storage at `data/my-farm-advisor/`
 - Preserve live data across reboot/redeploy
 - Use simple, auditable `rsync` commands only
 
@@ -21,11 +21,11 @@ Live data always wins unless you explicitly run the upgrade command.
 ## Paths
 
 - **Seed source (repo):** `skills/my-farm-advisor/r2-seed-pipeline/src/`
-- **Live destination (mounted R2 in runtime):** `/data/moltbot/`
-- **Live destination (local dev checkout):** `data/moltbot/`
+- **Live destination (mounted R2 in runtime):** `/data/my-farm-advisor/`
+- **Live destination (local dev checkout):** `data/my-farm-advisor/`
 
-> Use `/data/moltbot/` in Cloudflare runtime.
-> Use `data/moltbot/` locally.
+> Use `/data/my-farm-advisor/` in Cloudflare runtime.
+> Use `data/my-farm-advisor/` locally.
 
 ---
 
@@ -36,7 +36,7 @@ Live data always wins unless you explicitly run the upgrade command.
 ```bash
 rsync -r --no-times --ignore-existing \
   "skills/my-farm-advisor/r2-seed-pipeline/src/" \
-  "/data/moltbot/"
+  "/data/my-farm-advisor/"
 ```
 
 Behavior:
@@ -50,7 +50,7 @@ Behavior:
 ```bash
 rsync -r --no-times --checksum \
   "skills/my-farm-advisor/r2-seed-pipeline/src/" \
-  "/data/moltbot/"
+  "/data/my-farm-advisor/"
 ```
 
 Behavior:
@@ -72,7 +72,7 @@ Behavior:
 
 ## Minimal layout expectation
 
-`src/` should mirror canonical runtime shape under `data/moltbot/`, e.g.:
+`src/` should mirror canonical runtime shape under `data/my-farm-advisor/`, e.g.:
 
 ```text
 src/

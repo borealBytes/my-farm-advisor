@@ -13,7 +13,7 @@ This skill builds poster-ready soil profile cards from SSURGO horizon data store
 
 ```bash
 python scripts/build_ssurgo_poster_cards.py \
-  --db data/moltbot/raw/ssurgo.sqlite \
+  --db data/my-farm-advisor/raw/ssurgo.sqlite \
   --out outputs/cards \
   --dominant-only \
   --max-profiles 6

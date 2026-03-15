@@ -3,8 +3,8 @@
   "source_name": "natural-earth",
   "source_url": "https://naciscdn.org/naturalearth/10m/cultural/ne_10m_admin_0_countries.zip",
   "archive_name": "ne_10m_admin_0_countries.zip",
-  "output_geojson": "data/moltbot/shared/geoadmin/l0_countries/countries.geojson",
-  "output_parquet": "data/moltbot/shared/geoadmin/l0_countries/countries.parquet",
+  "output_geojson": "data/my-farm-advisor/shared/geoadmin/l0_countries/countries.geojson",
+  "output_parquet": "data/my-farm-advisor/shared/geoadmin/l0_countries/countries.parquet",
   "vintage": "natural-earth-10m",
   "feature_count": 258,
   "columns": [

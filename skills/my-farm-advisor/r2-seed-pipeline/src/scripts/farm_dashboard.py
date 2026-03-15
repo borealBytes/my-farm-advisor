@@ -32,7 +32,7 @@ from paths import farm_boundary_path, shared_cdl_raster_dir
 COUNTIES_PATH = (
     REPO_ROOT
     / "data"
-    / "moltbot"
+    / "my-farm-advisor"
     / "shared"
     / "geoadmin"
     / "l2_counties"
@@ -52,7 +52,7 @@ def _ensure_counties() -> None:
     _run(
         [
             "python",
-            "data/moltbot/scripts/ingest/download_geoadmin.py",
+            "data/my-farm-advisor/scripts/ingest/download_geoadmin.py",
             "--levels",
             "l2_counties",
         ]
@@ -197,7 +197,7 @@ def _inventory_path_for_farm(farm_slug: str) -> Path:
     return (
         REPO_ROOT
         / "data"
-        / "moltbot"
+        / "my-farm-advisor"
         / "growers"
         / grower_slug
         / "farms"
@@ -222,7 +222,7 @@ def _run_bootstrap_for_counties(
     for idx, county in enumerate(counties):
         cmd = [
             "python",
-            "data/moltbot/scripts/ingest/bootstrap_farm_from_county.py",
+            "data/my-farm-advisor/scripts/ingest/bootstrap_farm_from_county.py",
             "--state-fips",
             county["state_fips"],
             "--county-name",
@@ -257,7 +257,7 @@ def _run_pipeline_for_farm(
 ) -> None:
     cmd = [
         "python",
-        "data/moltbot/scripts/run_farm_pipeline.py",
+        "data/my-farm-advisor/scripts/run_farm_pipeline.py",
         "--boundaries",
         str(farm_boundary_path(grower_slug, farm_slug).relative_to(REPO_ROOT)),
         "--grower-slug",
@@ -348,7 +348,7 @@ def _ensure_inventory_for_boundary(boundary_path: Path, inventory_path: Path) ->
 def _discover_farms(
     scope: str, grower_slug: str | None, farm_slug: str | None
 ) -> list[dict[str, str]]:
-    growers_root = REPO_ROOT / "data" / "moltbot" / "growers"
+    growers_root = REPO_ROOT / "data" / "my-farm-advisor" / "growers"
     farms: list[dict[str, str]] = []
     for grower_dir in sorted(growers_root.glob("*")):
         if not grower_dir.is_dir():

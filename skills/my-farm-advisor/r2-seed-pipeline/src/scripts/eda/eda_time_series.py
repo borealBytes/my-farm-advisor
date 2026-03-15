@@ -4,10 +4,10 @@
 
 Creates time series visualizations for weather data (temperature, precipitation).
 
-Input:  data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/tables/iowa_weather_2021_2025.csv
-Output: data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports/iowa_weather_timeseries.png
-data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports/iowa_monthly_precip.png
-data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports/iowa_gdd_analysis.png
+Input:  data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/tables/iowa_weather_2021_2025.csv
+Output: data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports/iowa_weather_timeseries.png
+data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports/iowa_monthly_precip.png
+data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports/iowa_gdd_analysis.png
 """
 
 import os
@@ -26,10 +26,10 @@ def main():
     print("Step 6: Time Series Analysis")
     print("=" * 60)
 
-    os.makedirs("data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports", exist_ok=True)
+    os.makedirs("data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports", exist_ok=True)
 
     weather = pd.read_csv(
-        "data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/tables/iowa_weather_2021_2025.csv",
+        "data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/tables/iowa_weather_2021_2025.csv",
         parse_dates=["date"],
     )
     weather = weather.sort_values("date")
@@ -84,13 +84,13 @@ def main():
 
     plt.tight_layout()
     plt.savefig(
-        "data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports/iowa_weather_timeseries.png",
+        "data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports/iowa_weather_timeseries.png",
         dpi=150,
         bbox_inches="tight",
     )
     plt.close()
     print(
-        "✓ Saved: data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports/iowa_weather_timeseries.png"
+        "✓ Saved: data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports/iowa_weather_timeseries.png"
     )
 
     # ===============================
@@ -133,13 +133,13 @@ def main():
 
     plt.tight_layout()
     plt.savefig(
-        "data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports/iowa_monthly_precip.png",
+        "data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports/iowa_monthly_precip.png",
         dpi=150,
         bbox_inches="tight",
     )
     plt.close()
     print(
-        "✓ Saved: data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports/iowa_monthly_precip.png"
+        "✓ Saved: data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports/iowa_monthly_precip.png"
     )
 
     # ===============================
@@ -194,13 +194,13 @@ def main():
 
     plt.tight_layout()
     plt.savefig(
-        "data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports/iowa_gdd_analysis.png",
+        "data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports/iowa_gdd_analysis.png",
         dpi=150,
         bbox_inches="tight",
     )
     plt.close()
     print(
-        "✓ Saved: data/moltbot/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports/iowa_gdd_analysis.png"
+        "✓ Saved: data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/derived/reports/iowa_gdd_analysis.png"
     )
 
     print("\n✓ Time series analysis complete")
