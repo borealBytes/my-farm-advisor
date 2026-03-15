@@ -13,8 +13,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      args:
-        OPENCLAW_DOCKER_APT_PACKAGES: 'rclone fuse rsync awscli'
     privileged: true
     cap_add:
       - SYS_ADMIN
