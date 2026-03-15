@@ -16,10 +16,13 @@ import {
 } from "./constants.js";
 import { CDP_PORT_RANGE_START, getUsedPorts } from "./profiles.js";
 
+const DEFAULT_BROWSER_CONTROL_BIND_HOST = "127.0.0.1";
+
 export type ResolvedBrowserConfig = {
   enabled: boolean;
   evaluateEnabled: boolean;
   controlPort: number;
+  controlBindHost: string;
   cdpPortRangeStart: number;
   cdpPortRangeEnd: number;
   cdpProtocol: "http" | "https";
@@ -224,6 +227,11 @@ export function resolveBrowserConfig(
     Math.max(2000, remoteCdpTimeoutMs * 2),
   );
 
+  const envControlBindHost = process.env.OPENCLAW_BROWSER_CONTROL_BIND?.trim();
+  const configControlBindHost = cfg?.controlBindHost?.trim();
+  const controlBindHost =
+    envControlBindHost || configControlBindHost || DEFAULT_BROWSER_CONTROL_BIND_HOST;
+
   const derivedCdpRange = deriveDefaultBrowserCdpPortRange(controlPort);
   const cdpRangeSpan = derivedCdpRange.end - derivedCdpRange.start;
   const cdpPortRangeStart = resolveCdpPortRangeStart(
@@ -298,6 +306,7 @@ export function resolveBrowserConfig(
     enabled,
     evaluateEnabled,
     controlPort,
+    controlBindHost,
     cdpPortRangeStart,
     cdpPortRangeEnd,
     cdpProtocol,
