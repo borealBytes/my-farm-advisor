@@ -181,11 +181,35 @@ const fallbackModels = process.env.FALLBACK_MODELS?.trim();
 const allModels = [];
 if (primaryModel) allModels.push(primaryModel);
 if (fallbackModels) {
-  fallbackModels.split(',').map(m => m.trim()).filter(m => m && !allModels.includes(m)).forEach(m => allModels.push(m));
+  fallbackModels
+    .split(',')
+    .map(m => m.trim())
+    .filter(m => m && !allModels.includes(m))
+    .forEach(m => allModels.push(m));
 }
 
 if (allModels.length > 0) {
-  config.models = allModels.map(m => ({ id: m, name: m.split('/').pop() }));
+  config.agents ??= {};
+  config.agents.defaults ??= {};
+  config.agents.defaults.models ??= {};
+  allModels.forEach(m => {
+    const name = m.split('/').pop() ?? m;
+    config.agents.defaults.models[m] ??= { alias: name };
+  });
+}
+
+if (config.models && typeof config.models === 'object') {
+  const providers = config.models.providers;
+  if (providers && typeof providers === 'object') {
+    const providerKeys = Object.keys(providers);
+    const hasInvalidProvider = providerKeys.some(key => {
+      const entry = providers[key];
+      return entry && typeof entry === 'object' && !('baseUrl' in entry);
+    });
+    if (hasInvalidProvider) {
+      delete config.models;
+    }
+  }
 }
 
 if (primaryModel) {
