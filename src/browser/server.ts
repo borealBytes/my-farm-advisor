@@ -61,11 +61,12 @@ export async function startBrowserControlServerFromConfig(): Promise<BrowserServ
   registerBrowserRoutes(app as unknown as BrowserRouteRegistrar, ctx);
 
   const port = resolved.controlPort;
+  const bindHost = resolved.controlBindHost || "127.0.0.1";
   const server = await new Promise<Server>((resolve, reject) => {
-    const s = app.listen(port, "127.0.0.1", () => resolve(s));
+    const s = app.listen(port, bindHost, () => resolve(s));
     s.once("error", reject);
   }).catch((err) => {
-    logServer.error(`openclaw browser server failed to bind 127.0.0.1:${port}: ${String(err)}`);
+    logServer.error(`openclaw browser server failed to bind ${bindHost}:${port}: ${String(err)}`);
     return null;
   });
 
@@ -81,7 +82,7 @@ export async function startBrowserControlServerFromConfig(): Promise<BrowserServ
   });
 
   const authMode = browserAuth.token ? "token" : browserAuth.password ? "password" : "off";
-  logServer.info(`Browser control listening on http://127.0.0.1:${port}/ (auth=${authMode})`);
+  logServer.info(`Browser control listening on http://${bindHost}:${port}/ (auth=${authMode})`);
   return state;
 }
 

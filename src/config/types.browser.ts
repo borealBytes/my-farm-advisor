@@ -34,6 +34,8 @@ export type BrowserConfig = {
   enabled?: boolean;
   /** If false, disable browser act:evaluate (arbitrary JS). Default: true */
   evaluateEnabled?: boolean;
+  /** Bind host for the browser control HTTP server. Default: 127.0.0.1 */
+  controlBindHost?: string;
   /** Base URL of the CDP endpoint (for remote browsers). Default: loopback CDP on the derived port. */
   cdpUrl?: string;
   /** Remote CDP HTTP timeout (ms). Default: 1500. */
