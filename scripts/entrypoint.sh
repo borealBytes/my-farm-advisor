@@ -250,40 +250,46 @@ if (nvidiaApiKey && nvidiaBaseUrl && integrateModels.length > 0) {
   config.models ??= {};
   config.models.mode ??= 'merge';
   config.models.providers ??= {};
-  const providerId = 'nvidia';
-  const providerModels = integrateModels.map(m => {
-    const normalizedId = normalizeIntegrateModelId(m);
+  const modelsByProvider = new Map();
+  for (const rawModelId of integrateModels) {
+    const normalizedId = normalizeIntegrateModelId(rawModelId);
+    const providerId = normalizedId.split('/')[0];
+    if (!modelsByProvider.has(providerId)) {
+      modelsByProvider.set(providerId, []);
+    }
     const name = normalizedId.split('/').pop() ?? normalizedId;
-    return { id: normalizedId, name };
-  });
-  const existingProvider = config.models.providers[providerId] ?? {};
-  const existingModelsArray = Array.isArray(existingProvider.models)
-    ? existingProvider.models.map(model => {
-        const normalizedId = normalizeIntegrateModelId(model?.id ?? '');
-        const name = model?.name ?? normalizedId.split('/').pop() ?? normalizedId;
-        return { ...model, id: normalizedId, name };
-      })
-    : [];
-  const existingModelMap = new Map();
-  for (const model of existingModelsArray) {
-    if (model?.id && !existingModelMap.has(model.id)) {
-      existingModelMap.set(model.id, model);
-    }
+    modelsByProvider.get(providerId).push({ id: normalizedId, name });
   }
-  const mergedModels = Array.from(existingModelMap.values());
-  for (const model of providerModels) {
-    if (!mergedModels.some(existing => existing?.id === model.id)) {
-      mergedModels.push(model);
+
+  for (const [providerId, providerModels] of modelsByProvider.entries()) {
+    const existingProvider = config.models.providers[providerId] ?? {};
+    const existingModelsArray = Array.isArray(existingProvider.models)
+      ? existingProvider.models.map(model => {
+          const normalizedId = normalizeIntegrateModelId(model?.id ?? '');
+          const name = model?.name ?? normalizedId.split('/').pop() ?? normalizedId;
+          return { ...model, id: normalizedId, name };
+        })
+      : [];
+    const existingModelMap = new Map();
+    for (const model of existingModelsArray) {
+      if (model?.id && !existingModelMap.has(model.id)) {
+        existingModelMap.set(model.id, model);
+      }
     }
+    for (const model of providerModels) {
+      if (!existingModelMap.has(model.id)) {
+        existingModelMap.set(model.id, model);
+      }
+    }
+    config.models.providers[providerId] = {
+      ...existingProvider,
+      baseUrl: nvidiaBaseUrl,
+      api: 'openai-completions',
+      auth: 'api-key',
+      apiKey: 'secretref-env:NVIDIA_API_KEY',
+      models: Array.from(existingModelMap.values()),
+    };
   }
-  config.models.providers[providerId] = {
-    ...existingProvider,
-    baseUrl: nvidiaBaseUrl,
-    api: 'openai-completions',
-    auth: 'api-key',
-    apiKey: 'secretref-env:NVIDIA_API_KEY',
-    models: mergedModels,
-  };
 }
 
 if (config.models && typeof config.models === 'object') {
@@ -322,7 +328,7 @@ if (Array.isArray(config.agents?.list) && primaryModel) {
 fs.writeFileSync(configPath, `${JSON.stringify(config, null, 2)}\n`);
 EOF
 
-for file in SOUL.md USER.md AGENTS.md TOOLS.md; do
+for file in SOUL.md USER.md AGENTS.md TOOLS.md IDENTITY.md; do
     if [ -f "/app/$file" ] && [ ! -e "/data/workspace/$file" ]; then
         cp "/app/$file" "/data/workspace/$file"
     fi

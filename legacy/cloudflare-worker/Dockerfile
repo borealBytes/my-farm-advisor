@@ -39,10 +39,11 @@ RUN test -n "$BUILD_CACHE_BUST"
 COPY ["start-openclaw.sh", "/usr/local/bin/start-openclaw.sh"]
 RUN chmod +x /usr/local/bin/start-openclaw.sh && sha256sum /usr/local/bin/start-openclaw.sh
 
-# Copy SOUL.md, AGENTS.md, and USER.md to OpenClaw workspace directory
+# Copy SOUL.md, AGENTS.md, USER.md, and IDENTITY.md to OpenClaw workspace directory
 COPY SOUL.md /root/.openclaw/workspace/SOUL.md
 COPY AGENTS.md /root/.openclaw/workspace/AGENTS.md
 COPY USER.md /root/.openclaw/workspace/USER.md
+COPY IDENTITY.md /root/.openclaw/workspace/IDENTITY.md
 
 # Copy custom skills to OpenClaw's skills directory
 # OpenClaw looks for skills in /usr/local/lib/node_modules/openclaw/skills/
