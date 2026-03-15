@@ -110,6 +110,8 @@ The CLI command surface remains `openclaw` for upstream compatibility.
 - Workspace skills live in `~/.openclaw/workspace/skills`
 - This repo also ships bundled farm skills in `skills/`
 - `SOUL.md` and `USER.md` provide the farm-specific identity layer for this distribution
+- `scripts/fresh-local-bootstrap.sh` stops the stack, clears the bootstrapped workspaces (keeping `data/` and `.venv`), removes `openclaw.json`, then rebuilds with `docker compose up -d --build` for a clean resync.
+- When you know the numeric Telegram user IDs that should reach the bots, set `TELEGRAM_ALLOWED_USERS` (or the per-account overrides) in `.env`; the entrypoint will switch DM access to an allowlist so OpenClaw stops issuing one-time pairing codes after approval ([docs.openclaw.ai/channels/telegram](https://docs.openclaw.ai/channels/telegram)).
 
 If you want the fastest path to a usable farm assistant, start with Docker, then add credentials, channels, and workspace data once the gateway is healthy.
 

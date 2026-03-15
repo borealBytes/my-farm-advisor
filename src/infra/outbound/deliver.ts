@@ -34,6 +34,7 @@ import { markdownToSignalTextChunks, type SignalTextStyleRange } from "../../sig
 import { sendMessageSignal } from "../../signal/send.js";
 import type { sendMessageSlack } from "../../slack/send.js";
 import type { sendMessageTelegram } from "../../telegram/send.js";
+import { maybeTransformWrighterTelegramPayloads } from "../../telegram/wrighter-delivery.js";
 import type { sendMessageWhatsApp } from "../../web/outbound.js";
 import { throwIfAborted } from "./abort.js";
 import { ackDelivery, enqueueDelivery, failDelivery } from "./delivery-queue.js";
@@ -533,289 +534,317 @@ async function deliverOutboundPayloadsCore(
     params.session?.agentId ?? params.mirror?.agentId,
   );
   const results: OutboundDeliveryResult[] = [];
-  const handler = await createChannelHandler({
-    cfg,
-    channel,
-    to,
-    deps,
-    accountId,
-    replyToId: params.replyToId,
-    threadId: params.threadId,
-    identity: params.identity,
-    gifPlayback: params.gifPlayback,
-    silent: params.silent,
-    mediaLocalRoots,
-  });
-  const configuredTextLimit = handler.chunker
-    ? resolveTextChunkLimit(cfg, channel, accountId, {
-        fallbackLimit: handler.textChunkLimit,
-      })
-    : undefined;
-  const textLimit =
-    channel === "telegram" && typeof configuredTextLimit === "number"
-      ? Math.min(configuredTextLimit, TELEGRAM_TEXT_LIMIT)
-      : configuredTextLimit;
-  const chunkMode = handler.chunker ? resolveChunkMode(cfg, channel, accountId) : "length";
-  const isSignalChannel = channel === "signal";
-  const signalTableMode = isSignalChannel
-    ? resolveMarkdownTableMode({ cfg, channel: "signal", accountId })
-    : "code";
-  const signalMaxBytes = isSignalChannel
-    ? resolveChannelMediaMaxBytes({
-        cfg,
-        resolveChannelLimitMb: ({ cfg, accountId }) =>
-          cfg.channels?.signal?.accounts?.[accountId]?.mediaMaxMb ??
-          cfg.channels?.signal?.mediaMaxMb,
-        accountId,
-      })
-    : undefined;
+  const cleanupTasks: Array<() => Promise<void>> = [];
+  let workingPayloads = payloads;
 
-  const sendTextChunks = async (
-    text: string,
-    overrides?: { replyToId?: string | null; threadId?: string | number | null },
-  ) => {
-    throwIfAborted(abortSignal);
-    if (!handler.chunker || textLimit === undefined) {
-      results.push(await handler.sendText(text, overrides));
-      return;
-    }
-    if (chunkMode === "newline") {
-      const mode = handler.chunkerMode ?? "text";
-      const blockChunks =
-        mode === "markdown"
-          ? chunkMarkdownTextWithMode(text, textLimit, "newline")
-          : chunkByParagraph(text, textLimit);
-
-      if (!blockChunks.length && text) {
-        blockChunks.push(text);
+  try {
+    if (channel === "telegram") {
+      try {
+        const transform = await maybeTransformWrighterTelegramPayloads(payloads);
+        workingPayloads = transform.payloads;
+        cleanupTasks.push(...transform.cleanup);
+      } catch (err) {
+        log.warn("wrighter telegram delivery transform threw", { err });
       }
-      for (const blockChunk of blockChunks) {
-        const chunks = handler.chunker(blockChunk, textLimit);
-        if (!chunks.length && blockChunk) {
-          chunks.push(blockChunk);
+    }
+
+    const handler = await createChannelHandler({
+      cfg,
+      channel,
+      to,
+      deps,
+      accountId,
+      replyToId: params.replyToId,
+      threadId: params.threadId,
+      identity: params.identity,
+      gifPlayback: params.gifPlayback,
+      silent: params.silent,
+      mediaLocalRoots,
+    });
+    const configuredTextLimit = handler.chunker
+      ? resolveTextChunkLimit(cfg, channel, accountId, {
+          fallbackLimit: handler.textChunkLimit,
+        })
+      : undefined;
+    const textLimit =
+      channel === "telegram" && typeof configuredTextLimit === "number"
+        ? Math.min(configuredTextLimit, TELEGRAM_TEXT_LIMIT)
+        : configuredTextLimit;
+    const chunkMode = handler.chunker ? resolveChunkMode(cfg, channel, accountId) : "length";
+    const isSignalChannel = channel === "signal";
+    const signalTableMode = isSignalChannel
+      ? resolveMarkdownTableMode({ cfg, channel: "signal", accountId })
+      : "code";
+    const signalMaxBytes = isSignalChannel
+      ? resolveChannelMediaMaxBytes({
+          cfg,
+          resolveChannelLimitMb: ({ cfg, accountId }) =>
+            cfg.channels?.signal?.accounts?.[accountId]?.mediaMaxMb ??
+            cfg.channels?.signal?.mediaMaxMb,
+          accountId,
+        })
+      : undefined;
+
+    const sendTextChunks = async (
+      text: string,
+      overrides?: { replyToId?: string | null; threadId?: string | number | null },
+    ) => {
+      throwIfAborted(abortSignal);
+      if (!handler.chunker || textLimit === undefined) {
+        results.push(await handler.sendText(text, overrides));
+        return;
+      }
+      if (chunkMode === "newline") {
+        const mode = handler.chunkerMode ?? "text";
+        const blockChunks =
+          mode === "markdown"
+            ? chunkMarkdownTextWithMode(text, textLimit, "newline")
+            : chunkByParagraph(text, textLimit);
+
+        if (!blockChunks.length && text) {
+          blockChunks.push(text);
         }
-        for (const chunk of chunks) {
-          throwIfAborted(abortSignal);
-          results.push(await handler.sendText(chunk, overrides));
+        for (const blockChunk of blockChunks) {
+          const chunks = handler.chunker(blockChunk, textLimit);
+          if (!chunks.length && blockChunk) {
+            chunks.push(blockChunk);
+          }
+          for (const chunk of chunks) {
+            throwIfAborted(abortSignal);
+            results.push(await handler.sendText(chunk, overrides));
+          }
         }
+        return;
       }
-      return;
-    }
-    const chunks = handler.chunker(text, textLimit);
-    for (const chunk of chunks) {
-      throwIfAborted(abortSignal);
-      results.push(await handler.sendText(chunk, overrides));
-    }
-  };
-
-  const sendSignalText = async (text: string, styles: SignalTextStyleRange[]) => {
-    throwIfAborted(abortSignal);
-    return {
-      channel: "signal" as const,
-      ...(await sendSignal(to, text, {
-        cfg,
-        maxBytes: signalMaxBytes,
-        accountId: accountId ?? undefined,
-        textMode: "plain",
-        textStyles: styles,
-      })),
-    };
-  };
-
-  const sendSignalTextChunks = async (text: string) => {
-    throwIfAborted(abortSignal);
-    let signalChunks =
-      textLimit === undefined
-        ? markdownToSignalTextChunks(text, Number.POSITIVE_INFINITY, {
-            tableMode: signalTableMode,
-          })
-        : markdownToSignalTextChunks(text, textLimit, { tableMode: signalTableMode });
-    if (signalChunks.length === 0 && text) {
-      signalChunks = [{ text, styles: [] }];
-    }
-    for (const chunk of signalChunks) {
-      throwIfAborted(abortSignal);
-      results.push(await sendSignalText(chunk.text, chunk.styles));
-    }
-  };
-
-  const sendSignalMedia = async (caption: string, mediaUrl: string) => {
-    throwIfAborted(abortSignal);
-    const formatted = markdownToSignalTextChunks(caption, Number.POSITIVE_INFINITY, {
-      tableMode: signalTableMode,
-    })[0] ?? {
-      text: caption,
-      styles: [],
-    };
-    return {
-      channel: "signal" as const,
-      ...(await sendSignal(to, formatted.text, {
-        cfg,
-        mediaUrl,
-        maxBytes: signalMaxBytes,
-        accountId: accountId ?? undefined,
-        textMode: "plain",
-        textStyles: formatted.styles,
-        mediaLocalRoots,
-      })),
-    };
-  };
-  const normalizedPayloads = normalizePayloadsForChannelDelivery(
-    payloads,
-    channel,
-    cfg,
-    to,
-    accountId,
-  );
-  const hookRunner = getGlobalHookRunner();
-  const sessionKeyForInternalHooks = params.mirror?.sessionKey ?? params.session?.key;
-  const mirrorIsGroup = params.mirror?.isGroup;
-  const mirrorGroupId = params.mirror?.groupId;
-  const { emitMessageSent, hasMessageSentHooks } = createMessageSentEmitter({
-    hookRunner,
-    channel,
-    to,
-    accountId,
-    sessionKeyForInternalHooks,
-    mirrorIsGroup,
-    mirrorGroupId,
-  });
-  const hasMessageSendingHooks = hookRunner?.hasHooks("message_sending") ?? false;
-  if (hasMessageSentHooks && params.session?.agentId && !sessionKeyForInternalHooks) {
-    log.warn(
-      "deliverOutboundPayloads: session.agentId present without session key; internal message:sent hook will be skipped",
-      {
-        channel,
-        to,
-        agentId: params.session.agentId,
-      },
-    );
-  }
-  for (const payload of normalizedPayloads) {
-    let payloadSummary = buildPayloadSummary(payload);
-    try {
-      throwIfAborted(abortSignal);
-
-      // Run message_sending plugin hook (may modify content or cancel)
-      const hookResult = await applyMessageSendingHook({
-        hookRunner,
-        enabled: hasMessageSendingHooks,
-        payload,
-        payloadSummary,
-        to,
-        channel,
-        accountId,
-      });
-      if (hookResult.cancelled) {
-        continue;
+      const chunks = handler.chunker(text, textLimit);
+      for (const chunk of chunks) {
+        throwIfAborted(abortSignal);
+        results.push(await handler.sendText(chunk, overrides));
       }
-      const effectivePayload = hookResult.payload;
-      payloadSummary = hookResult.payloadSummary;
+    };
 
-      params.onPayload?.(payloadSummary);
-      const sendOverrides = {
-        replyToId: effectivePayload.replyToId ?? params.replyToId ?? undefined,
-        threadId: params.threadId ?? undefined,
+    const sendSignalText = async (text: string, styles: SignalTextStyleRange[]) => {
+      throwIfAborted(abortSignal);
+      return {
+        channel: "signal" as const,
+        ...(await sendSignal(to, text, {
+          cfg,
+          maxBytes: signalMaxBytes,
+          accountId: accountId ?? undefined,
+          textMode: "plain",
+          textStyles: styles,
+        })),
       };
-      if (handler.sendPayload && effectivePayload.channelData) {
-        const delivery = await handler.sendPayload(effectivePayload, sendOverrides);
-        results.push(delivery);
+    };
+
+    const sendSignalTextChunks = async (text: string) => {
+      throwIfAborted(abortSignal);
+      let signalChunks =
+        textLimit === undefined
+          ? markdownToSignalTextChunks(text, Number.POSITIVE_INFINITY, {
+              tableMode: signalTableMode,
+            })
+          : markdownToSignalTextChunks(text, textLimit, { tableMode: signalTableMode });
+      if (signalChunks.length === 0 && text) {
+        signalChunks = [{ text, styles: [] }];
+      }
+      for (const chunk of signalChunks) {
+        throwIfAborted(abortSignal);
+        results.push(await sendSignalText(chunk.text, chunk.styles));
+      }
+    };
+
+    const sendSignalMedia = async (caption: string, mediaUrl: string) => {
+      throwIfAborted(abortSignal);
+      const formatted = markdownToSignalTextChunks(caption, Number.POSITIVE_INFINITY, {
+        tableMode: signalTableMode,
+      })[0] ?? {
+        text: caption,
+        styles: [],
+      };
+      return {
+        channel: "signal" as const,
+        ...(await sendSignal(to, formatted.text, {
+          cfg,
+          mediaUrl,
+          maxBytes: signalMaxBytes,
+          accountId: accountId ?? undefined,
+          textMode: "plain",
+          textStyles: formatted.styles,
+          mediaLocalRoots,
+        })),
+      };
+    };
+
+    const normalizedPayloads = normalizePayloadsForChannelDelivery(
+      workingPayloads,
+      channel,
+      cfg,
+      to,
+      accountId,
+    );
+    const hookRunner = getGlobalHookRunner();
+    const sessionKeyForInternalHooks = params.mirror?.sessionKey ?? params.session?.key;
+    const mirrorIsGroup = params.mirror?.isGroup;
+    const mirrorGroupId = params.mirror?.groupId;
+    const { emitMessageSent, hasMessageSentHooks } = createMessageSentEmitter({
+      hookRunner,
+      channel,
+      to,
+      accountId,
+      sessionKeyForInternalHooks,
+      mirrorIsGroup,
+      mirrorGroupId,
+    });
+    const hasMessageSendingHooks = hookRunner?.hasHooks("message_sending") ?? false;
+    if (hasMessageSentHooks && params.session?.agentId && !sessionKeyForInternalHooks) {
+      log.warn(
+        "deliverOutboundPayloads: session.agentId present without session key; internal message:sent hook will be skipped",
+        {
+          channel,
+          to,
+          agentId: params.session.agentId,
+        },
+      );
+    }
+    for (const payload of normalizedPayloads) {
+      let payloadSummary = buildPayloadSummary(payload);
+      try {
+        throwIfAborted(abortSignal);
+
+        // Run message_sending plugin hook (may modify content or cancel)
+        const hookResult = await applyMessageSendingHook({
+          hookRunner,
+          enabled: hasMessageSendingHooks,
+          payload,
+          payloadSummary,
+          to,
+          channel,
+          accountId,
+        });
+        if (hookResult.cancelled) {
+          continue;
+        }
+        const effectivePayload = hookResult.payload;
+        payloadSummary = hookResult.payloadSummary;
+
+        params.onPayload?.(payloadSummary);
+        const sendOverrides = {
+          replyToId: effectivePayload.replyToId ?? params.replyToId ?? undefined,
+          threadId: params.threadId ?? undefined,
+        };
+        if (handler.sendPayload && effectivePayload.channelData) {
+          const delivery = await handler.sendPayload(effectivePayload, sendOverrides);
+          results.push(delivery);
+          emitMessageSent({
+            success: true,
+            content: payloadSummary.text,
+            messageId: delivery.messageId,
+          });
+          continue;
+        }
+        if (payloadSummary.mediaUrls.length === 0) {
+          const beforeCount = results.length;
+          if (isSignalChannel) {
+            await sendSignalTextChunks(payloadSummary.text);
+          } else {
+            await sendTextChunks(payloadSummary.text, sendOverrides);
+          }
+          const messageId = results.at(-1)?.messageId;
+          emitMessageSent({
+            success: results.length > beforeCount,
+            content: payloadSummary.text,
+            messageId,
+          });
+          continue;
+        }
+
+        if (!handler.supportsMedia) {
+          log.warn(
+            "Plugin outbound adapter does not implement sendMedia; media URLs will be dropped and text fallback will be used",
+            {
+              channel,
+              to,
+              mediaCount: payloadSummary.mediaUrls.length,
+            },
+          );
+          const fallbackText = payloadSummary.text.trim();
+          if (!fallbackText) {
+            throw new Error(
+              "Plugin outbound adapter does not implement sendMedia and no text fallback is available for media payload",
+            );
+          }
+          const beforeCount = results.length;
+          await sendTextChunks(fallbackText, sendOverrides);
+          const messageId = results.at(-1)?.messageId;
+          emitMessageSent({
+            success: results.length > beforeCount,
+            content: payloadSummary.text,
+            messageId,
+          });
+          continue;
+        }
+
+        let first = true;
+        let lastMessageId: string | undefined;
+        for (const url of payloadSummary.mediaUrls) {
+          throwIfAborted(abortSignal);
+          const caption = first ? payloadSummary.text : "";
+          first = false;
+          if (isSignalChannel) {
+            const delivery = await sendSignalMedia(caption, url);
+            results.push(delivery);
+            lastMessageId = delivery.messageId;
+          } else {
+            const delivery = await handler.sendMedia(caption, url, sendOverrides);
+            results.push(delivery);
+            lastMessageId = delivery.messageId;
+          }
+        }
         emitMessageSent({
           success: true,
           content: payloadSummary.text,
-          messageId: delivery.messageId,
+          messageId: lastMessageId,
         });
-        continue;
-      }
-      if (payloadSummary.mediaUrls.length === 0) {
-        const beforeCount = results.length;
-        if (isSignalChannel) {
-          await sendSignalTextChunks(payloadSummary.text);
-        } else {
-          await sendTextChunks(payloadSummary.text, sendOverrides);
-        }
-        const messageId = results.at(-1)?.messageId;
+      } catch (err) {
         emitMessageSent({
-          success: results.length > beforeCount,
+          success: false,
           content: payloadSummary.text,
-          messageId,
+          error: err instanceof Error ? err.message : String(err),
         });
-        continue;
-      }
-
-      if (!handler.supportsMedia) {
-        log.warn(
-          "Plugin outbound adapter does not implement sendMedia; media URLs will be dropped and text fallback will be used",
-          {
-            channel,
-            to,
-            mediaCount: payloadSummary.mediaUrls.length,
-          },
-        );
-        const fallbackText = payloadSummary.text.trim();
-        if (!fallbackText) {
-          throw new Error(
-            "Plugin outbound adapter does not implement sendMedia and no text fallback is available for media payload",
-          );
+        if (!params.bestEffort) {
+          throw err;
         }
-        const beforeCount = results.length;
-        await sendTextChunks(fallbackText, sendOverrides);
-        const messageId = results.at(-1)?.messageId;
-        emitMessageSent({
-          success: results.length > beforeCount,
-          content: payloadSummary.text,
-          messageId,
+        params.onError?.(err, payloadSummary);
+      }
+    }
+    if (params.mirror && results.length > 0) {
+      const mirrorText = resolveMirroredTranscriptText({
+        text: params.mirror.text,
+        mediaUrls: params.mirror.mediaUrls,
+      });
+      if (mirrorText) {
+        await appendAssistantMessageToSessionTranscript({
+          agentId: params.mirror.agentId,
+          sessionKey: params.mirror.sessionKey,
+          text: mirrorText,
+          idempotencyKey: params.mirror.idempotencyKey,
         });
-        continue;
       }
+    }
 
-      let first = true;
-      let lastMessageId: string | undefined;
-      for (const url of payloadSummary.mediaUrls) {
-        throwIfAborted(abortSignal);
-        const caption = first ? payloadSummary.text : "";
-        first = false;
-        if (isSignalChannel) {
-          const delivery = await sendSignalMedia(caption, url);
-          results.push(delivery);
-          lastMessageId = delivery.messageId;
-        } else {
-          const delivery = await handler.sendMedia(caption, url, sendOverrides);
-          results.push(delivery);
-          lastMessageId = delivery.messageId;
-        }
-      }
-      emitMessageSent({
-        success: true,
-        content: payloadSummary.text,
-        messageId: lastMessageId,
-      });
-    } catch (err) {
-      emitMessageSent({
-        success: false,
-        content: payloadSummary.text,
-        error: err instanceof Error ? err.message : String(err),
-      });
-      if (!params.bestEffort) {
-        throw err;
-      }
-      params.onError?.(err, payloadSummary);
+    return results;
+  } finally {
+    if (cleanupTasks.length > 0) {
+      await Promise.allSettled(
+        cleanupTasks.map(async (task) => {
+          try {
+            await task();
+          } catch (err) {
+            log.debug?.("wrighter telegram cleanup failed", { err });
+          }
+        }),
+      );
     }
   }
-  if (params.mirror && results.length > 0) {
-    const mirrorText = resolveMirroredTranscriptText({
-      text: params.mirror.text,
-      mediaUrls: params.mirror.mediaUrls,
-    });
-    if (mirrorText) {
-      await appendAssistantMessageToSessionTranscript({
-        agentId: params.mirror.agentId,
-        sessionKey: params.mirror.sessionKey,
-        text: mirrorText,
-        idempotencyKey: params.mirror.idempotencyKey,
-      });
-    }
-  }
-
-  return results;
 }
