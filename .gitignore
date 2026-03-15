@@ -83,7 +83,6 @@ apps/ios/*.mobileprovision
 .local/
 docs/.local/
 tmp/
-IDENTITY.md
 .tgz
 .idea
 .dev.vars
@@ -107,6 +106,7 @@ package-lock.json
 .agents
 .agent/
 skills-lock.json
+skills-manifest.json
 
 # Local iOS signing overrides
 apps/ios/LocalSigning.xcconfig
