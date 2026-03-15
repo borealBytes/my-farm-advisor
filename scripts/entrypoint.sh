@@ -178,7 +178,19 @@ config.agents.defaults.workspace ??= '/data/workspace';
 
 const primaryModel = process.env.PRIMARY_MODEL?.trim();
 const fallbackModels = process.env.FALLBACK_MODELS?.trim();
+const allModels = [];
+if (primaryModel) allModels.push(primaryModel);
+if (fallbackModels) {
+  fallbackModels.split(',').map(m => m.trim()).filter(m => m && !allModels.includes(m)).forEach(m => allModels.push(m));
+}
+
+if (allModels.length > 0) {
+  config.models = allModels.map(m => ({ id: m, model: m }));
+}
+
 if (primaryModel) {
+  config.agents ??= {};
+  config.agents.defaults ??= {};
   config.agents.defaults.model ??= {};
   config.agents.defaults.model.primary = primaryModel;
   if (fallbackModels) {
