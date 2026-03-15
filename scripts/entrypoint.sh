@@ -170,6 +170,105 @@ try {
   config = {};
 }
 
+const fieldOpsTelegramToken = process.env.TELEGRAM_FIELD_OPERATIONS_BOT_TOKEN?.trim();
+const dataPipelineTelegramToken = process.env.TELEGRAM_DATA_PIPELINE_BOT_TOKEN?.trim();
+
+const parseAllowList = value => {
+  if (!value) return [];
+  return value
+    .split(/[\s,]+/)
+    .map(entry => entry.trim())
+    .filter(Boolean)
+    .map(entry => entry.replace(/^(telegram:|tg:)/i, ''));
+};
+
+const mergeAllowFrom = (...lists) => {
+  const unique = new Set();
+  for (const list of lists) {
+    if (!Array.isArray(list)) continue;
+    for (const entry of list) {
+      if (entry) unique.add(entry);
+    }
+  }
+  return unique.size > 0 ? Array.from(unique) : undefined;
+};
+
+const sharedAllowFrom = parseAllowList(process.env.TELEGRAM_ALLOWED_USERS);
+const fieldOpsAllowFrom = parseAllowList(process.env.TELEGRAM_FIELD_OPERATIONS_ALLOWED_USERS);
+const dataPipelineAllowFrom = parseAllowList(
+  process.env.TELEGRAM_DATA_PIPELINE_BOT_ALLOWED_USERS ?? process.env.TELEGRAM_DATA_PIPELINE_ALLOWED_USERS,
+);
+
+const parseBooleanEnv = value => {
+  if (value === undefined || value === null) return null;
+  const normalized = value.trim().toLowerCase();
+  if (['1', 'true', 'yes', 'on'].includes(normalized)) return true;
+  if (['0', 'false', 'no', 'off'].includes(normalized)) return false;
+  return null;
+};
+
+const { execSync } = require('child_process');
+const shouldResetPollingRaw = process.env.TELEGRAM_FORCE_POLLING_RESET ?? '';
+const shouldResetPolling = parseBooleanEnv(shouldResetPollingRaw) ?? false;
+
+const clearTelegramWebhook = (token, label) => {
+  if (!token) {
+    return;
+  }
+  try {
+    const encoded = encodeURIComponent(token);
+    try {
+      execSync(
+        `curl -sS --max-time 5 "https://api.telegram.org/bot${encoded}/getUpdates?offset=-1&limit=1&timeout=0" >/dev/null`,
+        { stdio: 'ignore' },
+      );
+    } catch (prefetchErr) {
+      console.warn(`Warning: unable to prefetch getUpdates for ${label}: ${prefetchErr.message}`);
+    }
+    execSync(
+      `curl -sSf --max-time 5 "https://api.telegram.org/bot${encoded}/deleteWebhook?drop_pending_updates=true" >/dev/null`,
+      { stdio: 'ignore' },
+    );
+  } catch (err) {
+    console.warn(`Warning: unable to clear Telegram webhook for ${label}: ${err.message}`);
+  }
+};
+
+if (!shouldResetPolling) {
+  clearTelegramWebhook(fieldOpsTelegramToken, 'main');
+  clearTelegramWebhook(dataPipelineTelegramToken, 'data-pipeline');
+}
+
+const resetTelegramPollingSession = (token, label) => {
+  if (!token) {
+    return;
+  }
+  const encoded = encodeURIComponent(token);
+  const callApi = (method, query = '') => {
+    try {
+      execSync(`curl -sS --max-time 5 "https://api.telegram.org/bot${encoded}/${method}${query}" >/dev/null`, {
+        stdio: 'ignore',
+      });
+      return true;
+    } catch (err) {
+      console.warn(`Warning: Telegram ${method} for ${label} failed: ${err.message}`);
+      return false;
+    }
+  };
+
+  const loggedOut = callApi('logOut');
+  if (!loggedOut) {
+    callApi('close');
+  }
+  // Re-authorize session to prevent deleteWebhook 400 errors on startup.
+  callApi('getUpdates', '?offset=-1&limit=1&timeout=0');
+};
+
+if (shouldResetPolling) {
+  resetTelegramPollingSession(fieldOpsTelegramToken, 'main');
+  resetTelegramPollingSession(dataPipelineTelegramToken, 'data-pipeline');
+}
+
 const gatewayToken = process.env.OPENCLAW_GATEWAY_TOKEN?.trim();
 
 config.gateway ??= {};
@@ -182,7 +281,7 @@ if (config.gateway.controlUi.allowInsecureAuth === undefined) {
   config.gateway.controlUi.allowInsecureAuth = true;
 }
 if (config.gateway.controlUi.dangerouslyAllowHostHeaderOriginFallback === undefined) {
-  config.gateway.controlUi.dangerouslyAllowHostHeaderOriginFallback = true;
+  config.gateway.controlUi.dangerouslyAllowHostHeaderOriginFallback = false;
 }
 
 config.gateway.auth ??= {};
@@ -192,6 +291,10 @@ if (gatewayToken) {
 } else if (!config.gateway.auth.mode) {
   config.gateway.auth.mode = 'token';
 }
+const gatewayModeEnv = process.env.OPENCLAW_GATEWAY_MODE?.trim();
+if (!config.gateway.mode) {
+  config.gateway.mode = gatewayModeEnv || 'local';
+}
 
 const telegramGroupPolicy = process.env.OPENCLAW_TELEGRAM_GROUP_POLICY?.trim();
 if (telegramGroupPolicy) {
@@ -200,11 +303,139 @@ if (telegramGroupPolicy) {
   config.channels.telegram.groupPolicy = telegramGroupPolicy;
 }
 
+config.channels ??= {};
+const telegramConfig = (config.channels.telegram ??= {});
+if (process.env.TELEGRAM_FIELD_OPERATIONS_BOT_TOKEN || process.env.TELEGRAM_DATA_PIPELINE_BOT_TOKEN) {
+  telegramConfig.enabled ??= true;
+}
+telegramConfig.dmPolicy ??= 'pairing';
+if (telegramConfig.defaultAccount === undefined && typeof telegramConfig.defaultAccountId === 'string') {
+  telegramConfig.defaultAccount = telegramConfig.defaultAccountId;
+}
+delete telegramConfig.defaultAccountId;
+telegramConfig.defaultAccount ??= 'main';
+const hasAnyAccountAllowFrom =
+  sharedAllowFrom.length > 0 || fieldOpsAllowFrom.length > 0 || dataPipelineAllowFrom.length > 0;
+const normalizedGroupPolicy = (() => {
+  const normalized = telegramGroupPolicy ? telegramGroupPolicy.toLowerCase() : undefined;
+  const validPolicies = new Set(['open', 'allowlist', 'disabled']);
+  if (normalized && validPolicies.has(normalized)) {
+    if (normalized === 'open' && hasAnyAccountAllowFrom) {
+      return 'allowlist';
+    }
+    return normalized;
+  }
+  return hasAnyAccountAllowFrom ? 'allowlist' : 'open';
+})();
+telegramConfig.groupPolicy = normalizedGroupPolicy;
+telegramConfig.streaming ??= 'partial';
+delete telegramConfig.botToken;
+delete telegramConfig.tokenFile;
+telegramConfig.commands ??= {};
+if (telegramConfig.commands.native === undefined) {
+  telegramConfig.commands.native = false;
+}
+if (hasAnyAccountAllowFrom) {
+  const combinedAllowFrom = mergeAllowFrom(
+    telegramConfig.allowFrom,
+    sharedAllowFrom,
+    fieldOpsAllowFrom,
+    dataPipelineAllowFrom,
+  );
+  if (combinedAllowFrom) {
+    telegramConfig.allowFrom = combinedAllowFrom;
+  }
+  telegramConfig.dmPolicy = 'allowlist';
+}
+const telegramAccounts = (telegramConfig.accounts ??= {});
+telegramAccounts.default = {
+  ...(telegramAccounts.default ?? {}),
+  enabled: false,
+  dmPolicy: telegramConfig.dmPolicy,
+  groupPolicy: normalizedGroupPolicy,
+  streaming: telegramConfig.streaming,
+};
+if (hasAnyAccountAllowFrom) {
+  const defaultAllowFrom = mergeAllowFrom(
+    telegramAccounts.default?.allowFrom,
+    sharedAllowFrom,
+    fieldOpsAllowFrom,
+    dataPipelineAllowFrom,
+  );
+  if (defaultAllowFrom) {
+    telegramAccounts.default.allowFrom = defaultAllowFrom;
+  }
+  telegramAccounts.default.dmPolicy = 'allowlist';
+  telegramAccounts.default.groupPolicy = 'allowlist';
+}
+if (fieldOpsTelegramToken) {
+  const account = {
+    ...(telegramAccounts.main ?? {}),
+    name: telegramAccounts.main?.name ?? 'Field Operations Bot',
+    botToken: fieldOpsTelegramToken,
+    groupPolicy: telegramAccounts.main?.groupPolicy ?? normalizedGroupPolicy,
+    streaming: telegramAccounts.main?.streaming ?? telegramConfig.streaming,
+  };
+  if (fieldOpsAllowFrom.length > 0) {
+    account.allowFrom = mergeAllowFrom(account.allowFrom, fieldOpsAllowFrom, sharedAllowFrom);
+    account.dmPolicy = 'allowlist';
+    account.groupPolicy = 'allowlist';
+  } else if (hasAnyAccountAllowFrom && !account.allowFrom) {
+    account.allowFrom = telegramConfig.allowFrom;
+    account.dmPolicy ??= 'allowlist';
+    account.groupPolicy ??= normalizedGroupPolicy;
+  }
+  telegramAccounts.main = account;
+}
+if (dataPipelineTelegramToken) {
+  const accountKey = 'data-pipeline';
+  const account = {
+    ...(telegramAccounts[accountKey] ?? {}),
+    name: telegramAccounts[accountKey]?.name ?? 'Data Pipeline Bot',
+    botToken: dataPipelineTelegramToken,
+    groupPolicy: telegramAccounts[accountKey]?.groupPolicy ?? normalizedGroupPolicy,
+    streaming: telegramAccounts[accountKey]?.streaming ?? telegramConfig.streaming,
+  };
+  if (dataPipelineAllowFrom.length > 0) {
+    account.allowFrom = mergeAllowFrom(account.allowFrom, dataPipelineAllowFrom, sharedAllowFrom);
+    account.dmPolicy = 'allowlist';
+    account.groupPolicy = 'allowlist';
+  } else if (hasAnyAccountAllowFrom && !account.allowFrom) {
+    account.allowFrom = telegramConfig.allowFrom;
+    account.dmPolicy ??= 'allowlist';
+    account.groupPolicy ??= normalizedGroupPolicy;
+  }
+  telegramAccounts[accountKey] = account;
+}
+
+config.plugins ??= {};
+config.plugins.entries ??= {};
+if (!config.plugins.entries['qwen-portal-auth']) {
+  config.plugins.entries['qwen-portal-auth'] = { enabled: true };
+}
+
 config.agents ??= {};
 config.agents.defaults ??= {};
 config.agents.defaults.workspace ??= '/data/workspace';
+const memorySearchEnv = process.env.OPENCLAW_MEMORY_SEARCH_ENABLED?.trim();
+config.agents.defaults.memorySearch ??= {};
+if (memorySearchEnv !== undefined) {
+  config.agents.defaults.memorySearch.enabled = memorySearchEnv === '1' || memorySearchEnv?.toLowerCase() === 'true';
+} else if (config.agents.defaults.memorySearch.enabled === undefined) {
+  config.agents.defaults.memorySearch.enabled = false;
+}
 
 config.agents.list ??= [];
+
+const nowIso = new Date().toISOString();
+config.meta ??= {};
+config.meta.lastTouchedVersion ??= '2026.3.13';
+config.meta.lastTouchedAt = nowIso;
+config.wizard ??= {};
+config.wizard.lastRunVersion ??= '2026.3.13';
+config.wizard.lastRunCommand ??= 'entrypoint';
+config.wizard.lastRunMode ??= 'local';
+config.wizard.lastRunAt = nowIso;
 
 const ensureAgent = (id, baseConfig) => {
   const list = config.agents.list ?? [];
@@ -381,6 +612,35 @@ if (Array.isArray(config.agents?.list) && primaryModel) {
 }
 
 fs.writeFileSync(configPath, `${JSON.stringify(config, null, 2)}\n`);
+try {
+  fs.chmodSync(configPath, 0o600);
+} catch (err) {
+  console.warn(`Warning: unable to set permissions on ${configPath}: ${err.message}`);
+}
+
+const fieldOpsTelegramPairingCode = process.env.TELEGRAM_FIELD_OPERATIONS_BOT_PAIRING_CODE?.trim();
+const dataPipelineTelegramPairingCode = process.env.TELEGRAM_DATA_PIPELINE_BOT_PAIRING_CODE?.trim();
+if (!hasAnyAccountAllowFrom) {
+  const pairingQueue = [];
+  if (fieldOpsTelegramPairingCode) {
+    pairingQueue.push({ account: 'main', code: fieldOpsTelegramPairingCode });
+  }
+  if (dataPipelineTelegramPairingCode) {
+    pairingQueue.push({ account: 'data-pipeline', code: dataPipelineTelegramPairingCode });
+  }
+
+  for (const entry of pairingQueue) {
+    try {
+      execSync(`node /app/openclaw.mjs pairing approve telegram --account ${entry.account} ${entry.code}`, {
+        stdio: 'inherit',
+      });
+    } catch (err) {
+      console.warn(
+        `Warning: unable to approve Telegram pairing for account "${entry.account}": ${err.message}`,
+      );
+    }
+  }
+}
 EOF
 
 for file in SOUL.md USER.md AGENTS.md TOOLS.md IDENTITY.md IDENTITY.data-pipeline.md; do
