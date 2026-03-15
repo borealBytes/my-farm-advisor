@@ -3,6 +3,11 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import type { ReplyPayload } from "../auto-reply/types.js";
+import {
+  resolveHtmlDeliveryConfig,
+  maybeBuildHtmlArtifact,
+  type HtmlDeliveryResult,
+} from "../delivery/wrighter-html.js";
 import { resolvePreferredOpenClawTmpDir } from "../infra/tmp-openclaw-dir.js";
 import { createSubsystemLogger } from "../logging/subsystem.js";
 
@@ -27,6 +32,7 @@ type TelegramMediaMessage = {
 type TelegramMessage = TelegramTextMessage | TelegramMediaMessage;
 
 type TelegramDeliveryResult = {
+  frontmatter: Record<string, unknown>;
   messages: TelegramMessage[];
   validation: {
     passed: boolean;
@@ -101,6 +107,13 @@ export async function maybeTransformWrighterTelegramPayloads(
           continue;
         }
         transformed.push(...convertMessagesToPayloads(payload, result.messages));
+        await maybeAddHtmlAttachment(
+          payload,
+          result.frontmatter,
+          payload.text ?? "",
+          transformed,
+          cleanup,
+        );
         cleanup.push(() => removeDirSafe(runDir));
       } catch (err) {
         await removeDirSafe(runDir);
@@ -170,6 +183,51 @@ function convertMessagesToPayloads(
     results.push(base);
   }
   return results;
+}
+
+async function maybeAddHtmlAttachment(
+  original: ReplyPayload,
+  frontmatter: Record<string, unknown>,
+  rawMarkdown: string,
+  payloads: ReplyPayload[],
+  cleanup: CleanupFn[],
+): Promise<void> {
+  try {
+    const config = resolveHtmlDeliveryConfig(frontmatter);
+    const artifact = await maybeBuildHtmlArtifact({ raw: rawMarkdown, frontmatter }, config);
+    if (!artifact) {
+      return;
+    }
+    const payload = createHtmlDocumentPayload(original, artifact);
+    payloads.push(payload);
+    cleanup.push(artifact.cleanup);
+  } catch (err) {
+    log.warn("wrighter telegram html attachment generation failed", { err });
+  }
+}
+
+function createHtmlDocumentPayload(
+  original: ReplyPayload,
+  artifact: HtmlDeliveryResult,
+): ReplyPayload {
+  const base: ReplyPayload = {
+    ...original,
+    text: artifact.summary,
+    mediaUrl: pathToFileURL(artifact.htmlPath).href,
+    mediaUrls: [pathToFileURL(artifact.htmlPath).href],
+    channelData: markTelegramChannelData(original.channelData),
+  };
+  const telegramData = base.channelData?.telegram as Record<string, unknown>;
+  telegramData.mimeType = "text/html";
+  telegramData.fileName = artifact.fileName;
+  telegramData.deliveryMode = artifact.mode;
+  if (artifact.fingerprintId) {
+    telegramData.fingerprintId = artifact.fingerprintId;
+  }
+  if (artifact.principals) {
+    telegramData.principals = artifact.principals;
+  }
+  return base;
 }
 
 function markTelegramChannelData(
