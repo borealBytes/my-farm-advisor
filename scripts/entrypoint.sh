@@ -185,7 +185,7 @@ if (fallbackModels) {
 }
 
 if (allModels.length > 0) {
-  config.models = allModels.map(m => ({ id: m, model: m }));
+  config.models = allModels.map(m => ({ id: m, name: m.split('/').pop() }));
 }
 
 if (primaryModel) {
