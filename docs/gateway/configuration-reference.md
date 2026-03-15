@@ -2342,6 +2342,7 @@ See [Plugins](/tools/plugin).
   browser: {
     enabled: true,
     evaluateEnabled: true,
+    controlBindHost: "127.0.0.1",
     defaultProfile: "chrome",
     ssrfPolicy: {
       dangerouslyAllowPrivateNetwork: true, // default trusted-network mode
@@ -2366,6 +2367,10 @@ See [Plugins](/tools/plugin).
 ```
 
 - `evaluateEnabled: false` disables `act:evaluate` and `wait --fn`.
+- `controlBindHost` sets the internal bind address for the browser control HTTP server. Default is
+  `127.0.0.1`. Set to `0.0.0.0` when running inside Docker and you need other containers (or a
+  host-port forward) to reach it. Keep the host-side port mapping on loopback for security when
+  exposing to local tools only.
 - `ssrfPolicy.dangerouslyAllowPrivateNetwork` defaults to `true` when unset (trusted-network model).
 - Set `ssrfPolicy.dangerouslyAllowPrivateNetwork: false` for strict public-only browser navigation.
 - `ssrfPolicy.allowPrivateNetwork` remains supported as a legacy alias.
@@ -2395,6 +2400,36 @@ See [Plugins](/tools/plugin).
 
 - `seamColor`: accent color for native app UI chrome (Talk Mode bubble tint, etc.).
 - `assistant`: Control UI identity override. Falls back to active agent identity.
+
+---
+
+### Storage Modes and Workspace Data
+
+```env
+# bind: host bind-mount (default for local repos)
+# volume: docker-managed volume (e.g., Coolify persistent storage)
+DATA_MODE=bind
+
+# Mount Cloudflare R2 into /data/workspace/data when enabled
+WORKSPACE_DATA_R2_RCLONE_MOUNT=0
+WORKSPACE_DATA_R2_PREFIX=workspace/data
+```
+
+- `DATA_MODE`: descriptive hint for how `/data` is provided. `bind` assumes the compose file binds a host directory. `volume` pairs with named Docker volumes (for example Coolify).
+- `WORKSPACE_DATA_R2_RCLONE_MOUNT`: when `true`/`1`, the entrypoint mounts `r2://$R2_BUCKET_NAME/$WORKSPACE_DATA_R2_PREFIX` onto `/data/workspace/data` using rclone with VFS caching. Requires `R2_ENDPOINT`, `R2_ACCESS_KEY_ID`, and `R2_SECRET_ACCESS_KEY`.
+- `WORKSPACE_DATA_R2_PREFIX`: subpath inside the bucket to mount (strip leading/trailing `/`). Defaults to `workspace/data`, producing runtime paths like `/data/workspace/data/my-farm-advisor/...`.
+- When the mount flag is disabled, `/data/workspace/data` remains a local directory (bind or volume) and skills such as My Farm Advisor write directly to the local filesystem.
+
+Add or adjust Cloudflare credentials in the same `.env` file:
+
+```env
+R2_BUCKET_NAME=my-farm-advisor
+R2_ENDPOINT=https://<account>.r2.cloudflarestorage.com
+R2_ACCESS_KEY_ID=...
+R2_SECRET_ACCESS_KEY=...
+```
+
+The rclone mount only replaces the workspace data subtree. The rest of `/data` (workspace metadata, skills, logs, etc.) continues to use the selected `DATA_MODE` storage.
 
 ---
 

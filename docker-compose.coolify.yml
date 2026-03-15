@@ -58,7 +58,9 @@ services:
       R2_BUCKET_NAME: ${R2_BUCKET_NAME:-my-farm-advisor}
       R2_ENDPOINT: ${R2_ENDPOINT:-}
       CF_ACCOUNT_ID: ${CF_ACCOUNT_ID:-}
-      DATA_MODE: ${DATA_MODE:-local}
+      DATA_MODE: ${DATA_MODE:-volume}
+      WORKSPACE_DATA_R2_RCLONE_MOUNT: ${WORKSPACE_DATA_R2_RCLONE_MOUNT:-0}
+      WORKSPACE_DATA_R2_PREFIX: ${WORKSPACE_DATA_R2_PREFIX:-workspace/data}
       
       # Optional: skill sync control
       # OPENCLAW_SYNC_SKILLS_ON_START: 1

@@ -3,65 +3,108 @@ set -e
 
 echo "Starting OpenClaw Gateway..."
 
-DATA_MODE="${DATA_MODE:-local}"
+DATA_MODE="${DATA_MODE:-bind}"
+WORKSPACE_DATA_R2_RCLONE_MOUNT="${WORKSPACE_DATA_R2_RCLONE_MOUNT:-0}"
+WORKSPACE_DATA_R2_PREFIX="${WORKSPACE_DATA_R2_PREFIX:-workspace/data}"
+WORKSPACE_DATA_PATH="/data/workspace/data"
 R2_ENDPOINT="${R2_ENDPOINT:-}"
+
+is_truthy() {
+    case "$1" in
+        1|true|TRUE|True|yes|YES|on|ON)
+            return 0
+            ;;
+        *)
+            return 1
+            ;;
+    esac
+}
+
+log_storage_mode() {
+    case "$DATA_MODE" in
+        volume|VOLUME)
+            echo "DATA_MODE=volume (managed Docker volume)"
+            ;;
+        bind|local|BIND|LOCAL|"")
+            DATA_MODE="bind"
+            echo "DATA_MODE=bind (host directory mount)"
+            ;;
+        *)
+            echo "DATA_MODE=$DATA_MODE (custom)"
+            ;;
+    esac
+}
+
 if [ -z "$R2_ENDPOINT" ] && [ -n "$CF_ACCOUNT_ID" ]; then
     R2_ENDPOINT="https://${CF_ACCOUNT_ID}.r2.cloudflarestorage.com"
 fi
-REQUIRE_R2=0
-if [ "$DATA_MODE" != "local" ]; then
-    REQUIRE_R2=1
+
+log_storage_mode
+
+mkdir -p /data
+
+echo "Setting up workspace directories..."
+if ! mkdir -p /data/workspace/skills /data/workspace/.openclaw /data/workspace/data; then
+    echo "Unable to create workspace directories under /data/workspace"
+    exit 1
 fi
 
-if [ "$REQUIRE_R2" -eq 0 ]; then
-    echo "DATA_MODE=local, using local volume"
-    mkdir -p /data
-else
+workspace_data_mount_requested=0
+if is_truthy "$WORKSPACE_DATA_R2_RCLONE_MOUNT"; then
+    workspace_data_mount_requested=1
+fi
 
-if [ -n "$R2_ACCESS_KEY_ID" ] && [ -n "$R2_SECRET_ACCESS_KEY" ] && [ -n "$R2_ENDPOINT" ]; then
-    echo "Mounting R2 bucket: $R2_BUCKET_NAME"
-    echo "R2 endpoint: $R2_ENDPOINT"
-    fusermount -u /data 2>/dev/null || true
-    fusermount -uz /data 2>/dev/null || true
-    mkdir -p /data /tmp/rclone-cache /tmp/rclone-vfs
-    
+if [ $workspace_data_mount_requested -eq 1 ]; then
+    if [ -z "$R2_BUCKET_NAME" ] || [ -z "$R2_ACCESS_KEY_ID" ] || [ -z "$R2_SECRET_ACCESS_KEY" ] || [ -z "$R2_ENDPOINT" ]; then
+        echo "WORKSPACE_DATA_R2_RCLONE_MOUNT is enabled but R2 credentials are incomplete; exiting"
+        exit 1
+    fi
+
     export AWS_ACCESS_KEY_ID="$R2_ACCESS_KEY_ID"
     export AWS_SECRET_ACCESS_KEY="$R2_SECRET_ACCESS_KEY"
     export AWS_EC2_METADATA_DISABLED=true
     export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-auto}"
 
-    LOCAL_SKILLS_MANIFEST="${OPENCLAW_LOCAL_SKILLS_MANIFEST_PATH:-/app/skills-manifest.json}"
-    REMOTE_SKILLS_MANIFEST_OBJECT="${OPENCLAW_SKILLS_MANIFEST_OBJECT:-workspace/.skills-manifest.json}"
-    REMOTE_SKILLS_PREFIX="${OPENCLAW_REMOTE_SKILLS_PREFIX:-workspace/skills}"
-    SKILL_SYNC_STRATEGY="${OPENCLAW_SKILL_SYNC_STRATEGY:-auto}"
-    FORCE_SKILL_SYNC="${OPENCLAW_FORCE_SKILL_SYNC:-0}"
-    SKIP_FUSE_SKILL_SYNC=0
+    sync_skills_on_start=0
+    if is_truthy "${OPENCLAW_SYNC_SKILLS_ON_START:-}"; then
+        sync_skills_on_start=1
+    fi
 
-    if [ "$REQUIRE_R2" -eq 1 ] && [ -f "$LOCAL_SKILLS_MANIFEST" ] && command -v aws >/dev/null 2>&1 && [ "$SKILL_SYNC_STRATEGY" != "fuse" ]; then
-        REMOTE_MANIFEST_PATH=/tmp/remote-skills-manifest.json
-        if [ "$FORCE_SKILL_SYNC" != "1" ]; then
-            if aws s3 cp "s3://$R2_BUCKET_NAME/$REMOTE_SKILLS_MANIFEST_OBJECT" "$REMOTE_MANIFEST_PATH" --endpoint-url "$R2_ENDPOINT" --no-progress --only-show-errors >/dev/null 2>&1; then
-                if cmp -s "$LOCAL_SKILLS_MANIFEST" "$REMOTE_MANIFEST_PATH"; then
-                    echo "Remote skills manifest matches bundled skills; skipping upload"
-                    SKIP_FUSE_SKILL_SYNC=1
+    if [ $sync_skills_on_start -eq 1 ]; then
+        LOCAL_SKILLS_MANIFEST="${OPENCLAW_LOCAL_SKILLS_MANIFEST_PATH:-/app/skills-manifest.json}"
+        REMOTE_SKILLS_MANIFEST_OBJECT="${OPENCLAW_SKILLS_MANIFEST_OBJECT:-workspace/.skills-manifest.json}"
+        REMOTE_SKILLS_PREFIX="${OPENCLAW_REMOTE_SKILLS_PREFIX:-workspace/skills}"
+        SKILL_SYNC_STRATEGY="${OPENCLAW_SKILL_SYNC_STRATEGY:-auto}"
+        FORCE_SKILL_SYNC="${OPENCLAW_FORCE_SKILL_SYNC:-0}"
+        SKIP_REMOTE_SKILL_SYNC=0
+
+        if [ -f "$LOCAL_SKILLS_MANIFEST" ] && command -v aws >/dev/null 2>&1 && [ "$SKILL_SYNC_STRATEGY" != "fuse" ]; then
+            REMOTE_MANIFEST_PATH=/tmp/remote-skills-manifest.json
+            if [ "$FORCE_SKILL_SYNC" != "1" ]; then
+                if aws s3 cp "s3://$R2_BUCKET_NAME/$REMOTE_SKILLS_MANIFEST_OBJECT" "$REMOTE_MANIFEST_PATH" --endpoint-url "$R2_ENDPOINT" --no-progress --only-show-errors >/dev/null 2>&1; then
+                    if cmp -s "$LOCAL_SKILLS_MANIFEST" "$REMOTE_MANIFEST_PATH"; then
+                        echo "Remote skills manifest matches bundled skills; skipping upload"
+                        SKIP_REMOTE_SKILL_SYNC=1
+                    fi
+                fi
+            fi
+
+            if [ "$SKIP_REMOTE_SKILL_SYNC" != "1" ]; then
+                echo "Uploading bundled skills to R2 via aws s3 sync..."
+                if aws s3 sync /app/skills "s3://$R2_BUCKET_NAME/$REMOTE_SKILLS_PREFIX" --endpoint-url "$R2_ENDPOINT" --delete --exact-timestamps --no-progress --only-show-errors; then
+                    aws s3 cp "$LOCAL_SKILLS_MANIFEST" "s3://$R2_BUCKET_NAME/$REMOTE_SKILLS_MANIFEST_OBJECT" --endpoint-url "$R2_ENDPOINT" --no-progress --only-show-errors >/dev/null 2>&1 || true
+                else
+                    echo "aws s3 sync failed; continuing without remote skill seed"
                 fi
             fi
         fi
-
-        if [ "$SKIP_FUSE_SKILL_SYNC" != "1" ]; then
-            echo "Uploading bundled skills to R2 via aws s3 sync..."
-            if aws s3 sync /app/skills "s3://$R2_BUCKET_NAME/$REMOTE_SKILLS_PREFIX" --endpoint-url "$R2_ENDPOINT" --delete --exact-timestamps --no-progress --only-show-errors; then
-                aws s3 cp "$LOCAL_SKILLS_MANIFEST" "s3://$R2_BUCKET_NAME/$REMOTE_SKILLS_MANIFEST_OBJECT" --endpoint-url "$R2_ENDPOINT" --no-progress --only-show-errors >/dev/null 2>&1 || true
-                SKIP_FUSE_SKILL_SYNC=1
-            else
-                echo "aws s3 sync failed; falling back to rclone mount"
-            fi
-        fi
+    else
+        echo "Skipping bundled skill upload (OPENCLAW_SYNC_SKILLS_ON_START disabled)"
     fi
-    
+
     RCLONE_VFS_CACHE_SIZE="${RCLONE_VFS_CACHE_SIZE:-20G}"
     RCLONE_VFS_CACHE_MAX_AGE="${RCLONE_VFS_CACHE_MAX_AGE:-1h}"
-    
+
     cat > /tmp/rclone.conf <<EOF
 [r2]
 type = s3
@@ -88,46 +131,31 @@ EOF
         --daemon
     )
 
-    if ! rclone mount r2:/"$R2_BUCKET_NAME" /data "${RCLONE_OPTS[@]}" 2>&1; then
-        echo "rclone mount failed"
-        if [ "$REQUIRE_R2" -eq 1 ]; then
-            echo "DATA_MODE=$DATA_MODE requires R2; exiting"
-            exit 1
-        fi
-        echo "continuing with local storage"
-    else
-        sleep 2
-        if ! ls /data >/dev/null 2>&1; then
-            echo "R2 mount is unhealthy right after mount"
-            if [ "$REQUIRE_R2" -eq 1 ]; then
-                echo "DATA_MODE=$DATA_MODE requires healthy R2; exiting"
-                exit 1
-            fi
-            fusermount -u /data 2>/dev/null || true
-        fi
-        echo "R2 mount complete"
+    mkdir -p "$WORKSPACE_DATA_PATH"
+    fusermount -u "$WORKSPACE_DATA_PATH" 2>/dev/null || true
+    fusermount -uz "$WORKSPACE_DATA_PATH" 2>/dev/null || true
+
+    SANITIZED_PREFIX="${WORKSPACE_DATA_R2_PREFIX#/}"
+    SANITIZED_PREFIX="${SANITIZED_PREFIX%/}"
+    MOUNT_SOURCE="r2:/$R2_BUCKET_NAME"
+    if [ -n "$SANITIZED_PREFIX" ]; then
+        MOUNT_SOURCE="r2:/$R2_BUCKET_NAME/$SANITIZED_PREFIX"
     fi
+
+    echo "Mounting workspace data from $MOUNT_SOURCE to $WORKSPACE_DATA_PATH"
+    if ! rclone mount "$MOUNT_SOURCE" "$WORKSPACE_DATA_PATH" "${RCLONE_OPTS[@]}" 2>&1; then
+        echo "Failed to mount workspace data from R2; exiting"
+        exit 1
+    fi
+
+    sleep 2
+    if ! ls "$WORKSPACE_DATA_PATH" >/dev/null 2>&1; then
+        echo "R2 workspace data mount appears unhealthy; exiting"
+        exit 1
+    fi
+    echo "Workspace data mount ready at $WORKSPACE_DATA_PATH"
 else
-    if [ "$REQUIRE_R2" -eq 1 ]; then
-        echo "R2 config missing (R2_ACCESS_KEY_ID/R2_SECRET_ACCESS_KEY/R2_ENDPOINT) and DATA_MODE=$DATA_MODE requires R2; exiting"
-        exit 1
-    fi
-    echo "R2 credentials not set, using local volume"
-    mkdir -p /data
-fi
-
-fi
-
-echo "Setting up workspace..."
-if ! mkdir -p /data/workspace/skills /data/workspace/.openclaw; then
-    if [ "$REQUIRE_R2" -eq 1 ]; then
-        echo "Primary data path unavailable and DATA_MODE=$DATA_MODE requires R2; exiting"
-        exit 1
-    fi
-    echo "Primary data path unavailable, falling back to local volume"
-    fusermount -u /data 2>/dev/null || true
-    mkdir -p /data
-    mkdir -p /data/workspace/skills /data/workspace/.openclaw
+    mkdir -p "$WORKSPACE_DATA_PATH"
 fi
 
 node <<'EOF'
@@ -198,6 +226,26 @@ if (allModels.length > 0) {
   });
 }
 
+const nvidiaApiKey = process.env.NVIDIA_API_KEY?.trim();
+const nvidiaBaseUrl = process.env.NVIDIA_BASE_URL?.trim();
+const nvidiaModels = allModels.filter(m => m.startsWith('nvidia/'));
+if (nvidiaApiKey && nvidiaBaseUrl && nvidiaModels.length > 0) {
+  config.models ??= {};
+  config.models.mode ??= 'merge';
+  config.models.providers ??= {};
+  const providerId = 'nvidia';
+  const providerModels = nvidiaModels.map(m => ({ id: m, name: m.split('/').pop() ?? m }));
+  const existingProvider = config.models.providers[providerId] ?? {};
+  config.models.providers[providerId] = {
+    ...existingProvider,
+    baseUrl: nvidiaBaseUrl,
+    api: 'openai-responses',
+    auth: 'api-key',
+    apiKey: 'secretref-env:NVIDIA_API_KEY',
+    models: providerModels,
+  };
+}
+
 if (config.models && typeof config.models === 'object') {
   const providers = config.models.providers;
   if (providers && typeof providers === 'object') {
@@ -220,6 +268,15 @@ if (primaryModel) {
   if (fallbackModels) {
     config.agents.defaults.model.fallbacks = fallbackModels.split(',').map(m => m.trim()).filter(m => m);
   }
+}
+
+if (Array.isArray(config.agents?.list) && primaryModel) {
+  config.agents.list = config.agents.list.map(entry => {
+    if (entry && typeof entry === 'object' && entry.id === 'main') {
+      return { ...entry, model: primaryModel };
+    }
+    return entry;
+  });
 }
 
 fs.writeFileSync(configPath, `${JSON.stringify(config, null, 2)}\n`);
