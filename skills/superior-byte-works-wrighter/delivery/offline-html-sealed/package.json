@@ -1,0 +1,20 @@
+{
+  "name": "wrighter-offline-html-sealed",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Fingerprinting-aware offline HTML delivery pipeline for Wrighter sealed artifacts",
+  "type": "module",
+  "scripts": {
+    "build": "tsc --project tsconfig.json",
+    "lint": "tsc --project tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "gray-matter": "^4.0.3",
+    "nanoid": "^5.1.6",
+    "strip-html": "^2.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.37",
+    "typescript": "^5.9.3"
+  }
+}

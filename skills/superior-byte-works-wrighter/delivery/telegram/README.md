@@ -94,6 +94,16 @@ const result = await buildTelegramDelivery(
 The pipeline never sends messages; it only produces a deterministic payload
 structure so existing outbound routers can deliver it.
 
+### Framework Integration Hook
+
+For OpenClaw we inject the transformer in `deliverOutboundPayloadsCore`, before
+channel normalization, so every Telegram `ReplyPayload` that carries raw
+Wrighter Phase‑1 output is rewritten into validated messages and inline media.
+If you port this skill to a different agentic framework, ensure you hook the
+transformer at the same stage—immediately before channel-specific delivery—so
+Wrighter documents automatically receive Telegram-friendly splitting and media
+generation without extra per-agent plumbing.
+
 ### CLI helper
 
 For manual inspection, a small CLI is included:

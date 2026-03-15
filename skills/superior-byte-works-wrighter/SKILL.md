@@ -144,6 +144,13 @@ flowchart LR
 
 Shared: [\_shared/](_shared/)
 
+## Delivery Modes
+
+- [delivery/offline-html-open/SKILL.md](delivery/offline-html-open/SKILL.md) — Source-faithful offline HTML
+- [delivery/offline-html-sealed/SKILL.md](delivery/offline-html-sealed/SKILL.md) — Fingerprinted/personalized offline HTML
+- [delivery/offline-appliance/SKILL.md](delivery/offline-appliance/SKILL.md) — Spec-first future appliance
+- Shared delivery guides: [delivery/asset-model.md](delivery/asset-model.md), [delivery/snapshot-model.md](delivery/snapshot-model.md), [delivery/fingerprinting.md](delivery/fingerprinting.md), [delivery/threat-model.md](delivery/threat-model.md)
+
 ## Transition Notes
 
 - Markdown and Mermaid resources now route through `wrighter`.
