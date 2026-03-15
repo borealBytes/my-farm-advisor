@@ -42,7 +42,9 @@ services:
       R2_ENDPOINT: ${R2_ENDPOINT:-}
       CF_ACCOUNT_ID: ${CF_ACCOUNT_ID:-}
       TZ: ${OPENCLAW_TZ:-UTC}
-      DATA_MODE: ${DATA_MODE:-local}
+      DATA_MODE: ${DATA_MODE:-bind}
+      WORKSPACE_DATA_R2_RCLONE_MOUNT: ${WORKSPACE_DATA_R2_RCLONE_MOUNT:-0}
+      WORKSPACE_DATA_R2_PREFIX: ${WORKSPACE_DATA_R2_PREFIX:-workspace/data}
     volumes:
       - ${DATA_VOLUME_SOURCE:-./data}:/data
       ## Uncomment the lines below to enable sandbox isolation
