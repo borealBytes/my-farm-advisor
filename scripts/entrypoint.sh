@@ -228,21 +228,61 @@ if (allModels.length > 0) {
 
 const nvidiaApiKey = process.env.NVIDIA_API_KEY?.trim();
 const nvidiaBaseUrl = process.env.NVIDIA_BASE_URL?.trim();
-const nvidiaModels = allModels.filter(m => m.startsWith('nvidia/'));
-if (nvidiaApiKey && nvidiaBaseUrl && nvidiaModels.length > 0) {
+const INTEGRATE_MODEL_PREFIXES = new Set(['nvidia', 'stepfun-ai']);
+const normalizeIntegrateModelId = id => {
+  if (typeof id !== 'string') return id;
+  if (id.startsWith('nvidia/stepfun-ai/')) {
+    return id.replace('nvidia/stepfun-ai/', 'stepfun-ai/');
+  }
+  if (id.startsWith('nvidia/qwen/')) {
+    return id.replace('nvidia/qwen/', 'qwen/');
+  }
+  if (id.startsWith('nvidia/moonshotai/')) {
+    return id.replace('nvidia/moonshotai/', 'moonshotai/');
+  }
+  return id;
+};
+const integrateModels = allModels.filter(modelRef => {
+  const providerPrefix = modelRef.split('/')[0];
+  return INTEGRATE_MODEL_PREFIXES.has(providerPrefix) || modelRef.startsWith('stepfun-ai/');
+});
+if (nvidiaApiKey && nvidiaBaseUrl && integrateModels.length > 0) {
   config.models ??= {};
   config.models.mode ??= 'merge';
   config.models.providers ??= {};
   const providerId = 'nvidia';
-  const providerModels = nvidiaModels.map(m => ({ id: m, name: m.split('/').pop() ?? m }));
+  const providerModels = integrateModels.map(m => {
+    const normalizedId = normalizeIntegrateModelId(m);
+    const name = normalizedId.split('/').pop() ?? normalizedId;
+    return { id: normalizedId, name };
+  });
   const existingProvider = config.models.providers[providerId] ?? {};
+  const existingModelsArray = Array.isArray(existingProvider.models)
+    ? existingProvider.models.map(model => {
+        const normalizedId = normalizeIntegrateModelId(model?.id ?? '');
+        const name = model?.name ?? normalizedId.split('/').pop() ?? normalizedId;
+        return { ...model, id: normalizedId, name };
+      })
+    : [];
+  const existingModelMap = new Map();
+  for (const model of existingModelsArray) {
+    if (model?.id && !existingModelMap.has(model.id)) {
+      existingModelMap.set(model.id, model);
+    }
+  }
+  const mergedModels = Array.from(existingModelMap.values());
+  for (const model of providerModels) {
+    if (!mergedModels.some(existing => existing?.id === model.id)) {
+      mergedModels.push(model);
+    }
+  }
   config.models.providers[providerId] = {
     ...existingProvider,
     baseUrl: nvidiaBaseUrl,
-    api: 'openai-responses',
+    api: 'openai-completions',
     auth: 'api-key',
     apiKey: 'secretref-env:NVIDIA_API_KEY',
-    models: providerModels,
+    models: mergedModels,
   };
 }
 
