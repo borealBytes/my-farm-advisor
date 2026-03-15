@@ -171,13 +171,19 @@ function convertMessagesToPayloads(
     if (message.kind === "text") {
       base.text = message.html;
     } else {
-      const mediaUrl = pathToFileURL(message.filePath).href;
-      base.text = message.caption ?? "";
+      const mediaMessage = message;
+      const mediaUrl = pathToFileURL(mediaMessage.filePath).href;
+      base.text = mediaMessage.caption ?? "";
       base.mediaUrl = mediaUrl;
       base.mediaUrls = [mediaUrl];
       const telegramData = base.channelData?.telegram as Record<string, unknown>;
-      if (message.mimeType) {
-        telegramData.mimeType = telegramData.mimeType ?? message.mimeType;
+      const fileName = path.basename(mediaMessage.filePath);
+      const mimeType = inferMimeType(mediaMessage);
+      telegramData.mimeType = telegramData.mimeType ?? mimeType;
+      telegramData.contentType = telegramData.contentType ?? mimeType;
+      telegramData.fileName = telegramData.fileName ?? fileName;
+      if ("role" in mediaMessage && mediaMessage.role) {
+        telegramData.assetRole = telegramData.assetRole ?? mediaMessage.role;
       }
     }
     results.push(base);
@@ -219,6 +225,7 @@ function createHtmlDocumentPayload(
   };
   const telegramData = base.channelData?.telegram as Record<string, unknown>;
   telegramData.mimeType = "text/html";
+  telegramData.contentType = "text/html";
   telegramData.fileName = artifact.fileName;
   telegramData.deliveryMode = artifact.mode;
   if (artifact.fingerprintId) {
@@ -248,5 +255,28 @@ async function removeDirSafe(dir: string): Promise<void> {
     await fs.rm(dir, { recursive: true, force: true });
   } catch (err) {
     log.debug?.("failed to remove wrighter telegram temp dir", { dir, err });
+  }
+}
+
+function inferMimeType(message: TelegramMediaMessage): string {
+  if ("mimeType" in message && message.mimeType) {
+    return message.mimeType;
+  }
+  const ext = path.extname(message.filePath).toLowerCase();
+  switch (ext) {
+    case ".png":
+      return "image/png";
+    case ".jpg":
+    case ".jpeg":
+      return "image/jpeg";
+    case ".gif":
+      return "image/gif";
+    case ".html":
+    case ".htm":
+      return "text/html";
+    case ".pdf":
+      return "application/pdf";
+    default:
+      return message.kind === "photo" ? "image/png" : "application/octet-stream";
   }
 }
