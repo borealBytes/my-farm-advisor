@@ -8,55 +8,104 @@ title: "Cloudflare + Coolify"
 
 # Cloudflare + Coolify
 
-This is the authoritative runbook for the supported Cloudflare Zero Trust deployment on Coolify.
+## Goal
 
-Use this page when you want the Coolify stack to stay private on the VPS while Cloudflare publishes the hostname stored in `OPENCLAW_PUBLIC_HOSTNAME`.
+Use this runbook when you want one public app hostname, a private VPS origin, and the supported Coolify deployment contract.
 
-## What this setup does
+Public users open `https://<OPENCLAW_PUBLIC_HOSTNAME>`. Cloudflare protects that hostname, then forwards traffic through the same-compose `cloudflared` sidecar to the loopback-only gateway origin.
 
-- `docker-compose.coolify.yml` runs `openclaw-gateway` and a same-compose `cloudflared` sidecar.
-- `CLOUDFLARE_TUNNEL_TOKEN` is the only supported switch that turns on the tunnel path in Coolify.
-- If `CLOUDFLARE_TUNNEL_TOKEN` is blank, the `cloudflared` container exits immediately and the gateway stays private on `127.0.0.1:18789`.
-- Local Docker does not require Cloudflare. This runbook is only for the Coolify deployment story.
-- Browser control stays private on loopback and is not part of the tunnel setup.
-- The supported public app entry is `https://<OPENCLAW_PUBLIC_HOSTNAME>`.
-- Cloudflare should redirect that root URL to `/__openclaw__/canvas/`.
+## What are we doing
 
-## Trust boundary
+You are setting up two layers that work together:
 
-Treat the deployment as two layers:
+1. Cloudflare publishes and protects the hostname stored in `OPENCLAW_PUBLIC_HOSTNAME`.
+2. Coolify runs `docker-compose.coolify.yml`, where `openclaw-gateway` stays private on `127.0.0.1:18789` and `cloudflared` only connects outbound.
 
-1. Cloudflare Access protects the hostname stored in `OPENCLAW_PUBLIC_HOSTNAME`.
-2. Loopback-only origin publishing protects the raw VPS service because `openclaw-gateway` is published on `127.0.0.1:18789:18789`.
+Why this matters: people can reach the app through Cloudflare, but the raw VPS service still is not public.
 
-That means public traffic should enter through Cloudflare, while the origin stays private unless you already have shell access on the VPS. Do not treat the tunnel as a replacement for private origin binding. Both layers matter.
+| Topic             | Required value or behavior                                                         | Why it matters                                               |
+| ----------------- | ---------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| Public hostname   | `OPENCLAW_PUBLIC_HOSTNAME` is the public root hostname placeholder                 | This is the browser entry users type                         |
+| Root entry        | Cloudflare redirects `/` to `/__openclaw__/canvas/`                                | Users can start at the root hostname                         |
+| Tunnel switch     | `CLOUDFLARE_TUNNEL_TOKEN` is the only supported switch for tunnel mode             | Blank token means no public hostname is published            |
+| Origin target     | `CLOUDFLARED_ORIGIN_URL` is automatic from compose, not user-set                   | The sidecar always points at `http://openclaw-gateway:18789` |
+| Private origin    | Blank `CLOUDFLARE_TUNNEL_TOKEN` keeps the origin private on `127.0.0.1:18789`      | The app can stay VPS-private with no public exposure         |
+| Control UI safety | Control UI is not public-safe by default and still needs explicit `allowedOrigins` | Tunnel publishing does not replace browser origin policy     |
+
+```mermaid
+flowchart LR
+    Browser[Browser]
+    Access[Cloudflare Access]
+    Tunnel[cloudflared sidecar]
+    Gateway[openclaw-gateway]
+    Canvas[Canvas path]
+    Loopback[(127.0.0.1:18789)]
+
+    Browser --> Access --> Tunnel --> Gateway --> Canvas
+    Gateway --- Loopback
+```
+
+Caption: Traffic enters through Cloudflare, while the gateway port stays bound to loopback on the VPS.
+
+## Quick path
+
+- In Cloudflare, create a token-based tunnel and copy the token.
+- Set `OPENCLAW_PUBLIC_HOSTNAME` to the public hostname you want.
+- In the tunnel dashboard, point that hostname to `http://openclaw-gateway:18789`.
+- Add a Cloudflare Access self-hosted app for the same hostname.
+- Add a Cloudflare `Redirect Rules` rule that sends `/` to `/__openclaw__/canvas/`.
+- In Coolify, deploy `docker-compose.coolify.yml` with `CLOUDFLARE_TUNNEL_TOKEN`, `OPENCLAW_PUBLIC_HOSTNAME`, and the normal gateway env vars.
 
 ## Before you start
 
 - Cloudflare Zero Trust is available for your account.
-- The DNS zone for `superiorbyteworks.com` is already in Cloudflare.
-- Coolify can deploy this repository with `docker-compose.coolify.yml`.
+- The DNS zone for your hostname is already in Cloudflare.
+- Coolify can deploy this repo with `docker-compose.coolify.yml`.
 - You have a strong `OPENCLAW_GATEWAY_TOKEN` ready.
-- You are not looking for a public-origin mode. `OPENCLAW_PUBLIC_HTTP` is intentionally not part of the supported contract and should not be documented or used here.
 - You know the hostname you want to publish, for example `my-farm-advisor.superiorbyteworks.com`.
+- You are not trying to expose a raw public origin. `OPENCLAW_PUBLIC_HTTP` is not part of the supported contract.
 
 ## One-time Cloudflare prep
 
-### 1. Create the tunnel token
+Do these once in the Cloudflare dashboard before you deploy from Coolify.
 
-In the Cloudflare dashboard:
+```mermaid
+flowchart TD
+    Token[Create tunnel token]
+    Host[Choose hostname]
+    PublicHost[Add public hostname]
+    Access[Add Access app]
+    Redirect[Add root redirect]
 
-1. Go to Zero Trust.
-2. Open Networks, then Tunnels.
-3. Create a tunnel for this deployment.
-4. Choose the token-based connector flow.
-5. Copy the tunnel token and keep it for Coolify as `CLOUDFLARE_TUNNEL_TOKEN`.
+    Token --> Host --> PublicHost --> Access --> Redirect
+```
 
-This repo expects the token only. It does not expect a credentials JSON file or Cloudflare API automation.
+Caption: Set up Cloudflare in this order so the hostname, Access policy, and redirect all match the same deployment.
 
-### 2. Choose your public hostname
+| Cloudflare or Coolify field | Set it to                                   | Notes                                                     |
+| --------------------------- | ------------------------------------------- | --------------------------------------------------------- |
+| Tunnel connector type       | `token-based`                               | Use the token as `CLOUDFLARE_TUNNEL_TOKEN`                |
+| Public hostname target      | `http://openclaw-gateway:18789`             | Keep the target inside the compose network                |
+| Access application type     | `self-hosted`                               | Protect the hostname stored in `OPENCLAW_PUBLIC_HOSTNAME` |
+| Access login method         | `One-Time PIN`                              | Make sure your policy allows the right users              |
+| Redirect status             | `302` while testing, `301` later if desired | The redirect should send `/` to `/__openclaw__/canvas/`   |
 
-Set `OPENCLAW_PUBLIC_HOSTNAME` to the hostname people should type in the browser.
+### Step 1: Create the tunnel token
+
+In Cloudflare Zero Trust:
+
+1. Open `Networks`, then `Tunnels`.
+2. Create a tunnel for this deployment.
+3. Choose the token-based connector flow.
+4. Copy the token for Coolify.
+
+Save that value as `CLOUDFLARE_TUNNEL_TOKEN`.
+
+Why this matters: this repo supports the token flow only. Do not switch to a credentials JSON file or a local hostname mapping file.
+
+### Step 2: Choose the public hostname
+
+Set `OPENCLAW_PUBLIC_HOSTNAME` to the hostname users should open in the browser.
 
 Example:
 
@@ -64,68 +113,61 @@ Example:
 OPENCLAW_PUBLIC_HOSTNAME=my-farm-advisor.superiorbyteworks.com
 ```
 
-This variable is part of the Coolify compose contract so the hostname is defined in one place instead of being hard-coded through the docs.
+Why this matters: the docs, tunnel hostname, Access app, and redirect rule all need to point at the same root hostname.
 
-### 3. Create the public hostname
+### Step 3: Add the public hostname to the tunnel
 
-Inside the same tunnel configuration, add a public hostname with these values:
+Inside that tunnel, add a public hostname with these values:
 
-- Hostname: value of `OPENCLAW_PUBLIC_HOSTNAME`
+- Hostname: the value of `OPENCLAW_PUBLIC_HOSTNAME`
 - Service type: `HTTP`
 - Service URL: `http://openclaw-gateway:18789`
 
-Why this target: the same-compose `cloudflared` sidecar routes to `CLOUDFLARED_ORIGIN_URL=http://openclaw-gateway:18789` inside the Docker network. You do not set `CLOUDFLARED_ORIGIN_URL` yourself. `docker-compose.coolify.yml` sets it automatically. The VPS does not need a public port for this path. In token mode, Cloudflare owns the hostname mapping in the dashboard, so the local sidecar config stays focused on the origin target.
+Important truth: `CLOUDFLARED_ORIGIN_URL` is automatic from compose. You do not set it yourself. `docker-compose.coolify.yml` injects `CLOUDFLARED_ORIGIN_URL=http://openclaw-gateway:18789` for the sidecar.
 
-### 4. Create the Access application
+Important truth: in token mode, the hostname mapping lives in the Cloudflare dashboard, not in local config files on the VPS.
 
-In Zero Trust, create a self-hosted application for the same hostname stored in `OPENCLAW_PUBLIC_HOSTNAME`.
+### Step 4: Add the Cloudflare Access app
 
-Use these settings:
+Create a self-hosted Access application for the same hostname stored in `OPENCLAW_PUBLIC_HOSTNAME`.
 
-- Application type: self-hosted
-- Domain: value of `OPENCLAW_PUBLIC_HOSTNAME`
-- Path: protect the whole site so `/` and `/__openclaw__/canvas/` are both covered
+Use these values:
+
+- Domain: the value of `OPENCLAW_PUBLIC_HOSTNAME`
+- Path: protect the whole site
 - Login method: `One-Time PIN`
 
-Make sure the Access policy actually allows the users who should reach the app. This repo does not create the Access policy for you.
+Why this matters: both `/` and `/__openclaw__/canvas/` need to stay behind the same Access gate.
 
-### 5. Add the root redirect
+### Step 5: Add the root redirect
 
-Cloudflared does not give us a clean root-to-origin-path rewrite in this setup, so use a Cloudflare redirect rule for the public browser entry.
+Open your domain, then go to `Rules` -> `Redirect Rules`.
 
-In the Cloudflare dashboard:
-
-1. Open your domain.
-2. Go to `Rules`.
-3. Open `Redirect Rules`.
-4. Click `Create rule`.
-5. Create a rule with these values.
-
-Match:
+Create a rule that matches:
 
 - `https://<OPENCLAW_PUBLIC_HOSTNAME>/`
 
-Action:
+Redirect it to:
 
-- Redirect to `https://<OPENCLAW_PUBLIC_HOSTNAME>/__openclaw__/canvas/`
-- Use a `302` redirect while testing
-- Change it to `301` later if you want it permanent
+- `https://<OPENCLAW_PUBLIC_HOSTNAME>/__openclaw__/canvas/`
 
-Why this exists: people should only need to type the top-level hostname, while OpenClaw still serves the Canvas UI from the internal `/__openclaw__/canvas/` path.
+Use `302` while testing. Switch to `301` later if you want a permanent redirect.
 
-## Coolify deployment flow
+Why this matters: the supported browser entry is the root hostname, but the Canvas UI still lives on `/__openclaw__/canvas/`.
 
-### 1. Use the single compose file
+## Coolify deployment
 
-In Coolify, deploy this repository with `docker-compose.coolify.yml`.
+### Step 1: Deploy the single compose app
 
-Do not create a second Coolify app for `cloudflared`. The supported contract is one compose app with the tunnel sidecar already included.
+In Coolify, deploy this repo with `docker-compose.coolify.yml`.
 
-### 2. Set the environment variables
+Do not create a second app for `cloudflared`. The supported contract is one compose deployment with the sidecar already included.
 
-Use `.env.coolify` as the reference for Coolify environment values.
+### Step 2: Set the environment values
 
-Minimum values for the Cloudflare path:
+Use `.env.coolify` as your reference.
+
+Minimum values for the supported Cloudflare path:
 
 ```dotenv
 OPENCLAW_GATEWAY_TOKEN=<long-random-token>
@@ -138,212 +180,169 @@ NVIDIA_API_KEY=<optional-if-used>
 ANTHROPIC_API_KEY=<optional-if-used>
 ```
 
-Important behavior from the current compose contract:
+Why this matters: `CLOUDFLARE_TUNNEL_TOKEN` turns tunnel mode on, and `OPENCLAW_PUBLIC_HOSTNAME` tells Cloudflare which root hostname should represent this app.
 
-- `CLOUDFLARE_TUNNEL_TOKEN` present: `cloudflared` starts and publishes the Cloudflare hostname configured in the dashboard for `OPENCLAW_PUBLIC_HOSTNAME`.
-- `CLOUDFLARE_TUNNEL_TOKEN` blank: the stack still deploys, but `cloudflared` exits immediately and the app stays private on `127.0.0.1:18789`.
-- `OPENCLAW_PUBLIC_HOSTNAME` is required when `CLOUDFLARE_TUNNEL_TOKEN` is set.
-- `OPENCLAW_BROWSER_CONTROL_HOST` and `OPENCLAW_BROWSER_CONTROL_BIND` stay on `127.0.0.1`, so browser control remains private.
+### Step 3: Keep storage persistent
 
-### 3. Add persistent storage
+Attach the Coolify persistent volume for `/data`.
 
-Attach the Coolify persistent volume that backs `/data` for the `openclaw-data` volume used by `docker-compose.coolify.yml`.
+Why this matters: gateway state, workspace data, and seeded config survive restarts.
 
-That keeps gateway state, workspace data, and bootstrapped config across restarts.
+### Step 4: Wait for the first boot
 
-### 4. Deploy
+Start the deployment and give it a few minutes. The first boot can take longer because the gateway initializes before the health check settles.
 
-Start the Coolify deployment and allow several minutes for the first boot. The compose healthcheck grants a long startup window while the gateway initializes.
+### Step 5: Open the public entry
 
-### 5. Open the app through Cloudflare
-
-After the deployment is healthy, Access is configured, and the redirect is in place, open:
+After the deployment is healthy, Access is ready, and the redirect rule exists, open:
 
 `https://<OPENCLAW_PUBLIC_HOSTNAME>`
 
-That root URL is the supported public entry. Cloudflare should redirect it to the internal Canvas path for you.
+Cloudflare should redirect that root URL to `/__openclaw__/canvas/`.
+
+## Important truths to keep in mind
+
+- `CLOUDFLARE_TUNNEL_TOKEN` present: `cloudflared` starts and publishes the Cloudflare hostname already mapped in the dashboard.
+- `CLOUDFLARE_TUNNEL_TOKEN` blank: the sidecar exits cleanly and the app stays private on `127.0.0.1:18789`.
+- `OPENCLAW_PUBLIC_HOSTNAME` is required when `CLOUDFLARE_TUNNEL_TOKEN` is set.
+- Browser control stays bound to `127.0.0.1` and is outside the public tunnel path.
+- Control UI is an admin surface. It is not public-safe by default and still needs explicit `gateway.controlUi.allowedOrigins` for any non-loopback browser deployment.
+- `allowInsecureAuth` is not acceptable public-deployment guidance. It is a localhost compatibility flag, not a safe Cloudflare fix.
 
 ## Verification
 
-Run these checks on the VPS after Coolify deploys.
+Use the checks below after Coolify deploys.
 
-### Mode 1, token absent, cloud-safe private origin
+```mermaid
+flowchart TD
+    Start[Start verification]
+    Decision{Is `CLOUDFLARE_TUNNEL_TOKEN` set?}
+    Private[Check loopback health and Canvas]
+    Idle[Confirm sidecar stays idle]
+    Tunnel[Check loopback first, then public hostname]
+    Public[Confirm hostname answers through Cloudflare]
 
-Use this mode when `CLOUDFLARE_TUNNEL_TOKEN` is intentionally blank and the stack should stay private on the VPS.
-
-#### Origin health on loopback
-
-```bash
-curl -i http://127.0.0.1:18789/healthz
+    Start --> Decision
+    Decision -->|No| Private --> Idle
+    Decision -->|Yes| Tunnel --> Public
 ```
 
-Expected result:
+Caption: Verification splits into two supported modes, private-origin mode and tunnel-enabled mode.
 
-- Status `200 OK`
-- A short healthy response body
+| Check           | Command or place to look                              | Healthy result                                                      | Meaning                                        |
+| --------------- | ----------------------------------------------------- | ------------------------------------------------------------------- | ---------------------------------------------- |
+| Loopback health | `curl -i http://127.0.0.1:18789/healthz`              | `200 OK`                                                            | The raw origin is up on the VPS                |
+| Loopback Canvas | `curl -i http://127.0.0.1:18789/__openclaw__/canvas/` | `401 Unauthorized`                                                  | The Canvas route exists and is still protected |
+| Public hostname | `curl -I https://<OPENCLAW_PUBLIC_HOSTNAME>`          | Cloudflare-side response, often redirect or Access challenge        | The hostname is answering through Cloudflare   |
+| Sidecar logs    | Coolify `cloudflared` service logs                    | Connected tunnel in token mode, clean idle exit when token is blank | The sidecar behavior matches the selected mode |
 
-This proves the raw origin is up on loopback.
+### Mode 1: `CLOUDFLARE_TUNNEL_TOKEN` is blank
 
-#### Canvas pre-auth response on loopback
+Use this mode when you want the stack to stay private on the VPS.
 
-```bash
-curl -i http://127.0.0.1:18789/__openclaw__/canvas/
-```
-
-Expected result before Cloudflare auth:
-
-- Status `401 Unauthorized`
-
-That `401 Unauthorized` response is healthy here. It does not mean the route is broken. It means the Canvas endpoint is present, the gateway reached it, and the request still lacks the auth needed to enter the app. If this route were missing or miswired, you would expect a different failure such as `404` or `502`, not a clean auth challenge.
-
-#### Sidecar should stay idle when the token is blank
-
-If you inspect the Coolify-managed `cloudflared` container in this mode, it should exit cleanly because `CLOUDFLARE_TUNNEL_TOKEN` is unset. That is the expected cloud-safe behavior, not a restart-loop failure.
-
-### Mode 2, token present, tunnel-enabled hostname
-
-Use this mode when `CLOUDFLARE_TUNNEL_TOKEN` is set and Cloudflare should publish the hostname through the same-compose sidecar.
-
-#### Confirm the private origin still works first
+Run:
 
 ```bash
 curl -i http://127.0.0.1:18789/healthz
 curl -i http://127.0.0.1:18789/__openclaw__/canvas/
 ```
 
-Expected result:
+Expect:
 
 - `/healthz` returns `200 OK`
 - `/__openclaw__/canvas/` returns `401 Unauthorized`
+- the `cloudflared` container exits cleanly and stays idle
 
-Run these before blaming Cloudflare. The tunnel can only proxy a healthy origin.
+Why this matters: blank-token mode is the expected private-origin path, not a broken deployment.
 
-#### Check the published hostname from the command line
+### Mode 2: `CLOUDFLARE_TUNNEL_TOKEN` is set
+
+Use this mode when Cloudflare should publish the hostname.
+
+First confirm the private origin still works:
+
+```bash
+curl -i http://127.0.0.1:18789/healthz
+curl -i http://127.0.0.1:18789/__openclaw__/canvas/
+```
+
+Then check the public hostname:
 
 ```bash
 curl -I https://<OPENCLAW_PUBLIC_HOSTNAME>
 ```
 
-Expected result:
+Expect:
 
-- The request answers from Cloudflare rather than timing out at the VPS
-- The response is part of the Access flow, often a redirect or challenge before login
-- After you complete the browser login, Cloudflare Access prompts for `One-Time PIN` and then redirects you to the Canvas UI
+- loopback `/healthz` is `200 OK`
+- loopback Canvas is `401 Unauthorized`
+- the public hostname answers from Cloudflare instead of timing out at the VPS
+- after browser login, Cloudflare Access sends you to the Canvas UI
 
-The exact status can vary with Access state, but the hostname should not behave like a dead origin.
-
-#### Check that the tunnel points at the right sidecar origin
-
-Inspect the `cloudflared` container logs from the Coolify-managed compose stack.
-
-Healthy signals include:
-
-- The connector authenticates instead of reporting token errors
-- The ingress target is `openclaw-gateway:18789`
-- Logs show a connected tunnel rather than repeated connector restarts
-
-If logs never show a healthy connection, fix that before testing the browser path again.
-
-## Current contract, stated plainly
-
-- The supported Coolify file is `docker-compose.coolify.yml`.
-- The tunnel sidecar is already in that compose file.
-- `CLOUDFLARE_TUNNEL_TOKEN` enables tunnel mode.
-- A blank `CLOUDFLARE_TUNNEL_TOKEN` keeps the origin private on `127.0.0.1:18789`.
-- Local Docker does not require Cloudflare.
-- Browser control stays private and is outside the tunnel setup.
-- `OPENCLAW_PUBLIC_HTTP` is not a supported switch in the active contract.
+Why this matters: the tunnel can only proxy a healthy origin. Check loopback first, then Cloudflare.
 
 ## Troubleshooting
 
-### Missing `CLOUDFLARE_TUNNEL_TOKEN`
+### Tunnel token missing or wrong
 
 Symptoms:
 
-- `OPENCLAW_PUBLIC_HOSTNAME` does not come up through Cloudflare.
-- The `cloudflared` container exits right away.
+- the hostname does not come up through Cloudflare
+- the `cloudflared` container exits right away
 
-Likely cause:
+Check:
 
-- `CLOUDFLARE_TUNNEL_TOKEN` is blank, pasted incorrectly, or is not a real tunnel token.
-
-What to check:
-
-- Confirm `CLOUDFLARE_TUNNEL_TOKEN` is set in Coolify.
-- Confirm the value is the tunnel token, not a tunnel ID or unrelated API token.
-- Re-run `curl -i http://127.0.0.1:18789/healthz` to confirm the private origin is still healthy while the sidecar stays idle.
-
-Expected behavior when blank: the sidecar exits cleanly and the origin remains private. That is normal, not a crash loop.
+- `CLOUDFLARE_TUNNEL_TOKEN` is set in Coolify
+- the value is a real tunnel token, not a tunnel ID or unrelated API token
+- loopback health still works on `127.0.0.1:18789`
 
 ### Hostname mismatch
 
 Symptoms:
 
-- Cloudflare serves a hostname other than `OPENCLAW_PUBLIC_HOSTNAME`.
-- Access policy works for one hostname but your browser opens another.
+- Cloudflare publishes a different hostname
+- Access works for one hostname but the browser opens another
 
-Likely cause:
+Check:
 
-- The tunnel public hostname, the Access app hostname, and the URL you are testing do not all match exactly.
+- the tunnel public hostname exactly matches `OPENCLAW_PUBLIC_HOSTNAME`
+- the Access app uses the same hostname
+- the root redirect sends `/` to `/__openclaw__/canvas/`
+- the tunnel service URL still targets `http://openclaw-gateway:18789`
 
-What to check:
-
-- The tunnel public hostname exactly matches `OPENCLAW_PUBLIC_HOSTNAME`.
-- The Access application domain matches the same hostname.
-- The browser entry starts at the root hostname and the redirect sends `/` to `/__openclaw__/canvas/`.
-- The tunnel service URL still targets `http://openclaw-gateway:18789`, not a host-loopback address or a different container name.
-
-### Access not configured
+### Access is missing or incomplete
 
 Symptoms:
 
-- The hostname is reachable without an Access login.
-- You see Cloudflare routing errors or a direct app challenge instead of the Access flow.
+- the hostname is reachable without an Access login
+- you see routing errors or an unexpected auth path
 
-Likely cause:
+Check:
 
-- The tunnel exists, but the Cloudflare Access application or policy was never created, is scoped to the wrong hostname, or does not allow your user.
+- a self-hosted Access app exists for `OPENCLAW_PUBLIC_HOSTNAME`
+- `One-Time PIN` is enabled
+- the policy allows your test user
+- `curl -I https://<OPENCLAW_PUBLIC_HOSTNAME>` reaches Cloudflare instead of hanging
 
-What to check:
-
-- A self-hosted Access app exists for `OPENCLAW_PUBLIC_HOSTNAME`.
-- The login method includes `One-Time PIN`.
-- The policy actually allows your test user.
-- `curl -I https://<OPENCLAW_PUBLIC_HOSTNAME>` returns a Cloudflare-side response instead of hanging on origin reachability.
-
-Remember: this repo supports the compose side and tunnel token flow. It does not auto-create the Access app or policy.
-
-### Tunnel or log path issues
+### Control UI assumptions
 
 Symptoms:
 
-- The hostname fails intermittently.
-- `cloudflared` logs show auth or connector errors.
-- You cannot tell whether the sidecar is even targeting the right origin.
-- Coolify shows the service, but the log view is empty or you are looking at the wrong container.
+- you expect the tunnel to make Control UI public-safe by itself
+- you are considering `allowInsecureAuth` as the fix
 
-Likely cause:
+Check:
 
-- The token is invalid, the tunnel no longer owns the hostname, the sidecar is pointing somewhere other than `openclaw-gateway:18789`, or you are inspecting the wrong Coolify service logs.
+- non-loopback Control UI deployments still need explicit `gateway.controlUi.allowedOrigins`
+- Cloudflare Tunnel does not replace browser origin policy
+- `allowInsecureAuth` is not acceptable guidance for public deployment
 
-What to check:
+## Plain-language contract
 
-- Re-copy the `CLOUDFLARE_TUNNEL_TOKEN` from the Cloudflare tunnel screen.
-- Confirm the tunnel still exists and the hostname is attached to that tunnel.
-- Confirm the sidecar origin remains `http://openclaw-gateway:18789`.
-- Re-run the VPS loopback checks for `/healthz` and `/__openclaw__/canvas/` before blaming Cloudflare.
-- In Coolify, open the `cloudflared` service logs from the same compose deployment, not the `openclaw-gateway` logs.
-- If you have Docker shell access, inspect the same sidecar directly and look for connection messages plus the `openclaw-gateway:18789` origin target.
-
-## Quick checklist
-
-- Tunnel token created and saved as `CLOUDFLARE_TUNNEL_TOKEN`
-- Public hostname set to `OPENCLAW_PUBLIC_HOSTNAME`
-- `OPENCLAW_PUBLIC_HOSTNAME` is set in Coolify env vars
-- Access self-hosted app created with `One-Time PIN`
-- Cloudflare redirect sends `/` to `/__openclaw__/canvas/`
-- Coolify env values set from `.env.coolify`
-- Single compose app deployed from `docker-compose.coolify.yml`
-- VPS origin returns `200 OK` for `/healthz`
-- VPS origin returns `401 Unauthorized` for `/__openclaw__/canvas/`
-- Browser entry uses `https://<OPENCLAW_PUBLIC_HOSTNAME>`
+- Supported compose file: `docker-compose.coolify.yml`
+- Supported public entry: `https://<OPENCLAW_PUBLIC_HOSTNAME>`
+- Required root redirect: `/` to `/__openclaw__/canvas/`
+- Supported tunnel switch: `CLOUDFLARE_TUNNEL_TOKEN`
+- Automatic sidecar origin: `CLOUDFLARED_ORIGIN_URL=http://openclaw-gateway:18789`
+- Blank token behavior: keep the origin private on `127.0.0.1:18789`
+- Browser control stance: private by default, not covered by tunnel safety claims
