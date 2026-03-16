@@ -17,11 +17,10 @@ It is designed for farmhands, supervisors, owners, researchers, and ag analysts 
 
 ## What This Repo Is
 
-This repository now tracks real upstream OpenClaw as its runtime base.
+This repository tracks real upstream OpenClaw as its runtime base.
 
 - Core runtime, gateway, Docker flow, and channel support come from `openclaw/openclaw`
 - Farm-specific behavior lives in `SOUL.md`, `USER.md`, and retained custom skills in `skills/`
-- The previous Cloudflare Worker implementation is preserved in `legacy/cloudflare-worker/`
 
 ## Who It Is For
 
@@ -66,48 +65,30 @@ Derived from `SOUL.md` and `USER.md`:
 - Do not silently destroy or overwrite important farm history
 - Favor portable, inspectable tooling over vendor lock-in
 
-## Your Data, Your Way
+## Deployment
 
-**This is your system.** Whoever sets it up is the user. It is built for you—not to sell you something, not how I want it, not how a company wants it. It is yours.
+### Docker-first (recommended)
 
-- **Local or cloud**: Keep your data local, on S3, R2, or any S3-compatible object storage—wherever you want it, so long as your agent has fast access
-- **Portable**: Your data moves with you. Change hosts, change storage providers, your farm intelligence comes with you
-- **Field-atomic**: Each field's data is deterministic and self-contained. Scale one field or ten thousand without architectural changes
-- **Self-modifying**: Ask it to change itself to work how you want, and it will help you modify it that way
-- **No warranty**: Apache/MIT licensed. Best effort, always improving, always being tested. Will it be perfect on day one? No. Will it work better every day? Yes.
-
-**You run it. You own it. It works for you.**
-
-Runtime baseline: Node `22+`.
-
-### Docker deployment
-
-This is the default local development path.
+Works anywhere you can run Docker: local machine, VPS, cloud provider. No lock-in.
 
 ```bash
 cp .env.example .env
-
+# Add your API keys (see below)
 pnpm install
 pnpm build
 
-# Build the image locally first, then start with compose
-docker build -t openclaw:local -f Dockerfile .
+# Build and run
+docker build -t my-farm-adviser:local -f Dockerfile .
 docker compose up -d
 ```
 
-Open the gateway on the configured port, default `18789`.
+Open the gateway on port `18789` (configurable).
 
-For a deployment-oriented compose file that uses a persistent volume at `/data`,
-see `docs/install/docker.md` and `docker-compose.coolify.yml`.
+### Coolify (one-click)
 
-Useful follow-up commands:
+Point Coolify at our `docker-compose.coolify.yml`. It handles the rest.
 
-```bash
-docker compose logs -f openclaw-gateway
-docker compose exec openclaw-cli node dist/index.js status
-```
-
-### From source
+### Local development
 
 ```bash
 pnpm install
@@ -116,7 +97,21 @@ pnpm openclaw onboard --install-daemon
 pnpm gateway:watch
 ```
 
-The CLI command surface remains `openclaw` for upstream compatibility.
+## API Keys (inexpensive/free)
+
+Pre-configured to work with free/cheap options:
+
+- **NVIDIA NIM**: Free developer tier available at build.nvidia.com
+- **OpenRouter**: Access to free and very cheap models. Sign up at openrouter.ai
+
+Add these to `.env`:
+
+```
+NVIDIA_API_KEY=your_nvidia_key_here
+OPENROUTER_API_KEY=your_openrouter_key_here
+```
+
+Running costs should be minimal—often zero with free tiers.
 
 ## Setup Notes
 
@@ -126,26 +121,6 @@ The CLI command surface remains `openclaw` for upstream compatibility.
 - `SOUL.md` and `USER.md` provide the farm-specific identity layer for this distribution
 - `scripts/fresh-local-bootstrap.sh` stops the stack, clears the bootstrapped workspaces (keeping `data/` and `.venv`), removes `openclaw.json`, then rebuilds with `docker compose up -d --build` for a clean resync.
 - When you know the numeric Telegram user IDs that should reach the bots, set `TELEGRAM_ALLOWED_USERS` (or the per-account overrides) in `.env`; the entrypoint will switch DM access to an allowlist so OpenClaw stops issuing one-time pairing codes after approval ([docs.openclaw.ai/channels/telegram](https://docs.openclaw.ai/channels/telegram)).
-
-If you want the fastest path to a usable farm assistant, start with Docker, then add credentials, channels, and workspace data once the gateway is healthy.
-
-## Deployment Guidance
-
-For production-style deployment elsewhere:
-
-1. Use the upstream Docker path in `Dockerfile` and `docker-compose.yml`
-2. Mount persistent config and workspace volumes
-3. Keep farm data outside the container image
-4. Scale memory and CPU at the container host level instead of fighting worker limits
-5. Treat this repo's custom layer as skills + identity + docs, not a forked runtime architecture
-
-## Legacy Cloudflare Worker Build
-
-The old Cloudflare-based implementation is intentionally preserved for reference in:
-
-- `legacy/cloudflare-worker/`
-
-It is no longer the primary deployment target.
 
 ## Upstream Relationship
 
