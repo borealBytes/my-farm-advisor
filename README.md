@@ -6,11 +6,13 @@ My Farm Advisor is a farm intelligence and research assistant built on upstream 
 
 We use `advisor` deliberately. In this project the system is an authoritative, evidence-based component grounded in science, reproducible methods, and validated skills; it is not casual hearsay or a friendly guess. `Advisor` fits the formal system role we want the product to play.
 
-It is designed for farmhands, supervisors, owners, researchers, and ag analysts who need practical field decisions, reproducible analysis, and infrastructure they can actually keep running.
+It is designed for farmhands, supervisors, owners, researchers, and ag analysts who need practical field decisions, reproducible analysis, and infrastructure they can actually keep running—at any scale, from one field to infinite fields.
 
 - Evidence-first recommendations instead of dashboard theater
 - Field-level data lineage so results can be traced back to methods and inputs
 - Docker-first deployment so RAM and compute can scale beyond Cloudflare Worker limits
+- Scalable storage: local, S3, R2, or any S3-compatible object storage for infinite field capacity
+- Multi-agent architecture: starts with two agents (field operations + data pipeline), scales to unlimited custom agents
 - Upstream OpenClaw compatibility for easier updates and broader channel/tool support
 
 ## What This Repo Is
@@ -64,7 +66,17 @@ Derived from `SOUL.md` and `USER.md`:
 - Do not silently destroy or overwrite important farm history
 - Favor portable, inspectable tooling over vendor lock-in
 
-## Quick Start
+## Your Data, Your Way
+
+**This is your system.** Whoever sets it up is the user. It is built for you—not to sell you something, not how I want it, not how a company wants it. It is yours.
+
+- **Local or cloud**: Keep your data local, on S3, R2, or any S3-compatible object storage—wherever you want it, so long as your agent has fast access
+- **Portable**: Your data moves with you. Change hosts, change storage providers, your farm intelligence comes with you
+- **Field-atomic**: Each field's data is deterministic and self-contained. Scale one field or ten thousand without architectural changes
+- **Self-modifying**: Ask it to change itself to work how you want, and it will help you modify it that way
+- **No warranty**: Apache/MIT licensed. Best effort, always improving, always being tested. Will it be perfect on day one? No. Will it work better every day? Yes.
+
+**You run it. You own it. It works for you.**
 
 Runtime baseline: Node `22+`.
 
