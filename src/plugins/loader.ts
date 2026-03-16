@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import Module, { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createJiti } from "jiti";
@@ -60,6 +61,79 @@ const defaultLogger = () => createSubsystemLogger("plugins");
 
 type PluginSdkAliasCandidateKind = "dist" | "src";
 
+type PluginSdkPackageJson = {
+  exports?: Record<string, unknown>;
+};
+
+function readPluginSdkPackageJson(packageRoot: string): PluginSdkPackageJson | null {
+  try {
+    const pkgRaw = fs.readFileSync(path.join(packageRoot, "package.json"), "utf-8");
+    return JSON.parse(pkgRaw) as PluginSdkPackageJson;
+  } catch {
+    return null;
+  }
+}
+
+function packageExportsPluginSdk(packageRoot: string): boolean {
+  const pkg = readPluginSdkPackageJson(packageRoot);
+  if (!pkg?.exports || typeof pkg.exports !== "object") {
+    return false;
+  }
+  return Object.prototype.hasOwnProperty.call(pkg.exports, "./plugin-sdk");
+}
+
+function resolvePluginSdkPackageRoot(modulePath: string): string | null {
+  const packageRoot = resolveOpenClawPackageRootSync({
+    cwd: path.dirname(modulePath),
+  });
+  if (packageRoot && packageExportsPluginSdk(packageRoot)) {
+    return packageRoot;
+  }
+
+  let cursor = path.dirname(modulePath);
+  for (let i = 0; i < 12; i += 1) {
+    if (packageExportsPluginSdk(cursor)) {
+      return cursor;
+    }
+    const parent = path.dirname(cursor);
+    if (parent === cursor) {
+      break;
+    }
+    cursor = parent;
+  }
+
+  return null;
+}
+
+function resolvePluginSdkCompatSpecifier(params: {
+  specifier: string;
+  modulePath?: string;
+}): string | null {
+  const modulePath = params.modulePath ?? fileURLToPath(import.meta.url);
+  const packageRoot = resolvePluginSdkPackageRoot(modulePath);
+  if (!packageRoot) {
+    return null;
+  }
+  const compatPackageRoot = path.join(packageRoot, "node_modules", "openclaw");
+  const compatPackageJson = path.join(compatPackageRoot, "package.json");
+  if (!fs.existsSync(compatPackageJson)) {
+    return null;
+  }
+  try {
+    const resolved = createRequire(path.join(packageRoot, "package.json")).resolve(
+      params.specifier,
+    );
+    const resolvedPath = safeRealpathOrResolve(resolved);
+    const compatRootPath = safeRealpathOrResolve(compatPackageRoot);
+    if (resolvedPath === compatRootPath || isPathInside(compatRootPath, resolvedPath)) {
+      return resolved;
+    }
+  } catch {
+    // ignore
+  }
+  return null;
+}
+
 function resolvePluginSdkAliasCandidateOrder(params: {
   modulePath: string;
   isProduction: boolean;
@@ -78,15 +152,35 @@ function listPluginSdkAliasCandidates(params: {
     modulePath: params.modulePath,
     isProduction: process.env.NODE_ENV === "production",
   });
-  let cursor = path.dirname(params.modulePath);
   const candidates: string[] = [];
+  const seen = new Set<string>();
+  const pushCandidate = (candidate: string) => {
+    if (seen.has(candidate)) {
+      return;
+    }
+    seen.add(candidate);
+    candidates.push(candidate);
+  };
+  const pluginSdkPackageRoot = resolvePluginSdkPackageRoot(params.modulePath);
+  if (pluginSdkPackageRoot) {
+    const candidateMap = {
+      src: path.join(pluginSdkPackageRoot, "src", "plugin-sdk", params.srcFile),
+      dist: path.join(pluginSdkPackageRoot, "dist", "plugin-sdk", params.distFile),
+    } as const;
+    for (const kind of orderedKinds) {
+      pushCandidate(candidateMap[kind]);
+    }
+    return candidates;
+  }
+
+  let cursor = path.dirname(params.modulePath);
   for (let i = 0; i < 6; i += 1) {
     const candidateMap = {
       src: path.join(cursor, "src", "plugin-sdk", params.srcFile),
       dist: path.join(cursor, "dist", "plugin-sdk", params.distFile),
     } as const;
     for (const kind of orderedKinds) {
-      candidates.push(candidateMap[kind]);
+      pushCandidate(candidateMap[kind]);
     }
     const parent = path.dirname(cursor);
     if (parent === cursor) {
@@ -119,13 +213,57 @@ const resolvePluginSdkAliasFile = (params: {
   return null;
 };
 
+function resolvePluginSdkRootFallback(params: { modulePath?: string } = {}): string | null {
+  const modulePath = params.modulePath ?? fileURLToPath(import.meta.url);
+  const explicitAlias = resolvePluginSdkAliasFile({
+    srcFile: "root-alias.cjs",
+    distFile: "root-alias.cjs",
+    modulePath,
+  });
+  if (explicitAlias) {
+    return explicitAlias;
+  }
+  return resolvePluginSdkCompatSpecifier({
+    specifier: "openclaw/plugin-sdk",
+    modulePath,
+  });
+}
+
+type ResolveFilenameHook = (request: string, ...args: unknown[]) => string;
+
+function withPluginSdkRootFallback<T>(load: () => T): T {
+  const rootFallback = resolvePluginSdkRootFallback();
+  if (!rootFallback) {
+    return load();
+  }
+  const moduleApi = Module as typeof Module & {
+    _resolveFilename?: ResolveFilenameHook;
+  };
+  const originalResolveFilename = moduleApi._resolveFilename;
+  if (typeof originalResolveFilename !== "function") {
+    return load();
+  }
+  moduleApi._resolveFilename = function patchedResolveFilename(
+    request: string,
+    ...args: unknown[]
+  ) {
+    if (request === "openclaw/plugin-sdk") {
+      return rootFallback;
+    }
+    return originalResolveFilename.call(this, request, ...args);
+  };
+  try {
+    return load();
+  } finally {
+    moduleApi._resolveFilename = originalResolveFilename;
+  }
+}
+
 const cachedPluginSdkExportedSubpaths = new Map<string, string[]>();
 
 function listPluginSdkExportedSubpaths(params: { modulePath?: string } = {}): string[] {
   const modulePath = params.modulePath ?? fileURLToPath(import.meta.url);
-  const packageRoot = resolveOpenClawPackageRootSync({
-    cwd: path.dirname(modulePath),
-  });
+  const packageRoot = resolvePluginSdkPackageRoot(modulePath);
   if (!packageRoot) {
     return [];
   }
@@ -134,10 +272,10 @@ function listPluginSdkExportedSubpaths(params: { modulePath?: string } = {}): st
     return cached;
   }
   try {
-    const pkgRaw = fs.readFileSync(path.join(packageRoot, "package.json"), "utf-8");
-    const pkg = JSON.parse(pkgRaw) as {
-      exports?: Record<string, unknown>;
-    };
+    const pkg = readPluginSdkPackageJson(packageRoot);
+    if (!pkg?.exports || typeof pkg.exports !== "object") {
+      return [];
+    }
     const subpaths = Object.keys(pkg.exports ?? {})
       .filter((key) => key.startsWith("./plugin-sdk/"))
       .map((key) => key.slice("./plugin-sdk/".length))
@@ -167,8 +305,10 @@ const resolvePluginSdkScopedAliasMap = (): Record<string, string> => {
 export const __testing = {
   listPluginSdkAliasCandidates,
   listPluginSdkExportedSubpaths,
+  resolvePluginSdkCompatSpecifier,
   resolvePluginSdkAliasCandidateOrder,
   resolvePluginSdkAliasFile,
+  resolvePluginSdkRootFallback,
   maxPluginRegistryCacheEntries: MAX_PLUGIN_REGISTRY_CACHE_ENTRIES,
 };
 
@@ -746,7 +886,7 @@ export function loadOpenClawPlugins(options: PluginLoadOptions = {}): PluginRegi
 
     let mod: OpenClawPluginModule | null = null;
     try {
-      mod = getJiti()(safeSource) as OpenClawPluginModule;
+      mod = withPluginSdkRootFallback(() => getJiti()(safeSource) as OpenClawPluginModule);
     } catch (err) {
       recordPluginError({
         logger,

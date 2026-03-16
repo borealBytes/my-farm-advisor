@@ -274,6 +274,8 @@ function createPluginSdkAliasFixture(params?: {
   distFile?: string;
   srcBody?: string;
   distBody?: string;
+  packageName?: string;
+  exports?: string[];
 }) {
   const root = makeTempDir();
   const srcFile = path.join(root, "src", "plugin-sdk", params?.srcFile ?? "index.ts");
@@ -282,6 +284,32 @@ function createPluginSdkAliasFixture(params?: {
   mkdirSafe(path.dirname(distFile));
   fs.writeFileSync(srcFile, params?.srcBody ?? "export {};\n", "utf-8");
   fs.writeFileSync(distFile, params?.distBody ?? "export {};\n", "utf-8");
+  if (params?.exports) {
+    fs.writeFileSync(
+      path.join(root, "package.json"),
+      JSON.stringify(
+        {
+          name: params.packageName ?? "my-farm-advisor",
+          exports: {
+            "./plugin-sdk": {
+              default: "./dist/plugin-sdk/index.js",
+            },
+            ...Object.fromEntries(
+              params.exports.map((subpath) => [
+                `./plugin-sdk/${subpath}`,
+                {
+                  default: `./dist/plugin-sdk/${subpath}.js`,
+                },
+              ]),
+            ),
+          },
+        },
+        null,
+        2,
+      ),
+      "utf-8",
+    );
+  }
   return { root, srcFile, distFile };
 }
 
@@ -1942,6 +1970,18 @@ describe("loadOpenClawPlugins", () => {
     expect(subpaths).not.toContain("root-alias");
   });
 
+  it("derives plugin-sdk subpaths from branded package exports", () => {
+    const { root } = createPluginSdkAliasFixture({
+      exports: ["compat", "telegram", "root-alias/nested"],
+    });
+
+    const subpaths = __testing.listPluginSdkExportedSubpaths({
+      modulePath: path.join(root, "dist", "plugins", "loader.js"),
+    });
+
+    expect(subpaths).toEqual(["compat", "telegram"]);
+  });
+
   it("falls back to src plugin-sdk alias when dist is missing in production", () => {
     const { root, srcFile, distFile } = createPluginSdkAliasFixture();
     fs.rmSync(distFile);
@@ -1988,5 +2028,124 @@ describe("loadOpenClawPlugins", () => {
       }),
     );
     expect(resolved).toBe(srcFile);
+  });
+
+  it("prefers explicit src root-alias fallback before package compat resolution", () => {
+    const { root, srcFile } = createPluginSdkAliasFixture({
+      srcFile: "root-alias.cjs",
+      distFile: "root-alias.cjs",
+      srcBody: "module.exports = { source: 'src-root-alias' };\n",
+      distBody: "module.exports = { source: 'dist-root-alias' };\n",
+    });
+    const compatDir = path.join(root, "node_modules", "openclaw", "plugin-sdk");
+    mkdirSafe(compatDir);
+    fs.writeFileSync(
+      path.join(compatDir, "index.js"),
+      "module.exports = { source: 'compat-root' };\n",
+    );
+    fs.writeFileSync(
+      path.join(root, "node_modules", "openclaw", "package.json"),
+      JSON.stringify(
+        {
+          name: "openclaw",
+          type: "commonjs",
+          exports: {
+            "./plugin-sdk": "./plugin-sdk/index.js",
+          },
+        },
+        null,
+        2,
+      ),
+      "utf-8",
+    );
+
+    const resolved = withEnv({ NODE_ENV: undefined }, () =>
+      __testing.resolvePluginSdkRootFallback({
+        modulePath: path.join(root, "src", "plugins", "loader.ts"),
+      }),
+    );
+
+    expect(resolved).toBe(srcFile);
+  });
+
+  it("falls back to package compat resolution for monolithic plugin-sdk root when root-alias is absent", () => {
+    const { root } = createPluginSdkAliasFixture({ exports: ["compat"] });
+    const compatDir = path.join(root, "node_modules", "openclaw", "plugin-sdk");
+    mkdirSafe(compatDir);
+    const compatEntry = path.join(compatDir, "index.js");
+    fs.writeFileSync(compatEntry, "module.exports = { source: 'compat-root' };\n", "utf-8");
+    fs.writeFileSync(
+      path.join(root, "node_modules", "openclaw", "package.json"),
+      JSON.stringify(
+        {
+          name: "openclaw",
+          type: "commonjs",
+          exports: {
+            "./plugin-sdk": "./plugin-sdk/index.js",
+          },
+        },
+        null,
+        2,
+      ),
+      "utf-8",
+    );
+
+    const resolved = withEnv({ NODE_ENV: undefined }, () =>
+      __testing.resolvePluginSdkRootFallback({
+        modulePath: path.join(root, "src", "plugins", "loader.ts"),
+      }),
+    );
+
+    expect(resolved).toBe(compatEntry);
+  });
+
+  it("keeps missing monolithic plugin-sdk root visible when no alias or compat package exists", () => {
+    const { root } = createPluginSdkAliasFixture();
+    const resolved = withEnv({ NODE_ENV: undefined }, () =>
+      __testing.resolvePluginSdkRootFallback({
+        modulePath: path.join(root, "src", "plugins", "loader.ts"),
+      }),
+    );
+
+    expect(resolved).toBeNull();
+  });
+
+  it("does not fall through to unrelated ancestor aliases once a branded package root is verified", () => {
+    const outerRoot = makeTempDir();
+    const outerSrcFile = path.join(outerRoot, "src", "plugin-sdk", "compat.ts");
+    mkdirSafe(path.dirname(outerSrcFile));
+    fs.writeFileSync(outerSrcFile, "export const wrong = true;\n", "utf-8");
+
+    const brandedRoot = path.join(outerRoot, "node_modules", "my-farm-advisor");
+    mkdirSafe(brandedRoot);
+    fs.writeFileSync(
+      path.join(brandedRoot, "package.json"),
+      JSON.stringify(
+        {
+          name: "my-farm-advisor",
+          exports: {
+            "./plugin-sdk": {
+              default: "./dist/plugin-sdk/index.js",
+            },
+            "./plugin-sdk/compat": {
+              default: "./dist/plugin-sdk/compat.js",
+            },
+          },
+        },
+        null,
+        2,
+      ),
+      "utf-8",
+    );
+
+    const resolved = withEnv({ NODE_ENV: undefined }, () =>
+      __testing.resolvePluginSdkAliasFile({
+        srcFile: "compat.ts",
+        distFile: "compat.js",
+        modulePath: path.join(brandedRoot, "src", "plugins", "loader.ts"),
+      }),
+    );
+
+    expect(resolved).toBeNull();
   });
 });

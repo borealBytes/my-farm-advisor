@@ -60,6 +60,7 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
 COPY ui/package.json ./ui/package.json
 COPY patches ./patches
+COPY scripts/write-openclaw-plugin-sdk-compat.mjs ./scripts/write-openclaw-plugin-sdk-compat.mjs
 
 COPY --from=ext-deps /out/ ./extensions/
 
