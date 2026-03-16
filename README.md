@@ -1,6 +1,6 @@
 # My Farm Advisor
 
-![My Farm Advisor rooted farm intelligence hero](docs/assets/my-farm-adviser-hero.png)
+![My Farm Advisor rooted farm intelligence hero](docs/assets/my-farm-adviser-hero-1.png)
 
 My Farm Advisor is a farm intelligence and research assistant built on upstream OpenClaw and shaped by the farm-science principles in `SOUL.md` and the operator needs in `USER.md`.
 
