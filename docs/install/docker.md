@@ -372,6 +372,8 @@ The CLI service is behind the `cli` profile, so `up -d` in Coolify starts only
 the gateway by default.
 Use the deployment domain with the Canvas path:
 `https://<your-domain>/__openclaw__/canvas/`.
+For tunnel-only origin hardening, publish the gateway on loopback (`127.0.0.1:18789:18789`)
+and use Cloudflare Tunnel to reach it.
 
 Use these environment variables:
 
