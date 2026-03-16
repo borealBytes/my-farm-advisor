@@ -10,7 +10,7 @@ title: "Cloudflare + Coolify"
 
 This is the authoritative runbook for the supported Cloudflare Zero Trust deployment on Coolify.
 
-Use this page when you want the Coolify stack to stay private on the VPS while Cloudflare publishes the hostname `my-farm-advisor.superiorbyteworks.com`.
+Use this page when you want the Coolify stack to stay private on the VPS while Cloudflare publishes the hostname stored in `OPENCLAW_PUBLIC_HOSTNAME`.
 
 ## What this setup does
 
@@ -19,14 +19,14 @@ Use this page when you want the Coolify stack to stay private on the VPS while C
 - If `CLOUDFLARE_TUNNEL_TOKEN` is blank, the `cloudflared` container exits immediately and the gateway stays private on `127.0.0.1:18789`.
 - Local Docker does not require Cloudflare. This runbook is only for the Coolify deployment story.
 - Browser control stays private on loopback and is not part of the tunnel setup.
-- The supported public app entry is `https://my-farm-advisor.superiorbyteworks.com`.
+- The supported public app entry is `https://<OPENCLAW_PUBLIC_HOSTNAME>`.
 - Cloudflare should redirect that root URL to `/__openclaw__/canvas/`.
 
 ## Trust boundary
 
 Treat the deployment as two layers:
 
-1. Cloudflare Access protects `my-farm-advisor.superiorbyteworks.com`.
+1. Cloudflare Access protects the hostname stored in `OPENCLAW_PUBLIC_HOSTNAME`.
 2. Loopback-only origin publishing protects the raw VPS service because `openclaw-gateway` is published on `127.0.0.1:18789:18789`.
 
 That means public traffic should enter through Cloudflare, while the origin stays private unless you already have shell access on the VPS. Do not treat the tunnel as a replacement for private origin binding. Both layers matter.
@@ -38,6 +38,7 @@ That means public traffic should enter through Cloudflare, while the origin stay
 - Coolify can deploy this repository with `docker-compose.coolify.yml`.
 - You have a strong `OPENCLAW_GATEWAY_TOKEN` ready.
 - You are not looking for a public-origin mode. `OPENCLAW_PUBLIC_HTTP` is intentionally not part of the supported contract and should not be documented or used here.
+- You know the hostname you want to publish, for example `my-farm-advisor.superiorbyteworks.com`.
 
 ## One-time Cloudflare prep
 
@@ -53,37 +54,49 @@ In the Cloudflare dashboard:
 
 This repo expects the token only. It does not expect a credentials JSON file or Cloudflare API automation.
 
-### 2. Create the public hostname
+### 2. Choose your public hostname
+
+Set `OPENCLAW_PUBLIC_HOSTNAME` to the hostname people should type in the browser.
+
+Example:
+
+```dotenv
+OPENCLAW_PUBLIC_HOSTNAME=my-farm-advisor.superiorbyteworks.com
+```
+
+This variable is part of the Coolify compose contract so the hostname is defined in one place instead of being hard-coded through the docs.
+
+### 3. Create the public hostname
 
 Inside the same tunnel configuration, add a public hostname with these values:
 
-- Hostname: `my-farm-advisor.superiorbyteworks.com`
+- Hostname: value of `OPENCLAW_PUBLIC_HOSTNAME`
 - Service type: `HTTP`
 - Service URL: `http://openclaw-gateway:18789`
 
-Why this target: the same-compose `cloudflared` sidecar routes to `CLOUDFLARED_ORIGIN_URL=http://openclaw-gateway:18789` inside the Docker network. The VPS does not need a public port for this path.
+Why this target: the same-compose `cloudflared` sidecar routes to `CLOUDFLARED_ORIGIN_URL=http://openclaw-gateway:18789` inside the Docker network. The VPS does not need a public port for this path. In token mode, Cloudflare owns the hostname mapping in the dashboard, so the local sidecar config stays focused on the origin target.
 
-### 3. Create the Access application
+### 4. Create the Access application
 
-In Zero Trust, create a self-hosted application for `my-farm-advisor.superiorbyteworks.com`.
+In Zero Trust, create a self-hosted application for the same hostname stored in `OPENCLAW_PUBLIC_HOSTNAME`.
 
 Use these settings:
 
 - Application type: self-hosted
-- Domain: `my-farm-advisor.superiorbyteworks.com`
+- Domain: value of `OPENCLAW_PUBLIC_HOSTNAME`
 - Path: protect the whole site so `/` and `/__openclaw__/canvas/` are both covered
 - Login method: `One-Time PIN`
 
 Make sure the Access policy actually allows the users who should reach the app. This repo does not create the Access policy for you.
 
-### 4. Add the root redirect
+### 5. Add the root redirect
 
 Cloudflared does not give us a clean root-to-origin-path rewrite in this setup, so use a Cloudflare redirect rule for the public browser entry.
 
 Create a redirect so:
 
-- `https://my-farm-advisor.superiorbyteworks.com/`
-- redirects to `https://my-farm-advisor.superiorbyteworks.com/__openclaw__/canvas/`
+- `https://<OPENCLAW_PUBLIC_HOSTNAME>/`
+- redirects to `https://<OPENCLAW_PUBLIC_HOSTNAME>/__openclaw__/canvas/`
 
 Why this exists: people should only need to type the top-level hostname, while OpenClaw still serves the Canvas UI from the internal `/__openclaw__/canvas/` path.
 
@@ -104,6 +117,7 @@ Minimum values for the Cloudflare path:
 ```dotenv
 OPENCLAW_GATEWAY_TOKEN=<long-random-token>
 CLOUDFLARE_TUNNEL_TOKEN=<your-cloudflare-tunnel-token>
+OPENCLAW_PUBLIC_HOSTNAME=<your-public-hostname>
 TZ=America/Chicago
 DATA_MODE=volume
 OPENROUTER_API_KEY=<your-key>
@@ -113,8 +127,9 @@ ANTHROPIC_API_KEY=<optional-if-used>
 
 Important behavior from the current compose contract:
 
-- `CLOUDFLARE_TUNNEL_TOKEN` present: `cloudflared` starts and publishes the Cloudflare hostname.
+- `CLOUDFLARE_TUNNEL_TOKEN` present: `cloudflared` starts and publishes the Cloudflare hostname configured in the dashboard for `OPENCLAW_PUBLIC_HOSTNAME`.
 - `CLOUDFLARE_TUNNEL_TOKEN` blank: the stack still deploys, but `cloudflared` exits immediately and the app stays private on `127.0.0.1:18789`.
+- `OPENCLAW_PUBLIC_HOSTNAME` is required when `CLOUDFLARE_TUNNEL_TOKEN` is set.
 - `OPENCLAW_BROWSER_CONTROL_HOST` and `OPENCLAW_BROWSER_CONTROL_BIND` stay on `127.0.0.1`, so browser control remains private.
 
 ### 3. Add persistent storage
@@ -131,7 +146,7 @@ Start the Coolify deployment and allow several minutes for the first boot. The c
 
 After the deployment is healthy, Access is configured, and the redirect is in place, open:
 
-`https://my-farm-advisor.superiorbyteworks.com`
+`https://<OPENCLAW_PUBLIC_HOSTNAME>`
 
 That root URL is the supported public entry. Cloudflare should redirect it to the internal Canvas path for you.
 
@@ -193,7 +208,7 @@ Run these before blaming Cloudflare. The tunnel can only proxy a healthy origin.
 #### Check the published hostname from the command line
 
 ```bash
-curl -I https://my-farm-advisor.superiorbyteworks.com
+curl -I https://<OPENCLAW_PUBLIC_HOSTNAME>
 ```
 
 Expected result:
@@ -232,7 +247,7 @@ If logs never show a healthy connection, fix that before testing the browser pat
 
 Symptoms:
 
-- `my-farm-advisor.superiorbyteworks.com` does not come up through Cloudflare.
+- `OPENCLAW_PUBLIC_HOSTNAME` does not come up through Cloudflare.
 - The `cloudflared` container exits right away.
 
 Likely cause:
@@ -251,7 +266,7 @@ Expected behavior when blank: the sidecar exits cleanly and the origin remains p
 
 Symptoms:
 
-- Cloudflare serves a hostname other than `my-farm-advisor.superiorbyteworks.com`.
+- Cloudflare serves a hostname other than `OPENCLAW_PUBLIC_HOSTNAME`.
 - Access policy works for one hostname but your browser opens another.
 
 Likely cause:
@@ -260,7 +275,7 @@ Likely cause:
 
 What to check:
 
-- The tunnel public hostname exactly matches `my-farm-advisor.superiorbyteworks.com`.
+- The tunnel public hostname exactly matches `OPENCLAW_PUBLIC_HOSTNAME`.
 - The Access application domain matches the same hostname.
 - The browser entry starts at the root hostname and the redirect sends `/` to `/__openclaw__/canvas/`.
 - The tunnel service URL still targets `http://openclaw-gateway:18789`, not a host-loopback address or a different container name.
@@ -278,10 +293,10 @@ Likely cause:
 
 What to check:
 
-- A self-hosted Access app exists for `my-farm-advisor.superiorbyteworks.com`.
+- A self-hosted Access app exists for `OPENCLAW_PUBLIC_HOSTNAME`.
 - The login method includes `One-Time PIN`.
 - The policy actually allows your test user.
-- `curl -I https://my-farm-advisor.superiorbyteworks.com` returns a Cloudflare-side response instead of hanging on origin reachability.
+- `curl -I https://<OPENCLAW_PUBLIC_HOSTNAME>` returns a Cloudflare-side response instead of hanging on origin reachability.
 
 Remember: this repo supports the compose side and tunnel token flow. It does not auto-create the Access app or policy.
 
@@ -310,11 +325,12 @@ What to check:
 ## Quick checklist
 
 - Tunnel token created and saved as `CLOUDFLARE_TUNNEL_TOKEN`
-- Public hostname set to `my-farm-advisor.superiorbyteworks.com`
+- Public hostname set to `OPENCLAW_PUBLIC_HOSTNAME`
+- `OPENCLAW_PUBLIC_HOSTNAME` is set in Coolify env vars
 - Access self-hosted app created with `One-Time PIN`
 - Cloudflare redirect sends `/` to `/__openclaw__/canvas/`
 - Coolify env values set from `.env.coolify`
 - Single compose app deployed from `docker-compose.coolify.yml`
 - VPS origin returns `200 OK` for `/healthz`
 - VPS origin returns `401 Unauthorized` for `/__openclaw__/canvas/`
-- Browser entry uses `https://my-farm-advisor.superiorbyteworks.com`
+- Browser entry uses `https://<OPENCLAW_PUBLIC_HOSTNAME>`

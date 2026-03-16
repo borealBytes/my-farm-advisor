@@ -110,11 +110,16 @@ services:
       - openclaw-gateway
     environment:
       CLOUDFLARE_TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN:-}
+      OPENCLAW_PUBLIC_HOSTNAME: ${OPENCLAW_PUBLIC_HOSTNAME:-}
       CLOUDFLARED_ORIGIN_URL: http://openclaw-gateway:18789
     entrypoint: ["/bin/sh", "-ec"]
     command: |
       if [ -z "$$CLOUDFLARE_TUNNEL_TOKEN" ]; then
         exit 0
+      fi
+      if [ -z "$$OPENCLAW_PUBLIC_HOSTNAME" ]; then
+        echo "OPENCLAW_PUBLIC_HOSTNAME is required when CLOUDFLARE_TUNNEL_TOKEN is set" >&2
+        exit 1
       fi
       printf '%s\n' \
         'ingress:' \

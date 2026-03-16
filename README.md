@@ -98,8 +98,9 @@ gateway by default.
 For the supported Cloudflare Zero Trust deployment, see
 [`docs/install/cloudflare-coolify.md`](docs/install/cloudflare-coolify.md).
 That runbook covers the simplified contract: one Coolify compose app, one-time
-Cloudflare tunnel/DNS/Access prep, `CLOUDFLARE_TUNNEL_TOKEN` for the same-compose
-tunnel sidecar, and the root app entry at `https://my-farm-advisor.superiorbyteworks.com`.
+Cloudflare tunnel/DNS/Access prep, `CLOUDFLARE_TUNNEL_TOKEN` plus
+`OPENCLAW_PUBLIC_HOSTNAME` for the same-compose tunnel sidecar, and the root app
+entry at `https://<OPENCLAW_PUBLIC_HOSTNAME>`.
 
 ### Local development
 
