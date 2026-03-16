@@ -137,7 +137,8 @@ RUN --mount=type=cache,id=openclaw-bookworm-apt-cache,target=/var/cache/apt,shar
     --mount=type=cache,id=openclaw-bookworm-apt-lists,target=/var/lib/apt,sharing=locked \
     apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-      procps hostname curl git openssl
+      procps hostname curl git openssl python3 python3-pip python3-venv && \
+    ln -sf /usr/bin/pip3 /usr/local/bin/pip
 
 RUN chown node:node /app
 

@@ -17,14 +17,18 @@ import sys
 import time
 from pathlib import Path
 
+_SCRIPTS_DIR = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(_SCRIPTS_DIR))
+sys.path.insert(0, str(_SCRIPTS_DIR / "lib"))
+
+from bootstrap_runtime import ensure_runtime_environment
+
+ensure_runtime_environment()
+
 import geopandas as gpd
 import pandas as pd
 import requests
 from shapely.geometry import Polygon
-
-_SCRIPTS_DIR = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(_SCRIPTS_DIR))
-sys.path.insert(0, str(_SCRIPTS_DIR / "lib"))
 
 from naming import field_slug_from_id
 from paths import farm_boundary_path
@@ -48,12 +52,7 @@ COUNTIES_PATH = (
 
 def _slugify(value: str) -> str:
     return (
-        value.strip()
-        .lower()
-        .replace("_", "-")
-        .replace(" ", "-")
-        .replace("/", "-")
-        .replace(".", "")
+        value.strip().lower().replace("_", "-").replace(" ", "-").replace("/", "-").replace(".", "")
     )
 
 
@@ -80,18 +79,14 @@ def _load_target_county(state_fips: str, county_name: str) -> gpd.GeoDataFrame:
     target_state = state_fips.zfill(2)
     target_county = _normalize_county_name(county_name)
 
-    candidates = counties[
-        counties["state_fips"].astype(str).str.zfill(2) == target_state
-    ].copy()
+    candidates = counties[counties["state_fips"].astype(str).str.zfill(2) == target_state].copy()
     if candidates.empty:
         raise ValueError(f"No counties found for state_fips={target_state}")
 
     names = candidates["county_name"].astype(str).map(_normalize_county_name)
     exact = candidates[names == target_county].copy()
     if exact.empty:
-        available = ", ".join(
-            sorted(candidates["county_name"].astype(str).unique())[:15]
-        )
+        available = ", ".join(sorted(candidates["county_name"].astype(str).unique())[:15])
         raise ValueError(
             f"County '{county_name}' not found in state_fips={target_state}. "
             f"Sample available counties: {available}"
@@ -186,9 +181,9 @@ def _osm_elements_to_fields(
 def _sample_fields(gdf: gpd.GeoDataFrame, *, count: int, seed: int) -> gpd.GeoDataFrame:
     if gdf.empty:
         return gdf
-    ranked = gdf.sort_values(
-        ["area_acres", "field_id"], ascending=[False, True]
-    ).reset_index(drop=True)
+    ranked = gdf.sort_values(["area_acres", "field_id"], ascending=[False, True]).reset_index(
+        drop=True
+    )
     if len(ranked) <= count:
         return ranked
     sampled = ranked.sample(n=count, random_state=seed).copy()
@@ -280,9 +275,7 @@ def main() -> None:
         "--state-fips", required=True, help="Two-digit state FIPS, e.g. 29 for Missouri"
     )
     parser.add_argument("--county-name", required=True, help="County name, e.g. Boone")
-    parser.add_argument(
-        "--count", type=int, default=4, help="Number of fields to sample"
-    )
+    parser.add_argument("--count", type=int, default=4, help="Number of fields to sample")
     parser.add_argument("--seed", type=int, default=42, help="Deterministic seed")
     parser.add_argument("--grower-slug", required=True)
     parser.add_argument("--farm-slug", required=True)
@@ -308,9 +301,7 @@ def main() -> None:
         action="store_true",
         help="Run full farm pipeline after bootstrap",
     )
-    parser.add_argument(
-        "--force", action="store_true", help="Pass --force to run_farm_pipeline"
-    )
+    parser.add_argument("--force", action="store_true", help="Pass --force to run_farm_pipeline")
     args = parser.parse_args()
 
     county = _load_target_county(args.state_fips, args.county_name)
@@ -343,9 +334,7 @@ def main() -> None:
         / "manifests"
         / "field-inventory.csv"
     )
-    inventory_path = (
-        Path(args.inventory_csv) if args.inventory_csv else default_inventory
-    )
+    inventory_path = Path(args.inventory_csv) if args.inventory_csv else default_inventory
     inventory_path = (
         inventory_path if inventory_path.is_absolute() else (REPO_ROOT / inventory_path)
     )
@@ -355,9 +344,7 @@ def main() -> None:
         if args.boundary_out
         else farm_boundary_path(args.grower_slug, args.farm_slug)
     )
-    boundary_out = (
-        boundary_out if boundary_out.is_absolute() else (REPO_ROOT / boundary_out)
-    )
+    boundary_out = boundary_out if boundary_out.is_absolute() else (REPO_ROOT / boundary_out)
     boundary_out.parent.mkdir(parents=True, exist_ok=True)
 
     final_fields = sampled
