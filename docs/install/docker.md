@@ -23,6 +23,18 @@ This guide covers:
 
 Sandboxing details: [Sandboxing](/gateway/sandboxing)
 
+## Coolify + Cloudflare runbook
+
+If you are deploying with Coolify behind Cloudflare Zero Trust, use the dedicated
+runbook: [`docs/install/cloudflare-coolify.md`](cloudflare-coolify.md).
+
+That page is the supported contract for this deployment shape:
+
+- one Coolify compose app, not a separate `cloudflared` app
+- one-time Cloudflare tunnel, DNS, and Access prep
+- `CLOUDFLARE_TUNNEL_TOKEN` turns on the same-compose tunnel sidecar
+- the documented app entry is `/__openclaw__/canvas/`
+
 ## Requirements
 
 - Docker Desktop (or Docker Engine) + Docker Compose v2
