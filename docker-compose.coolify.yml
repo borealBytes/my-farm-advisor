@@ -83,7 +83,7 @@ services:
       AWS_CLI_AUTO_PROMPT: on-partial
     
     ports:
-      - "18789:18789"
+      - "127.0.0.1:18789:18789"
     
     volumes:
       - openclaw-data:/data

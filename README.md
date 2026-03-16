@@ -96,6 +96,8 @@ On first boot, allow several minutes for initialization before health checks set
 The `openclaw-cli` service is profile-gated (`cli`) so Coolify deploys only the
 gateway by default.
 Open the Coolify domain at `https://<your-domain>/__openclaw__/canvas/`.
+For tunnel-only access, keep gateway published as `127.0.0.1:18789:18789` and route
+public traffic through Cloudflare Tunnel + Access.
 
 ### Local development
 
