@@ -895,9 +895,11 @@ describe("docker-setup.sh", () => {
     const compose = await readFile(join(repoRoot, "docker-compose.coolify.yml"), "utf8");
     expect(compose).toContain("openclaw-gateway:");
     expect(compose).toContain("openclaw-cli:");
+    expect(compose).toContain('profiles: ["cli"]');
     expect(compose.match(/image: \$\{OPENCLAW_IMAGE:-openclaw:local\}/g)).toHaveLength(2);
     expect(compose.match(/user: "0:0"/g)).toHaveLength(2);
     expect(compose).toContain('network_mode: "service:openclaw-gateway"');
+    expect(compose).not.toContain("condition: service_healthy");
     expect(compose).toContain("healthcheck:");
     expect(compose).toContain("timeout: 10s");
     expect(compose).toContain("retries: 10");

@@ -93,6 +93,8 @@ Point Coolify at our `docker-compose.coolify.yml`. It handles the rest.
 That compose file builds and tags `${OPENCLAW_IMAGE:-openclaw:local}` for
 `openclaw-gateway` and reuses the same tag for `openclaw-cli`.
 On first boot, allow several minutes for initialization before health checks settle.
+The `openclaw-cli` service is profile-gated (`cli`) so Coolify deploys only the
+gateway by default.
 
 ### Local development
 

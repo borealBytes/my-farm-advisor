@@ -368,6 +368,8 @@ reuses that same tag for `openclaw-cli`, so the CLI service does not try to pull
 an external `openclaw` image by default.
 The gateway health window is intentionally extended for first boot, which can take
 several minutes while initialization completes.
+The CLI service is behind the `cli` profile, so `up -d` in Coolify starts only
+the gateway by default.
 
 Use these environment variables:
 
