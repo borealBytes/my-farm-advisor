@@ -99,7 +99,7 @@ For the supported Cloudflare Zero Trust deployment, see
 [`docs/install/cloudflare-coolify.md`](docs/install/cloudflare-coolify.md).
 That runbook covers the simplified contract: one Coolify compose app, one-time
 Cloudflare tunnel/DNS/Access prep, `CLOUDFLARE_TUNNEL_TOKEN` for the same-compose
-tunnel sidecar, and the app entry at `https://<your-domain>/__openclaw__/canvas/`.
+tunnel sidecar, and the root app entry at `https://my-farm-advisor.superiorbyteworks.com`.
 
 ### Local development
 
