@@ -103,13 +103,15 @@ type CoolifyTunnelContract = {
 
 function deriveExpectedCoolifyTunnelContract(env: {
   CLOUDFLARE_TUNNEL_TOKEN?: string;
+  OPENCLAW_PUBLIC_HOSTNAME?: string;
 }): CoolifyTunnelContract {
   const hasTunnelToken = Boolean(env.CLOUDFLARE_TUNNEL_TOKEN?.trim());
+  const publicHostname = env.OPENCLAW_PUBLIC_HOSTNAME?.trim();
 
   return {
     gatewayPublishedPorts: ["127.0.0.1:18789:18789"],
     browserControlPublishedPorts: [],
-    tunnelOriginTarget: hasTunnelToken ? "openclaw-gateway:18789" : undefined,
+    tunnelOriginTarget: hasTunnelToken && publicHostname ? "openclaw-gateway:18789" : undefined,
   };
 }
 
@@ -927,10 +929,12 @@ describe("docker-setup.sh", () => {
     expect(compose).not.toContain("127.0.0.1:18791:18791");
     expect(compose).toContain("cloudflared:");
     expect(compose).toContain("CLOUDFLARE_TUNNEL_TOKEN");
+    expect(compose).toContain("OPENCLAW_PUBLIC_HOSTNAME");
     expect(compose).toContain("restart: on-failure");
     expect(compose).toContain("http://openclaw-gateway:18789");
     expect(compose).not.toContain("localhost:18789");
     expect(compose).not.toContain("service: http://127.0.0.1:18789");
+    expect(compose).not.toContain("hostname: $$OPENCLAW_PUBLIC_HOSTNAME");
     expect(compose).not.toContain("OPENCLAW_PUBLIC_HTTP");
     expect(compose).not.toContain('- "80:80"');
     expect(compose).not.toContain('- "443:443"');
@@ -939,6 +943,7 @@ describe("docker-setup.sh", () => {
   it("locks the intended Coolify tunnel contract for the compose sidecar flow", () => {
     const tokenAbsent = deriveExpectedCoolifyTunnelContract({
       CLOUDFLARE_TUNNEL_TOKEN: "",
+      OPENCLAW_PUBLIC_HOSTNAME: "",
     });
     expect(tokenAbsent.gatewayPublishedPorts).toEqual(["127.0.0.1:18789:18789"]);
     expect(tokenAbsent.browserControlPublishedPorts).toEqual([]);
@@ -946,12 +951,21 @@ describe("docker-setup.sh", () => {
 
     const tokenPresent = deriveExpectedCoolifyTunnelContract({
       CLOUDFLARE_TUNNEL_TOKEN: "test-token",
+      OPENCLAW_PUBLIC_HOSTNAME: "my-farm-advisor.superiorbyteworks.com",
     });
     expect(tokenPresent.gatewayPublishedPorts).toEqual(["127.0.0.1:18789:18789"]);
     expect(tokenPresent.browserControlPublishedPorts).toEqual([]);
     expect(tokenPresent.tunnelOriginTarget).toBe("openclaw-gateway:18789");
     expect(tokenPresent.tunnelOriginTarget).not.toContain("127.0.0.1");
     expect(tokenPresent.tunnelOriginTarget).not.toContain("localhost");
+
+    const missingHostname = deriveExpectedCoolifyTunnelContract({
+      CLOUDFLARE_TUNNEL_TOKEN: "test-token",
+      OPENCLAW_PUBLIC_HOSTNAME: "",
+    });
+    expect(missingHostname.gatewayPublishedPorts).toEqual(["127.0.0.1:18789:18789"]);
+    expect(missingHostname.browserControlPublishedPorts).toEqual([]);
+    expect(missingHostname.tunnelOriginTarget).toBeUndefined();
   });
 
   it("extends the local-image smoke path with plugin resolution and startup log checks", async () => {

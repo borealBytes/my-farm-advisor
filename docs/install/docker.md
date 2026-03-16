@@ -33,7 +33,8 @@ That page is the supported contract for this deployment shape:
 - one Coolify compose app, not a separate `cloudflared` app
 - one-time Cloudflare tunnel, DNS, and Access prep
 - `CLOUDFLARE_TUNNEL_TOKEN` turns on the same-compose tunnel sidecar
-- the documented public app entry is the root hostname `https://my-farm-advisor.superiorbyteworks.com`
+- `OPENCLAW_PUBLIC_HOSTNAME` defines the public hostname used by the tunnel docs and config
+- the documented public app entry is the root hostname `https://<OPENCLAW_PUBLIC_HOSTNAME>`
 
 ## Requirements
 
@@ -383,7 +384,7 @@ several minutes while initialization completes.
 The CLI service is behind the `cli` profile, so `up -d` in Coolify starts only
 the gateway by default.
 Use the deployment domain with the Canvas path:
-`https://my-farm-advisor.superiorbyteworks.com`.
+`https://<OPENCLAW_PUBLIC_HOSTNAME>`.
 For tunnel-only origin hardening, publish the gateway on loopback (`127.0.0.1:18789:18789`)
 and use Cloudflare Tunnel to reach it.
 
