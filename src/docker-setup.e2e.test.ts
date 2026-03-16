@@ -891,6 +891,15 @@ describe("docker-setup.sh", () => {
     expect(compose.match(/TZ: \$\{OPENCLAW_TZ:-UTC\}/g)).toHaveLength(2);
   });
 
+  it("keeps Coolify compose gateway and cli image wiring aligned", async () => {
+    const compose = await readFile(join(repoRoot, "docker-compose.coolify.yml"), "utf8");
+    expect(compose).toContain("openclaw-gateway:");
+    expect(compose).toContain("openclaw-cli:");
+    expect(compose.match(/image: \$\{OPENCLAW_IMAGE:-openclaw:local\}/g)).toHaveLength(2);
+    expect(compose.match(/user: "0:0"/g)).toHaveLength(2);
+    expect(compose).toContain('network_mode: "service:openclaw-gateway"');
+  });
+
   it("extends the local-image smoke path with plugin resolution and startup log checks", async () => {
     const activeSandbox = requireSandbox(sandbox);
     await writeFile(activeSandbox.logPath, "");
