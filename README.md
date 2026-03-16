@@ -92,6 +92,7 @@ if you stop the stack later, bring the long-running gateway back with `docker co
 Point Coolify at our `docker-compose.coolify.yml`. It handles the rest.
 That compose file builds and tags `${OPENCLAW_IMAGE:-openclaw:local}` for
 `openclaw-gateway` and reuses the same tag for `openclaw-cli`.
+On first boot, allow several minutes for initialization before health checks settle.
 
 ### Local development
 
