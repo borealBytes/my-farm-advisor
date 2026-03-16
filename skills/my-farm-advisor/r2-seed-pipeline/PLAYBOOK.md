@@ -31,6 +31,23 @@ Live data always wins unless you explicitly run the upgrade command.
 
 ## Commands (exact)
 
+### 0) Provision runtime environment (once per host)
+
+```bash
+cd skills/my-farm-advisor/r2-seed-pipeline
+./scripts/install.sh
+```
+
+This creates `/data/workspace/data/my-farm-advisor/r2-seed-pipeline/.venv` (or the
+path specified via `R2_SEED_DATA_ROOT`). The pipeline entrypoints also run this
+installer automatically when the venv is missing. Activate it manually with
+
+```bash
+source /data/workspace/data/my-farm-advisor/r2-seed-pipeline/.venv/bin/activate
+```
+
+Run all pipeline scripts from that environment.
+
 ### 1) Safe Seed (append only, never overwrite)
 
 ```bash

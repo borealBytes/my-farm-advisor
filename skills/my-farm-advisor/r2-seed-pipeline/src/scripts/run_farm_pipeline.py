@@ -30,6 +30,10 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, cast
 
+from bootstrap_runtime import ensure_runtime_environment
+
+ensure_runtime_environment()
+
 from lib.paths import farm_boundary_path, farm_report_asset_path, grower_manifest_path
 from reporting_bootstrap import ensure_canonical_data_tree
 
@@ -58,9 +62,7 @@ def _init_grower_manifest(grower_slug: str, farm_slug: str, farm_name: str) -> P
         else []
     )
     farm_exists = any(
-        str(item.get("farm_slug")) == farm_slug
-        for item in farms
-        if isinstance(item, dict)
+        str(item.get("farm_slug")) == farm_slug for item in farms if isinstance(item, dict)
     )
     if not farm_exists:
         farms.append(
@@ -118,9 +120,7 @@ def _update_grower_manifest(
         farms[idx] = current
         break
     payload["farms"] = farms
-    payload["updated_at"] = (
-        datetime.now(UTC).isoformat(timespec="seconds").replace("+00:00", "Z")
-    )
+    payload["updated_at"] = datetime.now(UTC).isoformat(timespec="seconds").replace("+00:00", "Z")
     _write_json(manifest_path, payload)
 
 
@@ -197,9 +197,7 @@ def main() -> None:
     print("=" * 60)
 
     run_started = datetime.now(UTC).isoformat(timespec="seconds").replace("+00:00", "Z")
-    grower_manifest = _init_grower_manifest(
-        args.grower_slug, args.farm_slug, args.farm_name
-    )
+    grower_manifest = _init_grower_manifest(args.grower_slug, args.farm_slug, args.farm_name)
     step_results: list[dict[str, str]] = []
     _update_grower_manifest(
         grower_manifest,
@@ -258,9 +256,7 @@ def main() -> None:
                 run_status="failed",
                 active_step=script,
                 step_results=step_results,
-                finished_at=datetime.now(UTC)
-                .isoformat(timespec="seconds")
-                .replace("+00:00", "Z"),
+                finished_at=datetime.now(UTC).isoformat(timespec="seconds").replace("+00:00", "Z"),
             )
             print(f"  Pipeline halted at: {script}")
             print("  Fix the error above and rerun.")
@@ -275,9 +271,7 @@ def main() -> None:
             run_status="complete",
             active_step=None,
             step_results=step_results,
-            finished_at=datetime.now(UTC)
-            .isoformat(timespec="seconds")
-            .replace("+00:00", "Z"),
+            finished_at=datetime.now(UTC).isoformat(timespec="seconds").replace("+00:00", "Z"),
         )
         print("  Pipeline complete.")
         print()

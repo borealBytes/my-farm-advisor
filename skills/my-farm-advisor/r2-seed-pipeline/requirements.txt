@@ -1,0 +1,22 @@
+# Core data stack
+pandas>=2.1
+numpy>=1.25
+scipy>=1.11
+scikit-learn>=1.3
+tqdm>=4.66
+
+# Geospatial dependencies
+geopandas>=0.14
+fiona>=1.9
+pyproj>=3.6
+shapely>=2.0
+rasterio>=1.3
+
+# Plotting / reporting
+matplotlib>=3.8
+seaborn>=0.13
+
+# General utilities
+requests>=2.31
+beautifulsoup4>=4.12
+python-dotenv>=1.0

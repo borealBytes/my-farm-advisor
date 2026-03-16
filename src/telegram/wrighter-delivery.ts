@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import { statSync } from "node:fs";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
@@ -10,6 +11,7 @@ import {
 } from "../delivery/wrighter-html.js";
 import { resolvePreferredOpenClawTmpDir } from "../infra/tmp-openclaw-dir.js";
 import { createSubsystemLogger } from "../logging/subsystem.js";
+import { runCommandWithTimeout } from "../process/exec.js";
 
 const log = createSubsystemLogger("telegram/wrighter-delivery");
 
@@ -27,6 +29,7 @@ type TelegramMediaMessage = {
   filePath: string;
   caption?: string;
   mimeType?: string;
+  role?: string;
 };
 
 type TelegramMessage = TelegramTextMessage | TelegramMediaMessage;
@@ -58,23 +61,92 @@ export type WrighterTelegramTransformResult = {
 };
 
 let cachedBuilderPromise: Promise<BuildTelegramDeliveryFn> | null = null;
+let telegramInstallAttempted = false;
 
 async function loadBuildTelegramDelivery(): Promise<BuildTelegramDeliveryFn> {
   if (!cachedBuilderPromise) {
-    const moduleUrl = new URL(
-      "../../skills/superior-byte-works-wrighter/delivery/telegram/dist/index.js",
-      import.meta.url,
-    );
-    cachedBuilderPromise = import(moduleUrl.href).then((mod) => {
-      const builder = (mod as { buildTelegramDelivery?: BuildTelegramDeliveryFn })
-        .buildTelegramDelivery;
-      if (typeof builder !== "function") {
-        throw new Error("Wrighter Telegram delivery module export missing buildTelegramDelivery");
-      }
-      return builder;
-    });
+    cachedBuilderPromise = loadTelegramBuilderWithAutoInstall();
   }
   return cachedBuilderPromise;
+}
+
+async function loadTelegramBuilderWithAutoInstall(): Promise<BuildTelegramDeliveryFn> {
+  try {
+    return await importTelegramBuilder();
+  } catch (error) {
+    if (!shouldAutoInstallTelegramDelivery(error)) {
+      throw error;
+    }
+    await ensureTelegramDeliveryInstalled();
+    return await importTelegramBuilder();
+  }
+}
+
+async function importTelegramBuilder(): Promise<BuildTelegramDeliveryFn> {
+  const moduleUrl = new URL(
+    "../../skills/superior-byte-works-wrighter/delivery/telegram/dist/index.js",
+    import.meta.url,
+  );
+  const mod = await import(moduleUrl.href);
+  const builder = (mod as { buildTelegramDelivery?: BuildTelegramDeliveryFn })
+    .buildTelegramDelivery;
+  if (typeof builder !== "function") {
+    throw new Error("Wrighter Telegram delivery module export missing buildTelegramDelivery");
+  }
+  return builder;
+}
+
+function shouldAutoInstallTelegramDelivery(error: unknown): boolean {
+  if (telegramInstallAttempted) {
+    return false;
+  }
+  if (!(error instanceof Error)) {
+    return false;
+  }
+  return (
+    error.message.includes("Cannot find module") || error.message.includes("ERR_MODULE_NOT_FOUND")
+  );
+}
+
+async function ensureTelegramDeliveryInstalled(): Promise<void> {
+  telegramInstallAttempted = true;
+  const scriptPath = resolveTelegramInstallScript();
+  log.info("running wrighter telegram delivery installer", { scriptPath });
+  const result = await runCommandWithTimeout(["bash", scriptPath], {
+    timeoutMs: 20 * 60 * 1000,
+    cwd: path.dirname(path.dirname(scriptPath)),
+    noOutputTimeoutMs: 5 * 60 * 1000,
+  });
+  if (result.code !== 0) {
+    throw new Error(
+      `wrighter telegram delivery installer failed (code=${result.code}): ${result.stderr || result.stdout}`,
+    );
+  }
+  cachedBuilderPromise = null;
+  log.info("wrighter telegram delivery installer completed");
+}
+
+function resolveTelegramInstallScript(): string {
+  const candidates = [
+    path.resolve(
+      process.cwd(),
+      "skills/superior-byte-works-wrighter/delivery/telegram/scripts/install.sh",
+    ),
+    path.resolve(
+      "/data/workspace/skills/superior-byte-works-wrighter/delivery/telegram/scripts/install.sh",
+    ),
+  ];
+  for (const candidate of candidates) {
+    try {
+      const stat = statSync(candidate);
+      if (stat.isFile()) {
+        return candidate;
+      }
+    } catch {
+      continue;
+    }
+  }
+  return candidates[0];
 }
 
 export async function maybeTransformWrighterTelegramPayloads(
