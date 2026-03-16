@@ -106,12 +106,11 @@ function deriveExpectedCoolifyTunnelContract(env: {
   OPENCLAW_PUBLIC_HOSTNAME?: string;
 }): CoolifyTunnelContract {
   const hasTunnelToken = Boolean(env.CLOUDFLARE_TUNNEL_TOKEN?.trim());
-  const publicHostname = env.OPENCLAW_PUBLIC_HOSTNAME?.trim();
 
   return {
     gatewayPublishedPorts: ["127.0.0.1:18789:18789"],
     browserControlPublishedPorts: [],
-    tunnelOriginTarget: hasTunnelToken && publicHostname ? "openclaw-gateway:18789" : undefined,
+    tunnelOriginTarget: hasTunnelToken ? "openclaw-gateway:18789" : undefined,
   };
 }
 
@@ -970,7 +969,7 @@ describe("docker-setup.sh", () => {
     });
     expect(missingHostname.gatewayPublishedPorts).toEqual(["127.0.0.1:18789:18789"]);
     expect(missingHostname.browserControlPublishedPorts).toEqual([]);
-    expect(missingHostname.tunnelOriginTarget).toBeUndefined();
+    expect(missingHostname.tunnelOriginTarget).toBe("openclaw-gateway:18789");
   });
 
   it("extends the local-image smoke path with plugin resolution and startup log checks", async () => {
