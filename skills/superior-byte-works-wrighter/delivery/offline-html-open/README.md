@@ -12,8 +12,10 @@ chmod +x scripts/install.sh
 ./scripts/install.sh
 ```
 
-This creates a local virtualenv (for tooling parity), installs pnpm
-dependencies, and emits compiled ESM into `dist/`.
+This uses the shared Wrighter delivery environment under
+`skills/superior-byte-works-wrighter/delivery/` (shared `.venv`, shared
+Puppeteer cache, shared Chromium setup), installs pnpm dependencies, and emits
+compiled ESM into `dist/`.
 
 ## Usage
 

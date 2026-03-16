@@ -1,5 +1,5 @@
 {
-  "name": "my-farm-adviser",
+  "name": "my-farm-advisor",
   "version": "2026.3.13",
   "description": "Farm intelligence and research assistant built on upstream OpenClaw",
   "keywords": [
@@ -20,7 +20,7 @@
     "url": "git+https://github.com/borealBytes/my-farm-advisor.git"
   },
   "bin": {
-    "my-farm-adviser": "openclaw.mjs",
+    "my-farm-advisor": "openclaw.mjs",
     "openclaw": "openclaw.mjs"
   },
   "directories": {

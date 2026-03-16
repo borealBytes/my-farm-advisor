@@ -3,6 +3,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { resolvePreferredOpenClawTmpDir } from "../infra/tmp-openclaw-dir.js";
 import { createSubsystemLogger } from "../logging/subsystem.js";
+import { runCommandWithTimeout } from "../process/exec.js";
 
 const log = createSubsystemLogger("delivery/wrighter-html");
 
@@ -13,6 +14,7 @@ type SealedBuilderModule =
 
 let cachedOpenBuilder: Promise<OpenBuilderModule["buildOfflineHtmlOpen"]> | null = null;
 let cachedSealedBuilder: Promise<SealedBuilderModule["buildOfflineHtmlSealed"]> | null = null;
+let htmlDeliveryInstallAttempted = false;
 
 export type HtmlDeliveryMode = "open" | "sealed" | "none";
 
@@ -123,36 +125,75 @@ async function createTempOutputDir(mode: string): Promise<string> {
 
 async function loadOpenBuilder(): Promise<OpenBuilderModule["buildOfflineHtmlOpen"]> {
   if (!cachedOpenBuilder) {
-    cachedOpenBuilder = import(
-      new URL(
-        "../../skills/superior-byte-works-wrighter/delivery/offline-html-open/dist/index.js",
-        import.meta.url,
-      ).href
-    ).then((mod) => {
-      const builder = (mod as OpenBuilderModule).buildOfflineHtmlOpen;
-      if (typeof builder !== "function") {
-        throw new Error("offline-html-open build output missing buildOfflineHtmlOpen");
-      }
-      return builder;
-    });
+    cachedOpenBuilder = loadHtmlBuilderWithAutoInstall("open") as Promise<
+      OpenBuilderModule["buildOfflineHtmlOpen"]
+    >;
   }
   return cachedOpenBuilder;
 }
 
 async function loadSealedBuilder(): Promise<SealedBuilderModule["buildOfflineHtmlSealed"]> {
   if (!cachedSealedBuilder) {
-    cachedSealedBuilder = import(
-      new URL(
-        "../../skills/superior-byte-works-wrighter/delivery/offline-html-sealed/dist/index.js",
-        import.meta.url,
-      ).href
-    ).then((mod) => {
-      const builder = (mod as SealedBuilderModule).buildOfflineHtmlSealed;
-      if (typeof builder !== "function") {
-        throw new Error("offline-html-sealed build output missing buildOfflineHtmlSealed");
-      }
-      return builder;
-    });
+    cachedSealedBuilder = loadHtmlBuilderWithAutoInstall("sealed") as Promise<
+      SealedBuilderModule["buildOfflineHtmlSealed"]
+    >;
   }
   return cachedSealedBuilder;
+}
+
+async function loadHtmlBuilderWithAutoInstall(mode: "open" | "sealed"): Promise<Function> {
+  try {
+    return await importHtmlBuilder(mode);
+  } catch (error) {
+    if (!shouldAutoInstallHtmlDelivery(error)) {
+      throw error;
+    }
+    await ensureHtmlDeliveryInstalled(mode);
+    return await importHtmlBuilder(mode);
+  }
+}
+
+async function importHtmlBuilder(mode: "open" | "sealed"): Promise<Function> {
+  const relativePath =
+    mode === "open"
+      ? "../../skills/superior-byte-works-wrighter/delivery/offline-html-open/dist/index.js"
+      : "../../skills/superior-byte-works-wrighter/delivery/offline-html-sealed/dist/index.js";
+  const exportName = mode === "open" ? "buildOfflineHtmlOpen" : "buildOfflineHtmlSealed";
+  const mod = await import(new URL(relativePath, import.meta.url).href);
+  const builder = (mod as Record<string, unknown>)[exportName];
+  if (typeof builder !== "function") {
+    throw new Error(`${relativePath} missing ${exportName}`);
+  }
+  return builder;
+}
+
+function shouldAutoInstallHtmlDelivery(error: unknown): boolean {
+  if (htmlDeliveryInstallAttempted || !(error instanceof Error)) {
+    return false;
+  }
+  return (
+    error.message.includes("Cannot find module") || error.message.includes("ERR_MODULE_NOT_FOUND")
+  );
+}
+
+async function ensureHtmlDeliveryInstalled(mode: "open" | "sealed"): Promise<void> {
+  htmlDeliveryInstallAttempted = true;
+  const scriptPath = path.resolve(
+    process.cwd(),
+    mode === "open"
+      ? "skills/superior-byte-works-wrighter/delivery/offline-html-open/scripts/install.sh"
+      : "skills/superior-byte-works-wrighter/delivery/offline-html-sealed/scripts/install.sh",
+  );
+  const result = await runCommandWithTimeout(["bash", scriptPath], {
+    timeoutMs: 20 * 60 * 1000,
+    cwd: path.dirname(path.dirname(scriptPath)),
+    noOutputTimeoutMs: 5 * 60 * 1000,
+  });
+  if (result.code !== 0) {
+    throw new Error(
+      `${mode} html delivery installer failed (code=${result.code}): ${result.stderr || result.stdout}`,
+    );
+  }
+  cachedOpenBuilder = null;
+  cachedSealedBuilder = null;
 }

@@ -50,6 +50,9 @@ def _resolve_install_script() -> Path:
 
 def _is_current_python(venv_python: Path) -> bool:
     try:
-        return venv_python.resolve() == Path(sys.executable).resolve()
+        current_executable = Path(sys.executable)
+        if current_executable == venv_python:
+            return True
+        return sys.prefix == str(venv_python.parent.parent)
     except FileNotFoundError:
         return False

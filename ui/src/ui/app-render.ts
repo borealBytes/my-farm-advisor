@@ -451,8 +451,8 @@ export function renderApp(state: AppViewState) {
             ? nothing
             : html`
           <div class="sidebar-brand">
-            <img class="sidebar-brand__logo" src="${agentLogoUrl(basePath)}" alt="My Farm Adviser" />
-            <span class="sidebar-brand__title">My Farm Adviser</span>
+            <img class="sidebar-brand__logo" src="${agentLogoUrl(basePath)}" alt="My Farm Advisor" />
+            <span class="sidebar-brand__title">My Farm Advisor</span>
           </div>
         `
         }

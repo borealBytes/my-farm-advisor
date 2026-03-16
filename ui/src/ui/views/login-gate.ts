@@ -15,8 +15,8 @@ export function renderLoginGate(state: AppViewState) {
       <div class="login-gate__theme">${renderThemeToggle(state)}</div>
       <div class="login-gate__card">
         <div class="login-gate__header">
-          <img class="login-gate__logo" src=${faviconSrc} alt="My Farm Adviser" />
-          <div class="login-gate__title">My Farm Adviser</div>
+      <img class="login-gate__logo" src=${faviconSrc} alt="My Farm Advisor" />
+      <div class="login-gate__title">My Farm Advisor</div>
           <div class="login-gate__sub">${t("login.subtitle")}</div>
         </div>
         <div class="login-gate__form">

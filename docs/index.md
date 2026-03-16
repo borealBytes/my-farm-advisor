@@ -1,22 +1,22 @@
 ---
-summary: "My Farm Adviser is a rooted farm intelligence workspace built on upstream OpenClaw."
+summary: "My Farm Advisor is a rooted farm intelligence workspace built on upstream OpenClaw."
 read_when:
-  - Introducing My Farm Adviser to newcomers
-title: "My Farm Adviser"
+  - Introducing My Farm Advisor to newcomers
+title: "My Farm Advisor"
 ---
 
-# My Farm Adviser
+# My Farm Advisor
 
 <p align="center">
     <img
         src="/assets/my-farm-adviser-logo-text-dark.png"
-        alt="My Farm Adviser"
+        alt="My Farm Advisor"
         width="500"
         class="dark:hidden"
     />
     <img
         src="/assets/my-farm-adviser-logo-text.png"
-        alt="My Farm Adviser"
+        alt="My Farm Advisor"
         width="500"
         class="hidden dark:block"
     />
@@ -27,14 +27,14 @@ title: "My Farm Adviser"
 <p align="center">
     <img
         src="/assets/my-farm-adviser-hero.png"
-        alt="My Farm Adviser rooted farm intelligence hero"
+        alt="My Farm Advisor rooted farm intelligence hero"
         width="900"
     />
 </p>
 
 <p align="center">
   <strong>Farm intelligence built for the real world: field decisions above ground, data structure below ground.</strong><br />
-  My Farm Adviser keeps the OpenClaw runtime while focusing the product around field operations, research, and practical farm action.
+  My Farm Advisor keeps the OpenClaw runtime while focusing the product around field operations, research, and practical farm action.
 </p>
 
 <Columns>

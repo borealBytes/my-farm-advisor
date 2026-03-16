@@ -2,7 +2,6 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
 import { nanoid } from "nanoid";
-import stripHtml from "strip-html";
 
 type OpenBuilderModule = typeof import("../../offline-html-open/dist/index.js");
 
@@ -293,11 +292,27 @@ function escapeAttribute(value: string): string {
 }
 
 export function summarizeHtml(html: string): string {
-  return stripHtml(html).result.replace(/\s+/g, " ").trim().slice(0, 360);
+  return html
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 360);
 }
 
 export async function extractDeliverySummary(raw: string): Promise<string> {
   const parsed = matter(raw ?? "");
   const content = parsed.content ?? "";
-  return stripHtml(content).result.replace(/\s+/g, " ").trim().slice(0, 360);
+  return content
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 360);
 }

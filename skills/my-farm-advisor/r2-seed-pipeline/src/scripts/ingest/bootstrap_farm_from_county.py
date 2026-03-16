@@ -65,7 +65,7 @@ def _ensure_counties_layer() -> None:
     if COUNTIES_PATH.exists():
         return
     cmd = [
-        "python",
+        sys.executable,
         "data/my-farm-advisor/scripts/ingest/download_geoadmin.py",
         "--levels",
         "l2_counties",
@@ -249,7 +249,7 @@ def _merge_with_existing(
 
 def _run_farm_pipeline(args, boundary_path: Path, inventory_path: Path) -> None:
     cmd = [
-        "python",
+        sys.executable,
         "data/my-farm-advisor/scripts/run_farm_pipeline.py",
         "--boundaries",
         str(boundary_path.relative_to(REPO_ROOT)),
