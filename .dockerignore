@@ -27,6 +27,12 @@ node_modules
 **/.next
 coverage
 **/coverage
+.pytest_cache
+**/.pytest_cache
+__pycache__
+**/__pycache__
+.venv
+**/.venv
 *.log
 tmp
 **/tmp
@@ -46,9 +52,38 @@ Swabble/
 Core/
 Users/
 vendor/
+legacy/
+
+# local project metadata and CI/dev-only files
+.github/
+.sisyphus/
+.vscode/
+.pi/
+.env
+.env.*
+!.env.example
+CHANGELOG.md
+changelog/
+appcast.xml
+render.yaml
+fly.toml
+fly.private.toml
+docker-compose.yml
+docker-compose.coolify.yml
+openclaw.podman.env
+test/
+test-fixtures/
 
 # Data directory - mounted at runtime, not built into image
 data/
+
+# Generated example outputs are not needed for image builds or runtime skills.
+skills/**/examples/**/output/
+
+# Preserve-list exception: these geoadmin datasets stay in context because the
+# bundled r2-seed-pipeline runtime reads them directly when building reports.
+# Do not ignore them unless Dockerfile/runtime packaging is changed to restore
+# the files another way.
 
 # Needed for building the Canvas A2UI bundle during Docker image builds.
 # Keep the rest of apps/ and vendor/ excluded to avoid a large build context.

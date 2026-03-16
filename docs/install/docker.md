@@ -50,10 +50,10 @@ From repo root:
 
 This script:
 
-- builds the gateway image locally (or pulls a remote image if `OPENCLAW_IMAGE` is set)
-- runs the onboarding wizard
+- builds `openclaw:local` from the repo by default, or pulls `OPENCLAW_IMAGE` when you point at a remote image
+- runs `openclaw-cli onboard --mode local --no-install-daemon`
 - prints optional provider setup hints
-- starts the gateway via Docker Compose
+- starts `openclaw-gateway` via Docker Compose
 - generates a gateway token and writes it to `.env`
 
 Optional env vars:
@@ -138,6 +138,9 @@ network path instead of the bundled `openclaw-cli` service.
 
 To reduce impact if the CLI process is compromised, the compose config drops
 `NET_RAW`/`NET_ADMIN` and enables `no-new-privileges` on `openclaw-cli`.
+The bundled CLI service also runs as root so compose-managed onboarding and follow-up
+commands can read and update `/data/openclaw.json` even when the gateway seeded that
+file with root ownership.
 
 It writes config/workspace on the host:
 
@@ -187,8 +190,8 @@ Reference: [OCI image annotations](https://github.com/opencontainers/image-spec/
 Release context: this repository's tagged history already uses Bookworm in
 `v2026.2.22` and earlier 2026 tags (for example `v2026.2.21`, `v2026.2.9`).
 
-By default the setup script builds the image from source. To pull a pre-built
-image instead, set `OPENCLAW_IMAGE` before running the script:
+By default the setup script builds `openclaw:local` from source. To pull a
+pre-built image instead, set `OPENCLAW_IMAGE` before running the script:
 
 ```bash
 export OPENCLAW_IMAGE="ghcr.io/openclaw/openclaw:latest"
@@ -196,8 +199,9 @@ export OPENCLAW_IMAGE="ghcr.io/openclaw/openclaw:latest"
 ```
 
 The script detects that `OPENCLAW_IMAGE` is not the default `openclaw:local` and
-runs `docker pull` instead of `docker build`. Everything else (onboarding,
-gateway start, token generation) works the same way.
+runs `docker pull` instead of `docker build`. Everything else still follows the
+same compose-managed flow: onboard through `openclaw-cli`, then start
+`openclaw-gateway`, then use `openclaw-cli` for follow-up commands.
 
 `docker-setup.sh` still runs from the repository root because it uses the local
 `docker-compose.yml` and helper files. `OPENCLAW_IMAGE` skips local image build
@@ -221,13 +225,35 @@ Then use `clawdock-start`, `clawdock-stop`, `clawdock-dashboard`, etc. Run `claw
 
 See [`ClawDock` Helper README](https://github.com/openclaw/openclaw/blob/main/scripts/shell-helpers/README.md) for details.
 
-### Manual flow (compose)
+### Manual flow (local image)
 
 ```bash
 docker build -t openclaw:local -f Dockerfile .
-docker compose run --rm openclaw-cli onboard
+docker compose run --rm openclaw-cli onboard --mode local --no-install-daemon
+docker compose run --rm openclaw-cli dashboard --no-open
+```
+
+Because `openclaw-cli` uses `network_mode: "service:openclaw-gateway"`, that onboarding command
+starts or reuses `openclaw-gateway` first. After onboarding, keep using `openclaw-cli` for follow-up
+commands. If you stop the stack later and want the long-running gateway back, run:
+
+```bash
 docker compose up -d openclaw-gateway
 ```
+
+This is the same compose-managed local-image smoke path validated by the current Docker checks.
+
+### Manual flow (remote image)
+
+```bash
+export OPENCLAW_IMAGE="ghcr.io/openclaw/openclaw:latest"
+docker pull "$OPENCLAW_IMAGE"
+docker compose run --rm openclaw-cli onboard --mode local --no-install-daemon
+docker compose run --rm openclaw-cli dashboard --no-open
+```
+
+`OPENCLAW_IMAGE` only changes which image Compose uses. The service names stay
+`openclaw-cli` and `openclaw-gateway`.
 
 Note: run `docker compose ...` from the repo root. If you enabled
 `OPENCLAW_EXTRA_MOUNTS` or `OPENCLAW_HOME_VOLUME`, the setup script writes
@@ -451,8 +477,12 @@ If you need Playwright to install system deps, rebuild the image with
 
 ### Permissions + EACCES
 
-The image runs as `node` (uid 1000). If you see permission errors on
-`/home/node/.openclaw`, make sure your host bind mounts are owned by uid 1000.
+The image defaults to the `node` user (uid 1000), but the compose-managed
+`openclaw-cli` service runs as root so it can safely operate on `/data/openclaw.json`
+and other bind-mounted state created by the gateway service.
+
+If you see permission errors on `/home/node/.openclaw`, make sure your host bind mounts
+are owned by uid 1000.
 
 Example (Linux host):
 

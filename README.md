@@ -77,12 +77,15 @@ cp .env.example .env
 pnpm install
 pnpm build
 
-# Build and run
-docker build -t my-farm-adviser:local -f Dockerfile .
-docker compose up -d
+# Build the local image, onboard through the compose-managed CLI, then fetch the dashboard URL
+docker build -t openclaw:local -f Dockerfile .
+docker compose run --rm openclaw-cli onboard --mode local --no-install-daemon
+docker compose run --rm openclaw-cli dashboard --no-open
 ```
 
-Open the gateway on port `18789` (configurable).
+`openclaw-cli` shares `openclaw-gateway`'s network namespace, so `docker compose run --rm openclaw-cli ...`
+starts or reuses the gateway service automatically. Use `openclaw-cli` for follow-up Docker commands;
+if you stop the stack later, bring the long-running gateway back with `docker compose up -d openclaw-gateway`.
 
 ### Coolify (one-click)
 
