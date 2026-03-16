@@ -103,6 +103,7 @@ services:
       start_period: 360s
 
   openclaw-cli:
+    profiles: ["cli"]
     user: "0:0"
     image: ${OPENCLAW_IMAGE:-openclaw:local}
     network_mode: "service:openclaw-gateway"
@@ -132,9 +133,6 @@ services:
     tty: true
     init: true
     entrypoint: ["node", "dist/index.js"]
-    depends_on:
-      openclaw-gateway:
-        condition: service_healthy
 
 volumes:
   openclaw-data:
