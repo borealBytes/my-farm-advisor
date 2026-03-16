@@ -57,6 +57,7 @@ This script will create:
 - `.venv/` – Python virtual environment used for the helper tooling
 - `node_modules/` – pnpm-managed dependencies for the delivery pipeline
 - `.cache/puppeteer/` – Chromium binaries cached locally for Mermaid CLI
+- `puppeteer.config.cjs` – launch configuration that keeps Chromium sandboxed by default and only adds `--no-sandbox` when running as root
 
 If you prefer to perform each step manually:
 

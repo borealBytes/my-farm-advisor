@@ -31,7 +31,7 @@ if [[ ! -x "$(command -v python3)" ]]; then
   exit 1
 fi
 
-python3 -m venv "${VENV_DIR}"
+python3 -m venv --system-site-packages "${VENV_DIR}"
 source "${VENV_DIR}/bin/activate"
 
 pip install --upgrade pip

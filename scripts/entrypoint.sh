@@ -492,11 +492,17 @@ ensureAgent('data-pipeline', {
 const primaryModel = process.env.PRIMARY_MODEL?.trim();
 const fallbackModels = process.env.FALLBACK_MODELS?.trim();
 const allModels = [];
-if (primaryModel) allModels.push(primaryModel);
+const canonicalizeModelRef = id => String(id ?? '').trim().replace(/\/+/g, '/');
+const parseModelRef = id => {
+  const normalized = canonicalizeModelRef(id);
+  const [provider = '', company = '', model = ''] = normalized.split('/');
+  return { normalized, provider, company, model };
+};
+if (primaryModel) allModels.push(canonicalizeModelRef(primaryModel));
 if (fallbackModels) {
   fallbackModels
     .split(',')
-    .map(m => m.trim())
+    .map(m => canonicalizeModelRef(m))
     .filter(m => m && !allModels.includes(m))
     .forEach(m => allModels.push(m));
 }
@@ -504,32 +510,49 @@ if (fallbackModels) {
 if (allModels.length > 0) {
   config.agents ??= {};
   config.agents.defaults ??= {};
-  config.agents.defaults.models ??= {};
+  config.agents.defaults.models = {};
   allModels.forEach(m => {
-    const name = m.split('/').pop() ?? m;
-    config.agents.defaults.models[m] ??= { alias: name };
+    const parsed = parseModelRef(m);
+    const alias = parsed.model || parsed.company || parsed.provider || parsed.normalized;
+    config.agents.defaults.models[parsed.normalized] = { alias };
   });
 }
 
 const nvidiaApiKey = process.env.NVIDIA_API_KEY?.trim();
 const nvidiaBaseUrl = process.env.NVIDIA_BASE_URL?.trim();
 const INTEGRATE_MODEL_PREFIXES = new Set(['nvidia', 'stepfun-ai']);
-const normalizeIntegrateModelId = id => {
-  if (typeof id !== 'string') return id;
-  if (id.startsWith('nvidia/stepfun-ai/')) {
-    return id.replace('nvidia/stepfun-ai/', 'stepfun-ai/');
+const resolveIntegrateProviderId = id => {
+  const parsed = parseModelRef(id);
+  if (parsed.provider === 'nvidia' && parsed.company === 'stepfun-ai') {
+    return 'stepfun-ai';
   }
-  if (id.startsWith('nvidia/qwen/')) {
-    return id.replace('nvidia/qwen/', 'qwen/');
+  if (parsed.provider === 'nvidia' && parsed.company === 'qwen') {
+    return 'qwen';
   }
-  if (id.startsWith('nvidia/moonshotai/')) {
-    return id.replace('nvidia/moonshotai/', 'moonshotai/');
+  if (parsed.provider === 'nvidia' && parsed.company === 'moonshotai') {
+    return 'moonshotai';
   }
-  return id;
+  if (parsed.provider === 'stepfun-ai') {
+    return 'stepfun-ai';
+  }
+  return parsed.provider;
+};
+const normalizeProviderModelId = (providerId, id) => {
+  const parsed = parseModelRef(id);
+  if (providerId === 'stepfun-ai' && parsed.provider === 'stepfun-ai') {
+    return canonicalizeModelRef(`nvidia/${parsed.provider}/${parsed.company}`);
+  }
+  if (providerId === 'qwen' && parsed.provider === 'qwen') {
+    return canonicalizeModelRef(`nvidia/${parsed.provider}/${parsed.company}`);
+  }
+  if (providerId === 'moonshotai' && parsed.provider === 'moonshotai') {
+    return canonicalizeModelRef(`nvidia/${parsed.provider}/${parsed.company}`);
+  }
+  return parsed.normalized;
 };
 const integrateModels = allModels.filter(modelRef => {
-  const providerPrefix = modelRef.split('/')[0];
-  return INTEGRATE_MODEL_PREFIXES.has(providerPrefix) || modelRef.startsWith('stepfun-ai/');
+  const parsed = parseModelRef(modelRef);
+  return INTEGRATE_MODEL_PREFIXES.has(parsed.provider) || parsed.provider === 'stepfun-ai';
 });
 if (nvidiaApiKey && nvidiaBaseUrl && integrateModels.length > 0) {
   config.models ??= {};
@@ -537,12 +560,13 @@ if (nvidiaApiKey && nvidiaBaseUrl && integrateModels.length > 0) {
   config.models.providers ??= {};
   const modelsByProvider = new Map();
   for (const rawModelId of integrateModels) {
-    const normalizedId = normalizeIntegrateModelId(rawModelId);
-    const providerId = normalizedId.split('/')[0];
+    const providerId = resolveIntegrateProviderId(rawModelId);
+    const normalizedId = normalizeProviderModelId(providerId, rawModelId);
     if (!modelsByProvider.has(providerId)) {
       modelsByProvider.set(providerId, []);
     }
-    const name = normalizedId.split('/').pop() ?? normalizedId;
+    const parsed = parseModelRef(normalizedId);
+    const name = parsed.model || parsed.company || parsed.provider || normalizedId;
     modelsByProvider.get(providerId).push({ id: normalizedId, name });
   }
 
@@ -550,8 +574,9 @@ if (nvidiaApiKey && nvidiaBaseUrl && integrateModels.length > 0) {
     const existingProvider = config.models.providers[providerId] ?? {};
     const existingModelsArray = Array.isArray(existingProvider.models)
       ? existingProvider.models.map(model => {
-          const normalizedId = normalizeIntegrateModelId(model?.id ?? '');
-          const name = model?.name ?? normalizedId.split('/').pop() ?? normalizedId;
+          const normalizedId = normalizeProviderModelId(providerId, model?.id ?? '');
+          const parsed = parseModelRef(normalizedId);
+          const name = model?.name ?? parsed.model ?? parsed.company ?? parsed.provider ?? normalizedId;
           return { ...model, id: normalizedId, name };
         })
       : [];
@@ -595,9 +620,12 @@ if (primaryModel) {
   config.agents ??= {};
   config.agents.defaults ??= {};
   config.agents.defaults.model ??= {};
-  config.agents.defaults.model.primary = primaryModel;
+  config.agents.defaults.model.primary = canonicalizeModelRef(primaryModel);
   if (fallbackModels) {
-    config.agents.defaults.model.fallbacks = fallbackModels.split(',').map(m => m.trim()).filter(m => m);
+    config.agents.defaults.model.fallbacks = fallbackModels
+      .split(',')
+      .map(m => canonicalizeModelRef(m))
+      .filter(m => m);
   }
 }
 
