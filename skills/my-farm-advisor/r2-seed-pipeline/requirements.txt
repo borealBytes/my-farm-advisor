@@ -11,6 +11,10 @@ fiona>=1.9
 pyproj>=3.6
 shapely>=2.0
 rasterio>=1.3
+rasterstats>=0.19
+
+# Storage / interchange
+pyarrow>=15
 
 # Plotting / reporting
 matplotlib>=3.8

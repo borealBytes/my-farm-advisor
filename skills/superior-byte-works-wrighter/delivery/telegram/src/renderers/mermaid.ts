@@ -22,13 +22,22 @@ export async function renderMermaidDiagram(
   const tempDir = await fs.mkdtemp(path.join(tmpdir(), "mermaid-"));
   const inputPath = path.join(tempDir, `${randomUUID()}.mmd`);
   const tempOutputPath = path.join(tempDir, `${randomUUID()}.png`);
+  const puppeteerConfigPath = path.resolve(
+    process.cwd(),
+    "skills/superior-byte-works-wrighter/delivery/telegram/puppeteer.config.cjs",
+  );
 
   await fs.writeFile(inputPath, code, "utf8");
 
   const cliPath = resolveMermaidCli();
 
   try {
-    await execa(process.execPath, [cliPath, "-i", inputPath, "-o", tempOutputPath], {
+    const args = [cliPath, "-i", inputPath, "-o", tempOutputPath];
+    try {
+      await fs.access(puppeteerConfigPath);
+      args.push("-p", puppeteerConfigPath);
+    } catch {}
+    await execa(process.execPath, args, {
       stdio: "pipe",
     });
   } finally {

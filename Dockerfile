@@ -137,8 +137,15 @@ RUN --mount=type=cache,id=openclaw-bookworm-apt-cache,target=/var/cache/apt,shar
     --mount=type=cache,id=openclaw-bookworm-apt-lists,target=/var/lib/apt,sharing=locked \
     apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-      procps hostname curl git openssl python3 python3-pip python3-venv && \
-    ln -sf /usr/bin/pip3 /usr/local/bin/pip
+      procps hostname curl git openssl python3 python3-pip python3-venv \
+      gdal-bin libgdal-dev proj-bin proj-data libproj-dev libgeos-dev libspatialindex-dev \
+      libasound2 libatk-bridge2.0-0 libatk1.0-0 libcups2 libgbm1 libgtk-3-0 libnss3 \
+      libpangocairo-1.0-0 libx11-xcb1 libxcomposite1 libxdamage1 libxfixes3 libxkbcommon0 \
+      libxrandr2 libxshmfence1 \
+      python3-numpy python3-pandas python3-matplotlib python3-scipy python3-sklearn \
+      python3-geopandas python3-fiona python3-shapely python3-pyproj python3-rasterio && \
+    ln -sf /usr/bin/pip3 /usr/local/bin/pip && \
+    python3 -m pip install --break-system-packages --no-cache-dir pyarrow rasterstats
 
 RUN chown node:node /app
 
