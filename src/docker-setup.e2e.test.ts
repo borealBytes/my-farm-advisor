@@ -95,6 +95,24 @@ function assertNoKnownPluginFailures(output: string, context: string) {
   }
 }
 
+type CoolifyTunnelContract = {
+  gatewayPublishedPorts: string[];
+  browserControlPublishedPorts: string[];
+  tunnelOriginTarget?: string;
+};
+
+function deriveExpectedCoolifyTunnelContract(env: {
+  CLOUDFLARE_TUNNEL_TOKEN?: string;
+}): CoolifyTunnelContract {
+  const hasTunnelToken = Boolean(env.CLOUDFLARE_TUNNEL_TOKEN?.trim());
+
+  return {
+    gatewayPublishedPorts: ["127.0.0.1:18789:18789"],
+    browserControlPublishedPorts: [],
+    tunnelOriginTarget: hasTunnelToken ? "openclaw-gateway:18789" : undefined,
+  };
+}
+
 function runComposeCommand(
   sandbox: DockerSetupSandbox,
   args: string[],
@@ -907,6 +925,33 @@ describe("docker-setup.sh", () => {
     expect(compose).toContain('- "127.0.0.1:18789:18789"');
     expect(compose).not.toContain('- "18789:18789"');
     expect(compose).not.toContain("127.0.0.1:18791:18791");
+    expect(compose).toContain("cloudflared:");
+    expect(compose).toContain("CLOUDFLARE_TUNNEL_TOKEN");
+    expect(compose).toContain("restart: on-failure");
+    expect(compose).toContain("http://openclaw-gateway:18789");
+    expect(compose).not.toContain("localhost:18789");
+    expect(compose).not.toContain("service: http://127.0.0.1:18789");
+    expect(compose).not.toContain("OPENCLAW_PUBLIC_HTTP");
+    expect(compose).not.toContain('- "80:80"');
+    expect(compose).not.toContain('- "443:443"');
+  });
+
+  it("locks the intended Coolify tunnel contract for the compose sidecar flow", () => {
+    const tokenAbsent = deriveExpectedCoolifyTunnelContract({
+      CLOUDFLARE_TUNNEL_TOKEN: "",
+    });
+    expect(tokenAbsent.gatewayPublishedPorts).toEqual(["127.0.0.1:18789:18789"]);
+    expect(tokenAbsent.browserControlPublishedPorts).toEqual([]);
+    expect(tokenAbsent.tunnelOriginTarget).toBeUndefined();
+
+    const tokenPresent = deriveExpectedCoolifyTunnelContract({
+      CLOUDFLARE_TUNNEL_TOKEN: "test-token",
+    });
+    expect(tokenPresent.gatewayPublishedPorts).toEqual(["127.0.0.1:18789:18789"]);
+    expect(tokenPresent.browserControlPublishedPorts).toEqual([]);
+    expect(tokenPresent.tunnelOriginTarget).toBe("openclaw-gateway:18789");
+    expect(tokenPresent.tunnelOriginTarget).not.toContain("127.0.0.1");
+    expect(tokenPresent.tunnelOriginTarget).not.toContain("localhost");
   });
 
   it("extends the local-image smoke path with plugin resolution and startup log checks", async () => {

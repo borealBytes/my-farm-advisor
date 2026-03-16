@@ -2,8 +2,6 @@
 # Deploy behind Cloudflare ZeroTrust for secure public access
 #
 # Key differences from local:
-# - No exposed public ports (ZeroTrust handles routing)
-# - Browser control bound to localhost only (accessed via ZeroTrust tunnel)
 # - R2 for persistent data (keeps data off the VPS)
 # - Security hardening for production
 
@@ -26,7 +24,6 @@ services:
       OPENCLAW_STATE_DIR: /data
       OPENCLAW_WORKSPACE_DIR: /data/workspace
       
-      # Gateway binding (lan = bind to all interfaces, but access controlled via ZeroTrust)
       OPENCLAW_GATEWAY_BIND: lan
       TZ: ${TZ:-UTC}
       
@@ -98,6 +95,33 @@ services:
       timeout: 10s
       retries: 10
       start_period: 360s
+
+  cloudflared:
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM cloudflare/cloudflared:latest AS cloudflared
+        FROM alpine:3.20
+        RUN apk add --no-cache ca-certificates
+        COPY --from=cloudflared /usr/local/bin/cloudflared /usr/local/bin/cloudflared
+    image: ${OPENCLAW_CLOUDFLARED_IMAGE:-openclaw-cloudflared:local}
+    restart: on-failure
+    depends_on:
+      - openclaw-gateway
+    environment:
+      CLOUDFLARE_TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN:-}
+      CLOUDFLARED_ORIGIN_URL: http://openclaw-gateway:18789
+    entrypoint: ["/bin/sh", "-ec"]
+    command: |
+      if [ -z "$$CLOUDFLARE_TUNNEL_TOKEN" ]; then
+        exit 0
+      fi
+      printf '%s\n' \
+        'ingress:' \
+        "  - service: $$CLOUDFLARED_ORIGIN_URL" \
+        '  - service: http_status:404' \
+        >/tmp/cloudflared-config.yml
+      exec cloudflared tunnel --config /tmp/cloudflared-config.yml --no-autoupdate run --token "$$CLOUDFLARE_TUNNEL_TOKEN"
 
   openclaw-cli:
     profiles: ["cli"]

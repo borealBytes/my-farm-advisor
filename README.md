@@ -95,9 +95,11 @@ That compose file builds and tags `${OPENCLAW_IMAGE:-openclaw:local}` for
 On first boot, allow several minutes for initialization before health checks settle.
 The `openclaw-cli` service is profile-gated (`cli`) so Coolify deploys only the
 gateway by default.
-Open the Coolify domain at `https://<your-domain>/__openclaw__/canvas/`.
-For tunnel-only access, keep gateway published as `127.0.0.1:18789:18789` and route
-public traffic through Cloudflare Tunnel + Access.
+For the supported Cloudflare Zero Trust deployment, see
+[`docs/install/cloudflare-coolify.md`](docs/install/cloudflare-coolify.md).
+That runbook covers the simplified contract: one Coolify compose app, one-time
+Cloudflare tunnel/DNS/Access prep, `CLOUDFLARE_TUNNEL_TOKEN` for the same-compose
+tunnel sidecar, and the app entry at `https://<your-domain>/__openclaw__/canvas/`.
 
 ### Local development
 
