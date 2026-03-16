@@ -31,24 +31,35 @@ services:
       
       # Security
       OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN:-}
+      OPENCLAW_ALLOW_INSECURE_PRIVATE_WS: ${OPENCLAW_ALLOW_INSECURE_PRIVATE_WS:-}
       
       # Browser control - bind to localhost only (ZeroTrust tunnels to this)
       OPENCLAW_BROWSER_CONTROL_HOST: 127.0.0.1
       OPENCLAW_BROWSER_CONTROL_BIND: 127.0.0.1
       
       # Model providers
+      CLAUDE_AI_SESSION_KEY: ${CLAUDE_AI_SESSION_KEY:-}
+      CLAUDE_WEB_SESSION_KEY: ${CLAUDE_WEB_SESSION_KEY:-}
+      CLAUDE_WEB_COOKIE: ${CLAUDE_WEB_COOKIE:-}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
       NVIDIA_API_KEY: ${NVIDIA_API_KEY:-}
       NVIDIA_BASE_URL: ${NVIDIA_BASE_URL:-https://integrate.api.nvidia.com/v1}
-      PRIMARY_MODEL: ${PRIMARY_MODEL:-stepfun-ai/step-3.5-flash}
-      FALLBACK_MODELS: ${FALLBACK_MODELS:-nvidia/llama-3.1-nemotron-70b-instruct,openrouter/openrouter/free,openrouter/openai/gpt-5.4,openrouter/google/gemini-3.1-flash-lite-preview,openrouter/anthropic/claude-sonnet-4.6}
+      PRIMARY_MODEL: ${PRIMARY_MODEL:-openrouter/openrouter/hunter-alpha}
+      FALLBACK_MODELS: ${FALLBACK_MODELS:-openrouter/openrouter/healer-alpha,openrouter/nvidia/nemotron-3-super-120b-a12b,openrouter/openrouter/free,nvidia/stepfun-ai/step-3.5-flash,nvidia/qwen/qwen3.5-397b-a17b,nvidia/moonshotai/kimi-k2.5,openrouter/stepfun/step-3.5-flash}
       
       # Telegram
+      TELEGRAM_FIELD_OPERATIONS_BOT_TOKEN: ${TELEGRAM_FIELD_OPERATIONS_BOT_TOKEN:-}
+      TELEGRAM_FIELD_OPERATIONS_BOT_PAIRING_CODE: ${TELEGRAM_FIELD_OPERATIONS_BOT_PAIRING_CODE:-}
+      TELEGRAM_FIELD_OPERATIONS_ALLOWED_USERS: ${TELEGRAM_FIELD_OPERATIONS_ALLOWED_USERS:-}
+      TELEGRAM_DATA_PIPELINE_BOT_TOKEN: ${TELEGRAM_DATA_PIPELINE_BOT_TOKEN:-}
+      TELEGRAM_DATA_PIPELINE_BOT_PAIRING_CODE: ${TELEGRAM_DATA_PIPELINE_BOT_PAIRING_CODE:-}
+      TELEGRAM_DATA_PIPELINE_ALLOWED_USERS: ${TELEGRAM_DATA_PIPELINE_ALLOWED_USERS:-}
+      TELEGRAM_DATA_PIPELINE_BOT_ALLOWED_USERS: ${TELEGRAM_DATA_PIPELINE_BOT_ALLOWED_USERS:-}
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
       TELEGRAM_ACCOUNT_ID: ${TELEGRAM_ACCOUNT_ID:-}
       TELEGRAM_ALLOWED_USERS: ${TELEGRAM_ALLOWED_USERS:-}
-      OPENCLAW_TELEGRAM_GROUP_POLICY: ${OPENCLAW_TELEGRAM_GROUP_POLICY:-open}
+      OPENCLAW_TELEGRAM_GROUP_POLICY: ${OPENCLAW_TELEGRAM_GROUP_POLICY:-allowlist}
       
       # R2 persistence
       R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID:-}
@@ -64,6 +75,8 @@ services:
       # OPENCLAW_SYNC_SKILLS_ON_START: 1
       OPENCLAW_SYNC_SKILLS_OVERWRITE: ${OPENCLAW_SYNC_SKILLS_OVERWRITE:-1}
       OPENCLAW_FORCE_SKILL_SYNC: ${OPENCLAW_FORCE_SKILL_SYNC:-0}
+      OPENCLAW_BOOTSTRAP_REFRESH: ${OPENCLAW_BOOTSTRAP_REFRESH:-0}
+      OPENCLAW_MEMORY_SEARCH_ENABLED: ${OPENCLAW_MEMORY_SEARCH_ENABLED:-0}
       
       # AWS CLI for R2 sync
       AWS_CLI_AUTO_PROMPT: on-partial
@@ -87,6 +100,39 @@ services:
       timeout: 5s
       retries: 5
       start_period: 60s
+
+  openclaw-cli:
+    image: ${OPENCLAW_IMAGE:-openclaw:local}
+    network_mode: "service:openclaw-gateway"
+    cap_drop:
+      - NET_RAW
+      - NET_ADMIN
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      HOME: /home/node
+      TERM: xterm-256color
+      OPENCLAW_STATE_DIR: /data
+      OPENCLAW_WORKSPACE_DIR: /data/workspace
+      OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN:-}
+      OPENCLAW_ALLOW_INSECURE_PRIVATE_WS: ${OPENCLAW_ALLOW_INSECURE_PRIVATE_WS:-}
+      BROWSER: echo
+      CLAUDE_AI_SESSION_KEY: ${CLAUDE_AI_SESSION_KEY:-}
+      CLAUDE_WEB_SESSION_KEY: ${CLAUDE_WEB_SESSION_KEY:-}
+      CLAUDE_WEB_COOKIE: ${CLAUDE_WEB_COOKIE:-}
+      TELEGRAM_FIELD_OPERATIONS_BOT_TOKEN: ${TELEGRAM_FIELD_OPERATIONS_BOT_TOKEN:-}
+      TELEGRAM_DATA_PIPELINE_BOT_TOKEN: ${TELEGRAM_DATA_PIPELINE_BOT_TOKEN:-}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      TZ: ${TZ:-UTC}
+    volumes:
+      - openclaw-data:/data
+    stdin_open: true
+    tty: true
+    init: true
+    entrypoint: ["node", "dist/index.js"]
+    depends_on:
+      openclaw-gateway:
+        condition: service_healthy
 
 volumes:
   openclaw-data:

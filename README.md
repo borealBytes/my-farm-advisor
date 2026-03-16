@@ -1,8 +1,10 @@
-# My Farm Adviser
+# My Farm Advisor
 
-![My Farm Adviser rooted farm intelligence hero](docs/assets/my-farm-adviser-hero.png)
+![My Farm Advisor rooted farm intelligence hero](docs/assets/my-farm-adviser-hero.png)
 
-My Farm Adviser is a farm intelligence and research assistant built on upstream OpenClaw and shaped by the farm-science principles in `SOUL.md` and the operator needs in `USER.md`.
+My Farm Advisor is a farm intelligence and research assistant built on upstream OpenClaw and shaped by the farm-science principles in `SOUL.md` and the operator needs in `USER.md`.
+
+We use `advisor` deliberately. In this project the system is an authoritative, evidence-based component grounded in science, reproducible methods, and validated skills; it is not casual hearsay or a friendly guess. `Advisor` fits the formal system role we want the product to play.
 
 It is designed for farmhands, supervisors, owners, researchers, and ag analysts who need practical field decisions, reproducible analysis, and infrastructure they can actually keep running.
 
@@ -21,7 +23,7 @@ This repository now tracks real upstream OpenClaw as its runtime base.
 
 ## Who It Is For
 
-My Farm Adviser assumes multiple roles may use the same system:
+My Farm Advisor assumes multiple roles may use the same system:
 
 - Farmhands who need simple instructions for one field today
 - Supervisors who need fast rollups across active fields
@@ -33,7 +35,7 @@ The guiding rule is simple: one field-level source of truth, many ways to summar
 
 ## Agents
 
-My Farm Adviser runs two personas that share the same soul, user, and tool context:
+My Farm Advisor runs two personas that share the same soul, user, and tool context:
 
 - **Field Operations Agent** (`IDENTITY.md`, workspace `/data/workspace`) — focuses on day-of field work, scouting, and application plans.
 - **Data Pipeline Agent** (`IDENTITY.data-pipeline.md`, workspace `/data/workspace-data-pipeline`) — maintains ingestion jobs, validations, and lineage so every recommendation remains reproducible.
@@ -135,7 +137,7 @@ It is no longer the primary deployment target.
 
 ## Upstream Relationship
 
-My Farm Adviser tracks upstream OpenClaw closely so the project can keep benefiting from:
+My Farm Advisor tracks upstream OpenClaw closely so the project can keep benefiting from:
 
 - active runtime maintenance
 - broader channel support
@@ -153,6 +155,7 @@ When changing core runtime behavior, prefer upstream-compatible changes whenever
 
 ## Brand Notes
 
-- Product name: My Farm Adviser
+- Product name: My Farm Advisor
 - Runtime/CLI base: OpenClaw
-- Historical repo naming may still use `my-farm-advisor` in some paths while branding shifts to `adviser`
+- Use `advisor` for the system component and all project-facing naming.
+- Historical paths may still use `my-farm-advisor` for compatibility, but internal branding should use `Advisor`.

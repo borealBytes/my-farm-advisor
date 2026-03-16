@@ -24,7 +24,11 @@ export async function renderMermaidDiagram(
   const tempOutputPath = path.join(tempDir, `${randomUUID()}.png`);
   const puppeteerConfigPath = path.resolve(
     process.cwd(),
-    "skills/superior-byte-works-wrighter/delivery/telegram/puppeteer.config.cjs",
+    "skills/superior-byte-works-wrighter/delivery/puppeteer.config.json",
+  );
+  const puppeteerCacheDir = path.resolve(
+    process.cwd(),
+    "skills/superior-byte-works-wrighter/delivery/.cache/puppeteer",
   );
 
   await fs.writeFile(inputPath, code, "utf8");
@@ -39,6 +43,10 @@ export async function renderMermaidDiagram(
     } catch {}
     await execa(process.execPath, args, {
       stdio: "pipe",
+      env: {
+        ...process.env,
+        PUPPETEER_CACHE_DIR: puppeteerCacheDir,
+      },
     });
   } finally {
     await fs.unlink(inputPath).catch(() => undefined);

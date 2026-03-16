@@ -19,6 +19,7 @@ pyarrow>=15
 # Plotting / reporting
 matplotlib>=3.8
 seaborn>=0.13
+contextily>=1.6
 
 # General utilities
 requests>=2.31

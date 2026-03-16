@@ -13,8 +13,9 @@ chmod +x scripts/install.sh
 ./scripts/install.sh
 ```
 
-The install script ensures the open-mode builder is compiled, installs local
-dependencies, and emits ESM into `dist/`.
+The install script ensures the open-mode builder is compiled, reuses the shared
+Wrighter delivery environment under `skills/superior-byte-works-wrighter/delivery/`,
+and emits ESM into `dist/`.
 
 ## Usage
 

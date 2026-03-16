@@ -1,6 +1,6 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "name": "My Farm Adviser",
+  "name": "My Farm Advisor",
   "description": "Farm intelligence and research assistant built on upstream OpenClaw for field decisions, analysis, and rooted operations across your channels.",
   "theme": "mint",
   "icons": {

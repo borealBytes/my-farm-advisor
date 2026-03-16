@@ -62,7 +62,7 @@ export function formatCliBannerLine(version: string, options: BannerOptions = {}
   const commitLabel = commit ?? "unknown";
   const tagline = pickTagline({ ...options, mode: resolveTaglineMode(options) });
   const rich = options.richTty ?? isRich();
-  const title = "🌱 My Farm Adviser";
+  const title = "🌱 My Farm Advisor";
   const prefix = "🌱 ";
   const columns = options.columns ?? process.stdout.columns ?? 120;
   const plainBaseLine = `${title} ${version} (${commitLabel})`;
@@ -110,7 +110,7 @@ const ROOTED_ASCII = [
   "      / | \\",
   "     /  |  \\",
   "    /___|___\\",
-  "  MY FARM ADVISER",
+  "  MY FARM ADVISOR",
   " ",
 ];
 
@@ -134,11 +134,11 @@ export function formatCliBannerArt(options: BannerOptions = {}): string {
   };
 
   const colored = ROOTED_ASCII.map((line) => {
-    if (line.includes("MY FARM ADVISER")) {
+    if (line.includes("MY FARM ADVISOR")) {
       return (
         theme.muted("  ") +
         theme.accent("🌱") +
-        theme.info(" MY FARM ADVISER ") +
+        theme.info(" MY FARM ADVISOR ") +
         theme.accent("🌱")
       );
     }

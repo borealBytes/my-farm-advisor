@@ -145,7 +145,7 @@ RUN --mount=type=cache,id=openclaw-bookworm-apt-cache,target=/var/cache/apt,shar
       python3-numpy python3-pandas python3-matplotlib python3-scipy python3-sklearn \
       python3-geopandas python3-fiona python3-shapely python3-pyproj python3-rasterio && \
     ln -sf /usr/bin/pip3 /usr/local/bin/pip && \
-    python3 -m pip install --break-system-packages --no-cache-dir pyarrow rasterstats
+    python3 -m pip install --break-system-packages --no-cache-dir pyarrow rasterstats contextily
 
 RUN chown node:node /app
 

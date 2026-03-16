@@ -16,7 +16,6 @@ import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
-import stripHtml from "strip-html";
 import { unified } from "unified";
 
 export interface BuildOfflineHtmlOptions {
@@ -144,9 +143,27 @@ async function renderMermaidToSvg(
   const workDir = await fs.mkdtemp(path.join(options.tempRoot, "mermaid-"));
   const inputPath = path.join(workDir, "diagram.mmd");
   const outputPath = path.join(workDir, "diagram.svg");
+  const sharedPuppeteerConfigPath = path.resolve(
+    process.cwd(),
+    "skills/superior-byte-works-wrighter/delivery/puppeteer.config.json",
+  );
+  const sharedPuppeteerCacheDir = path.resolve(
+    process.cwd(),
+    "skills/superior-byte-works-wrighter/delivery/.cache/puppeteer",
+  );
   try {
     await fs.writeFile(inputPath, code, "utf8");
-    await execa(process.execPath, [cliPath, "-i", inputPath, "-o", outputPath, "--svg", "--quiet"]);
+    const args = [cliPath, "-i", inputPath, "-o", outputPath, "--quiet"];
+    try {
+      await fs.access(sharedPuppeteerConfigPath);
+      args.push("-p", sharedPuppeteerConfigPath);
+    } catch {}
+    await execa(process.execPath, args, {
+      env: {
+        ...process.env,
+        PUPPETEER_CACHE_DIR: sharedPuppeteerCacheDir,
+      },
+    });
     const svg = await fs.readFile(outputPath, "utf8");
     return svg.trim();
   } finally {
@@ -158,17 +175,17 @@ async function resolveMermaidCli(override?: string): Promise<string> {
   if (override) {
     return override;
   }
-  return await importMetaResolve("@mermaid-js/mermaid-cli/src/cli.js");
-}
-
-async function importMetaResolve(specifier: string): Promise<string> {
   if (typeof (import.meta as any).resolve === "function") {
-    const resolved = (import.meta as any).resolve(specifier);
-    return fileUrlToPath(resolved);
+    try {
+      const resolved = (import.meta as any).resolve("@mermaid-js/mermaid-cli");
+      const rootDir = path.dirname(fileUrlToPath(resolved));
+      return path.resolve(rootDir, "cli.js");
+    } catch {}
   }
   const { createRequire } = await import("module");
   const require = createRequire(import.meta.url);
-  return require.resolve(specifier);
+  const entry = require.resolve("@mermaid-js/mermaid-cli");
+  return path.resolve(path.dirname(entry), "cli.js");
 }
 
 function fileUrlToPath(url: string): string {
@@ -246,7 +263,18 @@ function buildHtmlDocument(params: {
 }
 
 function buildSummary(html: string): string {
-  const stripped = stripHtml(html).result.replace(/\s+/g, " ").trim();
+  const stripped = html
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/\s+/g, " ")
+    .trim();
   return stripped.slice(0, 360);
 }
 

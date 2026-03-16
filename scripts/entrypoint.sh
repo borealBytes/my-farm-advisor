@@ -8,6 +8,7 @@ WORKSPACE_DATA_R2_RCLONE_MOUNT="${WORKSPACE_DATA_R2_RCLONE_MOUNT:-0}"
 WORKSPACE_DATA_R2_PREFIX="${WORKSPACE_DATA_R2_PREFIX:-workspace/data}"
 WORKSPACE_DATA_PATH="/data/workspace/data"
 R2_ENDPOINT="${R2_ENDPOINT:-}"
+OPENCLAW_BOOTSTRAP_REFRESH="${OPENCLAW_BOOTSTRAP_REFRESH:-0}"
 
 is_truthy() {
     case "$1" in
@@ -42,6 +43,13 @@ fi
 log_storage_mode
 
 mkdir -p /data
+
+if is_truthy "$OPENCLAW_BOOTSTRAP_REFRESH"; then
+    echo "OPENCLAW_BOOTSTRAP_REFRESH=1 -> clearing bootstrapped workspace state"
+    rm -rf /data/workspace /data/workspace-data-pipeline
+    rm -f /data/openclaw.json
+    find /data -maxdepth 1 -type f -name 'openclaw.json.bak*' -delete 2>/dev/null || true
+fi
 
 echo "Setting up workspace directories..."
 if ! mkdir -p /data/workspace/skills /data/workspace/.openclaw /data/workspace/data; then

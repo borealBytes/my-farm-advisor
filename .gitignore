@@ -12,6 +12,8 @@ __pycache__/
 *.pyc
 .tsbuildinfo
 .pnpm-store
+.cache/
+**/.cache/
 .worktrees/
 .DS_Store
 **/.DS_Store

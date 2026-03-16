@@ -3,17 +3,14 @@ set -euo pipefail
 
 THIS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "${THIS_DIR}/.." && pwd)"
-VENV_DIR="${ROOT_DIR}/.venv"
-CACHE_DIR="${ROOT_DIR}/.cache/puppeteer"
-PUPPETEER_CONFIG_PATH="${ROOT_DIR}/puppeteer.config.cjs"
+DELIVERY_ROOT="$(cd "${ROOT_DIR}/.." && pwd)"
+VENV_DIR="${WRIGHTER_DELIVERY_VENV_DIR:-${DELIVERY_ROOT}/.venv}"
+CACHE_DIR="${WRIGHTER_DELIVERY_PUPPETEER_CACHE_DIR:-${DELIVERY_ROOT}/.cache/puppeteer}"
+PUPPETEER_CONFIG_PATH="${WRIGHTER_DELIVERY_PUPPETEER_CONFIG_PATH:-${DELIVERY_ROOT}/puppeteer.config.json}"
 
-if [ ! -d "${VENV_DIR}" ]; then
-  python3 -m venv "${VENV_DIR}"
-fi
+"${DELIVERY_ROOT}/scripts/install-shared-delivery-env.sh"
 
 source "${VENV_DIR}/bin/activate"
-
-pip install --upgrade pip
 pip install -r "${ROOT_DIR}/requirements.txt"
 
 if ! command -v pnpm >/dev/null 2>&1; then
@@ -21,24 +18,20 @@ if ! command -v pnpm >/dev/null 2>&1; then
   npm install -g pnpm
 fi
 
+if [ "$(id -u)" = "0" ]; then
+  python3 - <<EOF
+import json
+from pathlib import Path
+path = Path(${PUPPETEER_CONFIG_PATH@Q})
+config = {"args": ["--no-sandbox", "--disable-setuid-sandbox"]}
+path.write_text(json.dumps(config, indent=2) + "\n", encoding="utf-8")
+EOF
+fi
+
 cd "${ROOT_DIR}"
 
 pnpm install
 pnpm run build
-
-mkdir -p "${CACHE_DIR}"
-PUPPETEER_CACHE_DIR="${CACHE_DIR}" pnpm dlx puppeteer browsers install chrome
-
-cat > "${PUPPETEER_CONFIG_PATH}" <<'EOF'
-const isRoot = typeof process.getuid === "function" && process.getuid() === 0;
-
-module.exports = {
-  launch: {
-    headless: true,
-    args: isRoot ? ["--no-sandbox", "--disable-setuid-sandbox"] : [],
-  },
-};
-EOF
 
 echo "Installation complete. Activate the virtualenv with:"
 echo "  source ${VENV_DIR}/bin/activate"
