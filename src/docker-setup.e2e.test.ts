@@ -898,6 +898,10 @@ describe("docker-setup.sh", () => {
     expect(compose.match(/image: \$\{OPENCLAW_IMAGE:-openclaw:local\}/g)).toHaveLength(2);
     expect(compose.match(/user: "0:0"/g)).toHaveLength(2);
     expect(compose).toContain('network_mode: "service:openclaw-gateway"');
+    expect(compose).toContain("healthcheck:");
+    expect(compose).toContain("timeout: 10s");
+    expect(compose).toContain("retries: 10");
+    expect(compose).toContain("start_period: 360s");
   });
 
   it("extends the local-image smoke path with plugin resolution and startup log checks", async () => {

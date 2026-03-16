@@ -366,6 +366,8 @@ For deployment, use `docker-compose.coolify.yml` and mount a persistent volume a
 The Coolify compose file tags the build as `${OPENCLAW_IMAGE:-openclaw:local}` and
 reuses that same tag for `openclaw-cli`, so the CLI service does not try to pull
 an external `openclaw` image by default.
+The gateway health window is intentionally extended for first boot, which can take
+several minutes while initialization completes.
 
 Use these environment variables:
 
