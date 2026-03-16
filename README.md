@@ -95,6 +95,7 @@ That compose file builds and tags `${OPENCLAW_IMAGE:-openclaw:local}` for
 On first boot, allow several minutes for initialization before health checks settle.
 The `openclaw-cli` service is profile-gated (`cli`) so Coolify deploys only the
 gateway by default.
+Open the Coolify domain at `https://<your-domain>/__openclaw__/canvas/`.
 
 ### Local development
 
