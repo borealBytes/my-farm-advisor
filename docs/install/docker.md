@@ -363,6 +363,9 @@ DATA_VOLUME_SOURCE=./data
 #### Volume mode (Coolify or another deployed environment)
 
 For deployment, use `docker-compose.coolify.yml` and mount a persistent volume at `/data`.
+The Coolify compose file tags the build as `${OPENCLAW_IMAGE:-openclaw:local}` and
+reuses that same tag for `openclaw-cli`, so the CLI service does not try to pull
+an external `openclaw` image by default.
 
 Use these environment variables:
 
