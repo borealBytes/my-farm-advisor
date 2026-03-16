@@ -74,7 +74,7 @@ Inside the same tunnel configuration, add a public hostname with these values:
 - Service type: `HTTP`
 - Service URL: `http://openclaw-gateway:18789`
 
-Why this target: the same-compose `cloudflared` sidecar routes to `CLOUDFLARED_ORIGIN_URL=http://openclaw-gateway:18789` inside the Docker network. The VPS does not need a public port for this path. In token mode, Cloudflare owns the hostname mapping in the dashboard, so the local sidecar config stays focused on the origin target.
+Why this target: the same-compose `cloudflared` sidecar routes to `CLOUDFLARED_ORIGIN_URL=http://openclaw-gateway:18789` inside the Docker network. You do not set `CLOUDFLARED_ORIGIN_URL` yourself. `docker-compose.coolify.yml` sets it automatically. The VPS does not need a public port for this path. In token mode, Cloudflare owns the hostname mapping in the dashboard, so the local sidecar config stays focused on the origin target.
 
 ### 4. Create the Access application
 
@@ -93,10 +93,23 @@ Make sure the Access policy actually allows the users who should reach the app. 
 
 Cloudflared does not give us a clean root-to-origin-path rewrite in this setup, so use a Cloudflare redirect rule for the public browser entry.
 
-Create a redirect so:
+In the Cloudflare dashboard:
+
+1. Open your domain.
+2. Go to `Rules`.
+3. Open `Redirect Rules`.
+4. Click `Create rule`.
+5. Create a rule with these values.
+
+Match:
 
 - `https://<OPENCLAW_PUBLIC_HOSTNAME>/`
-- redirects to `https://<OPENCLAW_PUBLIC_HOSTNAME>/__openclaw__/canvas/`
+
+Action:
+
+- Redirect to `https://<OPENCLAW_PUBLIC_HOSTNAME>/__openclaw__/canvas/`
+- Use a `302` redirect while testing
+- Change it to `301` later if you want it permanent
 
 Why this exists: people should only need to type the top-level hostname, while OpenClaw still serves the Canvas UI from the internal `/__openclaw__/canvas/` path.
 
