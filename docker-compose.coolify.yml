@@ -104,6 +104,8 @@ services:
         FROM alpine:3.20
         RUN apk add --no-cache ca-certificates
         COPY --from=cloudflared /usr/local/bin/cloudflared /usr/local/bin/cloudflared
+        COPY scripts/cloudflared-entrypoint.sh /usr/local/bin/cloudflared-entrypoint.sh
+        RUN chmod 755 /usr/local/bin/cloudflared-entrypoint.sh
     image: ${OPENCLAW_CLOUDFLARED_IMAGE:-openclaw-cloudflared:local}
     restart: on-failure
     depends_on:
@@ -112,21 +114,7 @@ services:
       CLOUDFLARE_TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN:-}
       OPENCLAW_PUBLIC_HOSTNAME: ${OPENCLAW_PUBLIC_HOSTNAME:-}
       CLOUDFLARED_ORIGIN_URL: http://openclaw-gateway:18789
-    entrypoint: ["/bin/sh", "-ec"]
-    command: |
-      if [ -z "$$CLOUDFLARE_TUNNEL_TOKEN" ]; then
-        exit 0
-      fi
-      if [ -z "$$OPENCLAW_PUBLIC_HOSTNAME" ]; then
-        echo "OPENCLAW_PUBLIC_HOSTNAME is required when CLOUDFLARE_TUNNEL_TOKEN is set" >&2
-        exit 1
-      fi
-      printf '%s\n' \
-        'ingress:' \
-        "  - service: $$CLOUDFLARED_ORIGIN_URL" \
-        '  - service: http_status:404' \
-        >/tmp/cloudflared-config.yml
-      exec cloudflared tunnel --config /tmp/cloudflared-config.yml --no-autoupdate run --token "$$CLOUDFLARE_TUNNEL_TOKEN"
+    entrypoint: ["/usr/local/bin/cloudflared-entrypoint.sh"]
 
   openclaw-cli:
     profiles: ["cli"]

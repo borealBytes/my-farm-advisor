@@ -931,6 +931,11 @@ describe("docker-setup.sh", () => {
     expect(compose).toContain("CLOUDFLARE_TUNNEL_TOKEN");
     expect(compose).toContain("OPENCLAW_PUBLIC_HOSTNAME");
     expect(compose).toContain("restart: on-failure");
+    expect(compose).toContain(
+      "COPY scripts/cloudflared-entrypoint.sh /usr/local/bin/cloudflared-entrypoint.sh",
+    );
+    expect(compose).toContain('entrypoint: ["/usr/local/bin/cloudflared-entrypoint.sh"]');
+    expect(compose).not.toContain('entrypoint: ["/bin/sh", "-ec"]');
     expect(compose).toContain("http://openclaw-gateway:18789");
     expect(compose).not.toContain("localhost:18789");
     expect(compose).not.toContain("service: http://127.0.0.1:18789");
