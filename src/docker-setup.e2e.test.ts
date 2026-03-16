@@ -904,6 +904,9 @@ describe("docker-setup.sh", () => {
     expect(compose).toContain("timeout: 10s");
     expect(compose).toContain("retries: 10");
     expect(compose).toContain("start_period: 360s");
+    expect(compose).toContain('- "18789:18789"');
+    expect(compose).not.toContain("127.0.0.1:18789:18789");
+    expect(compose).not.toContain("127.0.0.1:18791:18791");
   });
 
   it("extends the local-image smoke path with plugin resolution and startup log checks", async () => {

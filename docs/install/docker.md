@@ -370,6 +370,8 @@ The gateway health window is intentionally extended for first boot, which can ta
 several minutes while initialization completes.
 The CLI service is behind the `cli` profile, so `up -d` in Coolify starts only
 the gateway by default.
+Use the deployment domain with the Canvas path:
+`https://<your-domain>/__openclaw__/canvas/`.
 
 Use these environment variables:
 
