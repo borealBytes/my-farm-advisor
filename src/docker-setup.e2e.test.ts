@@ -936,6 +936,11 @@ describe("docker-setup.sh", () => {
     expect(compose).toContain('entrypoint: ["/usr/local/bin/cloudflared-entrypoint.sh"]');
     expect(compose).not.toContain('entrypoint: ["/bin/sh", "-ec"]');
     expect(compose).toContain("http://openclaw-gateway:18789");
+    expect(compose).toContain(
+      "OPENCLAW_TRUSTED_PROXY_IPS: ${OPENCLAW_CLOUDFLARED_IPV4:-172.30.0.2}",
+    );
+    expect(compose).toContain("ipv4_address: ${OPENCLAW_GATEWAY_IPV4:-172.30.0.3}");
+    expect(compose).toContain("ipv4_address: ${OPENCLAW_CLOUDFLARED_IPV4:-172.30.0.2}");
     expect(compose).not.toContain("localhost:18789");
     expect(compose).not.toContain("service: http://127.0.0.1:18789");
     expect(compose).not.toContain("hostname: $$OPENCLAW_PUBLIC_HOSTNAME");
