@@ -89,7 +89,7 @@ if you stop the stack later, bring the long-running gateway back with `docker co
 
 ### Coolify (one-click)
 
-Point Coolify at our `docker-compose.coolify.yml`. It handles the rest.
+Point Coolify at our `docker-compose.coolify.yml`. That is the validated deployment entrypoint.
 That compose file builds and tags `${OPENCLAW_IMAGE:-openclaw:local}` for
 `openclaw-gateway` and reuses the same tag for `openclaw-cli`.
 On first boot, allow several minutes for initialization before health checks settle.
@@ -97,12 +97,28 @@ The `openclaw-cli` service is profile-gated (`cli`) so Coolify deploys only the
 gateway by default.
 For the supported Cloudflare Zero Trust deployment, see
 [`docs/install/cloudflare-coolify.md`](docs/install/cloudflare-coolify.md).
-That runbook covers the simplified contract: one Coolify compose app, one-time
-Cloudflare tunnel/DNS/Access prep, `CLOUDFLARE_TUNNEL_TOKEN` plus
-`OPENCLAW_PUBLIC_HOSTNAME` for the same-compose tunnel sidecar, Cloudflare Access
-as the only public login layer, and the root dashboard/admin entry at
-`https://<OPENCLAW_PUBLIC_HOSTNAME>` with explicit trusted-proxy origin and IP
-allowlists.
+That runbook is the canonical Zero Trust contract: one Coolify compose app,
+same-compose `cloudflared`, `CLOUDFLARE_TUNNEL_TOKEN` plus
+`OPENCLAW_PUBLIC_HOSTNAME`, Cloudflare Access as the only public login layer,
+the root dashboard/admin entry at `https://<OPENCLAW_PUBLIC_HOSTNAME>`, exact
+trusted-proxy origin/IP allowlists, the optional secondary pinned hostname
+pattern, and the final step of turning off any temporary direct public `http://`
+path after Cloudflare is live.
+
+For the real-world operator order that was actually walked through, see
+[`docs/install/cloudflare-coolify-walkthrough.md`](docs/install/cloudflare-coolify-walkthrough.md).
+That walkthrough captures the practical sequence that worked in production-like
+testing: secure Coolify itself first, create the Cloudflare tunnel and Access
+policy, add the GitHub source/project/resource in Coolify, use
+`docker-compose.coolify.yml`, paste env vars in Coolify, watch live logs, then
+remove any direct public Coolify or raw-IP path once the protected hostname is healthy.
+
+Practical Zero Trust rules for this deployment:
+
+- Keep the gateway private on `127.0.0.1:18789`; do not normalize raw-IP access.
+- Treat Cloudflare Tunnel as the only public ingress path.
+- Treat Cloudflare Access as the only public admin login path.
+- After any env-var change in Coolify, save and redeploy so the runtime actually picks it up.
 
 For the supported farm Telegram setup, keep the roles split cleanly:
 
