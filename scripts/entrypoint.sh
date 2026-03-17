@@ -3,6 +3,9 @@ set -e
 
 echo "Starting OpenClaw Gateway..."
 
+unset TELEGRAM_BOT_TOKEN
+unset TELEGRAM_ACCOUNT_ID
+
 DATA_MODE="${DATA_MODE:-bind}"
 WORKSPACE_DATA_R2_RCLONE_MOUNT="${WORKSPACE_DATA_R2_RCLONE_MOUNT:-0}"
 WORKSPACE_DATA_R2_PREFIX="${WORKSPACE_DATA_R2_PREFIX:-workspace/data}"
@@ -177,6 +180,9 @@ const { buildDefaultControlUiAllowedOrigins, mergeControlUiAllowedOrigins } = aw
 const { applyTrustedProxyPublicDeploymentConfig } = await import(
   'file:///app/dist/gateway/runtime-deployment-config.js'
 );
+const { ensureTelegramRouteBinding } = await import(
+  'file:///app/dist/routing/bootstrap-telegram-bindings.js'
+);
 
 const configPath = '/data/openclaw.json';
 let config = {};
@@ -189,6 +195,9 @@ try {
 
 const fieldOpsTelegramToken = process.env.TELEGRAM_FIELD_OPERATIONS_BOT_TOKEN?.trim();
 const dataPipelineTelegramToken = process.env.TELEGRAM_DATA_PIPELINE_BOT_TOKEN?.trim();
+const fieldOperationsAccountKey = 'field-operations';
+const legacyFieldOperationsAccountKey = 'main';
+const dataPipelineAccountKey = 'data-pipeline';
 
 const parseAllowList = value => {
   if (!value) return [];
@@ -251,8 +260,8 @@ const clearTelegramWebhook = (token, label) => {
 };
 
 if (!shouldResetPolling) {
-  clearTelegramWebhook(fieldOpsTelegramToken, 'main');
-  clearTelegramWebhook(dataPipelineTelegramToken, 'data-pipeline');
+  clearTelegramWebhook(fieldOpsTelegramToken, fieldOperationsAccountKey);
+  clearTelegramWebhook(dataPipelineTelegramToken, dataPipelineAccountKey);
 }
 
 const resetTelegramPollingSession = (token, label) => {
@@ -281,8 +290,8 @@ const resetTelegramPollingSession = (token, label) => {
 };
 
 if (shouldResetPolling) {
-  resetTelegramPollingSession(fieldOpsTelegramToken, 'main');
-  resetTelegramPollingSession(dataPipelineTelegramToken, 'data-pipeline');
+  resetTelegramPollingSession(fieldOpsTelegramToken, fieldOperationsAccountKey);
+  resetTelegramPollingSession(dataPipelineTelegramToken, dataPipelineAccountKey);
 }
 
 const gatewayToken = process.env.OPENCLAW_GATEWAY_TOKEN?.trim();
@@ -349,7 +358,10 @@ if (telegramConfig.defaultAccount === undefined && typeof telegramConfig.default
   telegramConfig.defaultAccount = telegramConfig.defaultAccountId;
 }
 delete telegramConfig.defaultAccountId;
-telegramConfig.defaultAccount ??= 'main';
+telegramConfig.defaultAccount ??= fieldOperationsAccountKey;
+if (telegramConfig.defaultAccount === legacyFieldOperationsAccountKey) {
+  telegramConfig.defaultAccount = fieldOperationsAccountKey;
+}
 const hasAnyAccountAllowFrom =
   sharedAllowFrom.length > 0 || fieldOpsAllowFrom.length > 0 || dataPipelineAllowFrom.length > 0;
 const normalizedGroupPolicy = (() => {
@@ -384,6 +396,14 @@ if (hasAnyAccountAllowFrom) {
   telegramConfig.dmPolicy = 'allowlist';
 }
 const telegramAccounts = (telegramConfig.accounts ??= {});
+if (
+  telegramConfig.defaultAccount === fieldOperationsAccountKey &&
+  telegramAccounts[fieldOperationsAccountKey] === undefined &&
+  telegramAccounts[legacyFieldOperationsAccountKey] !== undefined
+) {
+  telegramAccounts[fieldOperationsAccountKey] = telegramAccounts[legacyFieldOperationsAccountKey];
+  delete telegramAccounts[legacyFieldOperationsAccountKey];
+}
 telegramAccounts.default = {
   ...(telegramAccounts.default ?? {}),
   enabled: false,
@@ -405,12 +425,14 @@ if (hasAnyAccountAllowFrom) {
   telegramAccounts.default.groupPolicy = 'allowlist';
 }
 if (fieldOpsTelegramToken) {
+  const legacyFieldOperationsAccount =
+    telegramAccounts[fieldOperationsAccountKey] ?? telegramAccounts[legacyFieldOperationsAccountKey];
   const account = {
-    ...(telegramAccounts.main ?? {}),
-    name: telegramAccounts.main?.name ?? 'Field Operations Bot',
+    ...(legacyFieldOperationsAccount ?? {}),
+    name: legacyFieldOperationsAccount?.name ?? 'Field Operations Bot',
     botToken: fieldOpsTelegramToken,
-    groupPolicy: telegramAccounts.main?.groupPolicy ?? normalizedGroupPolicy,
-    streaming: telegramAccounts.main?.streaming ?? telegramConfig.streaming,
+    groupPolicy: legacyFieldOperationsAccount?.groupPolicy ?? normalizedGroupPolicy,
+    streaming: legacyFieldOperationsAccount?.streaming ?? telegramConfig.streaming,
   };
   if (fieldOpsAllowFrom.length > 0) {
     account.allowFrom = mergeAllowFrom(account.allowFrom, fieldOpsAllowFrom, sharedAllowFrom);
@@ -421,10 +443,16 @@ if (fieldOpsTelegramToken) {
     account.dmPolicy ??= 'allowlist';
     account.groupPolicy ??= normalizedGroupPolicy;
   }
-  telegramAccounts.main = account;
+  telegramAccounts[fieldOperationsAccountKey] = account;
+  if (
+    telegramAccounts[legacyFieldOperationsAccountKey]?.botToken === fieldOpsTelegramToken ||
+    telegramConfig.defaultAccount === legacyFieldOperationsAccountKey
+  ) {
+    delete telegramAccounts[legacyFieldOperationsAccountKey];
+  }
 }
 if (dataPipelineTelegramToken) {
-  const accountKey = 'data-pipeline';
+  const accountKey = dataPipelineAccountKey;
   const account = {
     ...(telegramAccounts[accountKey] ?? {}),
     name: telegramAccounts[accountKey]?.name ?? 'Data Pipeline Bot',
@@ -524,6 +552,13 @@ ensureAgent('data-pipeline', {
     emoji: '🔄',
   },
 });
+
+config.bindings = ensureTelegramRouteBinding(config.bindings, fieldOperationsAccountKey, 'main');
+config.bindings = ensureTelegramRouteBinding(
+  config.bindings,
+  dataPipelineAccountKey,
+  'data-pipeline',
+);
 
 const primaryModel = process.env.PRIMARY_MODEL?.trim();
 const fallbackModels = process.env.FALLBACK_MODELS?.trim();
@@ -687,10 +722,10 @@ const dataPipelineTelegramPairingCode = process.env.TELEGRAM_DATA_PIPELINE_BOT_P
 if (!hasAnyAccountAllowFrom) {
   const pairingQueue = [];
   if (fieldOpsTelegramPairingCode) {
-    pairingQueue.push({ account: 'main', code: fieldOpsTelegramPairingCode });
+    pairingQueue.push({ account: fieldOperationsAccountKey, code: fieldOpsTelegramPairingCode });
   }
   if (dataPipelineTelegramPairingCode) {
-    pairingQueue.push({ account: 'data-pipeline', code: dataPipelineTelegramPairingCode });
+    pairingQueue.push({ account: dataPipelineAccountKey, code: dataPipelineTelegramPairingCode });
   }
 
   for (const entry of pairingQueue) {
@@ -823,4 +858,5 @@ else
 fi
 
 echo "Starting gateway..."
-exec node dist/index.js gateway --bind ${OPENCLAW_GATEWAY_BIND:-lan} --port 18789 --allow-unconfigured
+GATEWAY_BIND="${OPENCLAW_GATEWAY_BIND:-lan}"
+exec node dist/index.js gateway --bind "$GATEWAY_BIND" --port 18789 --allow-unconfigured
