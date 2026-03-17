@@ -104,6 +104,8 @@ export default defineConfig([
   nodeBuildConfig({
     // Keep sync lazy-runtime channel modules as concrete dist files.
     entry: {
+      "config/gateway-control-ui-origins": "src/config/gateway-control-ui-origins.ts",
+      "gateway/runtime-deployment-config": "src/gateway/runtime-deployment-config.ts",
       "channels/plugins/agent-tools/whatsapp-login":
         "src/channels/plugins/agent-tools/whatsapp-login.ts",
       "channels/plugins/actions/discord": "src/channels/plugins/actions/discord.ts",
