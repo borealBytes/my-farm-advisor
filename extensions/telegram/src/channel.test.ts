@@ -376,11 +376,27 @@ describe("telegramPlugin duplicate token guard", () => {
   });
 
   it("ignores accounts with missing tokens during duplicate-token checks", async () => {
-    const cfg = createCfg();
-    cfg.channels!.telegram!.accounts!.ops = {} as never;
+    const cfg: OpenClawConfig = {
+      channels: {
+        telegram: {
+          enabled: true,
+          defaultAccount: "main",
+          accounts: {
+            default: {
+              enabled: false,
+            },
+            main: { botToken: "token-field-operations" },
+            "data-pipeline": { botToken: "token-data-pipeline" },
+          },
+        },
+      },
+    } as OpenClawConfig;
 
-    const alertsAccount = telegramPlugin.config.resolveAccount(cfg, "alerts");
-    expect(await telegramPlugin.config.isConfigured!(alertsAccount, cfg)).toBe(true);
+    const fieldOperationsAccount = telegramPlugin.config.resolveAccount(cfg, "main");
+    const dataPipelineAccount = telegramPlugin.config.resolveAccount(cfg, "data-pipeline");
+
+    expect(await telegramPlugin.config.isConfigured!(fieldOperationsAccount, cfg)).toBe(true);
+    expect(await telegramPlugin.config.isConfigured!(dataPipelineAccount, cfg)).toBe(true);
   });
 
   it("does not crash startup when a resolved account token is undefined", async () => {
