@@ -937,7 +937,7 @@ describe("docker-setup.sh", () => {
     expect(compose).not.toContain('entrypoint: ["/bin/sh", "-ec"]');
     expect(compose).toContain("http://openclaw-gateway:18789");
     expect(compose).toContain(
-      "OPENCLAW_TRUSTED_PROXY_IPS: ${OPENCLAW_CLOUDFLARED_IPV4:-172.30.0.2}",
+      "OPENCLAW_TRUSTED_PROXY_IPS: ${OPENCLAW_TRUSTED_PROXY_IPS:-10.0.2.3/32,172.30.0.2/32}",
     );
     expect(compose).toContain("ipv4_address: ${OPENCLAW_GATEWAY_IPV4:-172.30.0.3}");
     expect(compose).toContain("ipv4_address: ${OPENCLAW_CLOUDFLARED_IPV4:-172.30.0.2}");
