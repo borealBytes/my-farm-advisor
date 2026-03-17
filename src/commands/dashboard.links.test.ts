@@ -61,6 +61,38 @@ function mockSnapshot(token: unknown = "abc") {
   resolveSecretRefValuesMock.mockReset();
 }
 
+function mockTrustedProxySnapshot() {
+  readConfigFileSnapshotMock.mockResolvedValue({
+    path: "/tmp/openclaw.json",
+    exists: true,
+    raw: "{}",
+    parsed: {},
+    valid: true,
+    config: {
+      gateway: {
+        bind: "lan",
+        auth: {
+          mode: "trusted-proxy",
+          trustedProxy: {
+            userHeader: "x-forwarded-user",
+          },
+        },
+        controlUi: {
+          allowedOrigins: ["https://farm.example.com"],
+        },
+      },
+    },
+    issues: [],
+    legacyIssues: [],
+  });
+  resolveGatewayPortMock.mockReturnValue(18789);
+  resolveControlUiLinksMock.mockReturnValue({
+    httpUrl: "https://farm.example.com/",
+    wsUrl: "wss://farm.example.com",
+  });
+  resolveSecretRefValuesMock.mockReset();
+}
+
 describe("dashboardCommand", () => {
   beforeEach(() => {
     resetRuntime();
@@ -93,6 +125,85 @@ describe("dashboardCommand", () => {
     expect(openUrlMock).toHaveBeenCalledWith("http://127.0.0.1:18789/#token=abc123");
     expect(runtime.log).toHaveBeenCalledWith(
       "Opened in your browser. Keep that tab to control OpenClaw.",
+    );
+  });
+
+  it("opens the trusted-proxy public dashboard root without token bootstrap guidance", async () => {
+    mockTrustedProxySnapshot();
+    copyToClipboardMock.mockResolvedValue(true);
+    detectBrowserOpenSupportMock.mockResolvedValue({ ok: true });
+    openUrlMock.mockResolvedValue(true);
+
+    await dashboardCommand(runtime);
+
+    expect(resolveControlUiLinksMock).toHaveBeenCalledWith({
+      port: 18789,
+      bind: "loopback",
+      customBindHost: undefined,
+      basePath: undefined,
+    });
+    expect(copyToClipboardMock).toHaveBeenCalledWith("https://farm.example.com/");
+    expect(openUrlMock).toHaveBeenCalledWith("https://farm.example.com/");
+    expect(runtime.log).not.toHaveBeenCalledWith(expect.stringContaining("#token="));
+    expect(runtime.log).not.toHaveBeenCalledWith(expect.stringContaining("Token auto-auth"));
+    expect(runtime.log).toHaveBeenCalledWith(
+      "Trusted-proxy mode: use the dashboard root above as the supported public admin entry.",
+    );
+  });
+
+  it("prefers the public https origin over loopback allowed origins in trusted-proxy mode", async () => {
+    readConfigFileSnapshotMock.mockResolvedValue({
+      path: "/tmp/openclaw.json",
+      exists: true,
+      raw: "{}",
+      parsed: {},
+      valid: true,
+      config: {
+        gateway: {
+          bind: "lan",
+          auth: {
+            mode: "trusted-proxy",
+            trustedProxy: {
+              userHeader: "x-forwarded-user",
+            },
+          },
+          controlUi: {
+            allowedOrigins: [
+              "http://127.0.0.1:18789",
+              "http://localhost:18789",
+              "https://farm.example.com",
+            ],
+          },
+        },
+      },
+      issues: [],
+      legacyIssues: [],
+    });
+    resolveGatewayPortMock.mockReturnValue(18789);
+    resolveControlUiLinksMock.mockReturnValue({
+      httpUrl: "http://127.0.0.1:18789/",
+      wsUrl: "ws://127.0.0.1:18789",
+    });
+    resolveSecretRefValuesMock.mockReset();
+    copyToClipboardMock.mockResolvedValue(true);
+    detectBrowserOpenSupportMock.mockResolvedValue({ ok: true });
+    openUrlMock.mockResolvedValue(true);
+
+    await dashboardCommand(runtime);
+
+    expect(copyToClipboardMock).toHaveBeenCalledWith("https://farm.example.com/");
+    expect(openUrlMock).toHaveBeenCalledWith("https://farm.example.com/");
+  });
+
+  it("uses trusted-proxy root guidance for --no-open", async () => {
+    mockTrustedProxySnapshot();
+    copyToClipboardMock.mockResolvedValue(true);
+
+    await dashboardCommand(runtime, { noOpen: true });
+
+    expect(openUrlMock).not.toHaveBeenCalled();
+    expect(runtime.log).toHaveBeenCalledWith(
+      "Browser launch disabled (--no-open). Use the dashboard root above; trusted proxy auth handles sign-in.",
     );
   });
 

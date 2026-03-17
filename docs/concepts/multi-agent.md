@@ -269,26 +269,29 @@ Notes:
 
 ### Telegram bots per agent
 
+For the supported farm deployment, treat Telegram as a 3-role model: the root dashboard/admin path stays off Telegram, `field-operations` is the default Telegram account, and `data-pipeline` is a separate named Telegram account that must be routed with an explicit `bindings[].match.accountId` binding.
+
 ```json5
 {
   agents: {
     list: [
       { id: "main", workspace: "~/.openclaw/workspace-main" },
-      { id: "alerts", workspace: "~/.openclaw/workspace-alerts" },
+      { id: "data-pipeline", workspace: "~/.openclaw/workspace-data-pipeline" },
     ],
   },
   bindings: [
-    { agentId: "main", match: { channel: "telegram", accountId: "default" } },
-    { agentId: "alerts", match: { channel: "telegram", accountId: "alerts" } },
+    { agentId: "main", match: { channel: "telegram", accountId: "field-operations" } },
+    { agentId: "data-pipeline", match: { channel: "telegram", accountId: "data-pipeline" } },
   ],
   channels: {
     telegram: {
+      defaultAccount: "field-operations",
       accounts: {
-        default: {
+        "field-operations": {
           botToken: "123456:ABC...",
           dmPolicy: "pairing",
         },
-        alerts: {
+        "data-pipeline": {
           botToken: "987654:XYZ...",
           dmPolicy: "allowlist",
           allowFrom: ["tg:123456789"],
@@ -302,7 +305,9 @@ Notes:
 Notes:
 
 - Create one bot per agent with BotFather and copy each token.
-- Tokens live in `channels.telegram.accounts.<id>.botToken` (default account can use `TELEGRAM_BOT_TOKEN`).
+- Tokens live in `channels.telegram.accounts.<id>.botToken`.
+- In the supported farm path, leave `TELEGRAM_BOT_TOKEN` unset or blank. It is only a legacy fallback for the default Telegram account.
+- A Telegram binding with no `accountId` still matches the default account only, so it covers `field-operations` and not the named `data-pipeline` account.
 
 ### WhatsApp numbers per agent
 

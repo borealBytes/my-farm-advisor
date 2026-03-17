@@ -14,6 +14,8 @@ import {
   onceMessage,
   openWs,
   originForPort,
+  PUBLIC_TRUSTED_PROXY_CONTROL_UI_HEADERS,
+  PUBLIC_TRUSTED_PROXY_CONTROL_UI_ORIGIN,
   readConnectChallengeNonce,
   restoreGatewayToken,
   rpcReq,
@@ -231,6 +233,28 @@ export function registerControlUiAndPairingSuite(): void {
       });
     });
   }
+
+  test("allows trusted-proxy control ui admin flow from the public dashboard origin without token or password bootstrap", async () => {
+    await configureTrustedProxyControlUiAuth();
+    await writeTrustedProxyControlUiConfig({
+      allowedOrigins: [PUBLIC_TRUSTED_PROXY_CONTROL_UI_ORIGIN],
+    });
+
+    await withGatewayServer(async ({ port }) => {
+      const ws = await openWs(port, PUBLIC_TRUSTED_PROXY_CONTROL_UI_HEADERS);
+      const res = await connectReq(ws, {
+        skipDefaultAuth: true,
+        role: "operator",
+        scopes: ["operator.admin"],
+        device: null,
+        client: { ...CONTROL_UI_CLIENT },
+      });
+      expect(res.ok).toBe(true);
+      await expectStatusAndHealthOk(ws);
+      await expectAdminRpcOk(ws);
+      ws.close();
+    });
+  });
 
   test("allows localhost control ui without device identity when insecure auth is enabled", async () => {
     testState.gatewayControlUi = { allowInsecureAuth: true };

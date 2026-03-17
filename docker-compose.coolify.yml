@@ -2,8 +2,6 @@
 # Deploy behind Cloudflare ZeroTrust for secure public access
 #
 # Key differences from local:
-# - No exposed public ports (ZeroTrust handles routing)
-# - Browser control bound to localhost only (accessed via ZeroTrust tunnel)
 # - R2 for persistent data (keeps data off the VPS)
 # - Security hardening for production
 
@@ -13,6 +11,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    image: ${OPENCLAW_IMAGE:-openclaw:local}
     privileged: true
     cap_add:
       - SYS_ADMIN
@@ -25,8 +24,10 @@ services:
       OPENCLAW_STATE_DIR: /data
       OPENCLAW_WORKSPACE_DIR: /data/workspace
       
-      # Gateway binding (lan = bind to all interfaces, but access controlled via ZeroTrust)
       OPENCLAW_GATEWAY_BIND: lan
+      OPENCLAW_TRUSTED_PROXY_IPS: ${OPENCLAW_TRUSTED_PROXY_IPS:-10.0.2.3/32,172.30.0.2/32}
+      OPENCLAW_TRUSTED_PROXY_USER_HEADER: ${OPENCLAW_TRUSTED_PROXY_USER_HEADER:-cf-access-authenticated-user-email}
+      OPENCLAW_TRUSTED_PROXY_REQUIRED_HEADERS: ${OPENCLAW_TRUSTED_PROXY_REQUIRED_HEADERS:-cf-access-jwt-assertion,x-forwarded-proto}
       TZ: ${TZ:-UTC}
       
       # Security
@@ -56,8 +57,8 @@ services:
       TELEGRAM_DATA_PIPELINE_BOT_PAIRING_CODE: ${TELEGRAM_DATA_PIPELINE_BOT_PAIRING_CODE:-}
       TELEGRAM_DATA_PIPELINE_ALLOWED_USERS: ${TELEGRAM_DATA_PIPELINE_ALLOWED_USERS:-}
       TELEGRAM_DATA_PIPELINE_BOT_ALLOWED_USERS: ${TELEGRAM_DATA_PIPELINE_BOT_ALLOWED_USERS:-}
-      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
-      TELEGRAM_ACCOUNT_ID: ${TELEGRAM_ACCOUNT_ID:-}
+      TELEGRAM_BOT_TOKEN: ""
+      TELEGRAM_ACCOUNT_ID: ""
       TELEGRAM_ALLOWED_USERS: ${TELEGRAM_ALLOWED_USERS:-}
       OPENCLAW_TELEGRAM_GROUP_POLICY: ${OPENCLAW_TELEGRAM_GROUP_POLICY:-allowlist}
       
@@ -81,14 +82,16 @@ services:
       # AWS CLI for R2 sync
       AWS_CLI_AUTO_PROMPT: on-partial
     
-    # No exposed ports - ZeroTrust handles external access
-    # Internal ports still available for health checks and ZeroTrust tunnel
     ports:
-      - "127.0.0.1:18789:18789"  # Only localhost for health checks
-      - "127.0.0.1:18791:18791"  # Browser control via tunnel
+      - "127.0.0.1:18789:18789"
     
     volumes:
       - openclaw-data:/data
+    networks:
+      openclaw-tunnel:
+        ipv4_address: ${OPENCLAW_GATEWAY_IPV4:-172.30.0.3}
+        aliases:
+          - openclaw-gateway
     
     init: true
     restart: unless-stopped
@@ -97,11 +100,36 @@ services:
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:18789/healthz').then((r)=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
       interval: 30s
-      timeout: 5s
-      retries: 5
-      start_period: 60s
+      timeout: 10s
+      retries: 10
+      start_period: 360s
+
+  cloudflared:
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM cloudflare/cloudflared:latest AS cloudflared
+        FROM alpine:3.20
+        RUN apk add --no-cache ca-certificates
+        COPY --from=cloudflared /usr/local/bin/cloudflared /usr/local/bin/cloudflared
+        COPY scripts/cloudflared-entrypoint.sh /usr/local/bin/cloudflared-entrypoint.sh
+        RUN chmod 755 /usr/local/bin/cloudflared-entrypoint.sh
+    image: ${OPENCLAW_CLOUDFLARED_IMAGE:-openclaw-cloudflared:local}
+    restart: on-failure
+    depends_on:
+      - openclaw-gateway
+    environment:
+      CLOUDFLARE_TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN:-}
+      OPENCLAW_PUBLIC_HOSTNAME: ${OPENCLAW_PUBLIC_HOSTNAME:-}
+      CLOUDFLARED_ORIGIN_URL: http://openclaw-gateway:18789
+    entrypoint: ["/usr/local/bin/cloudflared-entrypoint.sh"]
+    networks:
+      openclaw-tunnel:
+        ipv4_address: ${OPENCLAW_CLOUDFLARED_IPV4:-172.30.0.2}
 
   openclaw-cli:
+    profiles: ["cli"]
+    user: "0:0"
     image: ${OPENCLAW_IMAGE:-openclaw:local}
     network_mode: "service:openclaw-gateway"
     cap_drop:
@@ -122,7 +150,8 @@ services:
       CLAUDE_WEB_COOKIE: ${CLAUDE_WEB_COOKIE:-}
       TELEGRAM_FIELD_OPERATIONS_BOT_TOKEN: ${TELEGRAM_FIELD_OPERATIONS_BOT_TOKEN:-}
       TELEGRAM_DATA_PIPELINE_BOT_TOKEN: ${TELEGRAM_DATA_PIPELINE_BOT_TOKEN:-}
-      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      TELEGRAM_BOT_TOKEN: ""
+      TELEGRAM_ACCOUNT_ID: ""
       TZ: ${TZ:-UTC}
     volumes:
       - openclaw-data:/data
@@ -130,9 +159,13 @@ services:
     tty: true
     init: true
     entrypoint: ["node", "dist/index.js"]
-    depends_on:
-      openclaw-gateway:
-        condition: service_healthy
 
 volumes:
   openclaw-data:
+
+networks:
+  openclaw-tunnel:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: ${OPENCLAW_TUNNEL_SUBNET:-172.30.0.0/29}

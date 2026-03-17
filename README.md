@@ -77,16 +77,56 @@ cp .env.example .env
 pnpm install
 pnpm build
 
-# Build and run
-docker build -t my-farm-adviser:local -f Dockerfile .
-docker compose up -d
+# Build the local image, onboard through the compose-managed CLI, then fetch the dashboard URL
+docker build -t openclaw:local -f Dockerfile .
+docker compose run --rm openclaw-cli onboard --mode local --no-install-daemon
+docker compose run --rm openclaw-cli dashboard --no-open
 ```
 
-Open the gateway on port `18789` (configurable).
+`openclaw-cli` shares `openclaw-gateway`'s network namespace, so `docker compose run --rm openclaw-cli ...`
+starts or reuses the gateway service automatically. Use `openclaw-cli` for follow-up Docker commands;
+if you stop the stack later, bring the long-running gateway back with `docker compose up -d openclaw-gateway`.
 
 ### Coolify (one-click)
 
-Point Coolify at our `docker-compose.coolify.yml`. It handles the rest.
+Point Coolify at our `docker-compose.coolify.yml`. That is the validated deployment entrypoint.
+That compose file builds and tags `${OPENCLAW_IMAGE:-openclaw:local}` for
+`openclaw-gateway` and reuses the same tag for `openclaw-cli`.
+On first boot, allow several minutes for initialization before health checks settle.
+The `openclaw-cli` service is profile-gated (`cli`) so Coolify deploys only the
+gateway by default.
+For the supported Cloudflare Zero Trust deployment, see
+[`docs/install/cloudflare-coolify.md`](docs/install/cloudflare-coolify.md).
+That runbook is the canonical Zero Trust contract: one Coolify compose app,
+same-compose `cloudflared`, `CLOUDFLARE_TUNNEL_TOKEN` plus
+`OPENCLAW_PUBLIC_HOSTNAME`, Cloudflare Access as the only public login layer,
+the root dashboard/admin entry at `https://<OPENCLAW_PUBLIC_HOSTNAME>`, exact
+trusted-proxy origin/IP allowlists, the optional secondary pinned hostname
+pattern, and the final step of turning off any temporary direct public `http://`
+path after Cloudflare is live.
+
+For the real-world operator order that was actually walked through, see
+[`docs/install/cloudflare-coolify-walkthrough.md`](docs/install/cloudflare-coolify-walkthrough.md).
+That walkthrough captures the practical sequence that worked in production-like
+testing: secure Coolify itself first, create the Cloudflare tunnel and Access
+policy, add the GitHub source/project/resource in Coolify, use
+`docker-compose.coolify.yml`, paste env vars in Coolify, watch live logs, then
+remove any direct public Coolify or raw-IP path once the protected hostname is healthy.
+
+Practical Zero Trust rules for this deployment:
+
+- Keep the gateway private on `127.0.0.1:18789`; do not normalize raw-IP access.
+- Treat Cloudflare Tunnel as the only public ingress path.
+- Treat Cloudflare Access as the only public admin login path.
+- After any env-var change in Coolify, save and redeploy so the runtime actually picks it up.
+
+For the supported farm Telegram setup, keep the roles split cleanly:
+
+- The root dashboard/admin path stays on the web surface only and does not own a Telegram bot.
+- `field-operations` is the default Telegram account and is the farm's main Telegram entry point.
+- `data-pipeline` is a separate named Telegram account and must be routed with an explicit `bindings[].match.accountId` binding.
+- Leave `TELEGRAM_BOT_TOKEN` unset or blank in the supported farm deployment path. It is only a legacy fallback for the default Telegram account.
+- Channel-only Telegram bindings with no `accountId` match the default account only, so they cover `field-operations` and not `data-pipeline`.
 
 ### Local development
 
@@ -120,6 +160,7 @@ Running costs should be minimal—often zero with free tiers.
 - This repo also ships bundled farm skills in `skills/`
 - `SOUL.md` and `USER.md` provide the farm-specific identity layer for this distribution
 - `scripts/fresh-local-bootstrap.sh` stops the stack, clears the bootstrapped workspaces (keeping `data/` and `.venv`), removes `openclaw.json`, then rebuilds with `docker compose up -d --build` for a clean resync.
+- The supported farm Telegram layout is a 3-role model: web-only dashboard/admin root, default Telegram account `field-operations`, and named Telegram account `data-pipeline`.
 - When you know the numeric Telegram user IDs that should reach the bots, set `TELEGRAM_ALLOWED_USERS` (or the per-account overrides) in `.env`; the entrypoint will switch DM access to an allowlist so OpenClaw stops issuing one-time pairing codes after approval ([docs.openclaw.ai/channels/telegram](https://docs.openclaw.ai/channels/telegram)).
 
 ## Upstream Relationship

@@ -106,8 +106,12 @@ export const en: TranslationMap = {
     },
     auth: {
       required: "This gateway requires auth. Add a token or password, then click Connect.",
+      trustedProxyRequired:
+        "This dashboard expects trusted-proxy sign-in. Open the public dashboard root instead of pasting a token or password.",
       failed:
         "Auth failed. Re-copy a tokenized URL with {command}, or update the token, then click Connect.",
+      trustedProxyFailed:
+        "Trusted-proxy sign-in failed. Re-open the public dashboard root and confirm the proxy is forwarding the required identity headers.",
     },
     pairing: {
       hint: "This device needs pairing approval from the gateway host.",
@@ -124,6 +128,9 @@ export const en: TranslationMap = {
       step2: "Get a tokenized dashboard URL:",
       step3: "Paste the WebSocket URL and token above, or open the tokenized URL directly.",
       step4: "Or generate a reusable token:",
+      trustedProxyStep2: "Open the dashboard root served by your trusted proxy.",
+      trustedProxyStep3:
+        "Let the proxy complete sign-in, then use Connect only if you need to retry the same public dashboard session.",
       docsHint: "For remote access, Tailscale Serve is recommended. ",
       docsLink: "Read the docs →",
     },

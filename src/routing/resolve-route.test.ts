@@ -392,6 +392,40 @@ describe("resolveAgentRoute", () => {
     expect(route.accountId).toBe("biz");
   });
 
+  test("farm Telegram bindings route each named account explicitly", () => {
+    const cfg: OpenClawConfig = {
+      agents: {
+        list: [
+          { id: "main", default: true, workspace: "/data/workspace" },
+          { id: "data-pipeline", workspace: "/data/workspace-data-pipeline" },
+        ],
+      },
+      bindings: [
+        { agentId: "main", match: { channel: "telegram", accountId: "field-operations" } },
+        { agentId: "data-pipeline", match: { channel: "telegram", accountId: "data-pipeline" } },
+        { agentId: "main", match: { channel: "telegram" } },
+      ],
+    };
+
+    const fieldOperationsRoute = resolveAgentRoute({
+      cfg,
+      channel: "telegram",
+      accountId: "field-operations",
+      peer: { kind: "direct", id: "111" },
+    });
+    expect(fieldOperationsRoute.agentId).toBe("main");
+    expect(fieldOperationsRoute.matchedBy).toBe("binding.account");
+
+    const dataPipelineRoute = resolveAgentRoute({
+      cfg,
+      channel: "telegram",
+      accountId: "data-pipeline",
+      peer: { kind: "direct", id: "222" },
+    });
+    expect(dataPipelineRoute.agentId).toBe("data-pipeline");
+    expect(dataPipelineRoute.matchedBy).toBe("binding.account");
+  });
+
   test("defaultAgentId is used when no binding matches", () => {
     const cfg: OpenClawConfig = {
       agents: {

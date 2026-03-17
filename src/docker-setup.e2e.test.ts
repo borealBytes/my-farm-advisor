@@ -1,4 +1,5 @@
-import { spawnSync } from "node:child_process";
+import { spawnSync, type SpawnSyncReturns } from "node:child_process";
+import { randomUUID } from "node:crypto";
 import { chmod, copyFile, mkdir, mkdtemp, readFile, rm, stat, writeFile } from "node:fs/promises";
 import { createServer } from "node:net";
 import { tmpdir } from "node:os";
@@ -15,11 +16,412 @@ type DockerSetupSandbox = {
   binDir: string;
 };
 
+type LiveComposeSandbox = {
+  rootDir: string;
+  dataDir: string;
+  projectName: string;
+  bridgePort: number;
+  browserControlPort: number;
+  gatewayToken: string;
+};
+
+const pluginResolutionSubpaths = [
+  "openclaw/plugin-sdk/core",
+  "openclaw/plugin-sdk/device-pair",
+  "openclaw/plugin-sdk/memory-core",
+] as const;
+
+const pluginResolutionRegressionSpecifier = "openclaw/plugin-sdk/core";
+
+const knownPluginFailurePatterns = [
+  /\[plugins\].*failed to load plugin:/i,
+  /\[plugins\].*failed during register/i,
+  /\[plugins\].*missing register\/activate export/i,
+  /\[plugins\].*invalid config:/i,
+  /ERR_MODULE_NOT_FOUND/i,
+  /Cannot find module ["']openclaw\/plugin-sdk\/(core|device-pair|memory-core)["']/i,
+  /Cannot find package ["']openclaw\/plugin-sdk\/(core|device-pair|memory-core)["']/i,
+];
+
+const pluginResolutionScript = [
+  `import { createRequire } from 'node:module';`,
+  `const require = createRequire(import.meta.url);`,
+  ...pluginResolutionSubpaths.map(
+    (specifier) =>
+      `console.log(${JSON.stringify(`require.resolve('${specifier}') => `)} + require.resolve(${JSON.stringify(specifier)}));`,
+  ),
+].join(" ");
+
+const liveComposeSmokeEnabled = isTruthyEnvValue(process.env.OPENCLAW_DOCKER_COMPOSE_SMOKE);
+
+type SmokeCommandResult = SpawnSyncReturns<string>;
+
+function extractMarkdownBashBlock(markdown: string, requiredLines: string[]): string[] {
+  const blocks = Array.from(markdown.matchAll(/```bash\n([\s\S]*?)```/g), (match) =>
+    match[1]
+      .split("\n")
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0 && !line.startsWith("#")),
+  );
+  const matchingBlock = blocks.find((lines) => requiredLines.every((line) => lines.includes(line)));
+  expect(matchingBlock, `expected bash block containing ${requiredLines.join(", ")}`).toBeDefined();
+  return matchingBlock ?? [];
+}
+
+function extractStubbedCommandSequence(log: string): string[] {
+  return log
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0)
+    .map((line) => line.replace(/^(build|compose)\s+/, ""));
+}
+
+function expectOrderedSubsequence(actualLines: string[], expectedLines: string[], context: string) {
+  let nextIndex = 0;
+  for (const expectedLine of expectedLines) {
+    const foundIndex = actualLines.findIndex(
+      (line, index) => index >= nextIndex && line.includes(expectedLine),
+    );
+    expect(foundIndex, `${context} should contain ${expectedLine} in order`).toBeGreaterThanOrEqual(
+      0,
+    );
+    nextIndex = foundIndex + 1;
+  }
+}
+
+function assertNoKnownPluginFailures(output: string, context: string) {
+  for (const pattern of knownPluginFailurePatterns) {
+    expect(output, `${context} should not match ${pattern}`).not.toMatch(pattern);
+  }
+}
+
+type CoolifyTunnelContract = {
+  gatewayPublishedPorts: string[];
+  browserControlPublishedPorts: string[];
+  tunnelOriginTarget?: string;
+};
+
+function deriveExpectedCoolifyTunnelContract(env: {
+  CLOUDFLARE_TUNNEL_TOKEN?: string;
+  OPENCLAW_PUBLIC_HOSTNAME?: string;
+}): CoolifyTunnelContract {
+  const hasTunnelToken = Boolean(env.CLOUDFLARE_TUNNEL_TOKEN?.trim());
+
+  return {
+    gatewayPublishedPorts: ["127.0.0.1:18789:18789"],
+    browserControlPublishedPorts: [],
+    tunnelOriginTarget: hasTunnelToken ? "openclaw-gateway:18789" : undefined,
+  };
+}
+
+function runComposeCommand(
+  sandbox: DockerSetupSandbox,
+  args: string[],
+  overrides: Record<string, string | undefined> = {},
+): SmokeCommandResult {
+  return spawnSync("docker", ["compose", ...args], {
+    cwd: sandbox.rootDir,
+    env: createEnv(sandbox, overrides),
+    encoding: "utf8",
+  });
+}
+
+function isTruthyEnvValue(raw: string | undefined): boolean {
+  if (!raw) {
+    return false;
+  }
+
+  switch (raw.trim().toLowerCase()) {
+    case "1":
+    case "true":
+    case "yes":
+    case "on":
+      return true;
+    default:
+      return false;
+  }
+}
+
+function runDockerCommand(
+  args: string[],
+  workdir = repoRoot,
+  overrides: Record<string, string | undefined> = {},
+): SmokeCommandResult {
+  const env = { ...process.env };
+  for (const [key, value] of Object.entries(overrides)) {
+    if (value === undefined) {
+      delete env[key];
+    } else {
+      env[key] = value;
+    }
+  }
+
+  return spawnSync("docker", args, {
+    cwd: workdir,
+    env,
+    encoding: "utf8",
+  });
+}
+
+function runLiveComposeCommand(
+  sandbox: LiveComposeSandbox,
+  args: string[],
+  overrides: Record<string, string | undefined> = {},
+): SmokeCommandResult {
+  return runDockerCommand(
+    ["compose", "--project-name", sandbox.projectName, ...args],
+    sandbox.rootDir,
+    overrides,
+  );
+}
+
+async function reserveFreePort(): Promise<number> {
+  const server = createServer();
+  await new Promise<void>((resolve, reject) => {
+    server.once("error", reject);
+    server.listen(0, "127.0.0.1", () => resolve());
+  });
+
+  const address = server.address();
+  if (!address || typeof address === "string") {
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+    throw new Error("failed to reserve TCP port");
+  }
+
+  const { port } = address;
+  await new Promise<void>((resolve) => server.close(() => resolve()));
+  return port;
+}
+
+async function createLiveComposeSandbox(): Promise<LiveComposeSandbox> {
+  const rootDir = await mkdtemp(join(tmpdir(), "openclaw-live-compose-"));
+  const dataDir = join(rootDir, "data");
+  const composeTemplate = await readFile(join(repoRoot, "docker-compose.yml"), "utf8");
+  const composeWithoutBuild = composeTemplate.replace(/^ {4}build:\n(?:^ {6}.*\n)+/m, "");
+  const bridgePort = await reserveFreePort();
+  const browserControlPort = await reserveFreePort();
+  const gatewayToken = `docker-smoke-${randomUUID()}`;
+  const projectName = `openclaw-smoke-${randomUUID().slice(0, 8)}`;
+
+  await mkdir(dataDir, { recursive: true });
+  await writeFile(join(rootDir, "docker-compose.yml"), composeWithoutBuild);
+  await writeFile(
+    join(rootDir, ".env"),
+    [
+      `OPENCLAW_IMAGE=openclaw:local`,
+      `OPENCLAW_GATEWAY_TOKEN=${gatewayToken}`,
+      `OPENCLAW_GATEWAY_BIND=lan`,
+      `OPENCLAW_BRIDGE_PORT=${bridgePort}`,
+      `OPENCLAW_BROWSER_CONTROL_HOST=127.0.0.1`,
+      `OPENCLAW_BROWSER_CONTROL_PORT=${browserControlPort}`,
+      `DATA_VOLUME_SOURCE=${dataDir}`,
+      `OPENCLAW_TZ=UTC`,
+      `OPENCLAW_ALLOW_INSECURE_PRIVATE_WS=1`,
+    ].join("\n") + "\n",
+  );
+
+  return {
+    rootDir,
+    dataDir,
+    projectName,
+    bridgePort,
+    browserControlPort,
+    gatewayToken,
+  };
+}
+
+async function destroyLiveComposeSandbox(sandbox: LiveComposeSandbox) {
+  const hostUid = typeof process.getuid === "function" ? String(process.getuid()) : undefined;
+  const hostGid = typeof process.getgid === "function" ? String(process.getgid()) : undefined;
+
+  if (hostUid && hostGid) {
+    runLiveComposeCommand(sandbox, [
+      "run",
+      "--rm",
+      "--no-deps",
+      "--user",
+      "root",
+      "--entrypoint",
+      "sh",
+      "openclaw-gateway",
+      "-c",
+      `chown -R ${hostUid}:${hostGid} /data || true`,
+    ]);
+  }
+
+  runLiveComposeCommand(sandbox, ["down", "-v", "--remove-orphans"]);
+  await rm(sandbox.rootDir, { recursive: true, force: true });
+}
+
+async function waitForGatewayHealthz(
+  sandbox: LiveComposeSandbox,
+  timeoutMs = 120_000,
+): Promise<string> {
+  const deadline = Date.now() + timeoutMs;
+  let lastFailure = "gateway did not answer";
+
+  while (Date.now() < deadline) {
+    const healthzResult = runLiveComposeCommand(sandbox, [
+      "exec",
+      "-T",
+      "openclaw-gateway",
+      "node",
+      "-e",
+      "fetch('http://127.0.0.1:18789/healthz').then(async (response) => { const body = await response.text(); if (!response.ok) { console.error(body); process.exit(1); } process.stdout.write(body); }).catch((error) => { console.error(String(error)); process.exit(1); })",
+    ]);
+    if (healthzResult.status === 0) {
+      return healthzResult.stdout;
+    }
+    lastFailure =
+      `${healthzResult.stderr}${healthzResult.stdout}`.trim() || "gateway /healthz probe failed";
+
+    await new Promise((resolve) => setTimeout(resolve, 1_000));
+  }
+
+  throw new Error(`gateway /healthz did not become ready inside compose service: ${lastFailure}`);
+}
+
+async function waitForComposeGatewayHealthy(
+  sandbox: LiveComposeSandbox,
+  timeoutMs = 120_000,
+): Promise<string> {
+  const deadline = Date.now() + timeoutMs;
+  let lastStatus = "unknown";
+  let lastOutput = "gateway health status unavailable";
+
+  while (Date.now() < deadline) {
+    const containerIdResult = runLiveComposeCommand(sandbox, ["ps", "-q", "openclaw-gateway"]);
+    if (containerIdResult.status === 0) {
+      const containerId = containerIdResult.stdout.trim();
+      if (containerId.length > 0) {
+        const inspectResult = runDockerCommand([
+          "inspect",
+          "--format",
+          '{{if .State.Health}}{{.State.Health.Status}}{{else}}no-healthcheck{{end}}\n{{if .State.Health}}{{range .State.Health.Log}}{{.ExitCode}} {{printf "%s" .Output}}{{end}}{{end}}',
+          containerId,
+        ]);
+        if (inspectResult.status === 0) {
+          const [statusLine, ...detailLines] = inspectResult.stdout.trim().split("\n");
+          lastStatus = statusLine || "unknown";
+          lastOutput = detailLines.join("\n").trim() || `gateway health status: ${lastStatus}`;
+          if (lastStatus === "healthy") {
+            return lastStatus;
+          }
+        } else {
+          lastOutput = `${inspectResult.stderr}${inspectResult.stdout}`.trim() || lastOutput;
+        }
+      }
+    } else {
+      lastOutput = `${containerIdResult.stderr}${containerIdResult.stdout}`.trim() || lastOutput;
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, 1_000));
+  }
+
+  throw new Error(
+    `gateway container did not become compose-healthy inside timeout (last status: ${lastStatus}; details: ${lastOutput})`,
+  );
+}
+
+function runPluginSmokeChecks(
+  sandbox: DockerSetupSandbox,
+  overrides: Record<string, string | undefined> = {},
+) {
+  const resolutionResult = runComposeCommand(
+    sandbox,
+    [
+      "run",
+      "--rm",
+      "--no-deps",
+      "openclaw-cli",
+      "node",
+      "--input-type=module",
+      "-e",
+      pluginResolutionScript,
+    ],
+    overrides,
+  );
+  expect(resolutionResult.status).toBe(0);
+  for (const specifier of pluginResolutionSubpaths) {
+    expect(resolutionResult.stdout).toContain(`require.resolve('${specifier}') => `);
+  }
+  assertNoKnownPluginFailures(
+    `${resolutionResult.stdout}\n${resolutionResult.stderr}`,
+    "plugin resolution smoke output",
+  );
+
+  const healthResult = runComposeCommand(
+    sandbox,
+    [
+      "exec",
+      "openclaw-gateway",
+      "node",
+      "dist/index.js",
+      "health",
+      "--token",
+      createEnv(sandbox, overrides).OPENCLAW_GATEWAY_TOKEN ?? "",
+    ],
+    overrides,
+  );
+  expect(healthResult.status).toBe(0);
+  expect(healthResult.stdout).toContain("Gateway Health");
+  expect(healthResult.stdout).toContain("OK");
+  assertNoKnownPluginFailures(
+    `${healthResult.stdout}\n${healthResult.stderr}`,
+    "gateway health output",
+  );
+
+  const logsResult = runComposeCommand(sandbox, ["logs", "openclaw-gateway"], overrides);
+  expect(logsResult.status).toBe(0);
+  assertNoKnownPluginFailures(`${logsResult.stdout}\n${logsResult.stderr}`, "gateway startup logs");
+
+  return { resolutionResult, healthResult, logsResult };
+}
+
+async function runLiveComposePluginSmokeChecks(sandbox: LiveComposeSandbox) {
+  const upResult = runLiveComposeCommand(sandbox, ["up", "-d", "openclaw-gateway"]);
+  expect(upResult.status, upResult.stderr || upResult.stdout).toBe(0);
+
+  const healthzBody = await waitForGatewayHealthz(sandbox);
+  const composeHealthStatus = await waitForComposeGatewayHealthy(sandbox);
+  expect(healthzBody).toContain("ok");
+  expect(composeHealthStatus).toBe("healthy");
+
+  const resolutionResult = runLiveComposeCommand(sandbox, [
+    "exec",
+    "-T",
+    "openclaw-gateway",
+    "node",
+    "-e",
+    `console.log(${JSON.stringify(`require.resolve('${pluginResolutionRegressionSpecifier}') => `)} + require.resolve(${JSON.stringify(pluginResolutionRegressionSpecifier)}));`,
+  ]);
+  expect(resolutionResult.status, resolutionResult.stderr || resolutionResult.stdout).toBe(0);
+  expect(resolutionResult.stdout).toContain(
+    `require.resolve('${pluginResolutionRegressionSpecifier}') => `,
+  );
+  assertNoKnownPluginFailures(
+    `${resolutionResult.stdout}\n${resolutionResult.stderr}`,
+    "live gateway require.resolve output",
+  );
+
+  const logsResult = runLiveComposeCommand(sandbox, ["logs", "--no-color", "openclaw-gateway"]);
+  expect(logsResult.status, logsResult.stderr || logsResult.stdout).toBe(0);
+  assertNoKnownPluginFailures(
+    `${logsResult.stdout}\n${logsResult.stderr}`,
+    "live gateway startup logs",
+  );
+
+  return { upResult, resolutionResult, logsResult, healthzBody, composeHealthStatus };
+}
+
 async function writeDockerStub(binDir: string, logPath: string) {
   const stub = `#!/usr/bin/env bash
 set -euo pipefail
 log="$DOCKER_STUB_LOG"
 fail_match="\${DOCKER_STUB_FAIL_MATCH:-}"
+plugin_resolution_output="\${DOCKER_STUB_PLUGIN_RESOLUTION_OUTPUT:-}"
+health_output="\${DOCKER_STUB_HEALTH_OUTPUT:-}"
+logs_output="\${DOCKER_STUB_GATEWAY_LOGS_OUTPUT:-}"
 if [[ "\${1:-}" == "compose" && "\${2:-}" == "version" ]]; then
   exit 0
 fi
@@ -37,6 +439,18 @@ if [[ "\${1:-}" == "compose" ]]; then
     exit 1
   fi
   echo "compose $*" >>"$log"
+  if [[ "$*" == *" node --input-type=module -e "* ]]; then
+    printf '%s' "$plugin_resolution_output"
+    exit 0
+  fi
+  if [[ "$*" == *" exec openclaw-gateway node dist/index.js health --token "* ]]; then
+    printf '%s' "$health_output"
+    exit 0
+  fi
+  if [[ "$*" == *" logs openclaw-gateway"* ]]; then
+    printf '%s' "$logs_output"
+    exit 0
+  fi
   exit 0
 fi
 echo "unknown $*" >>"$log"
@@ -463,13 +877,25 @@ describe("docker-setup.sh", () => {
   it("keeps docker-compose gateway command in sync", async () => {
     const compose = await readFile(join(repoRoot, "docker-compose.yml"), "utf8");
     expect(compose).not.toContain("gateway-daemon");
-    expect(compose).toContain('"gateway"');
+    expect(compose).toContain('command: ["/app/scripts/entrypoint.sh"]');
   });
 
   it("keeps docker-compose CLI network namespace settings in sync", async () => {
     const compose = await readFile(join(repoRoot, "docker-compose.yml"), "utf8");
+    expect(compose).toContain('    user: "0:0"');
     expect(compose).toContain('network_mode: "service:openclaw-gateway"');
-    expect(compose).toContain("depends_on:\n      - openclaw-gateway");
+    expect(compose).toContain(
+      "depends_on:\n      openclaw-gateway:\n        condition: service_healthy",
+    );
+  });
+
+  it("keeps docker-compose gateway healthcheck aligned with /healthz", async () => {
+    const compose = await readFile(join(repoRoot, "docker-compose.yml"), "utf8");
+    expect(compose).toContain("healthcheck:");
+    expect(compose).toContain(
+      'test: ["CMD-SHELL", "pgrep -f \'node dist/index.js gateway\' >/dev/null && node -e \\"fetch(\'http://127.0.0.1:18789/healthz\').then((r)=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\\""]',
+    );
+    expect(compose).not.toContain("pgrep -f openclaw-gateway");
   });
 
   it("keeps docker-compose gateway token env defaults aligned across services", async () => {
@@ -483,4 +909,210 @@ describe("docker-setup.sh", () => {
     const compose = await readFile(join(repoRoot, "docker-compose.yml"), "utf8");
     expect(compose.match(/TZ: \$\{OPENCLAW_TZ:-UTC\}/g)).toHaveLength(2);
   });
+
+  it("keeps Coolify compose gateway and cli image wiring aligned", async () => {
+    const compose = await readFile(join(repoRoot, "docker-compose.coolify.yml"), "utf8");
+    expect(compose).toContain("openclaw-gateway:");
+    expect(compose).toContain("openclaw-cli:");
+    expect(compose).toContain('profiles: ["cli"]');
+    expect(compose.match(/image: \$\{OPENCLAW_IMAGE:-openclaw:local\}/g)).toHaveLength(2);
+    expect(compose.match(/user: "0:0"/g)).toHaveLength(2);
+    expect(compose).toContain('network_mode: "service:openclaw-gateway"');
+    expect(compose).not.toContain("condition: service_healthy");
+    expect(compose).toContain("healthcheck:");
+    expect(compose).toContain("timeout: 10s");
+    expect(compose).toContain("retries: 10");
+    expect(compose).toContain("start_period: 360s");
+    expect(compose).toContain('- "127.0.0.1:18789:18789"');
+    expect(compose).not.toContain('- "18789:18789"');
+    expect(compose).not.toContain("127.0.0.1:18791:18791");
+    expect(compose).toContain("cloudflared:");
+    expect(compose).toContain("CLOUDFLARE_TUNNEL_TOKEN");
+    expect(compose).toContain("OPENCLAW_PUBLIC_HOSTNAME");
+    expect(compose).toContain("restart: on-failure");
+    expect(compose).toContain(
+      "COPY scripts/cloudflared-entrypoint.sh /usr/local/bin/cloudflared-entrypoint.sh",
+    );
+    expect(compose).toContain('entrypoint: ["/usr/local/bin/cloudflared-entrypoint.sh"]');
+    expect(compose).not.toContain('entrypoint: ["/bin/sh", "-ec"]');
+    expect(compose).toContain("http://openclaw-gateway:18789");
+    expect(compose).toContain(
+      "OPENCLAW_TRUSTED_PROXY_IPS: ${OPENCLAW_TRUSTED_PROXY_IPS:-10.0.2.3/32,172.30.0.2/32}",
+    );
+    expect(compose).toContain("ipv4_address: ${OPENCLAW_GATEWAY_IPV4:-172.30.0.3}");
+    expect(compose).toContain("ipv4_address: ${OPENCLAW_CLOUDFLARED_IPV4:-172.30.0.2}");
+    expect(compose).not.toContain("localhost:18789");
+    expect(compose).not.toContain("service: http://127.0.0.1:18789");
+    expect(compose).not.toContain("hostname: $$OPENCLAW_PUBLIC_HOSTNAME");
+    expect(compose).not.toContain("OPENCLAW_PUBLIC_HTTP");
+    expect(compose).not.toContain('- "80:80"');
+    expect(compose).not.toContain('- "443:443"');
+  });
+
+  it("locks the intended Coolify tunnel contract for the compose sidecar flow", () => {
+    const tokenAbsent = deriveExpectedCoolifyTunnelContract({
+      CLOUDFLARE_TUNNEL_TOKEN: "",
+      OPENCLAW_PUBLIC_HOSTNAME: "",
+    });
+    expect(tokenAbsent.gatewayPublishedPorts).toEqual(["127.0.0.1:18789:18789"]);
+    expect(tokenAbsent.browserControlPublishedPorts).toEqual([]);
+    expect(tokenAbsent.tunnelOriginTarget).toBeUndefined();
+
+    const tokenPresent = deriveExpectedCoolifyTunnelContract({
+      CLOUDFLARE_TUNNEL_TOKEN: "test-token",
+      OPENCLAW_PUBLIC_HOSTNAME: "my-farm-advisor.superiorbyteworks.com",
+    });
+    expect(tokenPresent.gatewayPublishedPorts).toEqual(["127.0.0.1:18789:18789"]);
+    expect(tokenPresent.browserControlPublishedPorts).toEqual([]);
+    expect(tokenPresent.tunnelOriginTarget).toBe("openclaw-gateway:18789");
+    expect(tokenPresent.tunnelOriginTarget).not.toContain("127.0.0.1");
+    expect(tokenPresent.tunnelOriginTarget).not.toContain("localhost");
+
+    const missingHostname = deriveExpectedCoolifyTunnelContract({
+      CLOUDFLARE_TUNNEL_TOKEN: "test-token",
+      OPENCLAW_PUBLIC_HOSTNAME: "",
+    });
+    expect(missingHostname.gatewayPublishedPorts).toEqual(["127.0.0.1:18789:18789"]);
+    expect(missingHostname.browserControlPublishedPorts).toEqual([]);
+    expect(missingHostname.tunnelOriginTarget).toBe("openclaw-gateway:18789");
+  });
+
+  it("extends the local-image smoke path with plugin resolution and startup log checks", async () => {
+    const activeSandbox = requireSandbox(sandbox);
+    await writeFile(activeSandbox.logPath, "");
+
+    const result = runDockerSetup(activeSandbox);
+    expect(result.status).toBe(0);
+
+    const smoke = runPluginSmokeChecks(activeSandbox, {
+      DOCKER_STUB_PLUGIN_RESOLUTION_OUTPUT: pluginResolutionSubpaths
+        .map(
+          (specifier) =>
+            `require.resolve('${specifier}') => /app/node_modules/openclaw/dist/${specifier.replace("openclaw/", "")}.js`,
+        )
+        .join("\n"),
+      DOCKER_STUB_HEALTH_OUTPUT: "Gateway Health\nOK (7ms)\n",
+      DOCKER_STUB_GATEWAY_LOGS_OUTPUT:
+        "[gateway] startup complete\n[plugins] loaded bundled plugins without diagnostics\n",
+    });
+
+    const log = await readFile(activeSandbox.logPath, "utf8");
+    expect(log).toContain("run --rm openclaw-cli onboard --mode local --no-install-daemon");
+    expect(log).toContain("run --rm openclaw-cli config set gateway.mode local");
+    expect(log).toContain("run --rm openclaw-cli config set gateway.bind lan");
+    expect(log).toContain("up -d openclaw-gateway");
+    expect(log).toContain("run --rm --no-deps openclaw-cli node --input-type=module -e");
+    expect(log).toContain("exec openclaw-gateway node dist/index.js health --token test-token");
+    expect(log).toContain("logs openclaw-gateway");
+    expect(smoke.logsResult.stdout).toContain("loaded bundled plugins without diagnostics");
+  });
+
+  it("keeps the documented manual compose flow aligned with the operator onboarding path", async () => {
+    const activeSandbox = requireSandbox(sandbox);
+    await writeFile(activeSandbox.logPath, "");
+
+    const result = runDockerSetup(activeSandbox);
+    expect(result.status).toBe(0);
+
+    const smoke = runPluginSmokeChecks(activeSandbox, {
+      DOCKER_STUB_PLUGIN_RESOLUTION_OUTPUT: pluginResolutionSubpaths
+        .map(
+          (specifier) =>
+            `require.resolve('${specifier}') => /app/node_modules/openclaw/dist/${specifier.replace("openclaw/", "")}.js`,
+        )
+        .join("\n"),
+      DOCKER_STUB_HEALTH_OUTPUT: "Gateway Health\nOK (7ms)\n",
+      DOCKER_STUB_GATEWAY_LOGS_OUTPUT:
+        "[gateway] startup complete\n[plugins] loaded bundled plugins without diagnostics\n",
+    });
+
+    const documentedLocalImageSequence = [
+      "docker build -t openclaw:local -f Dockerfile .",
+      "docker compose run --rm openclaw-cli onboard --mode local --no-install-daemon",
+      "docker compose run --rm openclaw-cli dashboard --no-open",
+    ];
+    const documentedStrictManualSequence = [
+      "docker build -t openclaw:local -f Dockerfile .",
+      "docker compose run --rm openclaw-cli onboard --mode local --no-install-daemon",
+      "docker compose run --rm openclaw-cli dashboard --no-open",
+    ];
+    const readme = await readFile(join(repoRoot, "README.md"), "utf8");
+    const installGuide = await readFile(join(repoRoot, "docs/install/docker.md"), "utf8");
+    const compose = await readFile(join(repoRoot, "docker-compose.yml"), "utf8");
+    const stubLog = await readFile(activeSandbox.logPath, "utf8");
+    const executedCommands = extractStubbedCommandSequence(stubLog);
+    const readmeCommands = extractMarkdownBashBlock(readme, documentedLocalImageSequence);
+    const installGuideCommands = extractMarkdownBashBlock(
+      installGuide,
+      documentedStrictManualSequence,
+    );
+
+    expectOrderedSubsequence(
+      readmeCommands,
+      documentedLocalImageSequence,
+      "README Docker quick start",
+    );
+    expect(installGuideCommands).toEqual(documentedStrictManualSequence);
+    expect(compose).toContain("openclaw-cli:");
+    expect(compose).toContain("openclaw-gateway:");
+    const buildCommand = executedCommands.find((line) => line.includes("build --build-arg"));
+    expect(buildCommand).toBeDefined();
+    expect(buildCommand).toContain("-t openclaw:local");
+    expect(buildCommand).toContain("Dockerfile");
+    expect(buildCommand).not.toContain("compose build");
+    expect(
+      executedCommands.some((line) =>
+        line.includes("run --rm openclaw-cli onboard --mode local --no-install-daemon"),
+      ),
+    ).toBe(true);
+    expect(executedCommands.some((line) => line.includes("up -d openclaw-gateway"))).toBe(true);
+    expectOrderedSubsequence(
+      executedCommands,
+      [
+        "up -d openclaw-gateway",
+        "run --rm --no-deps openclaw-cli node --input-type=module -e",
+        "exec openclaw-gateway node dist/index.js health --token test-token",
+        "logs openclaw-gateway",
+      ],
+      "plugin compatibility smoke flow",
+    );
+    expect(smoke.resolutionResult.stdout).toContain(
+      `require.resolve('${pluginResolutionRegressionSpecifier}') => `,
+    );
+    expect(smoke.logsResult.stdout).toContain("loaded bundled plugins without diagnostics");
+  });
+
+  it("fails the plugin smoke helper when broken plugin resolution or load patterns reappear", () => {
+    expect(() =>
+      assertNoKnownPluginFailures(
+        [
+          "[plugins] failed to load plugin: boom (plugin=device-pair, source=/app/extensions/device-pair/index.ts)",
+          "Error: Cannot find package 'openclaw/plugin-sdk/device-pair' imported from /app/extensions/device-pair/index.ts",
+        ].join("\n"),
+        "known broken plugin smoke",
+      ),
+    ).toThrowError();
+  });
+
+  it.skipIf(!liveComposeSmokeEnabled || process.platform === "win32")(
+    "reuses the operator docker-compose flow to prove healthz, require.resolve('openclaw/plugin-sdk/core'), and clean startup logs end-to-end",
+    async () => {
+      const imageResult = runDockerCommand(["image", "inspect", "openclaw:local"]);
+      expect(
+        imageResult.status,
+        "missing local image; build openclaw:local before running this smoke",
+      ).toBe(0);
+
+      const liveSandbox = await createLiveComposeSandbox();
+      try {
+        const smoke = await runLiveComposePluginSmokeChecks(liveSandbox);
+        expect(smoke.healthzBody).toContain("ok");
+        expect(smoke.composeHealthStatus).toBe("healthy");
+        expect(smoke.logsResult.stderr).toBe("");
+      } finally {
+        await destroyLiveComposeSandbox(liveSandbox);
+      }
+    },
+    180_000,
+  );
 });
