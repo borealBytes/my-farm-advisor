@@ -1,0 +1,8 @@
+{
+  "year": 2025,
+  "latitude_intercept": 7.5,
+  "latitude_slope": -0.11,
+  "county_count": 1250,
+  "product_type": "heuristic",
+  "caveat": "Soybean MG outputs are latitude-based planning heuristics and are not recommendation-grade planting prescriptions."
+}

@@ -1,0 +1,34 @@
+{
+  "name": "wrighter-offline-html-open",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Source-faithful offline HTML delivery pipeline for Wrighter outputs",
+  "type": "module",
+  "scripts": {
+    "build": "tsc --project tsconfig.json",
+    "lint": "tsc --project tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@mermaid-js/mermaid-cli": "^10.9.1",
+    "execa": "^8.0.1",
+    "gray-matter": "^4.0.3",
+    "nanoid": "^5.1.6",
+    "rehype-autolink-headings": "^7.1.0",
+    "rehype-katex": "^6.0.3",
+    "rehype-raw": "^7.0.0",
+    "rehype-slug": "^6.0.0",
+    "rehype-stringify": "^10.0.0",
+    "remark-gfm": "^4.0.1",
+    "remark-math": "^6.0.0",
+    "remark-parse": "^11.0.0",
+    "remark-rehype": "^11.1.0",
+    "strip-html": "^1.0.2",
+    "unified": "^11.0.5",
+    "unist-util-visit": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.37",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}
