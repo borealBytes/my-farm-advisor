@@ -238,6 +238,39 @@ describe("resolveDefaultTelegramAccountId", () => {
 
     expect(resolveDefaultTelegramAccountId(cfg)).toBe("default");
   });
+
+  it("uses Field Operations as the explicit Telegram default in the farm multi-account shape", () => {
+    const cfg: OpenClawConfig = {
+      channels: {
+        telegram: {
+          defaultAccount: "field-operations",
+          accounts: {
+            "field-operations": { botToken: "tok-field-operations" },
+            "data-pipeline": { botToken: "tok-data-pipeline" },
+          },
+        },
+      },
+    };
+
+    expect(resolveDefaultTelegramAccountId(cfg)).toBe("field-operations");
+    expect(listTelegramAccountIds(cfg)).toEqual(["data-pipeline", "field-operations"]);
+
+    const fieldOperationsAccount = resolveTelegramAccount({
+      cfg,
+      accountId: "field-operations",
+    });
+    expect(fieldOperationsAccount.accountId).toBe("field-operations");
+    expect(fieldOperationsAccount.token).toBe("tok-field-operations");
+    expect(fieldOperationsAccount.tokenSource).toBe("config");
+
+    const dataPipelineAccount = resolveTelegramAccount({
+      cfg,
+      accountId: "data-pipeline",
+    });
+    expect(dataPipelineAccount.accountId).toBe("data-pipeline");
+    expect(dataPipelineAccount.token).toBe("tok-data-pipeline");
+    expect(dataPipelineAccount.tokenSource).toBe("config");
+  });
 });
 
 describe("resolveTelegramAccount allowFrom precedence", () => {

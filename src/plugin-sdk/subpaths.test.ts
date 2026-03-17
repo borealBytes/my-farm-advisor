@@ -8,6 +8,33 @@ import * as slackSdk from "openclaw/plugin-sdk/slack";
 import * as telegramSdk from "openclaw/plugin-sdk/telegram";
 import * as whatsappSdk from "openclaw/plugin-sdk/whatsapp";
 import { describe, expect, it } from "vitest";
+import packageJson from "../../package.json" with { type: "json" };
+
+const packageExports = packageJson.exports as Record<string, unknown>;
+
+const proofCaseExtensions = [
+  {
+    id: "ollama",
+    subpath: "core",
+    loadSdk: () => import("openclaw/plugin-sdk/core"),
+    load: () => import("../../extensions/ollama/index.ts"),
+    expectDefault: (value: unknown) => expect(typeof value).toBe("object"),
+  },
+  {
+    id: "device-pair",
+    subpath: "device-pair",
+    loadSdk: () => import("openclaw/plugin-sdk/device-pair"),
+    load: () => import("../../extensions/device-pair/index.ts"),
+    expectDefault: (value: unknown) => expect(typeof value).toBe("function"),
+  },
+  {
+    id: "memory-core",
+    subpath: "memory-core",
+    loadSdk: () => import("openclaw/plugin-sdk/memory-core"),
+    load: () => import("../../extensions/memory-core/index.ts"),
+    expectDefault: (value: unknown) => expect(typeof value).toBe("object"),
+  },
+] as const;
 
 const bundledExtensionSubpathLoaders = [
   { id: "acpx", load: () => import("openclaw/plugin-sdk/acpx") },
@@ -50,6 +77,31 @@ const bundledExtensionSubpathLoaders = [
 ] as const;
 
 describe("plugin-sdk subpath exports", () => {
+  it("keeps the distribution branded while preserving openclaw plugin-sdk compatibility", async () => {
+    expect(packageJson.name).toBe("my-farm-advisor");
+
+    expect(proofCaseExtensions.map(({ subpath }) => subpath)).toEqual([
+      "core",
+      "device-pair",
+      "memory-core",
+    ]);
+
+    for (const proofCase of proofCaseExtensions) {
+      const exportKey = `./plugin-sdk/${proofCase.subpath}`;
+      expect(packageExports[exportKey], `${exportKey} should stay exported`).toBeTruthy();
+
+      const sdkModule = await proofCase.loadSdk();
+      expect(sdkModule, `openclaw/plugin-sdk/${proofCase.subpath} should resolve`).toBeTruthy();
+
+      const extensionModule = await proofCase.load();
+      expect(
+        extensionModule.default,
+        `${proofCase.id} should keep loading through compatibility imports`,
+      ).toBeTruthy();
+      proofCase.expectDefault(extensionModule.default);
+    }
+  });
+
   it("exports compat helpers", () => {
     expect(typeof compatSdk.emptyPluginConfigSchema).toBe("function");
     expect(typeof compatSdk.resolveControlCommandGate).toBe("function");

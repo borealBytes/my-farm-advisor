@@ -56,6 +56,7 @@ export type AppViewState = {
   assistantName: string;
   assistantAvatar: string | null;
   assistantAgentId: string | null;
+  bootstrapAuthMode: "none" | "token" | "password" | "trusted-proxy" | null;
   sessionKey: string;
   chatLoading: boolean;
   chatSending: boolean;

@@ -104,6 +104,8 @@ export default defineConfig([
   nodeBuildConfig({
     // Keep sync lazy-runtime channel modules as concrete dist files.
     entry: {
+      "config/gateway-control-ui-origins": "src/config/gateway-control-ui-origins.ts",
+      "gateway/runtime-deployment-config": "src/gateway/runtime-deployment-config.ts",
       "channels/plugins/agent-tools/whatsapp-login":
         "src/channels/plugins/agent-tools/whatsapp-login.ts",
       "channels/plugins/actions/discord": "src/channels/plugins/actions/discord.ts",
@@ -111,6 +113,7 @@ export default defineConfig([
       "channels/plugins/actions/telegram": "src/channels/plugins/actions/telegram.ts",
       "telegram/audit": "src/telegram/audit.ts",
       "telegram/token": "src/telegram/token.ts",
+      "routing/bootstrap-telegram-bindings": "src/routing/bootstrap-telegram-bindings.ts",
       "line/accounts": "src/line/accounts.ts",
       "line/send": "src/line/send.ts",
       "line/template-messages": "src/line/template-messages.ts",

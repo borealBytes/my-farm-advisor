@@ -28,6 +28,7 @@ import { renderOverviewLogTail } from "./overview-log-tail.ts";
 export type OverviewProps = {
   connected: boolean;
   hello: GatewayHelloOk | null;
+  bootstrapAuthMode: "none" | "token" | "password" | "trusted-proxy" | null;
   settings: UiSettings;
   password: string;
   lastError: string | null;
@@ -71,7 +72,7 @@ export function renderOverview(props: OverviewProps) {
   const tick = tickIntervalMs
     ? `${(tickIntervalMs / 1000).toFixed(tickIntervalMs % 1000 === 0 ? 0 : 1)}s`
     : t("common.na");
-  const authMode = snapshot?.authMode;
+  const authMode = snapshot?.authMode ?? props.bootstrapAuthMode ?? undefined;
   const isTrustedProxy = authMode === "trusted-proxy";
 
   const pairingHint = (() => {
@@ -112,6 +113,26 @@ export function renderOverview(props: OverviewProps) {
     const hasToken = Boolean(props.settings.token.trim());
     const hasPassword = Boolean(props.password.trim());
     if (shouldShowAuthRequiredHint(hasToken, hasPassword, props.lastErrorCode)) {
+      if (isTrustedProxy) {
+        return html`
+          <div class="muted" style="margin-top: 8px">
+            ${t("overview.auth.trustedProxyRequired")}
+            <div style="margin-top: 6px">
+              <span class="mono">https://your-public-dashboard/</span> → trusted proxy sign-in
+            </div>
+            <div style="margin-top: 6px">
+              <a
+                class="session-link"
+                href="https://docs.openclaw.ai/web/dashboard"
+                target=${EXTERNAL_LINK_TARGET}
+                rel=${buildExternalLinkRel()}
+                title="Control UI auth docs (opens in new tab)"
+                >Docs: Control UI auth</a
+              >
+            </div>
+          </div>
+        `;
+      }
       return html`
         <div class="muted" style="margin-top: 8px">
           ${t("overview.auth.required")}
@@ -119,6 +140,23 @@ export function renderOverview(props: OverviewProps) {
             <span class="mono">openclaw dashboard --no-open</span> → tokenized URL<br />
             <span class="mono">openclaw doctor --generate-gateway-token</span> → set token
           </div>
+          <div style="margin-top: 6px">
+            <a
+              class="session-link"
+              href="https://docs.openclaw.ai/web/dashboard"
+              target=${EXTERNAL_LINK_TARGET}
+              rel=${buildExternalLinkRel()}
+              title="Control UI auth docs (opens in new tab)"
+              >Docs: Control UI auth</a
+            >
+          </div>
+        </div>
+      `;
+    }
+    if (isTrustedProxy) {
+      return html`
+        <div class="muted" style="margin-top: 8px">
+          ${t("overview.auth.trustedProxyFailed")}
           <div style="margin-top: 6px">
             <a
               class="session-link"
@@ -313,9 +351,22 @@ export function renderOverview(props: OverviewProps) {
                   <div class="login-gate__help-title">${t("overview.connection.title")}</div>
                   <ol class="login-gate__steps">
                     <li>${t("overview.connection.step1")}<code>openclaw gateway run</code></li>
-                    <li>${t("overview.connection.step2")}<code>openclaw dashboard --no-open</code></li>
-                    <li>${t("overview.connection.step3")}</li>
-                    <li>${t("overview.connection.step4")}<code>openclaw doctor --generate-gateway-token</code></li>
+                    ${
+                      isTrustedProxy
+                        ? html`
+                          <li>${t("overview.connection.trustedProxyStep2")}</li>
+                          <li>${t("overview.connection.trustedProxyStep3")}</li>
+                        `
+                        : html`
+                          <li>${t("overview.connection.step2")}<code>openclaw dashboard --no-open</code></li>
+                          <li>${t("overview.connection.step3")}</li>
+                          <li>
+                            ${t("overview.connection.step4")}<code
+                              >openclaw doctor --generate-gateway-token</code
+                            >
+                          </li>
+                        `
+                    }
                   </ol>
                   <div class="login-gate__docs">
                     ${t("overview.connection.docsHint")}

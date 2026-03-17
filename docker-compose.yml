@@ -34,8 +34,8 @@ services:
       TELEGRAM_FIELD_OPERATIONS_BOT_PAIRING_CODE: ${TELEGRAM_FIELD_OPERATIONS_BOT_PAIRING_CODE:-}
       TELEGRAM_DATA_PIPELINE_BOT_TOKEN: ${TELEGRAM_DATA_PIPELINE_BOT_TOKEN:-}
       TELEGRAM_DATA_PIPELINE_BOT_PAIRING_CODE: ${TELEGRAM_DATA_PIPELINE_BOT_PAIRING_CODE:-}
-      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
-      TELEGRAM_ACCOUNT_ID: ${TELEGRAM_ACCOUNT_ID:-}
+      TELEGRAM_BOT_TOKEN: ""
+      TELEGRAM_ACCOUNT_ID: ""
       TELEGRAM_ALLOWED_USERS: ${TELEGRAM_ALLOWED_USERS:-}
       OPENCLAW_TELEGRAM_GROUP_POLICY: ${OPENCLAW_TELEGRAM_GROUP_POLICY:-}
       R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID:-}
@@ -66,13 +66,14 @@ services:
     restart: unless-stopped
     command: ["/app/scripts/entrypoint.sh"]
     healthcheck:
-      test: ["CMD-SHELL", "pgrep -f openclaw-gateway >/dev/null"]
+      test: ["CMD-SHELL", "pgrep -f 'node dist/index.js gateway' >/dev/null && node -e \"fetch('http://127.0.0.1:18789/healthz').then((r)=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""]
       interval: 30s
       timeout: 5s
       retries: 5
       start_period: 20s
 
   openclaw-cli:
+    user: "0:0"
     image: ${OPENCLAW_IMAGE:-openclaw:local}
     network_mode: "service:openclaw-gateway"
     env_file:
@@ -95,7 +96,8 @@ services:
       CLAUDE_WEB_COOKIE: ${CLAUDE_WEB_COOKIE:-}
       TELEGRAM_FIELD_OPERATIONS_BOT_TOKEN: ${TELEGRAM_FIELD_OPERATIONS_BOT_TOKEN:-}
       TELEGRAM_DATA_PIPELINE_BOT_TOKEN: ${TELEGRAM_DATA_PIPELINE_BOT_TOKEN:-}
-      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      TELEGRAM_BOT_TOKEN: ""
+      TELEGRAM_ACCOUNT_ID: ""
       TZ: ${OPENCLAW_TZ:-UTC}
     volumes:
       - ${DATA_VOLUME_SOURCE:-./data}:/data

@@ -142,6 +142,7 @@ export class OpenClawApp extends LitElement {
   @state() assistantName = bootAssistantIdentity.name;
   @state() assistantAvatar = bootAssistantIdentity.avatar;
   @state() assistantAgentId = bootAssistantIdentity.agentId ?? null;
+  @state() bootstrapAuthMode: "none" | "token" | "password" | "trusted-proxy" | null = null;
   @state() serverVersion: string | null = null;
 
   @state() sessionKey = this.settings.sessionKey;

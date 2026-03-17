@@ -101,6 +101,17 @@ describe("resolveGatewayRuntimeConfig", () => {
         expectedMessage:
           "gateway auth mode=trusted-proxy requires gateway.trustedProxies to be configured",
       },
+      {
+        name: "lan binding without control ui allowed origins",
+        cfg: {
+          gateway: {
+            bind: "lan" as const,
+            auth: TRUSTED_PROXY_AUTH,
+            trustedProxies: ["192.168.1.1"],
+          },
+        },
+        expectedMessage: "non-loopback Control UI requires gateway.controlUi.allowedOrigins",
+      },
     ])("rejects $name", async ({ cfg, expectedMessage }) => {
       await expect(resolveGatewayRuntimeConfig({ cfg, port: 18789 })).rejects.toThrow(
         expectedMessage,
