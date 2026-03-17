@@ -122,4 +122,19 @@ describe("runtime deployment config", () => {
       },
     });
   });
+
+  it("supports CIDR-based trusted proxy defaults for compose-managed deployments", () => {
+    const result = applyTrustedProxyPublicDeploymentConfig(
+      {},
+      {
+        OPENCLAW_PUBLIC_HOSTNAME: "my-farm-advisor.superiorbyteworks.com",
+        OPENCLAW_TRUSTED_PROXY_IPS: "10.0.2.3/32,172.30.0.2/32",
+      },
+    );
+
+    expect(result.gateway?.trustedProxies).toEqual(["10.0.2.3/32", "172.30.0.2/32"]);
+    expect(result.gateway?.controlUi?.allowedOrigins).toEqual([
+      "https://my-farm-advisor.superiorbyteworks.com",
+    ]);
+  });
 });
