@@ -47,6 +47,18 @@ Implications:
 - Your reverse proxy auth policy and `allowUsers` become the effective access control.
 - Keep gateway ingress locked to trusted proxy IPs only (`gateway.trustedProxies` + firewall).
 
+## Cloudflare Access Dashboard Pattern
+
+For the Cloudflare-only public dashboard pattern used by this repo's Coolify deployment docs:
+
+- Public admins start at the root dashboard URL, for example `https://my-farm-advisor.superiorbyteworks.com/`
+- Cloudflare Access is the only public login layer
+- OpenClaw trusts Cloudflare Access headers only after the request arrives from an IP in `gateway.trustedProxies`
+- `gateway.controlUi.allowedOrigins` must list the exact public HTTPS origin
+- Do not treat token bootstrap, password entry, pairing bootstrap, wildcard origins, host-header fallback, or `allowInsecureAuth` as the public admin path
+
+This deployment shape keeps local and private flows on their existing tokenized bootstrap path, but the supported public internet path is dashboard root plus trusted-proxy auth.
+
 ## Configuration
 
 ```json5
@@ -80,13 +92,14 @@ If `gateway.bind` is `loopback`, include a loopback proxy address in
 
 ### Configuration Reference
 
-| Field                                       | Required | Description                                                                 |
-| ------------------------------------------- | -------- | --------------------------------------------------------------------------- |
-| `gateway.trustedProxies`                    | Yes      | Array of proxy IP addresses to trust. Requests from other IPs are rejected. |
-| `gateway.auth.mode`                         | Yes      | Must be `"trusted-proxy"`                                                   |
-| `gateway.auth.trustedProxy.userHeader`      | Yes      | Header name containing the authenticated user identity                      |
-| `gateway.auth.trustedProxy.requiredHeaders` | No       | Additional headers that must be present for the request to be trusted       |
-| `gateway.auth.trustedProxy.allowUsers`      | No       | Allowlist of user identities. Empty means allow all authenticated users.    |
+| Field                                       | Required                            | Description                                                                 |
+| ------------------------------------------- | ----------------------------------- | --------------------------------------------------------------------------- |
+| `gateway.trustedProxies`                    | Yes                                 | Array of proxy IP addresses to trust. Requests from other IPs are rejected. |
+| `gateway.auth.mode`                         | Yes                                 | Must be `"trusted-proxy"`                                                   |
+| `gateway.auth.trustedProxy.userHeader`      | Yes                                 | Header name containing the authenticated user identity                      |
+| `gateway.auth.trustedProxy.requiredHeaders` | No                                  | Additional headers that must be present for the request to be trusted       |
+| `gateway.auth.trustedProxy.allowUsers`      | No                                  | Allowlist of user identities. Empty means allow all authenticated users.    |
+| `gateway.controlUi.allowedOrigins`          | Yes for non-loopback browser access | Exact browser origins allowed to open the Control UI                        |
 
 ## TLS termination and HSTS
 
@@ -262,6 +275,7 @@ Before enabling trusted-proxy auth, verify:
 - [ ] **Proxy strips headers**: Your proxy overwrites (not appends) `x-forwarded-*` headers from clients
 - [ ] **TLS termination**: Your proxy handles TLS; users connect via HTTPS
 - [ ] **allowUsers is set** (recommended): Restrict to known users rather than allowing anyone authenticated
+- [ ] **allowedOrigins is explicit**: `gateway.controlUi.allowedOrigins` lists each public HTTPS origin exactly, with no `*`
 
 ## Security Audit
 

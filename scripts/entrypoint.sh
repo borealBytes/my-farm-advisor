@@ -168,6 +168,15 @@ fi
 
 node <<'EOF'
 const fs = require('fs');
+const { execSync } = require('child_process');
+
+(async () => {
+const { buildDefaultControlUiAllowedOrigins, mergeControlUiAllowedOrigins } = await import(
+  'file:///app/dist/config/gateway-control-ui-origins.js'
+);
+const { applyTrustedProxyPublicDeploymentConfig } = await import(
+  'file:///app/dist/gateway/runtime-deployment-config.js'
+);
 
 const configPath = '/data/openclaw.json';
 let config = {};
@@ -215,7 +224,6 @@ const parseBooleanEnv = value => {
   return null;
 };
 
-const { execSync } = require('child_process');
 const shouldResetPollingRaw = process.env.TELEGRAM_FORCE_POLLING_RESET ?? '';
 const shouldResetPolling = parseBooleanEnv(shouldResetPollingRaw) ?? false;
 
@@ -281,10 +289,29 @@ const gatewayToken = process.env.OPENCLAW_GATEWAY_TOKEN?.trim();
 
 config.gateway ??= {};
 config.gateway.controlUi ??= {};
-config.gateway.controlUi.allowedOrigins ??= [
-  'http://127.0.0.1:18789',
-  'http://localhost:18789',
-];
+const defaultControlUiOrigins = buildDefaultControlUiAllowedOrigins({
+  port: 18789,
+  bind: 'lan',
+});
+const bootstrappedPublicOrigin = process.env.OPENCLAW_PUBLIC_HOSTNAME?.trim()
+  ? (() => {
+      try {
+        const candidate = process.env.OPENCLAW_PUBLIC_HOSTNAME.includes('://')
+          ? process.env.OPENCLAW_PUBLIC_HOSTNAME
+          : `https://${process.env.OPENCLAW_PUBLIC_HOSTNAME}`;
+        return new URL(candidate).origin;
+      } catch {
+        return undefined;
+      }
+    })()
+  : undefined;
+config.gateway.controlUi.allowedOrigins = mergeControlUiAllowedOrigins(
+  Array.isArray(config.gateway.controlUi.allowedOrigins)
+    ? config.gateway.controlUi.allowedOrigins
+    : undefined,
+  defaultControlUiOrigins,
+  bootstrappedPublicOrigin ? [bootstrappedPublicOrigin] : undefined,
+);
 if (config.gateway.controlUi.allowInsecureAuth === undefined) {
   config.gateway.controlUi.allowInsecureAuth = true;
 }
@@ -303,6 +330,7 @@ const gatewayModeEnv = process.env.OPENCLAW_GATEWAY_MODE?.trim();
 if (!config.gateway.mode) {
   config.gateway.mode = gatewayModeEnv || 'local';
 }
+config = applyTrustedProxyPublicDeploymentConfig(config, process.env);
 
 const telegramGroupPolicy = process.env.OPENCLAW_TELEGRAM_GROUP_POLICY?.trim();
 if (telegramGroupPolicy) {
@@ -677,6 +705,10 @@ if (!hasAnyAccountAllowFrom) {
     }
   }
 }
+})().catch(err => {
+  console.error(`Failed to bootstrap runtime config: ${err.message}`);
+  process.exit(1);
+});
 EOF
 
 for file in SOUL.md USER.md AGENTS.md TOOLS.md IDENTITY.md IDENTITY.data-pipeline.md; do

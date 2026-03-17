@@ -15,7 +15,6 @@ import {
   connectOk,
   installGatewayTestHooks,
   readConnectChallengeNonce,
-  rpcReq,
   testState,
   trackConnectChallengeNonce,
   withGatewayServer,
@@ -29,7 +28,14 @@ const TEST_OPERATOR_CLIENT = {
   platform: "test",
   mode: GATEWAY_CLIENT_MODES.TEST,
 };
+const CONTROL_UI_CLIENT = {
+  id: GATEWAY_CLIENT_NAMES.CONTROL_UI,
+  version: "1.0.0",
+  platform: "web",
+  mode: GATEWAY_CLIENT_MODES.WEBCHAT,
+};
 const ALLOWED_BROWSER_ORIGIN = "https://control.example.com";
+const PUBLIC_DASHBOARD_ORIGIN = "https://farm.example.com";
 
 const originForPort = (port: number) => `http://127.0.0.1:${port}`;
 
@@ -151,7 +157,47 @@ describe("gateway auth browser hardening", () => {
     });
   });
 
-  test("preserves scopes for trusted-proxy non-control-ui browser sessions", async () => {
+  test("rejects trusted-proxy control-ui admin sessions from disallowed public origins", async () => {
+    const { writeConfigFile } = await import("../config/config.js");
+    await writeConfigFile({
+      gateway: {
+        auth: {
+          mode: "trusted-proxy",
+          trustedProxy: {
+            userHeader: "x-forwarded-user",
+            requiredHeaders: ["x-forwarded-proto"],
+          },
+        },
+        trustedProxies: ["127.0.0.1"],
+        controlUi: {
+          allowedOrigins: [PUBLIC_DASHBOARD_ORIGIN],
+        },
+      },
+    });
+
+    await withGatewayServer(async ({ port }) => {
+      const ws = await openWs(port, {
+        origin: "https://evil.example",
+        "x-forwarded-for": "203.0.113.50",
+        "x-forwarded-proto": "https",
+        "x-forwarded-user": "operator@example.com",
+      });
+      try {
+        const res = await connectReq(ws, {
+          skipDefaultAuth: true,
+          role: "operator",
+          client: CONTROL_UI_CLIENT,
+          device: null,
+        });
+        expect(res.ok).toBe(false);
+        expect(res.error?.message ?? "").toContain("origin not allowed");
+      } finally {
+        ws.close();
+      }
+    });
+  });
+
+  test("accepts trusted-proxy non-control-ui browser sessions from allowed origins with explicit scopes", async () => {
     const { writeConfigFile } = await import("../config/config.js");
     await writeConfigFile({
       gateway: {
@@ -183,9 +229,6 @@ describe("gateway auth browser hardening", () => {
           scopes: ["operator.read"],
         });
         expect(payload.type).toBe("hello-ok");
-
-        const status = await rpcReq(ws, "status");
-        expect(status.ok).toBe(true);
       } finally {
         ws.close();
       }

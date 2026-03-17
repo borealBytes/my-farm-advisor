@@ -127,6 +127,15 @@ const TRUSTED_PROXY_CONTROL_UI_HEADERS = {
   "x-forwarded-user": "peter@example.com",
 } as const;
 
+const PUBLIC_TRUSTED_PROXY_CONTROL_UI_ORIGIN = "https://farm.example.com";
+
+const PUBLIC_TRUSTED_PROXY_CONTROL_UI_HEADERS = {
+  origin: PUBLIC_TRUSTED_PROXY_CONTROL_UI_ORIGIN,
+  "x-forwarded-for": "203.0.113.10",
+  "x-forwarded-proto": "https",
+  "x-forwarded-user": "peter@example.com",
+} as const;
+
 const NODE_CLIENT = {
   id: GATEWAY_CLIENT_NAMES.NODE_HOST,
   version: "1.0.0",
@@ -228,13 +237,16 @@ async function configureTrustedProxyControlUiAuth() {
   await writeTrustedProxyControlUiConfig();
 }
 
-async function writeTrustedProxyControlUiConfig(params?: { allowInsecureAuth?: boolean }) {
+async function writeTrustedProxyControlUiConfig(params?: {
+  allowInsecureAuth?: boolean;
+  allowedOrigins?: string[];
+}) {
   const { writeConfigFile } = await import("../config/config.js");
   await writeConfigFile({
     gateway: {
       trustedProxies: ["127.0.0.1"],
       controlUi: {
-        allowedOrigins: ["https://localhost"],
+        allowedOrigins: params?.allowedOrigins ?? ["https://localhost"],
         ...(params?.allowInsecureAuth ? { allowInsecureAuth: true } : {}),
       },
     },
@@ -372,6 +384,8 @@ export {
   openTailscaleWs,
   openWs,
   originForPort,
+  PUBLIC_TRUSTED_PROXY_CONTROL_UI_HEADERS,
+  PUBLIC_TRUSTED_PROXY_CONTROL_UI_ORIGIN,
   readConnectChallengeNonce,
   resolveGatewayTokenOrEnv,
   restoreGatewayToken,

@@ -25,6 +25,9 @@ services:
       OPENCLAW_WORKSPACE_DIR: /data/workspace
       
       OPENCLAW_GATEWAY_BIND: lan
+      OPENCLAW_TRUSTED_PROXY_IPS: ${OPENCLAW_CLOUDFLARED_IPV4:-172.30.0.2}
+      OPENCLAW_TRUSTED_PROXY_USER_HEADER: ${OPENCLAW_TRUSTED_PROXY_USER_HEADER:-cf-access-authenticated-user-email}
+      OPENCLAW_TRUSTED_PROXY_REQUIRED_HEADERS: ${OPENCLAW_TRUSTED_PROXY_REQUIRED_HEADERS:-cf-access-jwt-assertion,x-forwarded-proto}
       TZ: ${TZ:-UTC}
       
       # Security
@@ -84,6 +87,10 @@ services:
     
     volumes:
       - openclaw-data:/data
+    networks:
+      openclaw-tunnel:
+        aliases:
+          - openclaw-gateway
     
     init: true
     restart: unless-stopped
@@ -115,6 +122,9 @@ services:
       OPENCLAW_PUBLIC_HOSTNAME: ${OPENCLAW_PUBLIC_HOSTNAME:-}
       CLOUDFLARED_ORIGIN_URL: http://openclaw-gateway:18789
     entrypoint: ["/usr/local/bin/cloudflared-entrypoint.sh"]
+    networks:
+      openclaw-tunnel:
+        ipv4_address: ${OPENCLAW_CLOUDFLARED_IPV4:-172.30.0.2}
 
   openclaw-cli:
     profiles: ["cli"]
@@ -150,3 +160,10 @@ services:
 
 volumes:
   openclaw-data:
+
+networks:
+  openclaw-tunnel:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: ${OPENCLAW_TUNNEL_SUBNET:-172.30.0.0/29}

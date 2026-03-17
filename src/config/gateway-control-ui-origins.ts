@@ -27,6 +27,24 @@ export function resolveGatewayPortWithDefault(
   return typeof port === "number" && port > 0 ? port : fallback;
 }
 
+export function mergeControlUiAllowedOrigins(
+  ...groups: Array<Iterable<string> | undefined>
+): string[] {
+  const origins = new Set<string>();
+  for (const group of groups) {
+    if (!group) {
+      continue;
+    }
+    for (const value of group) {
+      const origin = value.trim();
+      if (origin) {
+        origins.add(origin);
+      }
+    }
+  }
+  return [...origins];
+}
+
 export function buildDefaultControlUiAllowedOrigins(params: {
   port: number;
   bind: unknown;
