@@ -1,0 +1,4 @@
+[submodule "skills/antigravity"]
+	path = skills/antigravity
+	url = https://github.com/sickn33/antigravity-awesome-skills.git
+	sparsecheckout = true

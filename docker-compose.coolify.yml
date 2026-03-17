@@ -1,0 +1,171 @@
+# Coolify-optimized docker-compose for OpenClaw Gateway
+# Deploy behind Cloudflare ZeroTrust for secure public access
+#
+# Key differences from local:
+# - R2 for persistent data (keeps data off the VPS)
+# - Security hardening for production
+
+services:
+  openclaw-gateway:
+    user: "0:0"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ${OPENCLAW_IMAGE:-openclaw:local}
+    privileged: true
+    cap_add:
+      - SYS_ADMIN
+      - DAC_READ_SEARCH
+    environment:
+      # Core paths
+      HOME: /home/node
+      TERM: xterm-256color
+      NODE_ENV: production
+      OPENCLAW_STATE_DIR: /data
+      OPENCLAW_WORKSPACE_DIR: /data/workspace
+      
+      OPENCLAW_GATEWAY_BIND: lan
+      OPENCLAW_TRUSTED_PROXY_IPS: ${OPENCLAW_TRUSTED_PROXY_IPS:-10.0.2.3/32,172.30.0.2/32}
+      OPENCLAW_TRUSTED_PROXY_USER_HEADER: ${OPENCLAW_TRUSTED_PROXY_USER_HEADER:-cf-access-authenticated-user-email}
+      OPENCLAW_TRUSTED_PROXY_REQUIRED_HEADERS: ${OPENCLAW_TRUSTED_PROXY_REQUIRED_HEADERS:-cf-access-jwt-assertion,x-forwarded-proto}
+      TZ: ${TZ:-UTC}
+      
+      # Security
+      OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN:-}
+      OPENCLAW_ALLOW_INSECURE_PRIVATE_WS: ${OPENCLAW_ALLOW_INSECURE_PRIVATE_WS:-}
+      
+      # Browser control - bind to localhost only (ZeroTrust tunnels to this)
+      OPENCLAW_BROWSER_CONTROL_HOST: 127.0.0.1
+      OPENCLAW_BROWSER_CONTROL_BIND: 127.0.0.1
+      
+      # Model providers
+      CLAUDE_AI_SESSION_KEY: ${CLAUDE_AI_SESSION_KEY:-}
+      CLAUDE_WEB_SESSION_KEY: ${CLAUDE_WEB_SESSION_KEY:-}
+      CLAUDE_WEB_COOKIE: ${CLAUDE_WEB_COOKIE:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      NVIDIA_API_KEY: ${NVIDIA_API_KEY:-}
+      NVIDIA_BASE_URL: ${NVIDIA_BASE_URL:-https://integrate.api.nvidia.com/v1}
+      PRIMARY_MODEL: ${PRIMARY_MODEL:-openrouter/openrouter/hunter-alpha}
+      FALLBACK_MODELS: ${FALLBACK_MODELS:-openrouter/openrouter/healer-alpha,openrouter/nvidia/nemotron-3-super-120b-a12b,openrouter/openrouter/free,nvidia/stepfun-ai/step-3.5-flash,nvidia/qwen/qwen3.5-397b-a17b,nvidia/moonshotai/kimi-k2.5,openrouter/stepfun/step-3.5-flash}
+      
+      # Telegram
+      TELEGRAM_FIELD_OPERATIONS_BOT_TOKEN: ${TELEGRAM_FIELD_OPERATIONS_BOT_TOKEN:-}
+      TELEGRAM_FIELD_OPERATIONS_BOT_PAIRING_CODE: ${TELEGRAM_FIELD_OPERATIONS_BOT_PAIRING_CODE:-}
+      TELEGRAM_FIELD_OPERATIONS_ALLOWED_USERS: ${TELEGRAM_FIELD_OPERATIONS_ALLOWED_USERS:-}
+      TELEGRAM_DATA_PIPELINE_BOT_TOKEN: ${TELEGRAM_DATA_PIPELINE_BOT_TOKEN:-}
+      TELEGRAM_DATA_PIPELINE_BOT_PAIRING_CODE: ${TELEGRAM_DATA_PIPELINE_BOT_PAIRING_CODE:-}
+      TELEGRAM_DATA_PIPELINE_ALLOWED_USERS: ${TELEGRAM_DATA_PIPELINE_ALLOWED_USERS:-}
+      TELEGRAM_DATA_PIPELINE_BOT_ALLOWED_USERS: ${TELEGRAM_DATA_PIPELINE_BOT_ALLOWED_USERS:-}
+      TELEGRAM_BOT_TOKEN: ""
+      TELEGRAM_ACCOUNT_ID: ""
+      TELEGRAM_ALLOWED_USERS: ${TELEGRAM_ALLOWED_USERS:-}
+      OPENCLAW_TELEGRAM_GROUP_POLICY: ${OPENCLAW_TELEGRAM_GROUP_POLICY:-allowlist}
+      
+      # R2 persistence
+      R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID:-}
+      R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY:-}
+      R2_BUCKET_NAME: ${R2_BUCKET_NAME:-my-farm-advisor}
+      R2_ENDPOINT: ${R2_ENDPOINT:-}
+      CF_ACCOUNT_ID: ${CF_ACCOUNT_ID:-}
+      DATA_MODE: ${DATA_MODE:-volume}
+      WORKSPACE_DATA_R2_RCLONE_MOUNT: ${WORKSPACE_DATA_R2_RCLONE_MOUNT:-0}
+      WORKSPACE_DATA_R2_PREFIX: ${WORKSPACE_DATA_R2_PREFIX:-workspace/data}
+      
+      # Optional: skill sync control
+      # OPENCLAW_SYNC_SKILLS_ON_START: 1
+      OPENCLAW_SYNC_SKILLS_OVERWRITE: ${OPENCLAW_SYNC_SKILLS_OVERWRITE:-1}
+      OPENCLAW_FORCE_SKILL_SYNC: ${OPENCLAW_FORCE_SKILL_SYNC:-0}
+      OPENCLAW_BOOTSTRAP_REFRESH: ${OPENCLAW_BOOTSTRAP_REFRESH:-0}
+      OPENCLAW_MEMORY_SEARCH_ENABLED: ${OPENCLAW_MEMORY_SEARCH_ENABLED:-0}
+      
+      # AWS CLI for R2 sync
+      AWS_CLI_AUTO_PROMPT: on-partial
+    
+    ports:
+      - "127.0.0.1:18789:18789"
+    
+    volumes:
+      - openclaw-data:/data
+    networks:
+      openclaw-tunnel:
+        ipv4_address: ${OPENCLAW_GATEWAY_IPV4:-172.30.0.3}
+        aliases:
+          - openclaw-gateway
+    
+    init: true
+    restart: unless-stopped
+    command: ["/app/scripts/entrypoint.sh"]
+    
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:18789/healthz').then((r)=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 360s
+
+  cloudflared:
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM cloudflare/cloudflared:latest AS cloudflared
+        FROM alpine:3.20
+        RUN apk add --no-cache ca-certificates
+        COPY --from=cloudflared /usr/local/bin/cloudflared /usr/local/bin/cloudflared
+        COPY scripts/cloudflared-entrypoint.sh /usr/local/bin/cloudflared-entrypoint.sh
+        RUN chmod 755 /usr/local/bin/cloudflared-entrypoint.sh
+    image: ${OPENCLAW_CLOUDFLARED_IMAGE:-openclaw-cloudflared:local}
+    restart: on-failure
+    depends_on:
+      - openclaw-gateway
+    environment:
+      CLOUDFLARE_TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN:-}
+      OPENCLAW_PUBLIC_HOSTNAME: ${OPENCLAW_PUBLIC_HOSTNAME:-}
+      CLOUDFLARED_ORIGIN_URL: http://openclaw-gateway:18789
+    entrypoint: ["/usr/local/bin/cloudflared-entrypoint.sh"]
+    networks:
+      openclaw-tunnel:
+        ipv4_address: ${OPENCLAW_CLOUDFLARED_IPV4:-172.30.0.2}
+
+  openclaw-cli:
+    profiles: ["cli"]
+    user: "0:0"
+    image: ${OPENCLAW_IMAGE:-openclaw:local}
+    network_mode: "service:openclaw-gateway"
+    cap_drop:
+      - NET_RAW
+      - NET_ADMIN
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      HOME: /home/node
+      TERM: xterm-256color
+      OPENCLAW_STATE_DIR: /data
+      OPENCLAW_WORKSPACE_DIR: /data/workspace
+      OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN:-}
+      OPENCLAW_ALLOW_INSECURE_PRIVATE_WS: ${OPENCLAW_ALLOW_INSECURE_PRIVATE_WS:-}
+      BROWSER: echo
+      CLAUDE_AI_SESSION_KEY: ${CLAUDE_AI_SESSION_KEY:-}
+      CLAUDE_WEB_SESSION_KEY: ${CLAUDE_WEB_SESSION_KEY:-}
+      CLAUDE_WEB_COOKIE: ${CLAUDE_WEB_COOKIE:-}
+      TELEGRAM_FIELD_OPERATIONS_BOT_TOKEN: ${TELEGRAM_FIELD_OPERATIONS_BOT_TOKEN:-}
+      TELEGRAM_DATA_PIPELINE_BOT_TOKEN: ${TELEGRAM_DATA_PIPELINE_BOT_TOKEN:-}
+      TELEGRAM_BOT_TOKEN: ""
+      TELEGRAM_ACCOUNT_ID: ""
+      TZ: ${TZ:-UTC}
+    volumes:
+      - openclaw-data:/data
+    stdin_open: true
+    tty: true
+    init: true
+    entrypoint: ["node", "dist/index.js"]
+
+volumes:
+  openclaw-data:
+
+networks:
+  openclaw-tunnel:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: ${OPENCLAW_TUNNEL_SUBNET:-172.30.0.0/29}
