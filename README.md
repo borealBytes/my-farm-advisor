@@ -2,6 +2,12 @@
 
 ![My Farm Advisor rooted farm intelligence hero](docs/assets/my-farm-adviser-hero-1.png)
 
+<!-- markdownlint-disable-next-line MD033 -->
+
+<video src="docs/assets/github-teaser.mp4" controls muted playsinline preload="metadata"></video>
+
+_If the embedded teaser does not render in your viewer, open [`docs/assets/github-teaser.mp4`](docs/assets/github-teaser.mp4) directly._
+
 My Farm Advisor is a farm intelligence and research assistant built on upstream OpenClaw and shaped by the farm-science principles in `SOUL.md` and the operator needs in `USER.md`.
 
 We use `advisor` deliberately. In this project the system is an authoritative, evidence-based component grounded in science, reproducible methods, and validated skills; it is not casual hearsay or a friendly guess. `Advisor` fits the formal system role we want the product to play.
@@ -21,6 +27,33 @@ This repository tracks real upstream OpenClaw as its runtime base.
 
 - Core runtime, gateway, Docker flow, and channel support come from `openclaw/openclaw`
 - Farm-specific behavior lives in `SOUL.md`, `USER.md`, and retained custom skills in `skills/`
+
+```mermaid
+flowchart LR
+    accTitle: My Farm Advisor Repo Architecture
+    accDescr: High-level overview showing the upstream OpenClaw runtime as the base, the farm and writing skill packs as the custom intelligence layer, and the resulting operator-facing outputs and deployment paths.
+
+    upstream([⚙️ Upstream OpenClaw runtime]) --> custom_layer[🌾 Custom farm advisor layer]
+
+    subgraph skill_layer ["📚 Retained custom skills"]
+        direction TB
+        farm_skill[My Farm Advisor]
+        specialist_skills[Breeding, QTL, forecasting]
+        wrighter[Wrighter]
+    end
+
+    custom_layer --> skill_layer
+    skill_layer --> outputs[🚜 Operator outputs, reports, and walkthroughs]
+    skill_layer --> deploy[☁️ Docker and Zero Trust deployment paths]
+
+    classDef primary fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a5f
+    classDef support fill:#ecfccb,stroke:#65a30d,stroke-width:2px,color:#365314
+    classDef outcome fill:#f3e8ff,stroke:#9333ea,stroke-width:2px,color:#581c87
+
+    class upstream,custom_layer primary
+    class farm_skill,specialist_skills,wrighter support
+    class outputs,deploy outcome
+```
 
 ## Who It Is For
 
@@ -48,9 +81,9 @@ Both agents follow the evidence-first, test-before-scaling practices defined in 
 The active custom layer currently keeps these skills:
 
 - [`skills/my-farm-advisor/`](skills/my-farm-advisor/README.md)
-- `skills/my-farm-breeding-trial-management/`
-- `skills/my-farm-qtl-analysis/`
-- `skills/superior-byte-works-google-timesfm-forecasting/`
+- [`skills/my-farm-breeding-trial-management/`](skills/my-farm-breeding-trial-management/README.md)
+- [`skills/my-farm-qtl-analysis/`](skills/my-farm-qtl-analysis/README.md)
+- [`skills/superior-byte-works-google-timesfm-forecasting/`](skills/superior-byte-works-google-timesfm-forecasting/README.md)
 - [`skills/superior-byte-works-wrighter/`](skills/superior-byte-works-wrighter/README.md)
 
 These sit on top of the upstream OpenClaw skill system rather than replacing it.
@@ -69,13 +102,26 @@ Together, those two skill packs cover the project's two most important custom la
 
 ```mermaid
 flowchart TD
-    Start[What are you trying to do?] --> Farm{Farm decision or farm data work?}
-    Farm -->|Yes| MFA[Start with skills/my-farm-advisor]
-    Farm -->|No| Writing{Writing, diagrams, reports, or walkthroughs?}
-    Writing -->|Yes| Wrighter[Start with skills/superior-byte-works-wrighter]
-    Writing -->|No| Other[Use the other bundled skill packs for breeding, QTL, or forecasting work]
-    MFA --> Ops[Field operations, imagery, soil, weather, reporting, strategy]
-    Wrighter --> Docs[Docs, Mermaid, research synthesis, delivery artifacts]
+    accTitle: Skill Entry Decision Guide
+    accDescr: Decision flow for choosing whether to start with the farm umbrella skill, the Wrighter documentation skill, or one of the more specialized farm skill packs.
+
+    start([🎯 Pick a starting skill]) --> farm_question{Farm decision or farm data work?}
+    farm_question -->|Yes| farm_skill[🌾 Start with My Farm Advisor]
+    farm_question -->|No| writing_question{Writing, diagrams, or reports?}
+    writing_question -->|Yes| wrighter_skill[🖋️ Start with Wrighter]
+    writing_question -->|No| specialist_skill[🧪 Start with a specialist farm skill]
+
+    farm_skill --> farm_scope[Field operations, imagery, soil, weather, strategy]
+    wrighter_skill --> wrighter_scope[Docs, Mermaid, walkthroughs, delivery artifacts]
+    specialist_skill --> specialist_scope[Breeding trials, QTL analysis, or forecasting]
+
+    classDef primary fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a5f
+    classDef secondary fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d
+    classDef tertiary fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#78350f
+
+    class start,farm_skill,wrighter_skill primary
+    class farm_scope,wrighter_scope secondary
+    class specialist_skill,specialist_scope tertiary
 ```
 
 As a rule of thumb:

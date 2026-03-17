@@ -1,3 +1,4 @@
 * text=auto eol=lf
 CLAUDE.md -text
 src/gateway/server-methods/CLAUDE.md -text
+docs/assets/*.mp4 filter=lfs diff=lfs merge=lfs -text
