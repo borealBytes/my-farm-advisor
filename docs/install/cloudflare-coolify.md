@@ -12,6 +12,10 @@ title: "Cloudflare + Coolify"
 
 Use this runbook when you want one public app hostname, a private VPS origin, and the supported Coolify deployment contract.
 
+It also covers the common follow-up shape where you keep the main public hostname behind Cloudflare Access, add a secondary pinned hostname through the same tunnel policy, and shut off any temporary direct `http://` exposure from the VPS or Coolify after onboarding.
+
+This runbook now reflects the validated deployment sequence captured in [`docs/install/cloudflare-coolify-walkthrough.md`](cloudflare-coolify-walkthrough.md), which records the real-world Coolify + Cloudflare Zero Trust steps we actually exercised.
+
 Public admins open `https://<OPENCLAW_PUBLIC_HOSTNAME>/`. Cloudflare Access is the only public login layer, then the same-compose `cloudflared` sidecar forwards trusted-proxy requests to the loopback-only gateway origin.
 
 ## What are we doing
@@ -53,9 +57,11 @@ Caption: Traffic enters through Cloudflare, while the gateway port stays bound t
 - In Cloudflare, create a token-based tunnel and copy the token.
 - Set `OPENCLAW_PUBLIC_HOSTNAME` to the public hostname you want.
 - In the tunnel dashboard, point that hostname to `http://openclaw-gateway:18789`.
-- Add a Cloudflare Access self-hosted app for the same hostname.
+- Add a Cloudflare Access self-hosted app for the same hostname before you share the URL publicly.
+- If you want a secondary pinned hostname, add it to the same tunnel and reuse the same Access policy shape.
 - Keep the gateway in trusted-proxy mode with explicit `gateway.controlUi.allowedOrigins` and explicit trusted proxy IPs.
 - In Coolify, deploy `docker-compose.coolify.yml` with `CLOUDFLARE_TUNNEL_TOKEN`, `OPENCLAW_PUBLIC_HOSTNAME`, and the normal gateway env vars.
+- After the tunnel path works, remove any temporary public `http://` path from Coolify or the VPS and leave Cloudflare as the only public entry.
 
 ## Before you start
 
@@ -65,6 +71,22 @@ Caption: Traffic enters through Cloudflare, while the gateway port stays bound t
 - You have a strong `OPENCLAW_GATEWAY_TOKEN` ready.
 - You know the hostname you want to publish, for example `my-farm-advisor.superiorbyteworks.com`.
 - You are not trying to expose a raw public origin. `OPENCLAW_PUBLIC_HTTP` is not part of the supported contract.
+
+## Validated operator sequence
+
+This is the deployment order that was actually walked through end to end:
+
+1. Install Coolify on a clean machine.
+2. Put Coolify itself behind Cloudflare before you publish the app.
+3. Create the tunnel and Access policy in Cloudflare.
+4. Add the GitHub source in Coolify.
+5. Create the project and resource for the target repo and branch.
+6. Use Docker Compose mode with `docker-compose.coolify.yml`.
+7. Paste env vars in Coolify, save them, then deploy.
+8. Watch live logs until the gateway and `cloudflared` settle.
+9. Verify the protected hostname, then remove any temporary direct public domain or raw-IP path.
+
+Why this matters: the validated flow secures the control plane first, keeps GitHub as the durable source of truth, and ends with Cloudflare as the only public ingress path.
 
 ## One-time Cloudflare prep
 
@@ -141,7 +163,29 @@ Use these values:
 - Login method: `One-Time PIN`
 - Identity headers: keep Cloudflare Access defaults so the gateway can trust `cf-access-authenticated-user-email` and require `cf-access-jwt-assertion`
 
+If Cloudflare shows a `Protect with Access` toggle on the tunnel route, enable it for this hostname.
+
 Why this matters: the supported public admin path is the dashboard root, and Cloudflare Access is the login gate for every public request.
+
+### Step 4a: Optional secondary pinned hostname under the same policy
+
+Use this when you want a second Cloudflare-published hostname for the same Coolify app, but you do not want a different public auth story.
+
+Inside the same tunnel:
+
+- add a second public hostname
+- keep the service type `HTTP`
+- keep the service URL `http://openclaw-gateway:18789`
+
+For Access:
+
+- reuse the same `One-Time PIN` login method
+- reuse the same allow policy or identity rules as the primary hostname
+- do not create a weaker bypass path for the secondary hostname
+
+Important boundary: `OPENCLAW_PUBLIC_HOSTNAME` bootstraps the primary public browser origin only. If browsers will actually open the secondary hostname, add that exact `https://...` origin to `gateway.controlUi.allowedOrigins` too.
+
+Why this matters: the tunnel can publish more than one hostname safely, but browser origin policy is still exact-match and each public hostname needs the same Access posture.
 
 ### Step 5: Allow the public browser origin explicitly
 
@@ -189,6 +233,8 @@ In Coolify, deploy this repo with `docker-compose.coolify.yml`.
 
 Do not create a second app for `cloudflared`. The supported contract is one compose deployment with the sidecar already included.
 
+The validated Coolify path is: add the GitHub source, create the project, create the resource, choose the deployment branch deliberately, and then load `docker-compose.coolify.yml` as the compose definition.
+
 ### Step 2: Set the environment values
 
 Use `.env.coolify` as your reference.
@@ -210,6 +256,8 @@ ANTHROPIC_API_KEY=<optional-if-used>
 Why this matters: `CLOUDFLARE_TUNNEL_TOKEN` turns tunnel mode on, and `OPENCLAW_PUBLIC_HOSTNAME` tells Cloudflare which root hostname should represent this app.
 The trusted proxy default is already set for the supported Coolify tunnel shape, so you should not have to discover proxy IPs manually for the normal path.
 
+Operational note from the validated walkthrough: most deployment friction came from getting the env values organized before touching Coolify. Treat the prepared env document as part of the release artifact, then redeploy any time those values change.
+
 ### Step 3: Keep storage persistent
 
 Attach the Coolify persistent volume for `/data`.
@@ -220,6 +268,8 @@ Why this matters: gateway state, workspace data, and seeded config survive resta
 
 Start the deployment and give it a few minutes. The first boot can take longer because the gateway initializes before the health check settles.
 
+Watch the logs live during this step. A temporary `bad gateway` can happen while the origin or tunnel is still coming up, so check readiness in the logs before assuming the whole deploy failed.
+
 ### Step 5: Open the public entry
 
 After the deployment is healthy, Access is ready, `gateway.controlUi.allowedOrigins` includes the public HTTPS origin, and `gateway.trustedProxies` includes only the trusted proxy IPs, open:
@@ -228,11 +278,33 @@ After the deployment is healthy, Access is ready, `gateway.controlUi.allowedOrig
 
 Cloudflare Access should challenge unauthenticated users, then send approved users to the dashboard and admin UI root at `/`.
 
+### Step 6: Turn off temporary public HTTP after onboarding
+
+If you used any temporary direct public path during setup, remove it after the Cloudflare hostname is healthy.
+
+Examples of temporary paths to shut off:
+
+- a Coolify public domain that points straight at the app instead of the tunnel
+- a raw VPS public IP or firewall rule exposing port `18789`
+- any test bookmark using `http://<public-ip>:18789`
+
+Keep this final state:
+
+- `docker-compose.coolify.yml` still maps `127.0.0.1:18789:18789`
+- Cloudflare Tunnel is the only public ingress path
+- Cloudflare Access is the only public login layer
+- the VPS no longer accepts direct public traffic to the gateway port
+
+If your VPS firewall is in scope, the safest end state is no public inbound route to the gateway at all; `cloudflared` should connect out and the browser should come in through Cloudflare only.
+
+Why this matters: the supported contract is Cloudflare-managed public access with a private origin. Temporary direct HTTP is useful for first contact only; leaving it in place weakens the trusted-proxy boundary.
+
 ## Important truths to keep in mind
 
 - `CLOUDFLARE_TUNNEL_TOKEN` present: `cloudflared` starts and publishes the Cloudflare hostname already mapped in the dashboard.
 - `CLOUDFLARE_TUNNEL_TOKEN` blank: the sidecar exits cleanly and the app stays private on `127.0.0.1:18789`.
 - `OPENCLAW_PUBLIC_HOSTNAME` is required when `CLOUDFLARE_TUNNEL_TOKEN` is set.
+- A secondary pinned hostname can reuse the same tunnel and Access policy shape, but every browser-visible hostname still needs its own exact allowed origin.
 - Browser control stays bound to `127.0.0.1` and is outside the public tunnel path.
 - The supported public admin path is the root dashboard URL, not a canvas-first or token-bootstrap flow.
 - Control UI is an admin surface. It still needs explicit `gateway.controlUi.allowedOrigins` for any non-loopback browser deployment.
@@ -336,9 +408,25 @@ Symptoms:
 Check:
 
 - the tunnel public hostname exactly matches `OPENCLAW_PUBLIC_HOSTNAME`
+- any secondary pinned hostname is also mapped to `http://openclaw-gateway:18789`
 - the Access app uses the same hostname
 - `gateway.controlUi.allowedOrigins` includes `https://<OPENCLAW_PUBLIC_HOSTNAME>` exactly
+- if the browser opens a secondary hostname, that exact `https://...` origin is also allowlisted
 - the tunnel service URL still targets `http://openclaw-gateway:18789`
+
+### Temporary public HTTP was left on
+
+Symptoms:
+
+- the app still answers on the VPS public IP or a Coolify-managed public domain
+- Cloudflare Access protects one path, but a second direct path still bypasses it
+
+Check:
+
+- Coolify no longer exposes a direct public domain for this compose app
+- port `18789` is not reachable from the public internet
+- the compose port map still binds only to `127.0.0.1:18789:18789`
+- `curl -I https://<OPENCLAW_PUBLIC_HOSTNAME>` works, while direct public `http://` access no longer does
 
 ### Access is missing or incomplete
 
@@ -379,6 +467,8 @@ Check:
 - Required browser allowlist: exact `https://<OPENCLAW_PUBLIC_HOSTNAME>` in `gateway.controlUi.allowedOrigins`
 - Required trusted boundary: explicit `gateway.trustedProxies`, no wildcard trust
 - Supported tunnel switch: `CLOUDFLARE_TUNNEL_TOKEN`
+- Optional secondary hostname: same tunnel target, same Access policy shape, separate exact browser origin if used
 - Automatic sidecar origin: `CLOUDFLARED_ORIGIN_URL=http://openclaw-gateway:18789`
 - Blank token behavior: keep the origin private on `127.0.0.1:18789`
+- Post-onboarding posture: disable temporary public `http://` access from Coolify or the VPS
 - Browser control stance: private by default, not covered by tunnel safety claims

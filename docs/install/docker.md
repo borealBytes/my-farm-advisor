@@ -393,6 +393,11 @@ Keep the public browser origin explicit in `gateway.controlUi.allowedOrigins`, k
 trusted proxy IPs explicit in `gateway.trustedProxies`, and keep local token bootstrap
 guidance scoped to local or private flows instead of the public Cloudflare path.
 
+For the full Zero Trust contract, use
+[`docs/install/cloudflare-coolify.md`](cloudflare-coolify.md).
+For the validated real-world operator order, use
+[`docs/install/cloudflare-coolify-walkthrough.md`](cloudflare-coolify-walkthrough.md).
+
 Use these environment variables:
 
 ```bash

@@ -62,6 +62,7 @@ legacy/
 .env
 .env.*
 !.env.example
+coolify.env
 CHANGELOG.md
 changelog/
 appcast.xml
