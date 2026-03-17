@@ -91,7 +91,7 @@ Caption: Set up Cloudflare and the gateway in this order so the hostname, Access
 | Access application type     | `self-hosted`                        | Protect the hostname stored in `OPENCLAW_PUBLIC_HOSTNAME`   |
 | Access login method         | `One-Time PIN`                       | Make sure your policy allows the right users                |
 | Allowed origin              | `https://<OPENCLAW_PUBLIC_HOSTNAME>` | Add this exact origin to `gateway.controlUi.allowedOrigins` |
-| Trusted proxy IPs           | explicit sidecar IPs only            | Add only the Cloudflare-facing proxy IPs, never wildcards   |
+| Trusted proxy IPs           | explicit `/32` proxy IPs only        | Add only the Cloudflare-facing proxy IPs, never wildcards   |
 
 ### Step 1: Create the tunnel token
 
@@ -170,6 +170,15 @@ Rules for this setting:
 - do not trust the whole Docker bridge range
 - do not leave a direct path to `openclaw-gateway` outside the proxy boundary
 
+Current default Compose contract:
+
+- `OPENCLAW_TRUSTED_PROXY_IPS=10.0.2.3/32,172.30.0.2/32`
+
+Why these two values exist:
+
+- `10.0.2.3/32` covers the proxy source IP the gateway currently sees in Coolify logs
+- `172.30.0.2/32` covers the fixed `cloudflared` sidecar IP inside the custom tunnel network
+
 Why this matters: trusted-proxy mode is only safe when the gateway accepts forwarded auth headers from explicit proxy IPs and nowhere else.
 
 ## Coolify deployment
@@ -190,6 +199,7 @@ Minimum values for the supported Cloudflare path:
 OPENCLAW_GATEWAY_TOKEN=<long-random-token>
 CLOUDFLARE_TUNNEL_TOKEN=<your-cloudflare-tunnel-token>
 OPENCLAW_PUBLIC_HOSTNAME=<your-public-hostname>
+OPENCLAW_TRUSTED_PROXY_IPS=10.0.2.3/32,172.30.0.2/32
 TZ=America/Chicago
 DATA_MODE=volume
 OPENROUTER_API_KEY=<your-key>
@@ -198,6 +208,7 @@ ANTHROPIC_API_KEY=<optional-if-used>
 ```
 
 Why this matters: `CLOUDFLARE_TUNNEL_TOKEN` turns tunnel mode on, and `OPENCLAW_PUBLIC_HOSTNAME` tells Cloudflare which root hostname should represent this app.
+The trusted proxy default is already set for the supported Coolify tunnel shape, so you should not have to discover proxy IPs manually for the normal path.
 
 ### Step 3: Keep storage persistent
 
