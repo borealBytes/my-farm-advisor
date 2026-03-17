@@ -66,6 +66,22 @@ describe("collectMissingExplicitDefaultAccountWarnings", () => {
     expect(collectMissingExplicitDefaultAccountWarnings(cfg)).toEqual([]);
   });
 
+  it("does not warn when Field Operations is the explicit Telegram default account", () => {
+    const cfg: OpenClawConfig = {
+      channels: {
+        telegram: {
+          defaultAccount: "field-operations",
+          accounts: {
+            "field-operations": { botToken: "field-operations-token" },
+            "data-pipeline": { botToken: "data-pipeline-token" },
+          },
+        },
+      },
+    };
+
+    expect(collectMissingExplicitDefaultAccountWarnings(cfg)).toEqual([]);
+  });
+
   it("normalizes defaultAccount before validating configured account ids", () => {
     const cfg: OpenClawConfig = {
       channels: {
