@@ -113,6 +113,7 @@ export default defineConfig([
       "channels/plugins/actions/telegram": "src/channels/plugins/actions/telegram.ts",
       "telegram/audit": "src/telegram/audit.ts",
       "telegram/token": "src/telegram/token.ts",
+      "routing/bootstrap-telegram-bindings": "src/routing/bootstrap-telegram-bindings.ts",
       "line/accounts": "src/line/accounts.ts",
       "line/send": "src/line/send.ts",
       "line/template-messages": "src/line/template-messages.ts",
