@@ -104,6 +104,14 @@ as the only public login layer, and the root dashboard/admin entry at
 `https://<OPENCLAW_PUBLIC_HOSTNAME>` with explicit trusted-proxy origin and IP
 allowlists.
 
+For the supported farm Telegram setup, keep the roles split cleanly:
+
+- The root dashboard/admin path stays on the web surface only and does not own a Telegram bot.
+- `field-operations` is the default Telegram account and is the farm's main Telegram entry point.
+- `data-pipeline` is a separate named Telegram account and must be routed with an explicit `bindings[].match.accountId` binding.
+- Leave `TELEGRAM_BOT_TOKEN` unset or blank in the supported farm deployment path. It is only a legacy fallback for the default Telegram account.
+- Channel-only Telegram bindings with no `accountId` match the default account only, so they cover `field-operations` and not `data-pipeline`.
+
 ### Local development
 
 ```bash
@@ -136,6 +144,7 @@ Running costs should be minimal—often zero with free tiers.
 - This repo also ships bundled farm skills in `skills/`
 - `SOUL.md` and `USER.md` provide the farm-specific identity layer for this distribution
 - `scripts/fresh-local-bootstrap.sh` stops the stack, clears the bootstrapped workspaces (keeping `data/` and `.venv`), removes `openclaw.json`, then rebuilds with `docker compose up -d --build` for a clean resync.
+- The supported farm Telegram layout is a 3-role model: web-only dashboard/admin root, default Telegram account `field-operations`, and named Telegram account `data-pipeline`.
 - When you know the numeric Telegram user IDs that should reach the bots, set `TELEGRAM_ALLOWED_USERS` (or the per-account overrides) in `.env`; the entrypoint will switch DM access to an allowlist so OpenClaw stops issuing one-time pairing codes after approval ([docs.openclaw.ai/channels/telegram](https://docs.openclaw.ai/channels/telegram)).
 
 ## Upstream Relationship

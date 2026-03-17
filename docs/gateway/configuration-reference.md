@@ -203,9 +203,11 @@ WhatsApp runs through the gateway's web channel (Baileys Web). It starts automat
 }
 ```
 
-- Bot token: `channels.telegram.botToken` or `channels.telegram.tokenFile` (regular file only; symlinks rejected), with `TELEGRAM_BOT_TOKEN` as fallback for the default account.
-- Optional `channels.telegram.defaultAccount` overrides default account selection when it matches a configured account id.
+- Bot token: `channels.telegram.botToken` or `channels.telegram.tokenFile` (regular file only; symlinks rejected), with `TELEGRAM_BOT_TOKEN` only as a legacy fallback for the default account.
+- Optional `channels.telegram.defaultAccount` overrides default account selection when it matches a configured account id. In the supported farm layout, set this to `field-operations`.
 - In multi-account setups (2+ account ids), set an explicit default (`channels.telegram.defaultAccount` or `channels.telegram.accounts.default`) to avoid fallback routing; `openclaw doctor` warns when this is missing or invalid.
+- In the supported farm deployment path, leave `TELEGRAM_BOT_TOKEN` unset or blank and put real bot tokens under `channels.telegram.accounts.field-operations.botToken` and `channels.telegram.accounts.data-pipeline.botToken`.
+- Named Telegram accounts should be routed with explicit `bindings[].match.accountId` entries such as `field-operations` and `data-pipeline`; a channel-only binding with no `accountId` still matches the default account only.
 - `configWrites: false` blocks Telegram-initiated config writes (supergroup ID migrations, `/config set|unset`).
 - Top-level `bindings[]` entries with `type: "acp"` configure persistent ACP bindings for forum topics (use canonical `chatId:topic:topicId` in `match.peer.id`). Field semantics are shared in [ACP Agents](/tools/acp-agents#channel-specific-settings).
 - Telegram stream previews use `sendMessage` + `editMessageText` (works in direct and group chats).
@@ -641,11 +643,11 @@ Run multiple accounts per channel (each with its own `accountId`):
 ```
 
 - `default` is used when `accountId` is omitted (CLI + routing).
-- Env tokens only apply to the **default** account.
+- Env tokens only apply to the **default** account, so the supported farm layout keeps `TELEGRAM_BOT_TOKEN` unset or blank and uses named Telegram accounts instead.
 - Base channel settings apply to all accounts unless overridden per account.
 - Use `bindings[].match.accountId` to route each account to a different agent.
 - If you add a non-default account via `openclaw channels add` (or channel onboarding) while still on a single-account top-level channel config, OpenClaw moves account-scoped top-level single-account values into `channels.<channel>.accounts.default` first so the original account keeps working.
-- Existing channel-only bindings (no `accountId`) keep matching the default account; account-scoped bindings remain optional.
+- Existing channel-only bindings (no `accountId`) keep matching the default account only; account-scoped bindings remain optional but are required when a named account like `data-pipeline` must route somewhere else.
 - `openclaw doctor --fix` also repairs mixed shapes by moving account-scoped top-level single-account values into `accounts.default` when named accounts exist but `default` is missing.
 
 ### Other extension channels
