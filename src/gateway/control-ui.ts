@@ -358,6 +358,7 @@ export function handleControlUiHttpRequest(
       assistantAvatar: avatarValue ?? identity.avatar,
       assistantAgentId: identity.agentId,
       serverVersion: resolveRuntimeServiceVersion(process.env),
+      authMode: config?.gateway?.auth?.mode,
     } satisfies ControlUiBootstrapConfig);
     return true;
   }

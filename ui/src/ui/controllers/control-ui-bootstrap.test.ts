@@ -14,6 +14,7 @@ describe("loadControlUiBootstrapConfig", () => {
         assistantAvatar: "O",
         assistantAgentId: "main",
         serverVersion: "2026.3.7",
+        authMode: "trusted-proxy",
       }),
     });
     vi.stubGlobal("fetch", fetchMock as unknown as typeof fetch);
@@ -24,6 +25,7 @@ describe("loadControlUiBootstrapConfig", () => {
       assistantAvatar: null,
       assistantAgentId: null,
       serverVersion: null,
+      bootstrapAuthMode: null,
     };
 
     await loadControlUiBootstrapConfig(state);
@@ -36,6 +38,7 @@ describe("loadControlUiBootstrapConfig", () => {
     expect(state.assistantAvatar).toBe("O");
     expect(state.assistantAgentId).toBe("main");
     expect(state.serverVersion).toBe("2026.3.7");
+    expect(state.bootstrapAuthMode).toBe("trusted-proxy");
 
     vi.unstubAllGlobals();
   });
@@ -50,6 +53,7 @@ describe("loadControlUiBootstrapConfig", () => {
       assistantAvatar: null,
       assistantAgentId: null,
       serverVersion: null,
+      bootstrapAuthMode: null,
     };
 
     await loadControlUiBootstrapConfig(state);
@@ -59,6 +63,7 @@ describe("loadControlUiBootstrapConfig", () => {
       expect.objectContaining({ method: "GET" }),
     );
     expect(state.assistantName).toBe("Assistant");
+    expect(state.bootstrapAuthMode).toBeNull();
 
     vi.unstubAllGlobals();
   });
@@ -73,6 +78,7 @@ describe("loadControlUiBootstrapConfig", () => {
       assistantAvatar: null,
       assistantAgentId: null,
       serverVersion: null,
+      bootstrapAuthMode: null,
     };
 
     await loadControlUiBootstrapConfig(state);
