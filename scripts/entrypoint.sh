@@ -763,13 +763,18 @@ if [ -f "/app/IDENTITY.data-pipeline.md" ] && [ ! -e "$PIPELINE_WORKSPACE/IDENTI
     cp "/app/IDENTITY.data-pipeline.md" "$PIPELINE_WORKSPACE/IDENTITY.md"
 fi
 
-for file in IDENTITY HEARTBEAT BOOT BOOTSTRAP; do
-    template="/app/$file.md.template"
-    target="/data/workspace/$file.md"
-    if [ -f "$template" ] && [ ! -e "$target" ]; then
-        cp "$template" "$target"
-    fi
+for file in IDENTITY HEARTBEAT BOOT BOOTSTRAP AGENTS; do
+  template="/app/$file.md.template"
+  target="/data/workspace/$file.md"
+  if [ -f "$template" ] && [ ! -e "$target" ]; then
+    cp "$template" "$target"
+  fi
 done
+
+mkdir -p "$PIPELINE_WORKSPACE/docs/reference/templates"
+if [ -f "/app/AGENTS.md.template" ] && [ ! -e "$PIPELINE_WORKSPACE/docs/reference/templates/AGENTS.md" ]; then
+  cp "/app/AGENTS.md.template" "$PIPELINE_WORKSPACE/docs/reference/templates/AGENTS.md"
+fi
 
 SYNC_SKILLS_ON_START="${OPENCLAW_SYNC_SKILLS_ON_START:-}"
 if [ -z "$SYNC_SKILLS_ON_START" ]; then

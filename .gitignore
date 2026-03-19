@@ -98,6 +98,17 @@ data/
 .serena/
 .ruff_cache/
 
+# Python virtual environments
+.venv/
+venv/
+env/
+.env/
+virtualenv/
+.Python
+pyvenv.cfg
+pip-log.txt
+pip-delete-this-directory.txt
+
 # Agent credentials and memory (NEVER COMMIT)
 /memory/
 .agent/*.json

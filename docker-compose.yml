@@ -28,8 +28,8 @@ services:
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
       NVIDIA_API_KEY: ${NVIDIA_API_KEY:-}
       NVIDIA_BASE_URL: ${NVIDIA_BASE_URL:-https://integrate.api.nvidia.com/v1}
-      PRIMARY_MODEL: ${PRIMARY_MODEL:-stepfun-ai/step-3.5-flash}
-      FALLBACK_MODELS: ${FALLBACK_MODELS:-nvidia/llama-3.1-nemotron-70b-instruct,openrouter/openrouter/free,openrouter/openai/gpt-5.4,openrouter/google/gemini-3.1-flash-lite-preview,openrouter/anthropic/claude-sonnet-4.6}
+      PRIMARY_MODEL: ${PRIMARY_MODEL:-nvidia/nemotron-3-super-120b-a12b:free}
+      FALLBACK_MODELS: ${FALLBACK_MODELS:-openrouter/openrouter/healer-alpha,openrouter/openrouter/free,nvidia/stepfun-ai/step-3.5-flash,nvidia/qwen/qwen3.5-397b-a17b,nvidia/moonshotai/kimi-k2.5,openrouter/stepfun/step-3.5-flash}
       TELEGRAM_FIELD_OPERATIONS_BOT_TOKEN: ${TELEGRAM_FIELD_OPERATIONS_BOT_TOKEN:-}
       TELEGRAM_FIELD_OPERATIONS_BOT_PAIRING_CODE: ${TELEGRAM_FIELD_OPERATIONS_BOT_PAIRING_CODE:-}
       TELEGRAM_DATA_PIPELINE_BOT_TOKEN: ${TELEGRAM_DATA_PIPELINE_BOT_TOKEN:-}

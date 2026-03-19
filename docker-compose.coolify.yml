@@ -46,8 +46,8 @@ services:
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
       NVIDIA_API_KEY: ${NVIDIA_API_KEY:-}
       NVIDIA_BASE_URL: ${NVIDIA_BASE_URL:-https://integrate.api.nvidia.com/v1}
-      PRIMARY_MODEL: ${PRIMARY_MODEL:-openrouter/openrouter/hunter-alpha}
-      FALLBACK_MODELS: ${FALLBACK_MODELS:-openrouter/openrouter/healer-alpha,openrouter/nvidia/nemotron-3-super-120b-a12b,openrouter/openrouter/free,nvidia/stepfun-ai/step-3.5-flash,nvidia/qwen/qwen3.5-397b-a17b,nvidia/moonshotai/kimi-k2.5,openrouter/stepfun/step-3.5-flash}
+      PRIMARY_MODEL: ${PRIMARY_MODEL:-nvidia/nemotron-3-super-120b-a12b:free}
+      FALLBACK_MODELS: ${FALLBACK_MODELS:-openrouter/openrouter/healer-alpha,openrouter/openrouter/free,nvidia/stepfun-ai/step-3.5-flash,nvidia/qwen/qwen3.5-397b-a17b,nvidia/moonshotai/kimi-k2.5,openrouter/stepfun/step-3.5-flash}
       
       # Telegram
       TELEGRAM_FIELD_OPERATIONS_BOT_TOKEN: ${TELEGRAM_FIELD_OPERATIONS_BOT_TOKEN:-}

@@ -168,6 +168,7 @@ COPY --chown=node:node docs/reference/templates/IDENTITY.md ./IDENTITY.md.templa
 COPY --chown=node:node docs/reference/templates/HEARTBEAT.md ./HEARTBEAT.md.template
 COPY --chown=node:node docs/reference/templates/BOOT.md ./BOOT.md.template
 COPY --chown=node:node docs/reference/templates/BOOTSTRAP.md ./BOOTSTRAP.md.template
+COPY --chown=node:node docs/reference/templates/AGENTS.md ./AGENTS.md.template
 
 # Copy entrypoint script for R2 mounting
 COPY --chown=node:node scripts/entrypoint.sh /app/scripts/entrypoint.sh
