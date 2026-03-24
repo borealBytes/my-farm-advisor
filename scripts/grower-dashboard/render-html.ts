@@ -169,7 +169,8 @@ h1 {
 .signal-wrap,
 .map-wrap,
 .weather-wrap,
-.soil-wrap {
+.soil-wrap,
+.crop-wrap {
   padding: 0 32px 32px;
 }
 
@@ -543,6 +544,133 @@ h1 {
   font-size: 1.05rem;
 }
 
+.crop-panel {
+  border-radius: 22px;
+  background: #f8fbf7;
+  border: 1px solid rgba(23, 38, 27, 0.08);
+  padding: 18px;
+}
+
+.crop-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.crop-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 7px 10px;
+  background: rgba(69, 119, 83, 0.1);
+  color: #31503c;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.crop-copy,
+.crop-composition-copy,
+.crop-rotation-copy {
+  margin: 8px 0 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #476356;
+}
+
+.crop-grid {
+  display: grid;
+  grid-template-columns: minmax(300px, 0.95fr) minmax(0, 1.05fr);
+  gap: 18px;
+  margin-top: 16px;
+}
+
+.crop-composition-card,
+.crop-rotation-card {
+  border-radius: 20px;
+  background: #ffffff;
+  border: 1px solid rgba(23, 38, 27, 0.08);
+  padding: 16px;
+}
+
+.composition-list,
+.rotation-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.composition-row,
+.rotation-item {
+  border-radius: 16px;
+  background: #f7fbf6;
+  border: 1px solid rgba(23, 38, 27, 0.08);
+  padding: 12px;
+}
+
+.composition-topline,
+.rotation-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.composition-name,
+.rotation-name {
+  font-weight: 700;
+  color: #213a2a;
+}
+
+.composition-pct,
+.rotation-value {
+  color: #214d2f;
+  font-weight: 700;
+}
+
+.composition-bar {
+  margin-top: 10px;
+  width: 100%;
+  height: 10px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: #e6efe4;
+}
+
+.composition-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #9aca86 0%, #4f8b5f 100%);
+}
+
+.composition-meta,
+.rotation-detail {
+  margin-top: 8px;
+  color: #4f695a;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.rotation-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.rotation-pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: rgba(69, 119, 83, 0.08);
+  color: #31503c;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
 .horizon-list {
   display: grid;
   gap: 10px;
@@ -669,7 +797,8 @@ h1 {
   .signal-wrap,
   .map-wrap,
   .weather-wrap,
-  .soil-wrap {
+  .soil-wrap,
+  .crop-wrap {
     padding: 0 20px 20px;
   }
 
@@ -679,7 +808,8 @@ h1 {
 
   .weather-overview,
   .weather-grid,
-  .soil-grid {
+  .soil-grid,
+  .crop-grid {
     grid-template-columns: 1fr;
   }
 }
@@ -753,6 +883,17 @@ const INLINE_JS = `
   const soilDrainage = document.getElementById("soil-drainage");
   const soilHorizonCount = document.getElementById("soil-horizon-count");
   const soilHorizonList = document.getElementById("soil-horizon-list");
+  const cropPanelField = document.getElementById("crop-selected-field");
+  const cropPanelSummary = document.getElementById("crop-selected-summary");
+  const cropLatestYear = document.getElementById("crop-latest-year");
+  const cropCompositionLead = document.getElementById("crop-composition-lead");
+  const cropCompositionList = document.getElementById("crop-composition-list");
+  const cropRotationNext = document.getElementById("crop-rotation-next");
+  const cropRotationConfidence = document.getElementById("crop-rotation-confidence");
+  const cropRotationSequence = document.getElementById("crop-rotation-sequence");
+  const cropRotationHistory = document.getElementById("crop-rotation-history");
+  const cropRotationPatterns = document.getElementById("crop-rotation-patterns");
+  const cropRotationOutlook = document.getElementById("crop-rotation-outlook");
 
   if (
     !payloadScript ||
@@ -797,7 +938,18 @@ const INLINE_JS = `
     !soilTexture ||
     !soilDrainage ||
     !soilHorizonCount ||
-    !soilHorizonList
+    !soilHorizonList ||
+    !cropPanelField ||
+    !cropPanelSummary ||
+    !cropLatestYear ||
+    !cropCompositionLead ||
+    !cropCompositionList ||
+    !cropRotationNext ||
+    !cropRotationConfidence ||
+    !cropRotationSequence ||
+    !cropRotationHistory ||
+    !cropRotationPatterns ||
+    !cropRotationOutlook
   ) {
     throw new Error("Dashboard HTML shell is missing the embedded payload weather/map nodes.");
   }
@@ -872,6 +1024,90 @@ const INLINE_JS = `
       }
     }
     return "Rotation signal unavailable.";
+  }
+
+  function latestCropYearValue() {
+    let year = null;
+    for (const entry of payload.cropComposition) {
+      if (year === null || entry.year > year) {
+        year = entry.year;
+      }
+    }
+    return year;
+  }
+
+  function cropCompositionForField(fieldId) {
+    const latestYear = latestCropYearValue();
+    if (latestYear === null) {
+      return { latestYear: null, rows: [] };
+    }
+
+    const rows = payload.cropComposition
+      .filter(function (entry) {
+        return entry.fieldId === fieldId && entry.year === latestYear;
+      })
+      .sort(function (left, right) {
+        return right.pct - left.pct;
+      });
+
+    return { latestYear: latestYear, rows: rows };
+  }
+
+  function cropRotationForField(fieldId) {
+    for (const entry of payload.cropRotation) {
+      if (entry.fieldId === fieldId) {
+        return entry;
+      }
+    }
+    return null;
+  }
+
+  function compositionRowMarkup(entry) {
+    return '<article class="composition-row"><div class="composition-topline"><span class="composition-name">' +
+      entry.cropName +
+      '</span><span class="composition-pct">' +
+      Number(entry.pct).toFixed(1) +
+      '%</span></div><div class="composition-bar"><div class="composition-fill" style="width:' +
+      Math.max(0, Math.min(100, Number(entry.pct))) +
+      '%"></div></div><div class="composition-meta">Crop code ' +
+      (entry.cropCode || 'n/a') +
+      ' • source ' +
+      entry.source +
+      '</div></article>';
+  }
+
+  function updateCropPanel(fieldId) {
+    const field = byFieldId.get(fieldId);
+    if (!field) {
+      return;
+    }
+
+    const composition = cropCompositionForField(fieldId);
+    const rotation = cropRotationForField(fieldId);
+    const dominant = composition.rows.length > 0 ? composition.rows[0] : null;
+
+    cropPanelField.textContent = field.fieldName;
+    cropPanelSummary.textContent = dominant
+      ? 'Latest-year crop composition and normalized rotation outlook for the selected field, updated directly from the embedded payload.'
+      : 'No normalized crop composition was found for this field.';
+    cropLatestYear.textContent = composition.latestYear === null ? 'Not available' : String(composition.latestYear);
+    cropCompositionLead.textContent = dominant
+      ? dominant.cropName + ' leads at ' + Number(dominant.pct).toFixed(1) + '%'
+      : 'No latest-year composition available';
+    cropCompositionList.innerHTML = composition.rows.length > 0
+      ? composition.rows.map(function (entry) { return compositionRowMarkup(entry); }).join('')
+      : '<article class="composition-row"><div class="composition-topline"><span class="composition-name">No composition data</span><span class="composition-pct">—</span></div><div class="composition-meta">The embedded payload has no latest-year crop composition rows for this field.</div></article>';
+
+    cropRotationNext.textContent = rotation && rotation.predictedNextCrop ? rotation.predictedNextCrop : 'Not available';
+    cropRotationConfidence.textContent = rotation && rotation.rotationConfidence ? rotation.rotationConfidence : 'Not available';
+    cropRotationSequence.textContent = rotation ? rotation.rotationSequence : 'No normalized rotation sequence available';
+    cropRotationHistory.textContent = rotation
+      ? String(rotation.historyStartYear || '—') + ' → ' + String(rotation.historyEndYear || '—') + ' • diversity ' + String(rotation.cropDiversity)
+      : 'History unavailable';
+    cropRotationPatterns.innerHTML = rotation && rotation.rotationPatterns.length > 0
+      ? rotation.rotationPatterns.map(function (pattern) { return '<span class="rotation-pill">' + pattern + '</span>'; }).join('')
+      : '<span class="rotation-pill">No rotation patterns available</span>';
+    cropRotationOutlook.textContent = rotation ? rotation.rotationOutlook : 'Rotation outlook unavailable';
   }
 
   function soilSummaryForField(fieldId) {
@@ -1134,6 +1370,7 @@ const INLINE_JS = `
     teaserSignal.textContent = fieldSignal(fieldId);
     updateWeatherPanel(fieldId);
     updateSoilPanel(fieldId);
+    updateCropPanel(fieldId);
 
     statusNode.textContent = [
       "Offline hero + map + weather shell loaded successfully.",
@@ -1660,6 +1897,50 @@ function fieldRotationSignal(payload: NormalizedGrowerDashboardPayload, fieldId:
     : rotation.rotationOutlook;
 }
 
+function cropCompositionForFieldPayload(
+  payload: NormalizedGrowerDashboardPayload,
+  fieldId: string,
+): {
+  latestYear: number | null;
+  rows: NormalizedGrowerDashboardPayload["cropComposition"];
+} {
+  const year = latestCropYear(payload);
+  if (year == null) {
+    return { latestYear: null, rows: [] };
+  }
+
+  return {
+    latestYear: year,
+    rows: payload.cropComposition
+      .filter((entry) => entry.fieldId === fieldId && entry.year === year)
+      .toSorted((left, right) => right.pct - left.pct),
+  };
+}
+
+function cropRotationForFieldPayload(
+  payload: NormalizedGrowerDashboardPayload,
+  fieldId: string,
+): NormalizedGrowerDashboardPayload["cropRotation"][number] | null {
+  return payload.cropRotation.find((entry) => entry.fieldId === fieldId) ?? null;
+}
+
+function renderInitialCropCompositionRows(
+  payload: NormalizedGrowerDashboardPayload,
+  fieldId: string,
+): string {
+  const composition = cropCompositionForFieldPayload(payload, fieldId);
+  if (composition.rows.length === 0) {
+    return '<article class="composition-row"><div class="composition-topline"><span class="composition-name">No composition data</span><span class="composition-pct">—</span></div><div class="composition-meta">The embedded payload has no latest-year crop composition rows for this field.</div></article>';
+  }
+
+  return composition.rows
+    .map(
+      (entry) =>
+        `<article class="composition-row"><div class="composition-topline"><span class="composition-name">${escapeHtml(entry.cropName)}</span><span class="composition-pct">${escapeHtml(entry.pct.toFixed(1))}%</span></div><div class="composition-bar"><div class="composition-fill" style="width:${Math.max(0, Math.min(100, entry.pct))}%"></div></div><div class="composition-meta">Crop code ${escapeHtml(entry.cropCode ?? "n/a")} • source ${escapeHtml(entry.source)}</div></article>`,
+    )
+    .join("");
+}
+
 export function renderGrowerDashboardHtml(payload: NormalizedGrowerDashboardPayload): string {
   assertNormalizedGrowerDashboardPayload(payload);
 
@@ -1688,6 +1969,9 @@ export function renderGrowerDashboardHtml(payload: NormalizedGrowerDashboardPayl
   const initialSoilSummary = soilSummaryForFieldPayload(payload, initialField.fieldId);
   const initialSurfaceHorizon =
     soilHorizonsForFieldPayload(payload, initialField.fieldId)[0] ?? null;
+  const initialCropComposition = cropCompositionForFieldPayload(payload, initialField.fieldId);
+  const initialCropLead = initialCropComposition.rows[0] ?? null;
+  const initialRotation = cropRotationForFieldPayload(payload, initialField.fieldId);
 
   return `<!doctype html>
 <html lang="en">
@@ -2019,6 +2303,80 @@ export function renderGrowerDashboardHtml(payload: NormalizedGrowerDashboardPayl
                   Horizon rows shown: <strong id="soil-horizon-count">${escapeHtml(String(initialSoilSummary?.horizonCount ?? 0))}</strong>
                 </p>
                 <div id="soil-horizon-list" class="horizon-list">${renderInitialSoilHorizonRows(payload, initialField.fieldId)}</div>
+              </section>
+            </div>
+          </section>
+        </section>
+
+        <section class="crop-wrap" aria-label="Selected field crop and rotation panel">
+          <p class="section-kicker">Selected field crop + rotation</p>
+          <section class="crop-panel">
+            <div class="crop-header">
+              <div>
+                <h2 id="crop-selected-field">${escapeHtml(initialField.fieldName)}</h2>
+                <p id="crop-selected-summary" class="crop-copy">
+                  Latest-year composition and normalized rotation outlook for the selected field, updated from the embedded payload only.
+                </p>
+              </div>
+              <span class="crop-badge">Crop only</span>
+            </div>
+
+            <div class="crop-grid">
+              <section class="crop-composition-card">
+                <h2 class="section-title">Latest composition snapshot</h2>
+                <p class="crop-composition-copy">
+                  Farmer-friendly composition rows for the latest available year stay tied to the current map selection.
+                </p>
+                <div class="rotation-list">
+                  <article class="rotation-item">
+                    <div class="rotation-topline">
+                      <span class="rotation-name">Latest crop year</span>
+                      <span id="crop-latest-year" class="rotation-value">${escapeHtml(initialCropComposition.latestYear == null ? "Not available" : String(initialCropComposition.latestYear))}</span>
+                    </div>
+                    <div id="crop-composition-lead" class="rotation-detail">${escapeHtml(initialCropLead ? `${initialCropLead.cropName} leads at ${initialCropLead.pct.toFixed(1)}%` : "No latest-year composition available")}</div>
+                  </article>
+                </div>
+                <div id="crop-composition-list" class="composition-list">${renderInitialCropCompositionRows(payload, initialField.fieldId)}</div>
+              </section>
+
+              <section class="crop-rotation-card">
+                <h2 class="section-title">Rotation outlook</h2>
+                <p class="crop-rotation-copy">
+                  Short historical context plus next-crop signal from the normalized rotation summary for the selected field.
+                </p>
+                <div class="rotation-list">
+                  <article class="rotation-item">
+                    <div class="rotation-topline">
+                      <span class="rotation-name">Predicted next crop</span>
+                      <span id="crop-rotation-next" class="rotation-value">${escapeHtml(initialRotation?.predictedNextCrop ?? "Not available")}</span>
+                    </div>
+                    <div id="crop-rotation-confidence" class="rotation-detail">Confidence: ${escapeHtml(initialRotation?.rotationConfidence ?? "Not available")}</div>
+                  </article>
+                  <article class="rotation-item">
+                    <div class="rotation-topline">
+                      <span class="rotation-name">Sequence</span>
+                    </div>
+                    <div id="crop-rotation-sequence" class="rotation-detail">${escapeHtml(initialRotation?.rotationSequence ?? "No normalized rotation sequence available")}</div>
+                  </article>
+                  <article class="rotation-item">
+                    <div class="rotation-topline">
+                      <span class="rotation-name">History window</span>
+                    </div>
+                    <div id="crop-rotation-history" class="rotation-detail">${escapeHtml(initialRotation ? `${initialRotation.historyStartYear ?? "—"} → ${initialRotation.historyEndYear ?? "—"} • diversity ${initialRotation.cropDiversity}` : "History unavailable")}</div>
+                  </article>
+                  <article class="rotation-item">
+                    <div class="rotation-topline">
+                      <span class="rotation-name">Observed patterns</span>
+                    </div>
+                    <div id="crop-rotation-patterns" class="rotation-pills">${initialRotation && initialRotation.rotationPatterns.length > 0 ? initialRotation.rotationPatterns.map((pattern) => `<span class="rotation-pill">${escapeHtml(pattern)}</span>`).join("") : '<span class="rotation-pill">No rotation patterns available</span>'}</div>
+                  </article>
+                  <article class="rotation-item">
+                    <div class="rotation-topline">
+                      <span class="rotation-name">Rotation outlook</span>
+                    </div>
+                    <div id="crop-rotation-outlook" class="rotation-detail">${escapeHtml(initialRotation?.rotationOutlook ?? "Rotation outlook unavailable")}</div>
+                  </article>
+                </div>
               </section>
             </div>
           </section>
