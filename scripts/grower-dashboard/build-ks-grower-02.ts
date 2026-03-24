@@ -11,9 +11,15 @@ export function buildKsGrowerDashboard(rootDir: string = repoRoot): string {
   const payload = loadKsGrowerDashboardPayload(rootDir);
   const html = renderGrowerDashboardHtml(payload);
   const outputPath = resolveKsGrowerDashboardOutputPath(rootDir);
+  const outputDirectory = path.dirname(outputPath);
+  const tempOutputPath = path.join(
+    outputDirectory,
+    `.${path.basename(outputPath)}.${process.pid}.${Date.now()}.tmp`,
+  );
 
-  fs.mkdirSync(path.dirname(outputPath), { recursive: true });
-  fs.writeFileSync(outputPath, html, "utf8");
+  fs.mkdirSync(outputDirectory, { recursive: true });
+  fs.writeFileSync(tempOutputPath, html, "utf8");
+  fs.renameSync(tempOutputPath, outputPath);
 
   return outputPath;
 }
