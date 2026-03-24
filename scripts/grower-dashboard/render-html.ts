@@ -1527,6 +1527,15 @@ const INLINE_JS = `
     return "Rotation signal unavailable.";
   }
 
+  function escapeHtmlText(value) {
+    return String(value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
   function latestCropYearValue() {
     let year = null;
     for (const entry of payload.cropComposition) {
@@ -1565,15 +1574,15 @@ const INLINE_JS = `
 
   function compositionRowMarkup(entry) {
     return '<article class="composition-row"><div class="composition-topline"><span class="composition-name">' +
-      entry.cropName +
+      escapeHtmlText(entry.cropName) +
       '</span><span class="composition-pct">' +
       Number(entry.pct).toFixed(1) +
       '%</span></div><div class="composition-bar"><div class="composition-fill" style="width:' +
       Math.max(0, Math.min(100, Number(entry.pct))) +
       '%"></div></div><div class="composition-meta">Crop code ' +
-      (entry.cropCode || 'n/a') +
+      escapeHtmlText(entry.cropCode || 'n/a') +
       ' • source ' +
-      entry.source +
+      escapeHtmlText(entry.source) +
       '</div></article>';
   }
 
@@ -1606,7 +1615,7 @@ const INLINE_JS = `
       ? String(rotation.historyStartYear || '—') + ' → ' + String(rotation.historyEndYear || '—') + ' • diversity ' + String(rotation.cropDiversity)
       : 'History unavailable';
     cropRotationPatterns.innerHTML = rotation && rotation.rotationPatterns.length > 0
-      ? rotation.rotationPatterns.map(function (pattern) { return '<span class="rotation-pill">' + pattern + '</span>'; }).join('')
+      ? rotation.rotationPatterns.map(function (pattern) { return '<span class="rotation-pill">' + escapeHtmlText(pattern) + '</span>'; }).join('')
       : '<span class="rotation-pill">No rotation patterns available</span>';
     cropRotationOutlook.textContent = rotation ? rotation.rotationOutlook : 'Rotation outlook unavailable';
   }
@@ -1633,17 +1642,17 @@ const INLINE_JS = `
 
   function imagerySourceRowMarkup(entry) {
     return '<article class="imagery-source-row"><div class="imagery-topline"><span class="imagery-name">' +
-      entry.source +
+      escapeHtmlText(entry.source) +
       '</span><span class="imagery-value">' +
       String(entry.sceneCount) +
       ' scene(s)</span></div><div class="imagery-detail">Available ' +
-      (entry.firstSceneDate || 'n/a') +
+      escapeHtmlText(entry.firstSceneDate || 'n/a') +
       ' → ' +
-      (entry.lastSceneDate || 'n/a') +
+      escapeHtmlText(entry.lastSceneDate || 'n/a') +
       ' • expected ' +
-      (entry.expectedSceneCount == null ? 'n/a' : String(entry.expectedSceneCount)) +
+      escapeHtmlText(entry.expectedSceneCount == null ? 'n/a' : String(entry.expectedSceneCount)) +
       ' • coverage ' +
-      (entry.coveragePct == null ? 'n/a' : Number(entry.coveragePct).toFixed(1) + '%') +
+      escapeHtmlText(entry.coveragePct == null ? 'n/a' : Number(entry.coveragePct).toFixed(1) + '%') +
       '</div></article>';
   }
 
@@ -1654,13 +1663,13 @@ const INLINE_JS = `
       entry.source,
     ].filter(Boolean);
     return '<article class="scene-row"><div class="scene-topline"><span class="scene-name">' +
-      entry.sceneDate +
+      escapeHtmlText(entry.sceneDate) +
       '</span><span class="scene-value">' +
-      entry.sceneId +
+      escapeHtmlText(entry.sceneId) +
       '</span></div><div class="scene-detail">' +
-      (entry.notes && entry.notes.length > 0 ? entry.notes.join(' • ') : 'Normalized scene metadata available') +
+      escapeHtmlText(entry.notes && entry.notes.length > 0 ? entry.notes.join(' • ') : 'Normalized scene metadata available') +
       '</div><div class="scene-pills">' +
-      pills.map(function (pill) { return '<span class="scene-pill">' + pill + '</span>'; }).join('') +
+      pills.map(function (pill) { return '<span class="scene-pill">' + escapeHtmlText(pill) + '</span>'; }).join('') +
       '</div></article>';
   }
 
