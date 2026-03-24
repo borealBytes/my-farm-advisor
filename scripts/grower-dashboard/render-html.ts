@@ -154,7 +154,8 @@ h1 {
 .summary-grid,
 .signal-grid,
 .map-grid,
-.teaser-metrics {
+.teaser-metrics,
+.weather-grid {
   display: grid;
   gap: 14px;
 }
@@ -166,7 +167,8 @@ h1 {
 
 .summary-wrap,
 .signal-wrap,
-.map-wrap {
+.map-wrap,
+.weather-wrap {
   padding: 0 32px 32px;
 }
 
@@ -401,6 +403,123 @@ h1 {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.weather-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.weather-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 7px 10px;
+  background: rgba(69, 119, 83, 0.1);
+  color: #31503c;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.weather-panel {
+  border-radius: 22px;
+  background: #f8fbf7;
+  border: 1px solid rgba(23, 38, 27, 0.08);
+  padding: 18px;
+}
+
+.weather-copy,
+.weather-overview-copy,
+.chart-subtitle {
+  margin: 8px 0 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #476356;
+}
+
+.weather-overview {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.9fr) minmax(0, 1.1fr);
+  gap: 18px;
+  margin-top: 16px;
+}
+
+.weather-overview-card,
+.weather-chart-card {
+  border-radius: 20px;
+  background: #ffffff;
+  border: 1px solid rgba(23, 38, 27, 0.08);
+  padding: 16px;
+}
+
+.weather-overview-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.weather-metric {
+  border-radius: 16px;
+  background: #f7fbf6;
+  border: 1px solid rgba(23, 38, 27, 0.08);
+  padding: 12px;
+}
+
+.weather-grid {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  margin-top: 16px;
+}
+
+.weather-chart-card {
+  min-width: 0;
+}
+
+.chart-value {
+  display: block;
+  margin-top: 8px;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.chart-frame {
+  margin-top: 14px;
+  border-radius: 16px;
+  padding: 10px;
+  background: linear-gradient(180deg, #eef7ec 0%, #f9fcf8 100%);
+  border: 1px solid rgba(23, 38, 27, 0.08);
+}
+
+.weather-chart {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.chart-grid-line {
+  stroke: rgba(23, 38, 27, 0.1);
+  stroke-width: 1;
+}
+
+.chart-line {
+  fill: none;
+  stroke: #3d7a50;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.chart-area {
+  fill: rgba(112, 177, 112, 0.16);
+}
+
+.chart-dot {
+  fill: #214d2f;
+}
+
 .metric-card {
   padding: 14px;
 }
@@ -429,12 +548,18 @@ h1 {
 
   .summary-wrap,
   .signal-wrap,
-  .map-wrap {
+  .map-wrap,
+  .weather-wrap {
     padding: 0 20px 20px;
   }
 
   .hero {
     padding: 24px;
+  }
+
+  .weather-overview,
+  .weather-grid {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -444,7 +569,8 @@ h1 {
   }
 
   .portfolio-grid,
-  .teaser-metrics {
+  .teaser-metrics,
+  .weather-overview-metrics {
     grid-template-columns: 1fr;
   }
 }
@@ -466,6 +592,35 @@ const INLINE_JS = `
   const teaserWeather = document.getElementById("selected-field-weather");
   const teaserSoil = document.getElementById("selected-field-soil");
   const teaserSignal = document.getElementById("selected-field-signal");
+  const weatherPanelField = document.getElementById("weather-selected-field");
+  const weatherPanelSummary = document.getElementById("weather-selected-summary");
+  const weatherLatestDate = document.getElementById("weather-latest-date");
+  const weatherLatestTemp = document.getElementById("weather-latest-temp");
+  const weatherLatestRain = document.getElementById("weather-latest-rain");
+  const weatherLatestSolar = document.getElementById("weather-latest-solar");
+  const weatherLatestHumidity = document.getElementById("weather-latest-humidity");
+  const weatherLatestWind = document.getElementById("weather-latest-wind");
+  const weatherCharts = {
+    temperature: document.getElementById("weather-chart-temperature"),
+    precipitation: document.getElementById("weather-chart-precipitation"),
+    solar: document.getElementById("weather-chart-solar"),
+    humidity: document.getElementById("weather-chart-humidity"),
+    wind: document.getElementById("weather-chart-wind"),
+  };
+  const weatherValues = {
+    temperature: document.getElementById("weather-value-temperature"),
+    precipitation: document.getElementById("weather-value-precipitation"),
+    solar: document.getElementById("weather-value-solar"),
+    humidity: document.getElementById("weather-value-humidity"),
+    wind: document.getElementById("weather-value-wind"),
+  };
+  const weatherSubtitles = {
+    temperature: document.getElementById("weather-subtitle-temperature"),
+    precipitation: document.getElementById("weather-subtitle-precipitation"),
+    solar: document.getElementById("weather-subtitle-solar"),
+    humidity: document.getElementById("weather-subtitle-humidity"),
+    wind: document.getElementById("weather-subtitle-wind"),
+  };
 
   if (
     !payloadScript ||
@@ -477,9 +632,32 @@ const INLINE_JS = `
     !teaserCrop ||
     !teaserWeather ||
     !teaserSoil ||
-    !teaserSignal
+    !teaserSignal ||
+    !weatherPanelField ||
+    !weatherPanelSummary ||
+    !weatherLatestDate ||
+    !weatherLatestTemp ||
+    !weatherLatestRain ||
+    !weatherLatestSolar ||
+    !weatherLatestHumidity ||
+    !weatherLatestWind ||
+    !weatherCharts.temperature ||
+    !weatherCharts.precipitation ||
+    !weatherCharts.solar ||
+    !weatherCharts.humidity ||
+    !weatherCharts.wind ||
+    !weatherValues.temperature ||
+    !weatherValues.precipitation ||
+    !weatherValues.solar ||
+    !weatherValues.humidity ||
+    !weatherValues.wind ||
+    !weatherSubtitles.temperature ||
+    !weatherSubtitles.precipitation ||
+    !weatherSubtitles.solar ||
+    !weatherSubtitles.humidity ||
+    !weatherSubtitles.wind
   ) {
-    throw new Error("Dashboard HTML shell is missing the embedded payload map nodes.");
+    throw new Error("Dashboard HTML shell is missing the embedded payload weather/map nodes.");
   }
 
   const payload = JSON.parse(payloadScript.textContent || "null");
@@ -554,6 +732,147 @@ const INLINE_JS = `
     return "Rotation signal unavailable.";
   }
 
+  function weatherSeries(fieldId) {
+    return payload.weatherSeries
+      .filter(function (entry) {
+        return entry.fieldId === fieldId;
+      })
+      .sort(function (left, right) {
+        return left.date.localeCompare(right.date);
+      });
+  }
+
+  function latestWeatherEntry(fieldId) {
+    const rows = weatherSeries(fieldId);
+    return rows.length > 0 ? rows[rows.length - 1] : null;
+  }
+
+  function trailingRows(fieldId, count) {
+    const rows = weatherSeries(fieldId);
+    return rows.slice(Math.max(0, rows.length - count));
+  }
+
+  function formatMetricValue(value, unit, fractionDigits) {
+    if (value === null || value === undefined) {
+      return "Not available";
+    }
+
+    return Number(value).toFixed(fractionDigits) + " " + unit;
+  }
+
+  function chartMarkup(values) {
+    const width = 220;
+    const height = 92;
+    const paddingX = 10;
+    const paddingY = 10;
+    const usable = values.filter(function (value) {
+      return value !== null && value !== undefined;
+    });
+
+    if (usable.length === 0) {
+      return '<svg class="weather-chart" viewBox="0 0 220 92" role="img" aria-label="No weather data available"><line class="chart-grid-line" x1="10" y1="78" x2="210" y2="78"></line><text x="110" y="50" text-anchor="middle" fill="#587061" font-size="11">No data</text></svg>';
+    }
+
+    let min = usable[0];
+    let max = usable[0];
+    for (const value of usable) {
+      if (value < min) min = value;
+      if (value > max) max = value;
+    }
+    if (min === max) {
+      min -= 1;
+      max += 1;
+    }
+
+    const points = [];
+    for (let index = 0; index < values.length; index += 1) {
+      const rawValue = values[index];
+      if (rawValue === null || rawValue === undefined) {
+        continue;
+      }
+      const x = paddingX + (index / Math.max(values.length - 1, 1)) * (width - paddingX * 2);
+      const y = height - paddingY - ((rawValue - min) / (max - min)) * (height - paddingY * 2);
+      points.push({ x: Number(x.toFixed(2)), y: Number(y.toFixed(2)) });
+    }
+
+    if (points.length === 0) {
+      return '<svg class="weather-chart" viewBox="0 0 220 92" role="img" aria-label="No weather data available"><line class="chart-grid-line" x1="10" y1="78" x2="210" y2="78"></line><text x="110" y="50" text-anchor="middle" fill="#587061" font-size="11">No data</text></svg>';
+    }
+
+    const linePath = points
+      .map(function (point, index) {
+        return (index === 0 ? 'M ' : 'L ') + point.x + ' ' + point.y;
+      })
+      .join(' ');
+    const areaPath =
+      linePath +
+      ' L ' +
+      points[points.length - 1].x +
+      ' ' +
+      (height - paddingY) +
+      ' L ' +
+      points[0].x +
+      ' ' +
+      (height - paddingY) +
+      ' Z';
+
+    return '<svg class="weather-chart" viewBox="0 0 220 92" role="img" aria-label="Selected field weather trend"><line class="chart-grid-line" x1="10" y1="20" x2="210" y2="20"></line><line class="chart-grid-line" x1="10" y1="49" x2="210" y2="49"></line><line class="chart-grid-line" x1="10" y1="78" x2="210" y2="78"></line><path class="chart-area" d="' + areaPath + '"></path><path class="chart-line" d="' + linePath + '"></path><circle class="chart-dot" cx="' + points[points.length - 1].x + '" cy="' + points[points.length - 1].y + '" r="3.5"></circle></svg>';
+  }
+
+  function updateWeatherPanel(fieldId) {
+    const rows = trailingRows(fieldId, 21);
+    const latest = latestWeatherEntry(fieldId);
+    const field = byFieldId.get(fieldId);
+    if (!field) {
+      return;
+    }
+
+    weatherPanelField.textContent = field.fieldName;
+    weatherPanelSummary.textContent = rows.length > 0
+      ? 'Latest ' + String(rows.length) + ' daily rows for ' + field.fieldName + ', updated from the embedded weather series without any external chart libraries.'
+      : 'No embedded weather series are available for this field.';
+    weatherLatestDate.textContent = latest ? latest.date : 'Not available';
+    weatherLatestTemp.textContent = latest ? formatMetricValue(latest.temperatureAvgC, '°C', 1) : 'Not available';
+    weatherLatestRain.textContent = latest ? formatMetricValue(latest.precipitationMm, 'mm', 1) : 'Not available';
+    weatherLatestSolar.textContent = latest ? formatMetricValue(latest.solarRadiationKwhM2, 'kWh/m²', 1) : 'Not available';
+    weatherLatestHumidity.textContent = latest ? formatMetricValue(latest.relativeHumidityPct, '%', 1) : 'Not available';
+    weatherLatestWind.textContent = latest ? formatMetricValue(latest.windSpeedMps, 'm/s', 1) : 'Not available';
+
+    const metrics = {
+      temperature: {
+        values: rows.map(function (row) { return row.temperatureAvgC; }),
+        current: latest ? formatMetricValue(latest.temperatureAvgC, '°C', 1) : 'Not available',
+        subtitle: rows.length > 0 ? rows[0].date + ' → ' + rows[rows.length - 1].date : 'No data range',
+      },
+      precipitation: {
+        values: rows.map(function (row) { return row.precipitationMm; }),
+        current: latest ? formatMetricValue(latest.precipitationMm, 'mm', 1) : 'Not available',
+        subtitle: 'Daily precipitation trend',
+      },
+      solar: {
+        values: rows.map(function (row) { return row.solarRadiationKwhM2; }),
+        current: latest ? formatMetricValue(latest.solarRadiationKwhM2, 'kWh/m²', 1) : 'Not available',
+        subtitle: 'Incoming solar radiation',
+      },
+      humidity: {
+        values: rows.map(function (row) { return row.relativeHumidityPct; }),
+        current: latest ? formatMetricValue(latest.relativeHumidityPct, '%', 1) : 'Not available',
+        subtitle: 'Relative humidity trend',
+      },
+      wind: {
+        values: rows.map(function (row) { return row.windSpeedMps; }),
+        current: latest ? formatMetricValue(latest.windSpeedMps, 'm/s', 1) : 'Not available',
+        subtitle: '10m wind speed trend',
+      },
+    };
+
+    for (const key of Object.keys(metrics)) {
+      weatherValues[key].textContent = metrics[key].current;
+      weatherSubtitles[key].textContent = metrics[key].subtitle;
+      weatherCharts[key].innerHTML = chartMarkup(metrics[key].values);
+    }
+  }
+
   const byFieldId = new Map();
   for (const field of payload.fields) {
     byFieldId.set(field.fieldId, field);
@@ -582,13 +901,15 @@ const INLINE_JS = `
     teaserWeather.textContent = latestWeather(fieldId);
     teaserSoil.textContent = soilHint(fieldId);
     teaserSignal.textContent = fieldSignal(fieldId);
+    updateWeatherPanel(fieldId);
 
     statusNode.textContent = [
-      "Offline hero + map shell loaded successfully.",
+      "Offline hero + map + weather shell loaded successfully.",
       "Farm: " + payload.farm.farmName,
       "Selected field: " + field.fieldId,
       "Rendered boundaries: " + String(payload.fields.length),
       "Interactive schematic: inline SVG only",
+      "Weather charts: inline SVG only",
     ].join("\\n");
   }
 
@@ -1234,6 +1555,96 @@ export function renderGrowerDashboardHtml(payload: NormalizedGrowerDashboardPayl
               <div id="runtime-status" class="runtime-status" aria-live="polite">Loading embedded payload…</div>
             </section>
           </div>
+        </section>
+
+        <section class="weather-wrap" aria-label="Selected field weather panel">
+          <p class="section-kicker">Selected field weather</p>
+          <section class="weather-panel">
+            <div class="weather-header">
+              <div>
+                <h2 id="weather-selected-field">${escapeHtml(initialField.fieldName)}</h2>
+                <p id="weather-selected-summary" class="weather-copy">
+                  Latest selected-field weather series rendered as inline SVG trend cards from the embedded payload only.
+                </p>
+              </div>
+              <span class="weather-badge">Weather only</span>
+            </div>
+
+            <div class="weather-overview">
+              <section class="weather-overview-card">
+                <h2 class="section-title">Latest field snapshot</h2>
+                <p class="weather-overview-copy">
+                  Daily weather context updates instantly when you click a different field in the schematic above.
+                </p>
+                <div class="weather-overview-metrics">
+                  <article class="weather-metric">
+                    <span class="label">Latest date</span>
+                    <span id="weather-latest-date" class="value">Loading…</span>
+                  </article>
+                  <article class="weather-metric">
+                    <span class="label">Average temp</span>
+                    <span id="weather-latest-temp" class="value">Loading…</span>
+                  </article>
+                  <article class="weather-metric">
+                    <span class="label">Precipitation</span>
+                    <span id="weather-latest-rain" class="value">Loading…</span>
+                  </article>
+                  <article class="weather-metric">
+                    <span class="label">Solar</span>
+                    <span id="weather-latest-solar" class="value">Loading…</span>
+                  </article>
+                  <article class="weather-metric">
+                    <span class="label">Humidity</span>
+                    <span id="weather-latest-humidity" class="value">Loading…</span>
+                  </article>
+                  <article class="weather-metric">
+                    <span class="label">Wind</span>
+                    <span id="weather-latest-wind" class="value">Loading…</span>
+                  </article>
+                </div>
+              </section>
+
+              <section class="weather-overview-card">
+                <h2 class="section-title">Inline trend cards</h2>
+                <p class="weather-overview-copy">
+                  Each chart uses the latest embedded daily rows for the currently selected field and redraws without any page reload.
+                </p>
+              </section>
+            </div>
+
+            <div class="weather-grid">
+              <article class="weather-chart-card">
+                <span class="label">Temperature</span>
+                <span id="weather-value-temperature" class="chart-value">Loading…</span>
+                <p id="weather-subtitle-temperature" class="chart-subtitle">Preparing chart…</p>
+                <div id="weather-chart-temperature" class="chart-frame"></div>
+              </article>
+              <article class="weather-chart-card">
+                <span class="label">Precipitation</span>
+                <span id="weather-value-precipitation" class="chart-value">Loading…</span>
+                <p id="weather-subtitle-precipitation" class="chart-subtitle">Preparing chart…</p>
+                <div id="weather-chart-precipitation" class="chart-frame"></div>
+              </article>
+              <article class="weather-chart-card">
+                <span class="label">Solar</span>
+                <span id="weather-value-solar" class="chart-value">Loading…</span>
+                <p id="weather-subtitle-solar" class="chart-subtitle">Preparing chart…</p>
+                <div id="weather-chart-solar" class="chart-frame"></div>
+              </article>
+              <article class="weather-chart-card">
+                <span class="label">Humidity</span>
+                <span id="weather-value-humidity" class="chart-value">Loading…</span>
+                <p id="weather-subtitle-humidity" class="chart-subtitle">Preparing chart…</p>
+                <div id="weather-chart-humidity" class="chart-frame"></div>
+              </article>
+              <article class="weather-chart-card">
+                <span class="label">Wind</span>
+                <span id="weather-value-wind" class="chart-value">Loading…</span>
+                <p id="weather-subtitle-wind" class="chart-subtitle">Preparing chart…</p>
+                <div id="weather-chart-wind" class="chart-frame"></div>
+              </article>
+            </div>
+          </section>
         </section>
       </section>
     </main>
