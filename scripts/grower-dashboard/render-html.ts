@@ -1,6 +1,8 @@
 import {
   assertNormalizedGrowerDashboardPayload,
   GROWER_DASHBOARD_EMBEDDED_PAYLOAD_SCRIPT_ID,
+  type DashboardPolygonGeometry,
+  type NormalizedGrowerDashboardField,
   type NormalizedGrowerDashboardPayload,
 } from "./contracts.ts";
 
@@ -122,7 +124,9 @@ h1 {
 
 .hero-note h2,
 .portfolio h2,
-.section-title {
+.section-title,
+.map-panel h2,
+.teaser-card h2 {
   margin: 0;
   font-size: 1rem;
   letter-spacing: -0.01em;
@@ -130,7 +134,9 @@ h1 {
 
 .hero-note p,
 .portfolio-copy,
-.signal-copy {
+.signal-copy,
+.map-copy,
+.teaser-copy {
   margin: 8px 0 0;
   font-size: 0.95rem;
   line-height: 1.6;
@@ -146,7 +152,9 @@ h1 {
 
 .portfolio-grid,
 .summary-grid,
-.signal-grid {
+.signal-grid,
+.map-grid,
+.teaser-metrics {
   display: grid;
   gap: 14px;
 }
@@ -157,7 +165,8 @@ h1 {
 }
 
 .summary-wrap,
-.signal-wrap {
+.signal-wrap,
+.map-wrap {
   padding: 0 32px 32px;
 }
 
@@ -174,8 +183,16 @@ h1 {
   margin-top: 14px;
 }
 
+.map-grid {
+  grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.8fr);
+  align-items: stretch;
+}
+
 .card,
-.signal-card {
+.signal-card,
+.map-panel,
+.teaser-card,
+.metric-card {
   border-radius: 22px;
   background: #f8fbf7;
   border: 1px solid rgba(23, 38, 27, 0.08);
@@ -256,6 +273,142 @@ h1 {
   font-weight: 700;
 }
 
+.map-header,
+.teaser-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.map-badge,
+.teaser-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 7px 10px;
+  background: rgba(69, 119, 83, 0.1);
+  color: #31503c;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.map-frame {
+  margin-top: 16px;
+  border-radius: 20px;
+  padding: 14px;
+  background: linear-gradient(180deg, #edf7ea 0%, #f8fbf7 100%);
+  border: 1px solid rgba(23, 38, 27, 0.08);
+}
+
+.map-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.field-node {
+  cursor: pointer;
+  outline: none;
+}
+
+.field-shape {
+  stroke: rgba(24, 40, 29, 0.54);
+  stroke-width: 2;
+  transition: fill 140ms ease, stroke 140ms ease, transform 140ms ease, opacity 140ms ease;
+}
+
+.field-node:hover .field-shape,
+.field-node.is-hovered .field-shape,
+.field-node:focus .field-shape {
+  stroke: #173d24;
+  stroke-width: 3;
+  filter: brightness(1.02);
+}
+
+.field-node.is-selected .field-shape {
+  stroke: #173d24;
+  stroke-width: 4;
+  filter: drop-shadow(0 10px 14px rgba(39, 78, 53, 0.18));
+}
+
+.field-shape.tone-corn {
+  fill: rgba(255, 224, 138, 0.9);
+}
+
+.field-shape.tone-soy {
+  fill: rgba(200, 232, 177, 0.92);
+}
+
+.field-shape.tone-mixed {
+  fill: rgba(201, 226, 189, 0.92);
+}
+
+.field-shape.tone-other {
+  fill: rgba(209, 221, 216, 0.94);
+}
+
+.field-label {
+  font-size: 12px;
+  font-weight: 700;
+  fill: #17311f;
+  text-anchor: middle;
+  pointer-events: none;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #4f695a;
+  font-size: 0.88rem;
+}
+
+.legend-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(23, 38, 27, 0.16);
+}
+
+.legend-swatch.corn {
+  background: #ffe08a;
+}
+
+.legend-swatch.soy {
+  background: #c8e8b1;
+}
+
+.legend-swatch.other {
+  background: #d1ddd8;
+}
+
+.teaser-copy {
+  color: #476356;
+}
+
+.teaser-metrics {
+  margin-top: 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.metric-card {
+  padding: 14px;
+}
+
+.metric-card .value {
+  font-size: 1.15rem;
+}
+
 .runtime-status {
   margin-top: 18px;
   padding: 14px 16px;
@@ -269,12 +422,14 @@ h1 {
 @media (max-width: 980px) {
   .hero,
   .summary-grid,
-  .signal-grid {
+  .signal-grid,
+  .map-grid {
     grid-template-columns: 1fr;
   }
 
   .summary-wrap,
-  .signal-wrap {
+  .signal-wrap,
+  .map-wrap {
     padding: 0 20px 20px;
   }
 
@@ -288,7 +443,8 @@ h1 {
     padding: 16px 12px 40px;
   }
 
-  .portfolio-grid {
+  .portfolio-grid,
+  .teaser-metrics {
     grid-template-columns: 1fr;
   }
 }
@@ -302,23 +458,206 @@ const INLINE_JS = `
     GROWER_DASHBOARD_EMBEDDED_PAYLOAD_SCRIPT_ID,
   )});
   const statusNode = document.getElementById("runtime-status");
+  const mapRoot = document.getElementById("field-map-root");
+  const teaserName = document.getElementById("selected-field-name");
+  const teaserAcreage = document.getElementById("selected-field-acreage");
+  const teaserCounty = document.getElementById("selected-field-county");
+  const teaserCrop = document.getElementById("selected-field-crop");
+  const teaserWeather = document.getElementById("selected-field-weather");
+  const teaserSoil = document.getElementById("selected-field-soil");
+  const teaserSignal = document.getElementById("selected-field-signal");
 
-  if (!payloadScript || !statusNode) {
-    throw new Error("Dashboard HTML shell is missing the embedded payload nodes.");
+  if (
+    !payloadScript ||
+    !statusNode ||
+    !mapRoot ||
+    !teaserName ||
+    !teaserAcreage ||
+    !teaserCounty ||
+    !teaserCrop ||
+    !teaserWeather ||
+    !teaserSoil ||
+    !teaserSignal
+  ) {
+    throw new Error("Dashboard HTML shell is missing the embedded payload map nodes.");
   }
 
   const payload = JSON.parse(payloadScript.textContent || "null");
-  const summary = [
-    "Offline hero shell loaded successfully.",
-    "Farm: " + payload.farm.farmName,
-    "Fields: " + String(payload.fields.length),
-    "Crop composition rows: " + String(payload.cropComposition.length),
-    "Imagery sources: " + String(payload.imageryCoverage.length),
-  ].join("\\n");
 
-  statusNode.textContent = summary;
+  function latestCropYear() {
+    let year = null;
+    for (const entry of payload.cropComposition) {
+      if (year === null || entry.year > year) {
+        year = entry.year;
+      }
+    }
+    return year;
+  }
+
+  function dominantCrop(fieldId) {
+    const year = latestCropYear();
+    if (year === null) {
+      return "Not available";
+    }
+
+    let best = null;
+    for (const entry of payload.cropComposition) {
+      if (entry.fieldId !== fieldId || entry.year !== year) {
+        continue;
+      }
+      if (!best || entry.pct > best.pct) {
+        best = entry;
+      }
+    }
+
+    return best ? best.cropName + " (" + Number(best.pct).toFixed(1) + "%)" : "Not available";
+  }
+
+  function latestWeather(fieldId) {
+    let best = null;
+    for (const entry of payload.weatherSeries) {
+      if (entry.fieldId !== fieldId) {
+        continue;
+      }
+      if (!best || entry.date > best.date) {
+        best = entry;
+      }
+    }
+    if (!best) {
+      return "Weather hint unavailable";
+    }
+    const temp = best.temperatureAvgC == null ? "n/a" : Number(best.temperatureAvgC).toFixed(1) + "°C";
+    const rain = best.precipitationMm == null ? "n/a" : Number(best.precipitationMm).toFixed(1) + " mm rain";
+    return best.date + " • " + temp + " • " + rain;
+  }
+
+  function soilHint(fieldId) {
+    for (const entry of payload.soilSummary) {
+      if (entry.fieldId !== fieldId) {
+        continue;
+      }
+      const soil = entry.dominantSoil || "soil type unavailable";
+      const om = entry.avgOrganicMatterPct == null ? "OM n/a" : "OM " + Number(entry.avgOrganicMatterPct).toFixed(1) + "%";
+      return soil + " • " + om;
+    }
+    return "Soil hint unavailable";
+  }
+
+  function fieldSignal(fieldId) {
+    for (const entry of payload.cropRotation) {
+      if (entry.fieldId === fieldId) {
+        return entry.predictedNextCrop
+          ? "Rotation outlook favors " + entry.predictedNextCrop + "."
+          : entry.rotationOutlook;
+      }
+    }
+    return "Rotation signal unavailable.";
+  }
+
+  const byFieldId = new Map();
+  for (const field of payload.fields) {
+    byFieldId.set(field.fieldId, field);
+  }
+
+  let selectedFieldId = mapRoot.getAttribute("data-initial-field-id") || (payload.fields[0] && payload.fields[0].fieldId);
+
+  function updateSelection(fieldId) {
+    const field = byFieldId.get(fieldId);
+    if (!field) {
+      return;
+    }
+
+    selectedFieldId = fieldId;
+    const nodes = mapRoot.querySelectorAll("[data-field-id]");
+    for (const node of nodes) {
+      const isSelected = node.getAttribute("data-field-id") === fieldId;
+      node.classList.toggle("is-selected", isSelected);
+      node.setAttribute("aria-pressed", isSelected ? "true" : "false");
+    }
+
+    teaserName.textContent = field.fieldName;
+    teaserAcreage.textContent = Number(field.areaAcres).toFixed(2) + " acres";
+    teaserCounty.textContent = field.countyName || "County unavailable";
+    teaserCrop.textContent = dominantCrop(fieldId);
+    teaserWeather.textContent = latestWeather(fieldId);
+    teaserSoil.textContent = soilHint(fieldId);
+    teaserSignal.textContent = fieldSignal(fieldId);
+
+    statusNode.textContent = [
+      "Offline hero + map shell loaded successfully.",
+      "Farm: " + payload.farm.farmName,
+      "Selected field: " + field.fieldId,
+      "Rendered boundaries: " + String(payload.fields.length),
+      "Interactive schematic: inline SVG only",
+    ].join("\\n");
+  }
+
+  const nodes = mapRoot.querySelectorAll("[data-field-id]");
+  for (const node of nodes) {
+    node.addEventListener("click", function () {
+      updateSelection(node.getAttribute("data-field-id"));
+    });
+    node.addEventListener("mouseenter", function () {
+      node.classList.add("is-hovered");
+    });
+    node.addEventListener("mouseleave", function () {
+      node.classList.remove("is-hovered");
+    });
+    node.addEventListener("focus", function () {
+      node.classList.add("is-hovered");
+    });
+    node.addEventListener("blur", function () {
+      node.classList.remove("is-hovered");
+    });
+    node.addEventListener("keydown", function (event) {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        updateSelection(node.getAttribute("data-field-id"));
+      }
+    });
+  }
+
+  if (selectedFieldId) {
+    updateSelection(selectedFieldId);
+  }
 })();
 `;
+
+type FieldCropTone = "corn" | "soy" | "mixed" | "other";
+
+interface CropMixSummary {
+  latestYear: number | null;
+  cornPct: number;
+  soyPct: number;
+  cornFieldCount: number;
+  soyFieldCount: number;
+}
+
+interface RecentWeatherSummary {
+  latestDate: string | null;
+  avgTempC: number | null;
+  precipitationMm: number | null;
+  windMps: number | null;
+}
+
+interface SoilSummaryOverview {
+  avgOmPct: number | null;
+  dominantSoil: string | null;
+}
+
+interface RotationSummaryOverview {
+  topNextCrop: string | null;
+  confidenceMix: string;
+}
+
+interface MapFeatureRender {
+  field: NormalizedGrowerDashboardField;
+  pathData: string;
+  labelX: number;
+  labelY: number;
+  shortLabel: string;
+  tone: FieldCropTone;
+}
 
 function escapeHtml(value: string): string {
   return value
@@ -356,13 +695,7 @@ function formatSignedNumber(
   }).format(value)} ${unit}`;
 }
 
-function summarizeCropMix(payload: NormalizedGrowerDashboardPayload): {
-  latestYear: number | null;
-  cornPct: number;
-  soyPct: number;
-  cornFieldCount: number;
-  soyFieldCount: number;
-} {
+function summarizeCropMix(payload: NormalizedGrowerDashboardPayload): CropMixSummary {
   const latestYear = payload.cropComposition.reduce<number | null>(
     (maxYear, entry) => (maxYear == null || entry.year > maxYear ? entry.year : maxYear),
     null,
@@ -413,12 +746,7 @@ function summarizeCropMix(payload: NormalizedGrowerDashboardPayload): {
   };
 }
 
-function summarizeRecentWeather(payload: NormalizedGrowerDashboardPayload): {
-  latestDate: string | null;
-  avgTempC: number | null;
-  precipitationMm: number | null;
-  windMps: number | null;
-} {
+function summarizeRecentWeather(payload: NormalizedGrowerDashboardPayload): RecentWeatherSummary {
   const latestDate = payload.weatherSeries.reduce<string | null>(
     (maxDate, entry) => (maxDate == null || entry.date > maxDate ? entry.date : maxDate),
     null,
@@ -445,10 +773,7 @@ function summarizeRecentWeather(payload: NormalizedGrowerDashboardPayload): {
   };
 }
 
-function summarizeSoil(payload: NormalizedGrowerDashboardPayload): {
-  avgOmPct: number | null;
-  dominantSoil: string | null;
-} {
+function summarizeSoil(payload: NormalizedGrowerDashboardPayload): SoilSummaryOverview {
   const omValues = payload.soilSummary
     .map((entry) => entry.avgOrganicMatterPct)
     .filter((value): value is number => value != null);
@@ -475,10 +800,7 @@ function summarizeSoil(payload: NormalizedGrowerDashboardPayload): {
   return { avgOmPct, dominantSoil };
 }
 
-function summarizeRotation(payload: NormalizedGrowerDashboardPayload): {
-  topNextCrop: string | null;
-  confidenceMix: string;
-} {
+function summarizeRotation(payload: NormalizedGrowerDashboardPayload): RotationSummaryOverview {
   const nextCropCounts = new Map<string, number>();
   const confidenceCounts = new Map<string, number>();
 
@@ -520,6 +842,190 @@ function countImageryReadyFields(payload: NormalizedGrowerDashboardPayload): num
   ).size;
 }
 
+function latestCropYear(payload: NormalizedGrowerDashboardPayload): number | null {
+  return payload.cropComposition.reduce<number | null>(
+    (maxYear, entry) => (maxYear == null || entry.year > maxYear ? entry.year : maxYear),
+    null,
+  );
+}
+
+function dominantCropForField(
+  payload: NormalizedGrowerDashboardPayload,
+  fieldId: string,
+): { name: string; pct: number } | null {
+  const year = latestCropYear(payload);
+  if (year == null) {
+    return null;
+  }
+
+  let best: { name: string; pct: number } | null = null;
+  for (const entry of payload.cropComposition) {
+    if (entry.fieldId !== fieldId || entry.year !== year) {
+      continue;
+    }
+    if (!best || entry.pct > best.pct) {
+      best = { name: entry.cropName, pct: entry.pct };
+    }
+  }
+  return best;
+}
+
+function toneForField(payload: NormalizedGrowerDashboardPayload, fieldId: string): FieldCropTone {
+  const dominantCrop = dominantCropForField(payload, fieldId);
+  if (!dominantCrop) {
+    return "other";
+  }
+
+  const cropName = dominantCrop.name.trim().toLowerCase();
+  if (cropName === "corn") {
+    return "corn";
+  }
+  if (cropName === "soybeans" || cropName === "soybean") {
+    return "soy";
+  }
+
+  const year = latestCropYear(payload);
+  if (year == null) {
+    return "other";
+  }
+
+  let corn = 0;
+  let soy = 0;
+  for (const entry of payload.cropComposition) {
+    if (entry.fieldId !== fieldId || entry.year !== year) {
+      continue;
+    }
+    const name = entry.cropName.trim().toLowerCase();
+    if (name === "corn") {
+      corn += entry.pct;
+    }
+    if (name === "soybeans" || name === "soybean") {
+      soy += entry.pct;
+    }
+  }
+
+  if (corn > 0 && soy > 0) {
+    return "mixed";
+  }
+  return "other";
+}
+
+function flattenRings(geometry: DashboardPolygonGeometry): number[][][] {
+  if (geometry.type === "Polygon") {
+    return geometry.coordinates as number[][][];
+  }
+
+  const polygons = geometry.coordinates as number[][][][];
+  const rings: number[][][] = [];
+  for (const polygon of polygons) {
+    for (const ring of polygon) {
+      rings.push(ring);
+    }
+  }
+  return rings;
+}
+
+function buildMapFeatures(payload: NormalizedGrowerDashboardPayload): MapFeatureRender[] {
+  const width = 760;
+  const height = 430;
+  const margin = 24;
+  const west = Math.min(...payload.fields.map((field) => field.boundary.bbox[0]));
+  const south = Math.min(...payload.fields.map((field) => field.boundary.bbox[1]));
+  const east = Math.max(...payload.fields.map((field) => field.boundary.bbox[2]));
+  const north = Math.max(...payload.fields.map((field) => field.boundary.bbox[3]));
+  const lonSpan = Math.max(east - west, 0.000001);
+  const latSpan = Math.max(north - south, 0.000001);
+  const scale = Math.min((width - margin * 2) / lonSpan, (height - margin * 2) / latSpan);
+
+  const project = (lon: number, lat: number): [number, number] => {
+    const x = margin + (lon - west) * scale;
+    const y = height - margin - (lat - south) * scale;
+    return [Number(x.toFixed(2)), Number(y.toFixed(2))];
+  };
+
+  return payload.fields.map((field, index) => {
+    const rings = flattenRings(field.boundary.geometry);
+    const pathData = rings
+      .map((ring) => {
+        return (
+          ring
+            .map(([lon, lat], pointIndex) => {
+              const [x, y] = project(lon, lat);
+              return `${pointIndex === 0 ? "M" : "L"} ${x} ${y}`;
+            })
+            .join(" ") + " Z"
+        );
+      })
+      .join(" ");
+
+    const [labelX, labelY] = project(field.boundary.centroid.lon, field.boundary.centroid.lat);
+
+    return {
+      field,
+      pathData,
+      labelX,
+      labelY,
+      shortLabel: `F${index + 1}`,
+      tone: toneForField(payload, field.fieldId),
+    };
+  });
+}
+
+function formatFieldCropContext(
+  payload: NormalizedGrowerDashboardPayload,
+  fieldId: string,
+): string {
+  const dominantCrop = dominantCropForField(payload, fieldId);
+  if (!dominantCrop) {
+    return "Crop context unavailable";
+  }
+  return `${dominantCrop.name} (${formatNumber(dominantCrop.pct, 1)}%)`;
+}
+
+function formatFieldWeatherHint(
+  payload: NormalizedGrowerDashboardPayload,
+  fieldId: string,
+): string {
+  let latestEntry = null as null | NormalizedGrowerDashboardPayload["weatherSeries"][number];
+  for (const entry of payload.weatherSeries) {
+    if (entry.fieldId !== fieldId) {
+      continue;
+    }
+    if (!latestEntry || entry.date > latestEntry.date) {
+      latestEntry = entry;
+    }
+  }
+  if (!latestEntry) {
+    return "Weather hint unavailable";
+  }
+
+  return `${latestEntry.date} • ${formatSignedNumber(latestEntry.temperatureAvgC, "°C")} • ${formatSignedNumber(latestEntry.precipitationMm, "mm")}`;
+}
+
+function formatFieldSoilHint(payload: NormalizedGrowerDashboardPayload, fieldId: string): string {
+  const soil = payload.soilSummary.find((entry) => entry.fieldId === fieldId);
+  if (!soil) {
+    return "Soil hint unavailable";
+  }
+
+  const dominant = soil.dominantSoil ?? "soil type unavailable";
+  const om =
+    soil.avgOrganicMatterPct == null
+      ? "OM n/a"
+      : `OM ${formatNumber(soil.avgOrganicMatterPct, 1)}%`;
+  return `${dominant} • ${om}`;
+}
+
+function fieldRotationSignal(payload: NormalizedGrowerDashboardPayload, fieldId: string): string {
+  const rotation = payload.cropRotation.find((entry) => entry.fieldId === fieldId);
+  if (!rotation) {
+    return "Rotation signal unavailable.";
+  }
+  return rotation.predictedNextCrop
+    ? `Rotation outlook favors ${rotation.predictedNextCrop}.`
+    : rotation.rotationOutlook;
+}
+
 export function renderGrowerDashboardHtml(payload: NormalizedGrowerDashboardPayload): string {
   assertNormalizedGrowerDashboardPayload(payload);
 
@@ -543,6 +1049,8 @@ export function renderGrowerDashboardHtml(payload: NormalizedGrowerDashboardPayl
         timeZone: payload.grower.timezone,
       })
     : "Not available";
+  const mapFeatures = buildMapFeatures(payload);
+  const initialField = payload.fields[0];
 
   return `<!doctype html>
 <html lang="en">
@@ -652,7 +1160,80 @@ export function renderGrowerDashboardHtml(payload: NormalizedGrowerDashboardPayl
               </p>
             </article>
           </div>
-          <div id="runtime-status" class="runtime-status" aria-live="polite">Loading embedded payload…</div>
+        </section>
+
+        <section class="map-wrap" aria-label="Offline field boundary schematic">
+          <p class="section-kicker">Field boundary schematic</p>
+          <div class="map-grid">
+            <section class="map-panel">
+              <div class="map-header">
+                <div>
+                  <h2>Clickable offline farm map</h2>
+                  <p class="map-copy">
+                    All five field boundaries are rendered as inline SVG. Hover and select states stay local to this document with no tiles or mapping libraries.
+                  </p>
+                </div>
+                <span class="map-badge">SVG only</span>
+              </div>
+              <div class="map-frame">
+                <svg id="field-map-root" class="map-svg" viewBox="0 0 760 430" role="group" aria-label="Farm field boundary schematic" data-initial-field-id="${escapeHtml(initialField.fieldId)}">
+                  ${mapFeatures
+                    .map(
+                      (feature) => `
+                  <g class="field-node" data-field-id="${escapeHtml(feature.field.fieldId)}" tabindex="0" role="button" aria-pressed="false" aria-label="${escapeHtml(feature.field.fieldName)}">
+                    <path class="field-shape tone-${feature.tone}" d="${feature.pathData}" />
+                    <text class="field-label" x="${feature.labelX}" y="${feature.labelY}">${escapeHtml(feature.shortLabel)}</text>
+                  </g>`,
+                    )
+                    .join("")}
+                </svg>
+              </div>
+              <div class="legend" aria-label="Map legend">
+                <span class="legend-item"><span class="legend-swatch corn"></span>Corn-led</span>
+                <span class="legend-item"><span class="legend-swatch soy"></span>Soy-led</span>
+                <span class="legend-item"><span class="legend-swatch other"></span>Other / mixed</span>
+              </div>
+            </section>
+
+            <section class="teaser-card" aria-label="Selected field teaser">
+              <div class="teaser-header">
+                <div>
+                  <h2 id="selected-field-name">${escapeHtml(initialField.fieldName)}</h2>
+                  <p class="teaser-copy">
+                    Click any field boundary to preview acreage, county, crop signal, and compact weather/soil hints before the full downstream panels are added.
+                  </p>
+                </div>
+                <span class="teaser-badge">Selection teaser</span>
+              </div>
+              <div class="teaser-metrics">
+                <article class="metric-card">
+                  <span class="label">Acreage</span>
+                  <span id="selected-field-acreage" class="value">${escapeHtml(`${formatNumber(initialField.areaAcres, 2)} acres`)}</span>
+                </article>
+                <article class="metric-card">
+                  <span class="label">County</span>
+                  <span id="selected-field-county" class="value">${escapeHtml(initialField.countyName ?? "County unavailable")}</span>
+                </article>
+                <article class="metric-card">
+                  <span class="label">Crop context</span>
+                  <span id="selected-field-crop" class="value">${escapeHtml(formatFieldCropContext(payload, initialField.fieldId))}</span>
+                </article>
+                <article class="metric-card">
+                  <span class="label">Weather hint</span>
+                  <span id="selected-field-weather" class="value">${escapeHtml(formatFieldWeatherHint(payload, initialField.fieldId))}</span>
+                </article>
+                <article class="metric-card">
+                  <span class="label">Soil hint</span>
+                  <span id="selected-field-soil" class="value">${escapeHtml(formatFieldSoilHint(payload, initialField.fieldId))}</span>
+                </article>
+                <article class="metric-card">
+                  <span class="label">Rotation signal</span>
+                  <span id="selected-field-signal" class="value">${escapeHtml(fieldRotationSignal(payload, initialField.fieldId))}</span>
+                </article>
+              </div>
+              <div id="runtime-status" class="runtime-status" aria-live="polite">Loading embedded payload…</div>
+            </section>
+          </div>
         </section>
       </section>
     </main>
