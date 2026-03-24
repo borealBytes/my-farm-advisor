@@ -168,7 +168,8 @@ h1 {
 .summary-wrap,
 .signal-wrap,
 .map-wrap,
-.weather-wrap {
+.weather-wrap,
+.soil-wrap {
   padding: 0 32px 32px;
 }
 
@@ -473,6 +474,124 @@ h1 {
   margin-top: 16px;
 }
 
+.soil-panel {
+  border-radius: 22px;
+  background: #f8fbf7;
+  border: 1px solid rgba(23, 38, 27, 0.08);
+  padding: 18px;
+}
+
+.soil-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.soil-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 7px 10px;
+  background: rgba(69, 119, 83, 0.1);
+  color: #31503c;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.soil-copy,
+.soil-summary-copy,
+.soil-horizon-copy {
+  margin: 8px 0 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #476356;
+}
+
+.soil-grid {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.95fr) minmax(0, 1.05fr);
+  gap: 18px;
+  margin-top: 16px;
+}
+
+.soil-summary-card,
+.soil-horizon-card {
+  border-radius: 20px;
+  background: #ffffff;
+  border: 1px solid rgba(23, 38, 27, 0.08);
+  padding: 16px;
+}
+
+.soil-summary-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.soil-metric {
+  border-radius: 16px;
+  background: #f7fbf6;
+  border: 1px solid rgba(23, 38, 27, 0.08);
+  padding: 12px;
+}
+
+.soil-metric .value {
+  font-size: 1.05rem;
+}
+
+.horizon-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.horizon-row {
+  display: grid;
+  gap: 8px;
+  border-radius: 16px;
+  padding: 12px;
+  background: #f7fbf6;
+  border: 1px solid rgba(23, 38, 27, 0.08);
+}
+
+.horizon-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.horizon-name {
+  font-weight: 700;
+  color: #213a2a;
+}
+
+.horizon-depth {
+  color: #4f695a;
+  font-size: 0.88rem;
+}
+
+.horizon-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.horizon-pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: rgba(69, 119, 83, 0.08);
+  color: #31503c;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
 .weather-chart-card {
   min-width: 0;
 }
@@ -549,7 +668,8 @@ h1 {
   .summary-wrap,
   .signal-wrap,
   .map-wrap,
-  .weather-wrap {
+  .weather-wrap,
+  .soil-wrap {
     padding: 0 20px 20px;
   }
 
@@ -558,7 +678,8 @@ h1 {
   }
 
   .weather-overview,
-  .weather-grid {
+  .weather-grid,
+  .soil-grid {
     grid-template-columns: 1fr;
   }
 }
@@ -570,7 +691,8 @@ h1 {
 
   .portfolio-grid,
   .teaser-metrics,
-  .weather-overview-metrics {
+  .weather-overview-metrics,
+  .soil-summary-metrics {
     grid-template-columns: 1fr;
   }
 }
@@ -621,6 +743,16 @@ const INLINE_JS = `
     humidity: document.getElementById("weather-subtitle-humidity"),
     wind: document.getElementById("weather-subtitle-wind"),
   };
+  const soilPanelField = document.getElementById("soil-selected-field");
+  const soilPanelSummary = document.getElementById("soil-selected-summary");
+  const soilDominant = document.getElementById("soil-dominant");
+  const soilOm = document.getElementById("soil-om");
+  const soilPh = document.getElementById("soil-ph");
+  const soilAws = document.getElementById("soil-aws");
+  const soilTexture = document.getElementById("soil-texture");
+  const soilDrainage = document.getElementById("soil-drainage");
+  const soilHorizonCount = document.getElementById("soil-horizon-count");
+  const soilHorizonList = document.getElementById("soil-horizon-list");
 
   if (
     !payloadScript ||
@@ -655,7 +787,17 @@ const INLINE_JS = `
     !weatherSubtitles.precipitation ||
     !weatherSubtitles.solar ||
     !weatherSubtitles.humidity ||
-    !weatherSubtitles.wind
+    !weatherSubtitles.wind ||
+    !soilPanelField ||
+    !soilPanelSummary ||
+    !soilDominant ||
+    !soilOm ||
+    !soilPh ||
+    !soilAws ||
+    !soilTexture ||
+    !soilDrainage ||
+    !soilHorizonCount ||
+    !soilHorizonList
   ) {
     throw new Error("Dashboard HTML shell is missing the embedded payload weather/map nodes.");
   }
@@ -730,6 +872,95 @@ const INLINE_JS = `
       }
     }
     return "Rotation signal unavailable.";
+  }
+
+  function soilSummaryForField(fieldId) {
+    for (const entry of payload.soilSummary) {
+      if (entry.fieldId === fieldId) {
+        return entry;
+      }
+    }
+    return null;
+  }
+
+  function soilHorizonsForField(fieldId) {
+    return payload.soilHorizons
+      .filter(function (entry) {
+        return entry.fieldId === fieldId;
+      })
+      .sort(function (left, right) {
+        const leftTop = left.horizonTopCm === null || left.horizonTopCm === undefined ? 9999 : left.horizonTopCm;
+        const rightTop = right.horizonTopCm === null || right.horizonTopCm === undefined ? 9999 : right.horizonTopCm;
+        return leftTop - rightTop;
+      });
+  }
+
+  function compactValue(value, suffix, fractionDigits) {
+    if (value === null || value === undefined) {
+      return "Not available";
+    }
+    return Number(value).toFixed(fractionDigits) + suffix;
+  }
+
+  function dominantTexture(horizon) {
+    if (!horizon) {
+      return "Texture unavailable";
+    }
+    const clay = horizon.clayPct;
+    const sand = horizon.sandPct;
+    const silt = horizon.siltPct;
+    const parts = [];
+    if (clay !== null && clay !== undefined) parts.push("Clay " + Number(clay).toFixed(0) + "%");
+    if (silt !== null && silt !== undefined) parts.push("Silt " + Number(silt).toFixed(0) + "%");
+    if (sand !== null && sand !== undefined) parts.push("Sand " + Number(sand).toFixed(0) + "%");
+    return parts.length > 0 ? parts.join(" • ") : "Texture unavailable";
+  }
+
+  function renderHorizonRow(horizon) {
+    const top = horizon.horizonTopCm === null || horizon.horizonTopCm === undefined ? "?" : Number(horizon.horizonTopCm).toFixed(0);
+    const bottom = horizon.horizonBottomCm === null || horizon.horizonBottomCm === undefined ? "?" : Number(horizon.horizonBottomCm).toFixed(0);
+    const pills = [
+      horizon.componentPct !== null && horizon.componentPct !== undefined ? 'Component ' + Number(horizon.componentPct).toFixed(0) + '%' : null,
+      horizon.ph !== null && horizon.ph !== undefined ? 'pH ' + Number(horizon.ph).toFixed(1) : null,
+      horizon.organicMatterPct !== null && horizon.organicMatterPct !== undefined ? 'OM ' + Number(horizon.organicMatterPct).toFixed(1) + '%' : null,
+      horizon.availableWaterCapacity !== null && horizon.availableWaterCapacity !== undefined ? 'AWC ' + Number(horizon.availableWaterCapacity).toFixed(2) : null,
+      dominantTexture(horizon),
+    ].filter(Boolean);
+
+    return '<article class="horizon-row"><div class="horizon-topline"><span class="horizon-name">' +
+      (horizon.componentName || 'Unnamed component') +
+      '</span><span class="horizon-depth">' +
+      top +
+      '–' +
+      bottom +
+      ' cm</span></div><div class="horizon-metrics">' +
+      pills.map(function (pill) { return '<span class="horizon-pill">' + pill + '</span>'; }).join('') +
+      '</div></article>';
+  }
+
+  function updateSoilPanel(fieldId) {
+    const field = byFieldId.get(fieldId);
+    if (!field) {
+      return;
+    }
+    const summary = soilSummaryForField(fieldId);
+    const horizons = soilHorizonsForField(fieldId).slice(0, 5);
+    const surfaceHorizon = horizons.length > 0 ? horizons[0] : null;
+
+    soilPanelField.textContent = field.fieldName;
+    soilPanelSummary.textContent = summary
+      ? 'Decision-relevant soil metrics and compact horizon context for the selected field, updated from the embedded normalized soil payload.'
+      : 'No normalized soil summary is available for this field.';
+    soilDominant.textContent = summary && summary.dominantSoil ? summary.dominantSoil : 'Not available';
+    soilOm.textContent = summary ? compactValue(summary.avgOrganicMatterPct, '%', 1) : 'Not available';
+    soilPh.textContent = summary ? compactValue(summary.avgPh, '', 2) : 'Not available';
+    soilAws.textContent = summary ? compactValue(summary.totalAwsInches, ' in', 2) : 'Not available';
+    soilTexture.textContent = dominantTexture(surfaceHorizon);
+    soilDrainage.textContent = summary && summary.drainageClass ? summary.drainageClass : 'Not available';
+    soilHorizonCount.textContent = summary ? String(summary.horizonCount) : '0';
+    soilHorizonList.innerHTML = horizons.length > 0
+      ? horizons.map(function (horizon) { return renderHorizonRow(horizon); }).join('')
+      : '<article class="horizon-row"><div class="horizon-topline"><span class="horizon-name">No horizon detail</span><span class="horizon-depth">—</span></div><div class="horizon-metrics"><span class="horizon-pill">No normalized soil horizon rows are available.</span></div></article>';
   }
 
   function weatherSeries(fieldId) {
@@ -902,6 +1133,7 @@ const INLINE_JS = `
     teaserSoil.textContent = soilHint(fieldId);
     teaserSignal.textContent = fieldSignal(fieldId);
     updateWeatherPanel(fieldId);
+    updateSoilPanel(fieldId);
 
     statusNode.textContent = [
       "Offline hero + map + weather shell loaded successfully.",
@@ -1337,6 +1569,87 @@ function formatFieldSoilHint(payload: NormalizedGrowerDashboardPayload, fieldId:
   return `${dominant} • ${om}`;
 }
 
+function soilSummaryForFieldPayload(
+  payload: NormalizedGrowerDashboardPayload,
+  fieldId: string,
+): NormalizedGrowerDashboardPayload["soilSummary"][number] | null {
+  return payload.soilSummary.find((entry) => entry.fieldId === fieldId) ?? null;
+}
+
+function soilHorizonsForFieldPayload(
+  payload: NormalizedGrowerDashboardPayload,
+  fieldId: string,
+): NormalizedGrowerDashboardPayload["soilHorizons"] {
+  return payload.soilHorizons
+    .filter((entry) => entry.fieldId === fieldId)
+    .toSorted((left, right) => {
+      const leftTop = left.horizonTopCm ?? 9_999;
+      const rightTop = right.horizonTopCm ?? 9_999;
+      return leftTop - rightTop;
+    });
+}
+
+function formatOptionalMetric(
+  value: number | null,
+  suffix: string,
+  fractionDigits: number,
+): string {
+  if (value == null) {
+    return "Not available";
+  }
+
+  return `${value.toFixed(fractionDigits)}${suffix}`;
+}
+
+function textureHintFromHorizon(
+  horizon: NormalizedGrowerDashboardPayload["soilHorizons"][number] | null,
+): string {
+  if (!horizon) {
+    return "Texture unavailable";
+  }
+
+  const parts: string[] = [];
+  if (horizon.clayPct != null) {
+    parts.push(`Clay ${horizon.clayPct.toFixed(0)}%`);
+  }
+  if (horizon.siltPct != null) {
+    parts.push(`Silt ${horizon.siltPct.toFixed(0)}%`);
+  }
+  if (horizon.sandPct != null) {
+    parts.push(`Sand ${horizon.sandPct.toFixed(0)}%`);
+  }
+
+  return parts.length > 0 ? parts.join(" • ") : "Texture unavailable";
+}
+
+function renderInitialSoilHorizonRows(
+  payload: NormalizedGrowerDashboardPayload,
+  fieldId: string,
+): string {
+  const horizons = soilHorizonsForFieldPayload(payload, fieldId).slice(0, 5);
+  if (horizons.length === 0) {
+    return '<article class="horizon-row"><div class="horizon-topline"><span class="horizon-name">No horizon detail</span><span class="horizon-depth">—</span></div><div class="horizon-metrics"><span class="horizon-pill">No normalized soil horizon rows are available.</span></div></article>';
+  }
+
+  return horizons
+    .map((horizon) => {
+      const pills = [
+        horizon.componentPct != null ? `Component ${horizon.componentPct.toFixed(0)}%` : null,
+        horizon.ph != null ? `pH ${horizon.ph.toFixed(1)}` : null,
+        horizon.organicMatterPct != null ? `OM ${horizon.organicMatterPct.toFixed(1)}%` : null,
+        horizon.availableWaterCapacity != null
+          ? `AWC ${horizon.availableWaterCapacity.toFixed(2)}`
+          : null,
+        textureHintFromHorizon(horizon),
+      ].filter((value): value is string => Boolean(value));
+      const top = horizon.horizonTopCm != null ? horizon.horizonTopCm.toFixed(0) : "?";
+      const bottom = horizon.horizonBottomCm != null ? horizon.horizonBottomCm.toFixed(0) : "?";
+
+      return `<article class="horizon-row"><div class="horizon-topline"><span class="horizon-name">${escapeHtml(horizon.componentName ?? "Unnamed component")}</span><span class="horizon-depth">${escapeHtml(`${top}–${bottom} cm`)}</span></div><div class="horizon-metrics">${pills.map((pill) => `<span class="horizon-pill">${escapeHtml(pill)}</span>`).join("")}</div></article>`;
+    })
+    .join("");
+}
+
 function fieldRotationSignal(payload: NormalizedGrowerDashboardPayload, fieldId: string): string {
   const rotation = payload.cropRotation.find((entry) => entry.fieldId === fieldId);
   if (!rotation) {
@@ -1372,6 +1685,9 @@ export function renderGrowerDashboardHtml(payload: NormalizedGrowerDashboardPayl
     : "Not available";
   const mapFeatures = buildMapFeatures(payload);
   const initialField = payload.fields[0];
+  const initialSoilSummary = soilSummaryForFieldPayload(payload, initialField.fieldId);
+  const initialSurfaceHorizon =
+    soilHorizonsForFieldPayload(payload, initialField.fieldId)[0] ?? null;
 
   return `<!doctype html>
 <html lang="en">
@@ -1643,6 +1959,67 @@ export function renderGrowerDashboardHtml(payload: NormalizedGrowerDashboardPayl
                 <p id="weather-subtitle-wind" class="chart-subtitle">Preparing chart…</p>
                 <div id="weather-chart-wind" class="chart-frame"></div>
               </article>
+            </div>
+          </section>
+        </section>
+
+        <section class="soil-wrap" aria-label="Selected field soil panel">
+          <p class="section-kicker">Selected field soil</p>
+          <section class="soil-panel">
+            <div class="soil-header">
+              <div>
+                <h2 id="soil-selected-field">${escapeHtml(initialField.fieldName)}</h2>
+                <p id="soil-selected-summary" class="soil-copy">
+                  Decision-relevant soil summary metrics and compact horizon detail for the currently selected field.
+                </p>
+              </div>
+              <span class="soil-badge">Soil only</span>
+            </div>
+
+            <div class="soil-grid">
+              <section class="soil-summary-card">
+                <h2 class="section-title">Field soil summary</h2>
+                <p class="soil-summary-copy">
+                  Core soil signals stay visible for quick agronomic framing before deeper downstream panels are added.
+                </p>
+                <div class="soil-summary-metrics">
+                  <article class="soil-metric">
+                    <span class="label">Dominant soil</span>
+                    <span id="soil-dominant" class="value">${escapeHtml(initialSoilSummary?.dominantSoil ?? "Not available")}</span>
+                  </article>
+                  <article class="soil-metric">
+                    <span class="label">Organic matter</span>
+                    <span id="soil-om" class="value">${escapeHtml(formatOptionalMetric(initialSoilSummary?.avgOrganicMatterPct ?? null, "%", 1))}</span>
+                  </article>
+                  <article class="soil-metric">
+                    <span class="label">pH</span>
+                    <span id="soil-ph" class="value">${escapeHtml(formatOptionalMetric(initialSoilSummary?.avgPh ?? null, "", 2))}</span>
+                  </article>
+                  <article class="soil-metric">
+                    <span class="label">Total AWS</span>
+                    <span id="soil-aws" class="value">${escapeHtml(formatOptionalMetric(initialSoilSummary?.totalAwsInches ?? null, " in", 2))}</span>
+                  </article>
+                  <article class="soil-metric">
+                    <span class="label">Surface texture</span>
+                    <span id="soil-texture" class="value">${escapeHtml(textureHintFromHorizon(initialSurfaceHorizon))}</span>
+                  </article>
+                  <article class="soil-metric">
+                    <span class="label">Drainage</span>
+                    <span id="soil-drainage" class="value">${escapeHtml(initialSoilSummary?.drainageClass ?? "Not available")}</span>
+                  </article>
+                </div>
+              </section>
+
+              <section class="soil-horizon-card">
+                <h2 class="section-title">Compact horizon view</h2>
+                <p class="soil-horizon-copy">
+                  Normalized horizon rows are condensed into a quick read for depth, chemistry, water capacity, and texture.
+                </p>
+                <p class="soil-horizon-copy">
+                  Horizon rows shown: <strong id="soil-horizon-count">${escapeHtml(String(initialSoilSummary?.horizonCount ?? 0))}</strong>
+                </p>
+                <div id="soil-horizon-list" class="horizon-list">${renderInitialSoilHorizonRows(payload, initialField.fieldId)}</div>
+              </section>
             </div>
           </section>
         </section>
