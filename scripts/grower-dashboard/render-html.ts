@@ -170,7 +170,8 @@ h1 {
 .map-wrap,
 .weather-wrap,
 .soil-wrap,
-.crop-wrap {
+.crop-wrap,
+.imagery-wrap {
   padding: 0 32px 32px;
 }
 
@@ -671,6 +672,132 @@ h1 {
   font-weight: 600;
 }
 
+.imagery-panel {
+  border-radius: 22px;
+  background: #f8fbf7;
+  border: 1px solid rgba(23, 38, 27, 0.08);
+  padding: 18px;
+}
+
+.imagery-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.imagery-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 7px 10px;
+  background: rgba(69, 119, 83, 0.1);
+  color: #31503c;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.imagery-copy,
+.imagery-summary-copy,
+.imagery-scenes-copy {
+  margin: 8px 0 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #476356;
+}
+
+.imagery-grid {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.95fr) minmax(0, 1.05fr);
+  gap: 18px;
+  margin-top: 16px;
+}
+
+.imagery-summary-card,
+.imagery-scenes-card {
+  border-radius: 20px;
+  background: #ffffff;
+  border: 1px solid rgba(23, 38, 27, 0.08);
+  padding: 16px;
+}
+
+.imagery-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.imagery-metric {
+  border-radius: 16px;
+  background: #f7fbf6;
+  border: 1px solid rgba(23, 38, 27, 0.08);
+  padding: 12px;
+}
+
+.imagery-list,
+.scene-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.imagery-source-row,
+.scene-row {
+  border-radius: 16px;
+  background: #f7fbf6;
+  border: 1px solid rgba(23, 38, 27, 0.08);
+  padding: 12px;
+}
+
+.imagery-topline,
+.scene-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.imagery-name,
+.scene-name {
+  font-weight: 700;
+  color: #213a2a;
+}
+
+.imagery-value,
+.scene-value {
+  color: #214d2f;
+  font-weight: 700;
+}
+
+.imagery-detail,
+.scene-detail {
+  margin-top: 8px;
+  color: #4f695a;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.scene-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.scene-pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: rgba(69, 119, 83, 0.08);
+  color: #31503c;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
 .horizon-list {
   display: grid;
   gap: 10px;
@@ -798,7 +925,8 @@ h1 {
   .map-wrap,
   .weather-wrap,
   .soil-wrap,
-  .crop-wrap {
+  .crop-wrap,
+  .imagery-wrap {
     padding: 0 20px 20px;
   }
 
@@ -809,7 +937,8 @@ h1 {
   .weather-overview,
   .weather-grid,
   .soil-grid,
-  .crop-grid {
+  .crop-grid,
+  .imagery-grid {
     grid-template-columns: 1fr;
   }
 }
@@ -822,7 +951,8 @@ h1 {
   .portfolio-grid,
   .teaser-metrics,
   .weather-overview-metrics,
-  .soil-summary-metrics {
+  .soil-summary-metrics,
+  .imagery-metrics {
     grid-template-columns: 1fr;
   }
 }
@@ -894,6 +1024,12 @@ const INLINE_JS = `
   const cropRotationHistory = document.getElementById("crop-rotation-history");
   const cropRotationPatterns = document.getElementById("crop-rotation-patterns");
   const cropRotationOutlook = document.getElementById("crop-rotation-outlook");
+  const imageryPanelField = document.getElementById("imagery-selected-field");
+  const imageryPanelSummary = document.getElementById("imagery-selected-summary");
+  const imageryReadyCount = document.getElementById("imagery-ready-count");
+  const imageryLatestScene = document.getElementById("imagery-latest-scene");
+  const imagerySources = document.getElementById("imagery-sources");
+  const imagerySceneList = document.getElementById("imagery-scene-list");
 
   if (
     !payloadScript ||
@@ -949,7 +1085,13 @@ const INLINE_JS = `
     !cropRotationSequence ||
     !cropRotationHistory ||
     !cropRotationPatterns ||
-    !cropRotationOutlook
+    !cropRotationOutlook ||
+    !imageryPanelField ||
+    !imageryPanelSummary ||
+    !imageryReadyCount ||
+    !imageryLatestScene ||
+    !imagerySources ||
+    !imagerySceneList
   ) {
     throw new Error("Dashboard HTML shell is missing the embedded payload weather/map nodes.");
   }
@@ -1108,6 +1250,85 @@ const INLINE_JS = `
       ? rotation.rotationPatterns.map(function (pattern) { return '<span class="rotation-pill">' + pattern + '</span>'; }).join('')
       : '<span class="rotation-pill">No rotation patterns available</span>';
     cropRotationOutlook.textContent = rotation ? rotation.rotationOutlook : 'Rotation outlook unavailable';
+  }
+
+  function imageryCoverageForField(fieldId) {
+    return payload.imageryCoverage
+      .filter(function (entry) {
+        return entry.fieldId === fieldId && entry.sceneCount > 0;
+      })
+      .sort(function (left, right) {
+        return String(left.source).localeCompare(String(right.source));
+      });
+  }
+
+  function imageryScenesForField(fieldId) {
+    return payload.imageryScenes
+      .filter(function (entry) {
+        return entry.fieldId === fieldId;
+      })
+      .sort(function (left, right) {
+        return right.sceneDate.localeCompare(left.sceneDate);
+      });
+  }
+
+  function imagerySourceRowMarkup(entry) {
+    return '<article class="imagery-source-row"><div class="imagery-topline"><span class="imagery-name">' +
+      entry.source +
+      '</span><span class="imagery-value">' +
+      String(entry.sceneCount) +
+      ' scene(s)</span></div><div class="imagery-detail">Available ' +
+      (entry.firstSceneDate || 'n/a') +
+      ' → ' +
+      (entry.lastSceneDate || 'n/a') +
+      ' • expected ' +
+      (entry.expectedSceneCount == null ? 'n/a' : String(entry.expectedSceneCount)) +
+      ' • coverage ' +
+      (entry.coveragePct == null ? 'n/a' : Number(entry.coveragePct).toFixed(1) + '%') +
+      '</div></article>';
+  }
+
+  function imagerySceneRowMarkup(entry) {
+    const pills = [
+      entry.cloudPct == null ? null : 'Cloud ' + Number(entry.cloudPct).toFixed(1) + '%',
+      'Assets ' + String(entry.assetCount),
+      entry.source,
+    ].filter(Boolean);
+    return '<article class="scene-row"><div class="scene-topline"><span class="scene-name">' +
+      entry.sceneDate +
+      '</span><span class="scene-value">' +
+      entry.sceneId +
+      '</span></div><div class="scene-detail">' +
+      (entry.notes && entry.notes.length > 0 ? entry.notes.join(' • ') : 'Normalized scene metadata available') +
+      '</div><div class="scene-pills">' +
+      pills.map(function (pill) { return '<span class="scene-pill">' + pill + '</span>'; }).join('') +
+      '</div></article>';
+  }
+
+  function updateImageryPanel(fieldId) {
+    const field = byFieldId.get(fieldId);
+    if (!field) {
+      return;
+    }
+
+    const coverage = imageryCoverageForField(fieldId);
+    const scenes = imageryScenesForField(fieldId).slice(0, 6);
+    const latestScene = scenes.length > 0 ? scenes[0] : null;
+
+    imageryPanelField.textContent = field.fieldName;
+    imageryPanelSummary.textContent = coverage.length > 0
+      ? 'Imagery-ready source availability and recent normalized scene cues for the selected field, all from the embedded payload.'
+      : 'This field has no imagery-ready sources in the current embedded payload.';
+    imageryReadyCount.textContent = String(coverage.length);
+    imageryLatestScene.textContent = latestScene
+      ? latestScene.sceneDate + ' • ' + latestScene.source
+      : 'Not available';
+    imagerySources.innerHTML = coverage.length > 0
+      ? coverage.map(function (entry) { return imagerySourceRowMarkup(entry); }).join('')
+      : '<article class="imagery-source-row"><div class="imagery-topline"><span class="imagery-name">No imagery-ready sources</span><span class="imagery-value">0</span></div><div class="imagery-detail">No normalized imagery coverage rows with scenes are available for this field.</div></article>';
+    imagerySceneList.innerHTML = scenes.length > 0
+      ? scenes.map(function (entry) { return imagerySceneRowMarkup(entry); }).join('')
+      : '<article class="scene-row"><div class="scene-topline"><span class="scene-name">No recent scenes</span><span class="scene-value">—</span></div><div class="scene-detail">No normalized imagery scene rows are available for this field.</div><div class="scene-pills"><span class="scene-pill">Non-breaking empty state</span></div></article>';
   }
 
   function soilSummaryForField(fieldId) {
@@ -1371,6 +1592,7 @@ const INLINE_JS = `
     updateWeatherPanel(fieldId);
     updateSoilPanel(fieldId);
     updateCropPanel(fieldId);
+    updateImageryPanel(fieldId);
 
     statusNode.textContent = [
       "Offline hero + map + weather shell loaded successfully.",
@@ -1941,6 +2163,63 @@ function renderInitialCropCompositionRows(
     .join("");
 }
 
+function imageryCoverageForFieldPayload(
+  payload: NormalizedGrowerDashboardPayload,
+  fieldId: string,
+): NormalizedGrowerDashboardPayload["imageryCoverage"] {
+  return payload.imageryCoverage
+    .filter((entry) => entry.fieldId === fieldId && entry.sceneCount > 0)
+    .toSorted((left, right) => String(left.source).localeCompare(String(right.source)));
+}
+
+function imageryScenesForFieldPayload(
+  payload: NormalizedGrowerDashboardPayload,
+  fieldId: string,
+): NormalizedGrowerDashboardPayload["imageryScenes"] {
+  return payload.imageryScenes
+    .filter((entry) => entry.fieldId === fieldId)
+    .toSorted((left, right) => right.sceneDate.localeCompare(left.sceneDate));
+}
+
+function renderInitialImagerySourceRows(
+  payload: NormalizedGrowerDashboardPayload,
+  fieldId: string,
+): string {
+  const rows = imageryCoverageForFieldPayload(payload, fieldId);
+  if (rows.length === 0) {
+    return '<article class="imagery-source-row"><div class="imagery-topline"><span class="imagery-name">No imagery-ready sources</span><span class="imagery-value">0</span></div><div class="imagery-detail">No normalized imagery coverage rows with scenes are available for this field.</div></article>';
+  }
+
+  return rows
+    .map(
+      (entry) =>
+        `<article class="imagery-source-row"><div class="imagery-topline"><span class="imagery-name">${escapeHtml(entry.source)}</span><span class="imagery-value">${escapeHtml(String(entry.sceneCount))} scene(s)</span></div><div class="imagery-detail">Available ${escapeHtml(entry.firstSceneDate ?? "n/a")} → ${escapeHtml(entry.lastSceneDate ?? "n/a")} • expected ${escapeHtml(entry.expectedSceneCount == null ? "n/a" : String(entry.expectedSceneCount))} • coverage ${escapeHtml(entry.coveragePct == null ? "n/a" : `${entry.coveragePct.toFixed(1)}%`)}</div></article>`,
+    )
+    .join("");
+}
+
+function renderInitialImagerySceneRows(
+  payload: NormalizedGrowerDashboardPayload,
+  fieldId: string,
+): string {
+  const rows = imageryScenesForFieldPayload(payload, fieldId).slice(0, 6);
+  if (rows.length === 0) {
+    return '<article class="scene-row"><div class="scene-topline"><span class="scene-name">No recent scenes</span><span class="scene-value">—</span></div><div class="scene-detail">No normalized imagery scene rows are available for this field.</div><div class="scene-pills"><span class="scene-pill">Non-breaking empty state</span></div></article>';
+  }
+
+  return rows
+    .map((entry) => {
+      const pills = [
+        entry.cloudPct == null ? null : `Cloud ${entry.cloudPct.toFixed(1)}%`,
+        `Assets ${entry.assetCount}`,
+        entry.source,
+      ].filter((value): value is string => Boolean(value));
+
+      return `<article class="scene-row"><div class="scene-topline"><span class="scene-name">${escapeHtml(entry.sceneDate)}</span><span class="scene-value">${escapeHtml(entry.sceneId)}</span></div><div class="scene-detail">${escapeHtml(entry.notes.length > 0 ? entry.notes.join(" • ") : "Normalized scene metadata available")}</div><div class="scene-pills">${pills.map((pill) => `<span class="scene-pill">${escapeHtml(pill)}</span>`).join("")}</div></article>`;
+    })
+    .join("");
+}
+
 export function renderGrowerDashboardHtml(payload: NormalizedGrowerDashboardPayload): string {
   assertNormalizedGrowerDashboardPayload(payload);
 
@@ -1972,6 +2251,9 @@ export function renderGrowerDashboardHtml(payload: NormalizedGrowerDashboardPayl
   const initialCropComposition = cropCompositionForFieldPayload(payload, initialField.fieldId);
   const initialCropLead = initialCropComposition.rows[0] ?? null;
   const initialRotation = cropRotationForFieldPayload(payload, initialField.fieldId);
+  const initialImageryCoverage = imageryCoverageForFieldPayload(payload, initialField.fieldId);
+  const initialImageryScenes = imageryScenesForFieldPayload(payload, initialField.fieldId);
+  const initialLatestImageryScene = initialImageryScenes[0] ?? null;
 
   return `<!doctype html>
 <html lang="en">
@@ -2377,6 +2659,49 @@ export function renderGrowerDashboardHtml(payload: NormalizedGrowerDashboardPayl
                     <div id="crop-rotation-outlook" class="rotation-detail">${escapeHtml(initialRotation?.rotationOutlook ?? "Rotation outlook unavailable")}</div>
                   </article>
                 </div>
+              </section>
+            </div>
+          </section>
+        </section>
+
+        <section class="imagery-wrap" aria-label="Selected field imagery panel">
+          <p class="section-kicker">Selected field imagery</p>
+          <section class="imagery-panel">
+            <div class="imagery-header">
+              <div>
+                <h2 id="imagery-selected-field">${escapeHtml(initialField.fieldName)}</h2>
+                <p id="imagery-selected-summary" class="imagery-copy">
+                  Imagery-ready source coverage and recent normalized scene cues for the currently selected field.
+                </p>
+              </div>
+              <span class="imagery-badge">Imagery only</span>
+            </div>
+
+            <div class="imagery-grid">
+              <section class="imagery-summary-card">
+                <h2 class="section-title">Source availability</h2>
+                <p class="imagery-summary-copy">
+                  Farmer-friendly source readiness and date coverage for imagery-ready fields, updated by the map selection above.
+                </p>
+                <div class="imagery-metrics">
+                  <article class="imagery-metric">
+                    <span class="label">Ready sources</span>
+                    <span id="imagery-ready-count" class="value">${escapeHtml(String(initialImageryCoverage.length))}</span>
+                  </article>
+                  <article class="imagery-metric">
+                    <span class="label">Latest scene</span>
+                    <span id="imagery-latest-scene" class="value">${escapeHtml(initialLatestImageryScene ? `${initialLatestImageryScene.sceneDate} • ${initialLatestImageryScene.source}` : "Not available")}</span>
+                  </article>
+                </div>
+                <div id="imagery-sources" class="imagery-list">${renderInitialImagerySourceRows(payload, initialField.fieldId)}</div>
+              </section>
+
+              <section class="imagery-scenes-card">
+                <h2 class="section-title">Recent scene cues</h2>
+                <p class="imagery-scenes-copy">
+                  Recent normalized scene metadata helps explain source freshness, cloud context, and asset availability without opening imagery yet.
+                </p>
+                <div id="imagery-scene-list" class="scene-list">${renderInitialImagerySceneRows(payload, initialField.fieldId)}</div>
               </section>
             </div>
           </section>
