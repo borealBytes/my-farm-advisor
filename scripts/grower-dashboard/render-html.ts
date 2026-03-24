@@ -44,6 +44,12 @@ main {
   box-shadow: 0 24px 70px rgba(43, 69, 50, 0.12);
 }
 
+.shell-body {
+  display: grid;
+  gap: 28px;
+  padding: 0 0 32px;
+}
+
 .hero {
   display: grid;
   grid-template-columns: minmax(0, 1.65fr) minmax(320px, 0.95fr);
@@ -173,6 +179,124 @@ h1 {
 .crop-wrap,
 .imagery-wrap {
   padding: 0 32px 32px;
+}
+
+.overview-grid,
+.downstream-grid {
+  display: grid;
+  gap: 18px;
+  padding: 0 32px;
+}
+
+.overview-grid {
+  grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+  align-items: start;
+}
+
+.overview-grid .summary-wrap,
+.overview-grid .signal-wrap,
+.downstream-grid .map-wrap,
+.downstream-grid .weather-wrap,
+.downstream-grid .soil-wrap,
+.downstream-grid .crop-wrap,
+.downstream-grid .imagery-wrap {
+  padding: 0;
+}
+
+.overview-grid .summary-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.overview-grid .signal-grid {
+  grid-template-columns: 1fr;
+  margin-top: 0;
+}
+
+.selection-stage {
+  padding: 0 32px;
+}
+
+.selection-shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+  gap: 18px;
+}
+
+.selection-focus,
+.selection-guide {
+  border-radius: 24px;
+  padding: 20px;
+  border: 1px solid rgba(23, 38, 27, 0.08);
+}
+
+.selection-focus {
+  background: linear-gradient(135deg, #1c3122 0%, #274534 100%);
+  color: #f3f8f1;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.selection-guide {
+  background: linear-gradient(180deg, #f9fcf8 0%, #f0f6ef 100%);
+}
+
+.selection-kicker {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(243, 248, 241, 0.78);
+}
+
+.selection-title {
+  margin: 10px 0 0;
+  font-size: clamp(1.35rem, 2vw, 1.85rem);
+  letter-spacing: -0.02em;
+}
+
+.selection-copy,
+.selection-guide-copy {
+  margin: 10px 0 0;
+  font-size: 0.96rem;
+  line-height: 1.65;
+}
+
+.selection-copy {
+  color: rgba(243, 248, 241, 0.88);
+}
+
+.selection-guide-copy {
+  color: #4f695a;
+}
+
+.selection-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.selection-chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 7px 11px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #f3f8f1;
+  font-size: 0.86rem;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.downstream-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+}
+
+.downstream-grid .map-wrap,
+.downstream-grid .weather-wrap,
+.downstream-grid .imagery-wrap {
+  grid-column: 1 / -1;
 }
 
 .summary-wrap {
@@ -969,10 +1093,18 @@ h1 {
     padding: 0 20px 20px;
   }
 
+  .overview-grid,
+  .downstream-grid,
+  .selection-stage {
+    padding: 0 20px;
+  }
+
   .hero {
     padding: 24px;
   }
 
+  .overview-grid,
+  .selection-shell,
   .weather-overview,
   .weather-grid,
   .soil-grid,
@@ -985,6 +1117,12 @@ h1 {
 @media (max-width: 640px) {
   main {
     padding: 16px 12px 40px;
+  }
+
+  .overview-grid,
+  .downstream-grid,
+  .selection-stage {
+    padding: 0 12px;
   }
 
   .portfolio-grid,
@@ -1013,6 +1151,10 @@ const INLINE_JS = `
   const teaserWeather = document.getElementById("selected-field-weather");
   const teaserSoil = document.getElementById("selected-field-soil");
   const teaserSignal = document.getElementById("selected-field-signal");
+  const selectedShowcaseField = document.getElementById("selected-showcase-field");
+  const selectedShowcaseSummary = document.getElementById("selected-showcase-summary");
+  const selectedShowcaseCrop = document.getElementById("selected-showcase-crop");
+  const selectedShowcaseImagery = document.getElementById("selected-showcase-imagery");
   const weatherPanelField = document.getElementById("weather-selected-field");
   const weatherPanelSummary = document.getElementById("weather-selected-summary");
   const weatherLatestDate = document.getElementById("weather-latest-date");
@@ -1081,6 +1223,10 @@ const INLINE_JS = `
     !teaserWeather ||
     !teaserSoil ||
     !teaserSignal ||
+    !selectedShowcaseField ||
+    !selectedShowcaseSummary ||
+    !selectedShowcaseCrop ||
+    !selectedShowcaseImagery ||
     !weatherPanelField ||
     !weatherPanelSummary ||
     !weatherLatestDate ||
@@ -1628,18 +1774,27 @@ const INLINE_JS = `
     teaserWeather.textContent = latestWeather(fieldId);
     teaserSoil.textContent = soilHint(fieldId);
     teaserSignal.textContent = fieldSignal(fieldId);
+    selectedShowcaseField.textContent = field.fieldName;
+    selectedShowcaseSummary.textContent =
+      (field.countyName || "County unavailable") +
+      ' • ' +
+      Number(field.areaAcres).toFixed(2) +
+      ' acres • ' +
+      field.fieldId;
+    selectedShowcaseCrop.textContent = dominantCrop(fieldId);
+    selectedShowcaseImagery.textContent = String(imageryCoverageForField(fieldId).length) + ' ready source(s)';
     updateWeatherPanel(fieldId);
     updateSoilPanel(fieldId);
     updateCropPanel(fieldId);
     updateImageryPanel(fieldId);
 
     statusNode.textContent = [
-      "Offline hero + map + weather shell loaded successfully.",
+      "Offline showcase dashboard loaded successfully.",
       "Farm: " + payload.farm.farmName,
       "Selected field: " + field.fieldId,
       "Rendered boundaries: " + String(payload.fields.length),
       "Interactive schematic: inline SVG only",
-      "Weather charts: inline SVG only",
+      "Downstream panels stay in sync with the selected field",
     ].join("\\n");
   }
 
@@ -2354,56 +2509,80 @@ export function renderGrowerDashboardHtml(payload: NormalizedGrowerDashboardPayl
           </div>
         </section>
 
-        <section class="summary-wrap" aria-label="Portfolio summary cards">
-          <p class="section-kicker">Portfolio summary</p>
-          <div class="summary-grid">
-            <article class="card">
-              <span class="label">Total acreage</span>
-              <span class="value">${escapeHtml(acreageLabel)}</span>
-              <span class="detail">Unified across all five normalized field records.</span>
-            </article>
-            <article class="card">
-              <span class="label">Field count</span>
-              <span class="value">${escapeHtml(fieldCountLabel)}</span>
-              <span class="detail">Every field carries boundary, weather, soil, and crop data.</span>
-            </article>
-            <article class="card">
-              <span class="label">Imagery-ready fields</span>
-              <span class="value">${escapeHtml(String(imageryReadyFields))}</span>
-              <span class="detail">Based on reconciled on-disk TIFF presence, not manifest claims alone.</span>
-            </article>
-            <article class="card">
-              <span class="label">Rotation outlook leader</span>
-              <span class="value">${escapeHtml(rotationSummary.topNextCrop ?? "Not available")}</span>
-              <span class="detail">Confidence mix: ${escapeHtml(rotationSummary.confidenceMix)}</span>
-            </article>
+        <div class="shell-body">
+        <section class="overview-grid" aria-label="Overview dashboard rail">
+          <section class="summary-wrap" aria-label="Portfolio summary cards">
+            <p class="section-kicker">Portfolio summary</p>
+            <div class="summary-grid">
+              <article class="card">
+                <span class="label">Total acreage</span>
+                <span class="value">${escapeHtml(acreageLabel)}</span>
+                <span class="detail">Unified across all five normalized field records.</span>
+              </article>
+              <article class="card">
+                <span class="label">Field count</span>
+                <span class="value">${escapeHtml(fieldCountLabel)}</span>
+                <span class="detail">Every field carries boundary, weather, soil, and crop data.</span>
+              </article>
+              <article class="card">
+                <span class="label">Imagery-ready fields</span>
+                <span class="value">${escapeHtml(String(imageryReadyFields))}</span>
+                <span class="detail">Based on reconciled on-disk TIFF presence, not manifest claims alone.</span>
+              </article>
+              <article class="card">
+                <span class="label">Rotation outlook leader</span>
+                <span class="value">${escapeHtml(rotationSummary.topNextCrop ?? "Not available")}</span>
+                <span class="detail">Confidence mix: ${escapeHtml(rotationSummary.confidenceMix)}</span>
+              </article>
+            </div>
+          </section>
+
+          <section class="signal-wrap" aria-label="Recent agronomic signals">
+            <p class="section-kicker">Recent agronomic signals</p>
+            <div class="signal-grid">
+              <article class="signal-card">
+                <h2 class="section-title">Latest weather snapshot</h2>
+                <p class="signal-copy">
+                  ${escapeHtml(recentWeatherDateLabel)} averages ${escapeHtml(formatSignedNumber(recentWeather.avgTempC, "°C"))} with ${escapeHtml(formatSignedNumber(recentWeather.precipitationMm, "mm"))} precipitation and ${escapeHtml(formatSignedNumber(recentWeather.windMps, "m/s"))} wind across the portfolio.
+                </p>
+              </article>
+              <article class="signal-card">
+                <h2 class="section-title">Soil footing</h2>
+                <p class="signal-copy">
+                  Average organic matter sits near ${escapeHtml(formatSignedNumber(soilSummary.avgOmPct, "%"))}, while the most common dominant soil family is ${escapeHtml(soilSummary.dominantSoil ?? "not available")}.
+                </p>
+              </article>
+              <article class="signal-card">
+                <h2 class="section-title">Crop signal</h2>
+                <p class="signal-copy">
+                  Latest composition year ${escapeHtml(cropMix.latestYear == null ? "N/A" : String(cropMix.latestYear))} keeps both corn and soy visible immediately: corn at ${escapeHtml(formatNumber(cropMix.cornPct, 1))}% average share and soy at ${escapeHtml(formatNumber(cropMix.soyPct, 1))}%.
+                </p>
+              </article>
+            </div>
+          </section>
+        </section>
+
+        <section class="selection-stage" aria-label="Selected field showcase context">
+          <div class="selection-shell">
+            <section class="selection-focus">
+              <p class="selection-kicker">Selected field focus</p>
+              <h2 id="selected-showcase-field" class="selection-title">${escapeHtml(initialField.fieldName)}</h2>
+              <p id="selected-showcase-summary" class="selection-copy">${escapeHtml(`${initialField.countyName ?? "County unavailable"} • ${formatNumber(initialField.areaAcres, 2)} acres • ${initialField.fieldId}`)}</p>
+              <div class="selection-chip-row">
+                <span id="selected-showcase-crop" class="selection-chip">${escapeHtml(formatFieldCropContext(payload, initialField.fieldId))}</span>
+                <span id="selected-showcase-imagery" class="selection-chip">${escapeHtml(`${initialImageryCoverage.length} ready source(s)`)}</span>
+              </div>
+            </section>
+            <section class="selection-guide">
+              <p class="section-kicker">Showcase flow</p>
+              <p class="selection-guide-copy">
+                Start with the field boundary map, then follow the same selected field through weather, soil, crop, and imagery panels. Every downstream section stays coordinated without leaving this one offline document.
+              </p>
+            </section>
           </div>
         </section>
 
-        <section class="signal-wrap" aria-label="Recent agronomic signals">
-          <p class="section-kicker">Recent agronomic signals</p>
-          <div class="signal-grid">
-            <article class="signal-card">
-              <h2 class="section-title">Latest weather snapshot</h2>
-              <p class="signal-copy">
-                ${escapeHtml(recentWeatherDateLabel)} averages ${escapeHtml(formatSignedNumber(recentWeather.avgTempC, "°C"))} with ${escapeHtml(formatSignedNumber(recentWeather.precipitationMm, "mm"))} precipitation and ${escapeHtml(formatSignedNumber(recentWeather.windMps, "m/s"))} wind across the portfolio.
-              </p>
-            </article>
-            <article class="signal-card">
-              <h2 class="section-title">Soil footing</h2>
-              <p class="signal-copy">
-                Average organic matter sits near ${escapeHtml(formatSignedNumber(soilSummary.avgOmPct, "%"))}, while the most common dominant soil family is ${escapeHtml(soilSummary.dominantSoil ?? "not available")}.
-              </p>
-            </article>
-            <article class="signal-card">
-              <h2 class="section-title">Crop signal</h2>
-              <p class="signal-copy">
-                Latest composition year ${escapeHtml(cropMix.latestYear == null ? "N/A" : String(cropMix.latestYear))} keeps both corn and soy visible immediately: corn at ${escapeHtml(formatNumber(cropMix.cornPct, 1))}% average share and soy at ${escapeHtml(formatNumber(cropMix.soyPct, 1))}%.
-              </p>
-            </article>
-          </div>
-        </section>
-
+        <section class="downstream-grid" aria-label="Selected field dashboard rail">
         <section class="map-wrap" aria-label="Offline field boundary schematic">
           <p class="section-kicker">Field boundary schematic</p>
           <div class="map-grid">
@@ -2745,6 +2924,8 @@ export function renderGrowerDashboardHtml(payload: NormalizedGrowerDashboardPayl
             </div>
           </section>
         </section>
+        </section>
+        </div>
       </section>
     </main>
     <script id="${GROWER_DASHBOARD_EMBEDDED_PAYLOAD_SCRIPT_ID}" type="application/json">${embeddedPayload}</script>
