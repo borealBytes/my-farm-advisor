@@ -177,7 +177,8 @@ h1 {
 .weather-wrap,
 .soil-wrap,
 .crop-wrap,
-.imagery-wrap {
+.imagery-wrap,
+.diagnostics-wrap {
   padding: 0 32px 32px;
 }
 
@@ -915,6 +916,176 @@ h1 {
   font-weight: 600;
 }
 
+.diagnostics-panel {
+  border-radius: 22px;
+  background: rgba(250, 252, 249, 0.92);
+  border: 1px solid rgba(23, 38, 27, 0.08);
+  padding: 18px;
+}
+
+.diagnostics-disclosure {
+  border-radius: 18px;
+  border: 1px dashed rgba(49, 80, 60, 0.2);
+  background: linear-gradient(180deg, #f8fbf7 0%, #f2f7f1 100%);
+  overflow: hidden;
+}
+
+.diagnostics-disclosure summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 18px 20px;
+}
+
+.diagnostics-disclosure summary::-webkit-details-marker {
+  display: none;
+}
+
+.diagnostics-summary {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.diagnostics-summary-copy {
+  margin: 8px 0 0;
+  color: #4f695a;
+  font-size: 0.94rem;
+  line-height: 1.6;
+}
+
+.diagnostics-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 7px 10px;
+  background: rgba(69, 119, 83, 0.1);
+  color: #31503c;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.diagnostics-body {
+  padding: 0 20px 20px;
+  display: grid;
+  gap: 18px;
+}
+
+.diagnostics-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 18px;
+}
+
+.lineage-card,
+.diagnostic-list-card {
+  border-radius: 18px;
+  background: #ffffff;
+  border: 1px solid rgba(23, 38, 27, 0.08);
+  padding: 16px;
+}
+
+.lineage-copy,
+.diagnostic-list-copy {
+  margin: 8px 0 0;
+  color: #4f695a;
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+.lineage-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.lineage-metric {
+  border-radius: 14px;
+  background: #f7fbf6;
+  border: 1px solid rgba(23, 38, 27, 0.08);
+  padding: 12px;
+}
+
+.diagnostic-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.diagnostic-item {
+  border-radius: 14px;
+  background: #f7fbf6;
+  border: 1px solid rgba(23, 38, 27, 0.08);
+  padding: 12px;
+}
+
+.diagnostic-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.diagnostic-code {
+  font-weight: 700;
+  color: #213a2a;
+}
+
+.diagnostic-severity {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 4px 8px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.diagnostic-severity.info {
+  background: rgba(69, 119, 83, 0.1);
+  color: #31503c;
+}
+
+.diagnostic-severity.warning {
+  background: rgba(180, 131, 35, 0.14);
+  color: #7a5713;
+}
+
+.diagnostic-severity.error {
+  background: rgba(179, 64, 64, 0.14);
+  color: #8a2d2d;
+}
+
+.diagnostic-message {
+  margin-top: 8px;
+  color: #4f695a;
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.diagnostic-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.diagnostic-pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: rgba(69, 119, 83, 0.08);
+  color: #31503c;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
 .imagery-topline,
 .scene-topline {
   display: flex;
@@ -1089,7 +1260,8 @@ h1 {
   .weather-wrap,
   .soil-wrap,
   .crop-wrap,
-  .imagery-wrap {
+  .imagery-wrap,
+  .diagnostics-wrap {
     padding: 0 20px 20px;
   }
 
@@ -1109,7 +1281,8 @@ h1 {
   .weather-grid,
   .soil-grid,
   .crop-grid,
-  .imagery-grid {
+  .imagery-grid,
+  .diagnostics-grid {
     grid-template-columns: 1fr;
   }
 }
@@ -1129,7 +1302,8 @@ h1 {
   .teaser-metrics,
   .weather-overview-metrics,
   .soil-summary-metrics,
-  .imagery-metrics {
+  .imagery-metrics,
+  .lineage-metrics {
     grid-template-columns: 1fr;
   }
 }
@@ -2414,6 +2588,62 @@ function renderInitialImagerySceneRows(
     .join("");
 }
 
+function summarizeDiagnosticCounts(
+  payload: NormalizedGrowerDashboardPayload,
+): Record<"info" | "warning" | "error", number> {
+  return payload.diagnostics.reduce(
+    (counts, entry) => {
+      counts[entry.severity] += 1;
+      return counts;
+    },
+    { info: 0, warning: 0, error: 0 },
+  );
+}
+
+function uniqueLineagePaths(payload: NormalizedGrowerDashboardPayload): string[] {
+  return [...new Set(payload.diagnostics.flatMap((entry) => entry.sourcePaths))].toSorted();
+}
+
+function coverageSummary(payload: NormalizedGrowerDashboardPayload): {
+  weatherReady: number;
+  soilReady: number;
+  cropReady: number;
+  imageryReady: number;
+} {
+  const fieldIds = payload.fields.map((field) => field.fieldId);
+  return {
+    weatherReady: fieldIds.filter((fieldId) =>
+      payload.weatherSeries.some((entry) => entry.fieldId === fieldId),
+    ).length,
+    soilReady: fieldIds.filter((fieldId) =>
+      payload.soilSummary.some((entry) => entry.fieldId === fieldId),
+    ).length,
+    cropReady: fieldIds.filter((fieldId) =>
+      payload.cropRotation.some((entry) => entry.fieldId === fieldId),
+    ).length,
+    imageryReady: fieldIds.filter((fieldId) =>
+      payload.imageryCoverage.some((entry) => entry.fieldId === fieldId && entry.sceneCount > 0),
+    ).length,
+  };
+}
+
+function renderDiagnosticEntries(payload: NormalizedGrowerDashboardPayload): string {
+  if (payload.diagnostics.length === 0) {
+    return '<article class="diagnostic-item"><div class="diagnostic-topline"><span class="diagnostic-code">no-diagnostics</span><span class="diagnostic-severity info">info</span></div><div class="diagnostic-message">No lineage or anomaly records were embedded in the normalized payload.</div></article>';
+  }
+
+  return payload.diagnostics
+    .map((entry) => {
+      const pills = [
+        ...entry.fieldIds.map((fieldId) => `field ${fieldId}`),
+        ...entry.sourcePaths.map((sourcePath) => sourcePath),
+      ];
+
+      return `<article class="diagnostic-item"><div class="diagnostic-topline"><span class="diagnostic-code">${escapeHtml(entry.code)}</span><span class="diagnostic-severity ${escapeHtml(entry.severity)}">${escapeHtml(entry.severity)}</span></div><div class="diagnostic-message">${escapeHtml(entry.message)}</div><div class="diagnostic-pills">${pills.map((pill) => `<span class="diagnostic-pill">${escapeHtml(pill)}</span>`).join("")}</div></article>`;
+    })
+    .join("");
+}
+
 export function renderGrowerDashboardHtml(payload: NormalizedGrowerDashboardPayload): string {
   assertNormalizedGrowerDashboardPayload(payload);
 
@@ -2448,6 +2678,9 @@ export function renderGrowerDashboardHtml(payload: NormalizedGrowerDashboardPayl
   const initialImageryCoverage = imageryCoverageForFieldPayload(payload, initialField.fieldId);
   const initialImageryScenes = imageryScenesForFieldPayload(payload, initialField.fieldId);
   const initialLatestImageryScene = initialImageryScenes[0] ?? null;
+  const diagnosticCounts = summarizeDiagnosticCounts(payload);
+  const lineagePaths = uniqueLineagePaths(payload);
+  const coverage = coverageSummary(payload);
 
   return `<!doctype html>
 <html lang="en">
@@ -2922,6 +3155,69 @@ export function renderGrowerDashboardHtml(payload: NormalizedGrowerDashboardPayl
                 <div id="imagery-scene-list" class="scene-list">${renderInitialImagerySceneRows(payload, initialField.fieldId)}</div>
               </section>
             </div>
+          </section>
+        </section>
+
+        <section class="diagnostics-wrap" aria-label="Diagnostics and lineage panel">
+          <p class="section-kicker">Diagnostics + lineage</p>
+          <section class="diagnostics-panel">
+            <details class="diagnostics-disclosure">
+              <summary>
+                <div class="diagnostics-summary">
+                  <div>
+                    <h2 class="section-title">Secondary lineage and anomaly view</h2>
+                    <p class="diagnostics-summary-copy">
+                      Collapsed by default so the showcase stays primary, while still exposing normalized lineage, coverage, and anomaly notes such as farm metadata mismatch and imagery reconciliation issues.
+                    </p>
+                  </div>
+                  <span class="diagnostics-badge">${escapeHtml(String(payload.diagnostics.length))} diagnostic record(s)</span>
+                </div>
+              </summary>
+              <div class="diagnostics-body">
+                <div class="diagnostics-grid">
+                  <section class="lineage-card">
+                    <h2 class="section-title">Lineage snapshot</h2>
+                    <p class="lineage-copy">
+                      This panel summarizes the embedded payload contract, source-trace coverage, and normalized anomaly counts without interrupting the main dashboard flow.
+                    </p>
+                    <div class="lineage-metrics">
+                      <article class="lineage-metric">
+                        <span class="label">Contract version</span>
+                        <span class="value">${escapeHtml(payload.contractVersion)}</span>
+                      </article>
+                      <article class="lineage-metric">
+                        <span class="label">Runtime mode</span>
+                        <span class="value">${escapeHtml(payload.runtime.dataMode)}</span>
+                      </article>
+                      <article class="lineage-metric">
+                        <span class="label">Coverage footprint</span>
+                        <span class="value">${escapeHtml(`${coverage.weatherReady}/${payload.fields.length} weather • ${coverage.soilReady}/${payload.fields.length} soil • ${coverage.cropReady}/${payload.fields.length} crop • ${coverage.imageryReady}/${payload.fields.length} imagery`)}</span>
+                      </article>
+                      <article class="lineage-metric">
+                        <span class="label">Severity mix</span>
+                        <span class="value">${escapeHtml(`info ${diagnosticCounts.info} • warning ${diagnosticCounts.warning} • error ${diagnosticCounts.error}`)}</span>
+                      </article>
+                      <article class="lineage-metric">
+                        <span class="label">Source paths traced</span>
+                        <span class="value">${escapeHtml(String(lineagePaths.length))}</span>
+                      </article>
+                      <article class="lineage-metric">
+                        <span class="label">Browser restrictions</span>
+                        <span class="value">${escapeHtml(`raw ${payload.runtime.rawSourceAccess} • fetch ${payload.runtime.networkFetch} • storage ${payload.runtime.localStorage}`)}</span>
+                      </article>
+                    </div>
+                  </section>
+
+                  <section class="diagnostic-list-card">
+                    <h2 class="section-title">Embedded anomalies and notes</h2>
+                    <p class="diagnostic-list-copy">
+                      Includes the known farm metadata mismatch and any imagery or coverage anomalies preserved during normalization.
+                    </p>
+                    <div class="diagnostic-list">${renderDiagnosticEntries(payload)}</div>
+                  </section>
+                </div>
+              </div>
+            </details>
           </section>
         </section>
         </section>
