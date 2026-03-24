@@ -752,6 +752,45 @@ h1 {
   padding: 12px;
 }
 
+.imagery-empty-state {
+  border-radius: 20px;
+  padding: 18px;
+  background: linear-gradient(180deg, #f5f8f4 0%, #edf4ec 100%);
+  border: 1px dashed rgba(49, 80, 60, 0.25);
+}
+
+.imagery-empty-title {
+  display: block;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #213a2a;
+}
+
+.imagery-empty-copy {
+  margin-top: 8px;
+  color: #4f695a;
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+.imagery-empty-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.imagery-empty-pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: rgba(69, 119, 83, 0.08);
+  color: #31503c;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
 .imagery-topline,
 .scene-topline {
   display: flex;
@@ -1318,17 +1357,17 @@ const INLINE_JS = `
     imageryPanelField.textContent = field.fieldName;
     imageryPanelSummary.textContent = coverage.length > 0
       ? 'Imagery-ready source availability and recent normalized scene cues for the selected field, all from the embedded payload.'
-      : 'This field has no imagery-ready sources in the current embedded payload.';
+      : 'This selected field has no imagery-ready sources in the current embedded payload, so the panel switches to a deliberate empty-state summary.';
     imageryReadyCount.textContent = String(coverage.length);
     imageryLatestScene.textContent = latestScene
       ? latestScene.sceneDate + ' • ' + latestScene.source
       : 'Not available';
     imagerySources.innerHTML = coverage.length > 0
       ? coverage.map(function (entry) { return imagerySourceRowMarkup(entry); }).join('')
-      : '<article class="imagery-source-row"><div class="imagery-topline"><span class="imagery-name">No imagery-ready sources</span><span class="imagery-value">0</span></div><div class="imagery-detail">No normalized imagery coverage rows with scenes are available for this field.</div></article>';
+      : '<article class="imagery-empty-state"><span class="imagery-empty-title">No imagery-ready sources for this field</span><div class="imagery-empty-copy">The embedded payload does not include any imagery-ready source coverage rows with available scenes for the currently selected field.</div><div class="imagery-empty-pills"><span class="imagery-empty-pill">Source count 0</span><span class="imagery-empty-pill">Embedded payload only</span><span class="imagery-empty-pill">Pick another field to compare</span></div></article>';
     imagerySceneList.innerHTML = scenes.length > 0
       ? scenes.map(function (entry) { return imagerySceneRowMarkup(entry); }).join('')
-      : '<article class="scene-row"><div class="scene-topline"><span class="scene-name">No recent scenes</span><span class="scene-value">—</span></div><div class="scene-detail">No normalized imagery scene rows are available for this field.</div><div class="scene-pills"><span class="scene-pill">Non-breaking empty state</span></div></article>';
+      : '<article class="imagery-empty-state"><span class="imagery-empty-title">No scene list available</span><div class="imagery-empty-copy">There are no normalized imagery scene rows with available scene metadata for the selected field in this offline dashboard payload.</div><div class="imagery-empty-pills"><span class="imagery-empty-pill">Recent scenes unavailable</span><span class="imagery-empty-pill">No reload needed</span><span class="imagery-empty-pill">Selection-aware panel</span></div></article>';
   }
 
   function soilSummaryForField(fieldId) {
@@ -2187,7 +2226,7 @@ function renderInitialImagerySourceRows(
 ): string {
   const rows = imageryCoverageForFieldPayload(payload, fieldId);
   if (rows.length === 0) {
-    return '<article class="imagery-source-row"><div class="imagery-topline"><span class="imagery-name">No imagery-ready sources</span><span class="imagery-value">0</span></div><div class="imagery-detail">No normalized imagery coverage rows with scenes are available for this field.</div></article>';
+    return '<article class="imagery-empty-state"><span class="imagery-empty-title">No imagery-ready sources for this field</span><div class="imagery-empty-copy">The embedded payload does not include any imagery-ready source coverage rows with available scenes for the currently selected field.</div><div class="imagery-empty-pills"><span class="imagery-empty-pill">Source count 0</span><span class="imagery-empty-pill">Embedded payload only</span><span class="imagery-empty-pill">Pick another field to compare</span></div></article>';
   }
 
   return rows
@@ -2204,7 +2243,7 @@ function renderInitialImagerySceneRows(
 ): string {
   const rows = imageryScenesForFieldPayload(payload, fieldId).slice(0, 6);
   if (rows.length === 0) {
-    return '<article class="scene-row"><div class="scene-topline"><span class="scene-name">No recent scenes</span><span class="scene-value">—</span></div><div class="scene-detail">No normalized imagery scene rows are available for this field.</div><div class="scene-pills"><span class="scene-pill">Non-breaking empty state</span></div></article>';
+    return '<article class="imagery-empty-state"><span class="imagery-empty-title">No scene list available</span><div class="imagery-empty-copy">There are no normalized imagery scene rows with available scene metadata for the selected field in this offline dashboard payload.</div><div class="imagery-empty-pills"><span class="imagery-empty-pill">Recent scenes unavailable</span><span class="imagery-empty-pill">No reload needed</span><span class="imagery-empty-pill">Selection-aware panel</span></div></article>';
   }
 
   return rows
