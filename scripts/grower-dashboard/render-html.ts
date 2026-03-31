@@ -52,8 +52,7 @@ main {
 
 .hero {
   display: grid;
-  grid-template-columns: minmax(0, 1.65fr) minmax(320px, 0.95fr);
-  gap: 24px;
+  gap: 18px;
   padding: 32px;
   background:
     linear-gradient(135deg, rgba(230, 244, 226, 0.95), rgba(245, 250, 241, 0.98)),
@@ -63,7 +62,31 @@ main {
 .hero-copy {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 14px;
+}
+
+.hero-topline {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.hero-meta {
+  display: grid;
+  gap: 6px;
+  justify-items: end;
+  text-align: right;
+}
+
+.hero-meta .label,
+.hero-meta .value,
+.hero-meta .detail {
+  margin-top: 0;
+}
+
+.hero-meta .value {
+  font-size: 1rem;
 }
 
 .eyebrow {
@@ -94,25 +117,6 @@ h1 {
   margin: 0;
   color: #587061;
   font-size: 0.96rem;
-}
-
-.chip-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  border-radius: 999px;
-  padding: 8px 12px;
-  background: rgba(255, 255, 255, 0.86);
-  border: 1px solid rgba(23, 38, 27, 0.08);
-  color: #31503c;
-  font-size: 0.9rem;
-  font-weight: 600;
 }
 
 .hero-aside {
@@ -205,7 +209,7 @@ h1 {
 }
 
 .overview-grid .summary-grid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 
 .overview-grid .signal-grid {
@@ -217,42 +221,19 @@ h1 {
   padding: 0 32px;
 }
 
-.selection-shell {
-  display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
-  gap: 18px;
-}
-
-.selection-focus,
-.selection-guide {
+.selection-panel {
   border-radius: 24px;
   padding: 20px;
   border: 1px solid rgba(23, 38, 27, 0.08);
+  background: linear-gradient(180deg, #fbfdf9 0%, #f1f6ef 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
 }
 
-.selection-focus {
-  background: linear-gradient(135deg, #1c3122 0%, #274534 100%);
-  color: #f3f8f1;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
-}
-
-.selection-guide {
-  background: linear-gradient(180deg, #f9fcf8 0%, #f0f6ef 100%);
-}
-
-.selection-kicker {
-  margin: 0;
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: rgba(243, 248, 241, 0.78);
-}
-
-.selection-title {
-  margin: 10px 0 0;
-  font-size: clamp(1.35rem, 2vw, 1.85rem);
-  letter-spacing: -0.02em;
+.selection-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(260px, 0.85fr);
+  gap: 18px;
+  align-items: end;
 }
 
 .selection-copy,
@@ -260,10 +241,6 @@ h1 {
   margin: 10px 0 0;
   font-size: 0.96rem;
   line-height: 1.65;
-}
-
-.selection-copy {
-  color: rgba(243, 248, 241, 0.88);
 }
 
 .selection-guide-copy {
@@ -282,11 +259,177 @@ h1 {
   align-items: center;
   border-radius: 999px;
   padding: 7px 11px;
-  background: rgba(255, 255, 255, 0.12);
-  color: #f3f8f1;
-  font-size: 0.86rem;
-  font-weight: 600;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(69, 119, 83, 0.08);
+  color: #214d2f;
+  font-size: 0.82rem;
+  font-weight: 700;
+  border: 1px solid rgba(69, 119, 83, 0.12);
+}
+
+.selection-table-scroll {
+  margin-top: 18px;
+  overflow-x: auto;
+  border-radius: 20px;
+  border: 1px solid rgba(23, 38, 27, 0.08);
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.selection-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 920px;
+}
+
+.selection-table thead th {
+  padding: 14px 16px;
+  text-align: left;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #587061;
+  background: rgba(238, 246, 235, 0.98);
+  border-bottom: 1px solid rgba(23, 38, 27, 0.08);
+}
+
+.selection-table tbody td {
+  padding: 14px 16px;
+  vertical-align: top;
+  border-bottom: 1px solid rgba(23, 38, 27, 0.08);
+}
+
+.selection-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.selection-table-row {
+  transition: background 140ms ease, box-shadow 140ms ease;
+  outline: none;
+}
+
+.selection-table-row:hover,
+.selection-table-row:focus-visible {
+  background: rgba(240, 247, 238, 0.92);
+}
+
+.selection-table-row[data-selected="true"] {
+  background: linear-gradient(90deg, rgba(230, 244, 226, 0.95), rgba(245, 249, 242, 0.98));
+  box-shadow: inset 4px 0 0 #31503c;
+}
+
+.action-field-cell {
+  min-width: 240px;
+}
+
+.action-field-stack,
+.action-window-cell,
+.action-limiter-cell {
+  display: grid;
+  gap: 8px;
+}
+
+.field-table-button {
+  display: grid;
+  gap: 6px;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
+  text-align: left;
+  color: inherit;
+  cursor: pointer;
+}
+
+.field-table-button.is-selected .action-field-name {
+  color: #173d24;
+}
+
+.field-table-button:focus-visible {
+  outline: 2px solid rgba(49, 80, 60, 0.35);
+  outline-offset: 4px;
+  border-radius: 12px;
+}
+
+.action-field-name,
+.action-window-value,
+.action-limiter-value {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: #1d3424;
+}
+
+.action-field-meta,
+.action-window-meta {
+  font-size: 0.84rem;
+  line-height: 1.45;
+  color: #5a7464;
+}
+
+.action-priority-badge,
+.action-state-pill,
+.action-confidence-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.action-priority-badge {
+  background: rgba(24, 40, 29, 0.08);
+  color: #274534;
+}
+
+.action-priority-badge.priority-0 {
+  background: rgba(80, 143, 89, 0.16);
+  color: #1f5a2d;
+}
+
+.action-priority-badge.priority-1 {
+  background: rgba(176, 150, 67, 0.16);
+  color: #6f5615;
+}
+
+.action-priority-badge.priority-2,
+.action-confidence-badge {
+  background: rgba(69, 119, 83, 0.1);
+  color: #31503c;
+}
+
+.action-priority-badge.priority-3 {
+  background: rgba(179, 64, 64, 0.12);
+  color: #8a2d2d;
+}
+
+.action-state-pill.tone-ready {
+  background: rgba(80, 143, 89, 0.16);
+  color: #1f5a2d;
+}
+
+.action-state-pill.tone-soon {
+  background: rgba(176, 150, 67, 0.16);
+  color: #6f5615;
+}
+
+.action-state-pill.tone-watch,
+.action-state-pill.tone-neutral {
+  background: rgba(69, 119, 83, 0.1);
+  color: #31503c;
+}
+
+.action-state-pill.tone-blocked {
+  background: rgba(179, 64, 64, 0.12);
+  color: #8a2d2d;
+}
+
+.action-confidence-cell {
+  white-space: nowrap;
 }
 
 .downstream-grid {
@@ -314,8 +457,310 @@ h1 {
 }
 
 .map-grid {
-  grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.8fr);
+  grid-template-columns: minmax(0, 1fr);
   align-items: stretch;
+}
+
+.map-stage-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.75fr);
+  gap: 18px;
+  align-items: start;
+  margin-top: 12px;
+}
+
+.map-stage-main {
+  display: grid;
+  gap: 12px;
+}
+
+.field-focus-panel {
+  position: sticky;
+  top: 20px;
+  display: grid;
+  gap: 14px;
+  border-radius: 24px;
+  padding: 18px;
+  background: linear-gradient(180deg, #fbfdf9 0%, #edf4ea 100%);
+  border: 1px solid rgba(23, 38, 27, 0.08);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.62);
+  max-height: calc(100vh - 40px);
+  overflow: auto;
+}
+
+.field-focus-panel[data-detail-state="overview"] {
+  background: linear-gradient(180deg, #f8fbf7 0%, #f1f6ef 100%);
+}
+
+
+
+.field-focus-header,
+.field-focus-topline,
+.field-focus-limiter {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.field-focus-topline {
+  align-items: center;
+}
+
+.field-focus-title {
+  margin: 0;
+  font-size: 1.5rem;
+  letter-spacing: -0.03em;
+  color: #17311f;
+}
+
+.field-focus-copy,
+.field-focus-support-copy,
+.field-support-copy,
+.field-support-meta,
+.field-overview-copy {
+  margin: 8px 0 0;
+  color: #4f695a;
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.field-focus-reset {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(49, 80, 60, 0.14);
+  border-radius: 999px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.88);
+  color: #274534;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.field-focus-reset:hover,
+.field-focus-reset:focus-visible {
+  background: #ffffff;
+}
+
+.field-focus-reset:focus-visible {
+  outline: 2px solid rgba(49, 80, 60, 0.35);
+  outline-offset: 3px;
+}
+
+.field-focus-meta-grid,
+.field-plan-grid,
+.field-overview-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.field-focus-meta-grid,
+.field-plan-grid,
+.field-overview-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.field-focus-meta-card,
+.field-plan-card,
+.field-limiter-card,
+.field-overview-card {
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(23, 38, 27, 0.08);
+  padding: 14px;
+}
+
+.field-plan-card.corn {
+  background: linear-gradient(180deg, rgba(255, 243, 191, 0.92), rgba(255, 235, 168, 0.94));
+}
+
+.field-plan-card.soy {
+  background: linear-gradient(180deg, rgba(223, 245, 210, 0.94), rgba(208, 236, 189, 0.96));
+}
+
+.field-plan-card .action-state-pill,
+.field-limiter-card .action-confidence-badge {
+  margin-top: 10px;
+}
+
+.field-plan-window,
+.field-limiter-value {
+  display: block;
+  margin-top: 10px;
+  font-size: 1.12rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #17311f;
+}
+
+.field-overview-copy {
+  margin-top: 0;
+}
+
+.field-evidence-stage {
+  display: grid;
+  gap: 12px;
+}
+
+.field-evidence-header {
+  display: grid;
+  gap: 6px;
+}
+
+.field-evidence-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.field-evidence-card {
+  border-radius: 18px;
+  border: 1px solid rgba(23, 38, 27, 0.08);
+  background: rgba(255, 255, 255, 0.88);
+  overflow: hidden;
+}
+
+.field-evidence-card[open] {
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+.field-evidence-card summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 14px 16px;
+}
+
+.field-evidence-card summary::-webkit-details-marker {
+  display: none;
+}
+
+.field-evidence-summary {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.field-evidence-summary-copy {
+  margin: 6px 0 0;
+  color: #4f695a;
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.field-evidence-summary h3 {
+  margin: 0;
+  font-size: 1rem;
+  letter-spacing: -0.01em;
+  color: #17311f;
+}
+
+.field-evidence-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 6px 9px;
+  background: rgba(69, 119, 83, 0.08);
+  color: #31503c;
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.field-evidence-body {
+  padding: 0 16px 16px;
+  display: grid;
+  gap: 14px;
+}
+
+.field-focus-panel .weather-panel,
+.field-focus-panel .soil-panel,
+.field-focus-panel .crop-panel,
+.field-focus-panel .imagery-panel {
+  border-radius: 0;
+  border: none;
+  background: transparent;
+  padding: 0;
+}
+
+.field-focus-panel .weather-header,
+.field-focus-panel .soil-header,
+.field-focus-panel .crop-header,
+.field-focus-panel .imagery-header {
+  display: block;
+}
+
+.field-focus-panel .weather-badge,
+.field-focus-panel .soil-badge,
+.field-focus-panel .crop-badge,
+.field-focus-panel .imagery-badge {
+  display: none;
+}
+
+.field-focus-panel .weather-copy,
+.field-focus-panel .soil-copy,
+.field-focus-panel .crop-copy,
+.field-focus-panel .imagery-copy,
+.field-focus-panel .weather-overview-copy,
+.field-focus-panel .soil-summary-copy,
+.field-focus-panel .soil-horizon-copy,
+.field-focus-panel .crop-composition-copy,
+.field-focus-panel .crop-rotation-copy,
+.field-focus-panel .imagery-summary-copy,
+.field-focus-panel .imagery-scenes-copy {
+  font-size: 0.88rem;
+}
+
+.field-focus-panel .weather-overview,
+.field-focus-panel .soil-grid,
+.field-focus-panel .crop-grid,
+.field-focus-panel .imagery-grid {
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.field-focus-panel .weather-overview-card,
+.field-focus-panel .weather-chart-card,
+.field-focus-panel .soil-summary-card,
+.field-focus-panel .soil-horizon-card,
+.field-focus-panel .crop-composition-card,
+.field-focus-panel .crop-rotation-card,
+.field-focus-panel .imagery-summary-card,
+.field-focus-panel .imagery-scenes-card {
+  padding: 14px;
+  border-radius: 16px;
+}
+
+.field-focus-panel .weather-overview-metrics,
+.field-focus-panel .soil-summary-metrics,
+.field-focus-panel .imagery-metrics,
+.field-focus-panel .weather-grid {
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.field-focus-panel .weather-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.field-focus-panel .chart-frame {
+  margin-top: 10px;
+  padding: 8px;
+}
+
+.field-focus-panel .weather-chart-card .chart-value,
+.field-focus-panel .soil-metric .value,
+.field-focus-panel .imagery-metric .value,
+.field-focus-panel .rotation-value {
+  font-size: 0.98rem;
 }
 
 .card,
@@ -411,6 +856,28 @@ h1 {
   gap: 12px;
 }
 
+.map-topbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(260px, 0.65fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.map-meta-stack {
+  display: grid;
+  gap: 10px;
+}
+
+.map-copy {
+  max-width: 64ch;
+}
+
+.map-support-strip {
+  display: grid;
+  gap: 10px;
+  justify-items: stretch;
+}
+
 .map-badge,
 .teaser-badge {
   display: inline-flex;
@@ -426,16 +893,18 @@ h1 {
 }
 
 .map-frame {
-  margin-top: 16px;
-  border-radius: 20px;
-  padding: 14px;
-  background: linear-gradient(180deg, #edf7ea 0%, #f8fbf7 100%);
+  margin-top: 12px;
+  border-radius: 24px;
+  padding: 10px;
+  background: linear-gradient(180deg, #eef8eb 0%, #f8fbf7 100%);
   border: 1px solid rgba(23, 38, 27, 0.08);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
 }
 
 .map-svg {
   display: block;
   width: 100%;
+  min-height: 520px;
   height: auto;
 }
 
@@ -491,8 +960,8 @@ h1 {
 .legend {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 14px;
+  gap: 10px;
+  margin-top: 12px;
 }
 
 .legend-item {
@@ -526,9 +995,52 @@ h1 {
   color: #476356;
 }
 
+.teaser-card {
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(248, 251, 247, 0.92);
+}
+
+.teaser-card h2 {
+  font-size: 0.98rem;
+}
+
+.teaser-card .teaser-copy {
+  margin-top: 6px;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
 .teaser-metrics {
-  margin-top: 16px;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 12px;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.teaser-metrics .metric-card {
+  min-height: 0;
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: #ffffff;
+}
+
+.teaser-metrics .metric-card .label {
+  font-size: 0.72rem;
+}
+
+.teaser-metrics .metric-card .value {
+  margin-top: 6px;
+  font-size: 0.96rem;
+  line-height: 1.4;
+}
+
+.map-status-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
 }
 
 .weather-header {
@@ -1237,21 +1749,34 @@ h1 {
 }
 
 .runtime-status {
-  margin-top: 18px;
-  padding: 14px 16px;
-  border-radius: 16px;
+  margin-top: 0;
+  padding: 10px 12px;
+  border-radius: 14px;
   background: #18281d;
   color: #f7fbf6;
   font-family: ui-monospace, SFMono-Regular, SFMono-Regular, Menlo, monospace;
   white-space: pre-wrap;
+  font-size: 0.76rem;
+  line-height: 1.45;
 }
 
 @media (max-width: 980px) {
   .hero,
   .summary-grid,
   .signal-grid,
-  .map-grid {
+  .map-grid,
+  .map-topbar,
+  .map-stage-grid {
     grid-template-columns: 1fr;
+  }
+
+  .hero-topline {
+    flex-direction: column;
+  }
+
+  .hero-meta {
+    justify-items: start;
+    text-align: left;
   }
 
   .summary-wrap,
@@ -1277,6 +1802,11 @@ h1 {
 
   .overview-grid,
   .selection-shell,
+  .selection-header,
+  .field-focus-meta-grid,
+  .field-plan-grid,
+  .field-overview-grid,
+  .field-evidence-grid,
   .weather-overview,
   .weather-grid,
   .soil-grid,
@@ -1292,6 +1822,15 @@ h1 {
     padding: 16px 12px 40px;
   }
 
+  .map-panel,
+  .teaser-card {
+    padding: 14px;
+  }
+
+  .map-svg {
+    min-height: 360px;
+  }
+
   .overview-grid,
   .downstream-grid,
   .selection-stage {
@@ -1303,6 +1842,7 @@ h1 {
   .weather-overview-metrics,
   .soil-summary-metrics,
   .imagery-metrics,
+  .field-focus-panel .weather-grid,
   .lineage-metrics {
     grid-template-columns: 1fr;
   }
@@ -1316,8 +1856,11 @@ const INLINE_JS = `
   const payloadScript = document.getElementById(${JSON.stringify(
     GROWER_DASHBOARD_EMBEDDED_PAYLOAD_SCRIPT_ID,
   )});
+  const body = document.body;
   const statusNode = document.getElementById("runtime-status");
   const mapRoot = document.getElementById("field-map-root");
+  const selectedFieldFocus = document.getElementById("selected-field-focus");
+  const resetSelectionButton = document.getElementById("selected-field-reset");
   const teaserName = document.getElementById("selected-field-name");
   const teaserAcreage = document.getElementById("selected-field-acreage");
   const teaserCounty = document.getElementById("selected-field-county");
@@ -1327,8 +1870,16 @@ const INLINE_JS = `
   const teaserSignal = document.getElementById("selected-field-signal");
   const selectedShowcaseField = document.getElementById("selected-showcase-field");
   const selectedShowcaseSummary = document.getElementById("selected-showcase-summary");
-  const selectedShowcaseCrop = document.getElementById("selected-showcase-crop");
   const selectedShowcaseImagery = document.getElementById("selected-showcase-imagery");
+  const selectedCornState = document.getElementById("selected-corn-state");
+  const selectedCornWindow = document.getElementById("selected-corn-window");
+  const selectedCornMeta = document.getElementById("selected-corn-meta");
+  const selectedSoyState = document.getElementById("selected-soy-state");
+  const selectedSoyWindow = document.getElementById("selected-soy-window");
+  const selectedSoyMeta = document.getElementById("selected-soy-meta");
+  const selectedLimitingFactor = document.getElementById("selected-limiting-factor");
+  const selectedLimitingMeta = document.getElementById("selected-limiting-meta");
+  const selectedPlanConfidence = document.getElementById("selected-plan-confidence");
   const weatherPanelField = document.getElementById("weather-selected-field");
   const weatherPanelSummary = document.getElementById("weather-selected-summary");
   const weatherLatestDate = document.getElementById("weather-latest-date");
@@ -1390,6 +1941,8 @@ const INLINE_JS = `
     !payloadScript ||
     !statusNode ||
     !mapRoot ||
+    !selectedFieldFocus ||
+    !resetSelectionButton ||
     !teaserName ||
     !teaserAcreage ||
     !teaserCounty ||
@@ -1399,8 +1952,16 @@ const INLINE_JS = `
     !teaserSignal ||
     !selectedShowcaseField ||
     !selectedShowcaseSummary ||
-    !selectedShowcaseCrop ||
     !selectedShowcaseImagery ||
+    !selectedCornState ||
+    !selectedCornWindow ||
+    !selectedCornMeta ||
+    !selectedSoyState ||
+    !selectedSoyWindow ||
+    !selectedSoyMeta ||
+    !selectedLimitingFactor ||
+    !selectedLimitingMeta ||
+    !selectedPlanConfidence ||
     !weatherPanelField ||
     !weatherPanelSummary ||
     !weatherLatestDate ||
@@ -1525,6 +2086,137 @@ const INLINE_JS = `
       }
     }
     return "Rotation signal unavailable.";
+  }
+
+  function formatCompactStatusLabel(value) {
+    if (!value) {
+      return "Unknown";
+    }
+
+    return String(value)
+      .split("_")
+      .filter(Boolean)
+      .map(function (part) { return part.charAt(0).toUpperCase() + part.slice(1); })
+      .join(" ");
+  }
+
+  function formatEarliestSafeBand(value) {
+    switch (value) {
+      case "now":
+        return "Now";
+      case "next_3_days":
+        return "Next 3 days";
+      case "next_7_days":
+        return "Next 7 days";
+      case "blocked":
+        return "Blocked";
+      default:
+        return "Unknown";
+    }
+  }
+
+  function formatNextWindow(value) {
+    if (!value) {
+      return "Monitor conditions";
+    }
+
+    return String(value)
+      .split("_")
+      .filter(Boolean)
+      .map(function (part) { return part.charAt(0).toUpperCase() + part.slice(1); })
+      .join(" ");
+  }
+
+  function readinessTone(value) {
+    switch (value) {
+      case "ready_now":
+        return "ready";
+      case "ready_soon":
+        return "soon";
+      case "blocked":
+      case "hold":
+      case "not_ready":
+        return "blocked";
+      case "watch":
+      case "monitor":
+      case "monitor_conditions":
+        return "watch";
+      default:
+        return "neutral";
+    }
+  }
+
+  function cornPlanForField(fieldId) {
+    return (payload.fieldCornPlans || []).find(function (entry) { return entry.fieldId === fieldId; }) || null;
+  }
+
+  function soybeanPlanForField(fieldId) {
+    return (payload.fieldSoybeanPlans || []).find(function (entry) { return entry.fieldId === fieldId; }) || null;
+  }
+
+  function sharedReadinessForField(fieldId) {
+    return (payload.fieldSharedReadiness || []).find(function (entry) { return entry.fieldId === fieldId; }) || null;
+  }
+
+  function cropActionSummary(state, earliestSafeBand, nextRecheckWindow) {
+    return {
+      stateLabel: formatCompactStatusLabel(state || "monitor"),
+      windowLabel: formatEarliestSafeBand(earliestSafeBand),
+      windowMeta: "Recheck " + formatNextWindow(nextRecheckWindow),
+      tone: readinessTone(state || earliestSafeBand),
+    };
+  }
+
+  function limitingFactorSummary(cornPlan, soybeanPlan, sharedReadiness) {
+    const explicitLimiter =
+      (cornPlan && (cornPlan.limitingFactor || cornPlan.limitingReason)) ||
+      (soybeanPlan && (soybeanPlan.limitingFactor || soybeanPlan.limitingReason));
+    if (explicitLimiter) {
+      return {
+        label: explicitLimiter,
+        meta: "Directly surfaced from the embedded plan summary.",
+      };
+    }
+
+    if (sharedReadiness) {
+      const parts = [
+        sharedReadiness.accessStatus ? formatCompactStatusLabel(sharedReadiness.accessStatus) + " access" : null,
+        sharedReadiness.trafficabilityStatus ? formatCompactStatusLabel(sharedReadiness.trafficabilityStatus) + " trafficability" : null,
+        sharedReadiness.drydownStatus ? formatCompactStatusLabel(sharedReadiness.drydownStatus) + " drydown" : null,
+      ].filter(Boolean);
+
+      if (parts.length > 0) {
+        return {
+          label: parts.slice(0, 2).join(" • "),
+          meta: "Shared field-fit state " + formatCompactStatusLabel(sharedReadiness.sharedReadinessState || "monitor") + ".",
+        };
+      }
+    }
+
+    return {
+      label: "No strong limiter surfaced",
+      meta: "Use the focused evidence cards for the next check.",
+    };
+  }
+
+  function planConfidence(fieldId, cornPlan, soybeanPlan) {
+    const directConfidence =
+      (cornPlan && (cornPlan.confidenceLabel || cornPlan.confidence)) ||
+      (soybeanPlan && (soybeanPlan.confidenceLabel || soybeanPlan.confidence));
+    if (directConfidence) {
+      return formatCompactStatusLabel(directConfidence);
+    }
+
+    const rotation = cropRotationForField(fieldId);
+    return formatCompactStatusLabel(rotation && rotation.rotationConfidence ? rotation.rotationConfidence : "standard");
+  }
+
+  function setStateTone(node, tone) {
+    const tones = ["ready", "soon", "watch", "blocked", "neutral"];
+    for (const toneName of tones) {
+      node.classList.remove("tone-" + toneName);
+    }
+    node.classList.add("tone-" + tone);
   }
 
   function escapeHtmlText(value) {
@@ -1934,22 +2626,123 @@ const INLINE_JS = `
     byFieldId.set(field.fieldId, field);
   }
 
-  let selectedFieldId = mapRoot.getAttribute("data-initial-field-id") || (payload.fields[0] && payload.fields[0].fieldId);
+  const initialFieldId = mapRoot.getAttribute("data-initial-field-id") || (payload.fields[0] && payload.fields[0].fieldId);
+  let selectedFieldId = initialFieldId;
 
-  function updateSelection(fieldId) {
+  function syncSelectionChrome(fieldId) {
+    const nodes = mapRoot.querySelectorAll("[data-field-id]");
+    for (const node of nodes) {
+      const isSelected = fieldId !== null && node.getAttribute("data-field-id") === fieldId;
+      node.classList.toggle("is-selected", isSelected);
+      node.setAttribute("aria-pressed", isSelected ? "true" : "false");
+    }
+
+    const selectionRows = document.querySelectorAll(".selection-table-row");
+    for (const row of selectionRows) {
+      const isSelected = fieldId !== null && row.getAttribute("data-selection-field-id") === fieldId;
+      row.setAttribute("data-selected", isSelected ? "true" : "false");
+    }
+
+    const selectionButtons = document.querySelectorAll(".field-table-button");
+    for (const button of selectionButtons) {
+      const buttonFieldId = button.getAttribute("data-selection-field-id");
+      const isSelected = fieldId !== null && buttonFieldId === fieldId;
+      button.classList.toggle("is-selected", isSelected);
+      button.setAttribute("aria-pressed", isSelected ? "true" : "false");
+      if (isSelected && buttonFieldId) {
+        button.setAttribute("data-field-id", buttonFieldId);
+      } else {
+        button.removeAttribute("data-field-id");
+      }
+    }
+  }
+
+  function applyOverviewDetails() {
+    selectedFieldFocus.setAttribute("data-detail-state", "overview");
+
+    teaserName.textContent = "Farm overview";
+    teaserAcreage.textContent = "Select a field";
+    teaserCounty.textContent = "Map and table stay available";
+    teaserCrop.textContent = "Pick a field for crop context";
+    teaserWeather.textContent = "Pick a field for the latest weather cue";
+    teaserSoil.textContent = "Pick a field for the latest soil cue";
+    teaserSignal.textContent = "Pick a field for the rotation cue";
+    selectedShowcaseField.textContent = "Farm overview";
+    selectedShowcaseSummary.textContent = "Use the map or action table to reopen one focused field panel.";
+    selectedShowcaseImagery.textContent = "Select a field to compare imagery readiness";
+    selectedCornState.textContent = "Select field";
+    setStateTone(selectedCornState, "neutral");
+    selectedCornWindow.textContent = "—";
+    selectedCornMeta.textContent = "Corn plan summary appears here after a field click.";
+    selectedSoyState.textContent = "Select field";
+    setStateTone(selectedSoyState, "neutral");
+    selectedSoyWindow.textContent = "—";
+    selectedSoyMeta.textContent = "Soy plan summary appears here after a field click.";
+    selectedLimitingFactor.textContent = "Farm overview active";
+    selectedLimitingMeta.textContent = "Choose any field to restore its limiting factor and supporting evidence.";
+    selectedPlanConfidence.textContent = "Overview";
+
+    weatherPanelField.textContent = "Farm overview";
+    weatherPanelSummary.textContent = "Select a field to reload weather evidence.";
+    weatherLatestDate.textContent = "—";
+    weatherLatestTemp.textContent = "—";
+    weatherLatestRain.textContent = "—";
+    weatherLatestSolar.textContent = "—";
+    weatherLatestHumidity.textContent = "—";
+    weatherLatestWind.textContent = "—";
+    for (const key of Object.keys(weatherCharts)) {
+      weatherValues[key].textContent = "—";
+      weatherSubtitles[key].textContent = "Awaiting field selection";
+      weatherCharts[key].innerHTML = chartMarkup([]);
+    }
+
+    soilPanelField.textContent = "Farm overview";
+    soilPanelSummary.textContent = "Select a field to reload soil evidence.";
+    soilDominant.textContent = "—";
+    soilOm.textContent = "—";
+    soilPh.textContent = "—";
+    soilAws.textContent = "—";
+    soilTexture.textContent = "—";
+    soilDrainage.textContent = "—";
+    soilHorizonCount.textContent = "0";
+    soilHorizonList.innerHTML = '<article class="horizon-row"><div class="horizon-topline"><span class="horizon-name">No horizon detail</span><span class="horizon-depth">—</span></div><div class="horizon-metrics"><span class="horizon-pill">Select a field to reload normalized soil horizon rows.</span></div></article>';
+
+    cropPanelField.textContent = "Farm overview";
+    cropPanelSummary.textContent = "Select a field to reload crop and rotation evidence.";
+    cropLatestYear.textContent = "—";
+    cropCompositionLead.textContent = "Select a field to restore the latest composition snapshot.";
+    cropCompositionList.innerHTML = '<article class="composition-row"><div class="composition-topline"><span class="composition-name">No composition data</span><span class="composition-pct">—</span></div><div class="composition-meta">Select a field to reload latest-year crop composition rows.</div></article>';
+    cropRotationNext.textContent = "—";
+    cropRotationConfidence.textContent = "Confidence: —";
+    cropRotationSequence.textContent = "Select a field to reload the normalized rotation sequence.";
+    cropRotationHistory.textContent = "History unavailable";
+    cropRotationPatterns.innerHTML = '<span class="rotation-pill">Select a field to reload observed patterns</span>';
+    cropRotationOutlook.textContent = "Select a field to reload the rotation outlook.";
+
+    imageryPanelField.textContent = "Farm overview";
+    imageryPanelSummary.textContent = "Select a field to reload imagery evidence.";
+    imageryReadyCount.textContent = "0";
+    imageryLatestScene.textContent = "—";
+    imagerySources.innerHTML = '<article class="imagery-empty-state"><span class="imagery-empty-title">No imagery-ready sources in overview</span><div class="imagery-empty-copy">Select a field to restore source coverage rows and imagery readiness details.</div><div class="imagery-empty-pills"><span class="imagery-empty-pill">Overview mode</span><span class="imagery-empty-pill">Source count 0</span><span class="imagery-empty-pill">Selection required</span></div></article>';
+    imagerySceneList.innerHTML = '<article class="imagery-empty-state"><span class="imagery-empty-title">No scene list in overview</span><div class="imagery-empty-copy">Select a field to reload the recent normalized imagery scene list.</div><div class="imagery-empty-pills"><span class="imagery-empty-pill">Overview mode</span><span class="imagery-empty-pill">Recent scenes hidden</span><span class="imagery-empty-pill">Selection required</span></div></article>';
+
+    statusNode.textContent = [
+      "Offline showcase dashboard loaded successfully.",
+      "Farm: " + payload.farm.farmName,
+      "Selected field: none",
+      "Rendered boundaries: " + String(payload.fields.length),
+      "Interactive schematic: inline SVG only",
+      "Focused panel reset to farm overview",
+    ].join("\\n");
+  }
+
+  function applySelectedFieldDetails(fieldId) {
     const field = byFieldId.get(fieldId);
     if (!field) {
       return;
     }
 
-    selectedFieldId = fieldId;
-    const nodes = mapRoot.querySelectorAll("[data-field-id]");
-    for (const node of nodes) {
-      const isSelected = node.getAttribute("data-field-id") === fieldId;
-      node.classList.toggle("is-selected", isSelected);
-      node.setAttribute("aria-pressed", isSelected ? "true" : "false");
-    }
-
+    selectedFieldFocus.setAttribute("data-detail-state", "selected");
     teaserName.textContent = field.fieldName;
     teaserAcreage.textContent = Number(field.areaAcres).toFixed(2) + " acres";
     teaserCounty.textContent = field.countyName || "County unavailable";
@@ -1964,8 +2757,32 @@ const INLINE_JS = `
       Number(field.areaAcres).toFixed(2) +
       ' acres • ' +
       field.fieldId;
-    selectedShowcaseCrop.textContent = dominantCrop(fieldId);
     selectedShowcaseImagery.textContent = String(imageryCoverageForField(fieldId).length) + ' ready source(s)';
+    const cornPlan = cornPlanForField(fieldId);
+    const soybeanPlan = soybeanPlanForField(fieldId);
+    const sharedReadiness = sharedReadinessForField(fieldId);
+    const cornAction = cropActionSummary(
+      cornPlan && cornPlan.cornReadinessState,
+      cornPlan && cornPlan.earliestSafeBand,
+      cornPlan && cornPlan.nextRecheckWindow,
+    );
+    const soyAction = cropActionSummary(
+      soybeanPlan && soybeanPlan.soybeanReadinessState,
+      soybeanPlan && soybeanPlan.earliestSafeBand,
+      soybeanPlan && soybeanPlan.nextRecheckWindow,
+    );
+    const limiter = limitingFactorSummary(cornPlan, soybeanPlan, sharedReadiness);
+    selectedCornState.textContent = cornAction.stateLabel;
+    setStateTone(selectedCornState, cornAction.tone);
+    selectedCornWindow.textContent = cornAction.windowLabel;
+    selectedCornMeta.textContent = cornAction.windowMeta;
+    selectedSoyState.textContent = soyAction.stateLabel;
+    setStateTone(selectedSoyState, soyAction.tone);
+    selectedSoyWindow.textContent = soyAction.windowLabel;
+    selectedSoyMeta.textContent = soyAction.windowMeta;
+    selectedLimitingFactor.textContent = limiter.label;
+    selectedLimitingMeta.textContent = limiter.meta;
+    selectedPlanConfidence.textContent = planConfidence(fieldId, cornPlan, soybeanPlan);
     updateWeatherPanel(fieldId);
     updateSoilPanel(fieldId);
     updateCropPanel(fieldId);
@@ -1977,14 +2794,28 @@ const INLINE_JS = `
       "Selected field: " + field.fieldId,
       "Rendered boundaries: " + String(payload.fields.length),
       "Interactive schematic: inline SVG only",
-      "Downstream panels stay in sync with the selected field",
+      "Focused panel and action table stay in sync with the selected field",
     ].join("\\n");
+  }
+
+  function setSelectedField(fieldId) {
+    const normalizedFieldId = fieldId && byFieldId.has(fieldId) ? fieldId : null;
+    selectedFieldId = normalizedFieldId || "";
+    body.dataset.selectedFieldId = normalizedFieldId || "";
+    syncSelectionChrome(normalizedFieldId);
+
+    if (normalizedFieldId) {
+      applySelectedFieldDetails(normalizedFieldId);
+      return;
+    }
+
+    applyOverviewDetails();
   }
 
   const nodes = mapRoot.querySelectorAll("[data-field-id]");
   for (const node of nodes) {
     node.addEventListener("click", function () {
-      updateSelection(node.getAttribute("data-field-id"));
+      setSelectedField(node.getAttribute("data-field-id"));
     });
     node.addEventListener("mouseenter", function () {
       node.classList.add("is-hovered");
@@ -2001,42 +2832,85 @@ const INLINE_JS = `
     node.addEventListener("keydown", function (event) {
       if (event.key === "Enter" || event.key === " ") {
         event.preventDefault();
-        updateSelection(node.getAttribute("data-field-id"));
+        setSelectedField(node.getAttribute("data-field-id"));
       }
     });
   }
 
+  const selectionRows = document.querySelectorAll(".selection-table-row");
+  for (const row of selectionRows) {
+    row.addEventListener("click", function () {
+      setSelectedField(row.getAttribute("data-selection-field-id"));
+    });
+    row.addEventListener("keydown", function (event) {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        setSelectedField(row.getAttribute("data-selection-field-id"));
+      }
+    });
+  }
+
+  const selectionButtons = document.querySelectorAll(".field-table-button");
+  for (const button of selectionButtons) {
+    button.addEventListener("click", function (event) {
+      event.stopPropagation();
+      setSelectedField(button.getAttribute("data-selection-field-id"));
+    });
+  }
+
+  resetSelectionButton.addEventListener("click", function () {
+    setSelectedField(null);
+  });
+
   if (selectedFieldId) {
-    updateSelection(selectedFieldId);
+    setSelectedField(selectedFieldId);
   }
 })();
 `;
 
 type FieldCropTone = "corn" | "soy" | "mixed" | "other";
 
-interface CropMixSummary {
-  latestYear: number | null;
-  cornPct: number;
-  soyPct: number;
-  cornFieldCount: number;
-  soyFieldCount: number;
+interface DashboardReadinessPlanEntry {
+  fieldId: string;
+  earliestSafeBand?: string | null;
+  nextRecheckWindow?: string | null;
+  cornReadinessState?: string | null;
+  soybeanReadinessState?: string | null;
+  limitingFactor?: string | null;
+  limitingReason?: string | null;
+  confidenceLabel?: string | null;
+  confidence?: string | null;
 }
 
-interface RecentWeatherSummary {
-  latestDate: string | null;
-  avgTempC: number | null;
-  precipitationMm: number | null;
-  windMps: number | null;
+interface DashboardSharedReadinessEntry {
+  fieldId: string;
+  sharedReadinessState?: string | null;
+  trafficabilityStatus?: string | null;
+  accessStatus?: string | null;
+  drydownStatus?: string | null;
 }
 
-interface SoilSummaryOverview {
-  avgOmPct: number | null;
-  dominantSoil: string | null;
-}
+type DashboardPayloadWithReadiness = NormalizedGrowerDashboardPayload & {
+  fieldCornPlans?: DashboardReadinessPlanEntry[];
+  fieldSoybeanPlans?: DashboardReadinessPlanEntry[];
+  fieldSharedReadiness?: DashboardSharedReadinessEntry[];
+};
 
-interface RotationSummaryOverview {
-  topNextCrop: string | null;
-  confidenceMix: string;
+interface ActionTableRowView {
+  field: NormalizedGrowerDashboardField;
+  priorityRank: number;
+  priorityLabel: string;
+  cornStateLabel: string;
+  cornWindowLabel: string;
+  cornWindowMeta: string;
+  cornTone: string;
+  soyStateLabel: string;
+  soyWindowLabel: string;
+  soyWindowMeta: string;
+  soyTone: string;
+  limitingFactorLabel: string;
+  limitingFactorMeta: string;
+  confidenceLabel: string;
 }
 
 interface MapFeatureRender {
@@ -2084,151 +2958,388 @@ function formatSignedNumber(
   }).format(value)} ${unit}`;
 }
 
-function summarizeCropMix(payload: NormalizedGrowerDashboardPayload): CropMixSummary {
-  const latestYear = payload.cropComposition.reduce<number | null>(
-    (maxYear, entry) => (maxYear == null || entry.year > maxYear ? entry.year : maxYear),
-    null,
-  );
-
-  if (latestYear == null) {
-    return { latestYear: null, cornPct: 0, soyPct: 0, cornFieldCount: 0, soyFieldCount: 0 };
-  }
-
-  const fieldTotals = new Map<string, { corn: number; soy: number }>();
-  for (const entry of payload.cropComposition) {
-    if (entry.year !== latestYear) {
-      continue;
-    }
-    const bucket = fieldTotals.get(entry.fieldId) ?? { corn: 0, soy: 0 };
-    const normalizedName = entry.cropName.trim().toLowerCase();
-    if (normalizedName === "corn") {
-      bucket.corn += entry.pct;
-    }
-    if (normalizedName === "soybeans" || normalizedName === "soybean") {
-      bucket.soy += entry.pct;
-    }
-    fieldTotals.set(entry.fieldId, bucket);
-  }
-
-  let cornPct = 0;
-  let soyPct = 0;
-  let cornFieldCount = 0;
-  let soyFieldCount = 0;
-  for (const totals of fieldTotals.values()) {
-    cornPct += totals.corn;
-    soyPct += totals.soy;
-    if (totals.corn > 0) {
-      cornFieldCount += 1;
-    }
-    if (totals.soy > 0) {
-      soyFieldCount += 1;
-    }
-  }
-
-  const denominator = fieldTotals.size || 1;
-  return {
-    latestYear,
-    cornPct: cornPct / denominator,
-    soyPct: soyPct / denominator,
-    cornFieldCount,
-    soyFieldCount,
-  };
-}
-
-function summarizeRecentWeather(payload: NormalizedGrowerDashboardPayload): RecentWeatherSummary {
-  const latestDate = payload.weatherSeries.reduce<string | null>(
-    (maxDate, entry) => (maxDate == null || entry.date > maxDate ? entry.date : maxDate),
-    null,
-  );
-
-  if (latestDate == null) {
-    return { latestDate: null, avgTempC: null, precipitationMm: null, windMps: null };
-  }
-
-  const rows = payload.weatherSeries.filter((entry) => entry.date === latestDate);
-  const average = (values: Array<number | null>): number | null => {
-    const usable = values.filter((value): value is number => value != null);
-    if (usable.length === 0) {
-      return null;
-    }
-    return usable.reduce((sum, value) => sum + value, 0) / usable.length;
-  };
-
-  return {
-    latestDate,
-    avgTempC: average(rows.map((entry) => entry.temperatureAvgC)),
-    precipitationMm: average(rows.map((entry) => entry.precipitationMm)),
-    windMps: average(rows.map((entry) => entry.windSpeedMps)),
-  };
-}
-
-function summarizeSoil(payload: NormalizedGrowerDashboardPayload): SoilSummaryOverview {
-  const omValues = payload.soilSummary
-    .map((entry) => entry.avgOrganicMatterPct)
-    .filter((value): value is number => value != null);
-  const avgOmPct =
-    omValues.length > 0 ? omValues.reduce((sum, value) => sum + value, 0) / omValues.length : null;
-
-  const dominantCounts = new Map<string, number>();
-  for (const entry of payload.soilSummary) {
-    if (!entry.dominantSoil) {
-      continue;
-    }
-    dominantCounts.set(entry.dominantSoil, (dominantCounts.get(entry.dominantSoil) ?? 0) + 1);
-  }
-
-  let dominantSoil: string | null = null;
-  let dominantCount = -1;
-  for (const [soil, count] of dominantCounts.entries()) {
-    if (count > dominantCount) {
-      dominantSoil = soil;
-      dominantCount = count;
-    }
-  }
-
-  return { avgOmPct, dominantSoil };
-}
-
-function summarizeRotation(payload: NormalizedGrowerDashboardPayload): RotationSummaryOverview {
-  const nextCropCounts = new Map<string, number>();
-  const confidenceCounts = new Map<string, number>();
-
-  for (const entry of payload.cropRotation) {
-    if (entry.predictedNextCrop) {
-      nextCropCounts.set(
-        entry.predictedNextCrop,
-        (nextCropCounts.get(entry.predictedNextCrop) ?? 0) + 1,
-      );
-    }
-    if (entry.rotationConfidence) {
-      confidenceCounts.set(
-        entry.rotationConfidence,
-        (confidenceCounts.get(entry.rotationConfidence) ?? 0) + 1,
-      );
-    }
-  }
-
-  let topNextCrop: string | null = null;
-  let topNextCropCount = -1;
-  for (const [crop, count] of nextCropCounts.entries()) {
-    if (count > topNextCropCount) {
-      topNextCrop = crop;
-      topNextCropCount = count;
-    }
-  }
-
-  const confidenceMix = [...confidenceCounts.entries()]
-    .toSorted((left, right) => right[1] - left[1])
-    .map(([label, count]) => `${label} ${count}`)
-    .join(" • ");
-
-  return { topNextCrop, confidenceMix: confidenceMix || "Not available" };
-}
-
 function countImageryReadyFields(payload: NormalizedGrowerDashboardPayload): number {
   return new Set(
     payload.imageryCoverage.filter((entry) => entry.sceneCount > 0).map((entry) => entry.fieldId),
   ).size;
+}
+
+function dominantSummaryValue(values: Array<string | null | undefined>, fallback: string): string {
+  const usable = values
+    .map((value) => value?.trim())
+    .filter((value): value is string => Boolean(value));
+  if (usable.length === 0) {
+    return fallback;
+  }
+
+  const counts = new Map<string, number>();
+  for (const value of usable) {
+    counts.set(value, (counts.get(value) ?? 0) + 1);
+  }
+
+  return (
+    [...counts.entries()].toSorted(
+      (left, right) => right[1] - left[1] || left[0].localeCompare(right[0]),
+    )[0]?.[0] ?? fallback
+  );
+}
+
+function formatEarliestSafeBandLabel(value: string | null | undefined): string {
+  switch (value) {
+    case "now":
+      return "Now";
+    case "next_3_days":
+      return "Next 3 days";
+    case "next_7_days":
+      return "Next 7 days";
+    case "blocked":
+      return "Blocked";
+    default:
+      return "Unknown";
+  }
+}
+
+function earliestSafeBandPriority(value: string | null | undefined): number {
+  switch (value) {
+    case "now":
+      return 0;
+    case "next_3_days":
+      return 1;
+    case "next_7_days":
+      return 2;
+    case "blocked":
+      return 3;
+    default:
+      return 4;
+  }
+}
+
+function formatNextWindowLabel(value: string | null | undefined): string {
+  if (!value) {
+    return "Monitor conditions";
+  }
+
+  return value
+    .split("_")
+    .filter((part) => part.length > 0)
+    .map((part) => part[0].toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+function formatCompactStatusLabel(value: string | null | undefined): string {
+  if (!value) {
+    return "Unknown";
+  }
+
+  return value
+    .split("_")
+    .filter((part) => part.length > 0)
+    .map((part) => part[0].toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+function readinessStatePriority(value: string | null | undefined): number {
+  switch (value) {
+    case "ready_now":
+      return 0;
+    case "ready_soon":
+      return 1;
+    case "watch":
+    case "monitor":
+    case "monitor_conditions":
+      return 2;
+    case "blocked":
+    case "hold":
+    case "not_ready":
+      return 3;
+    default:
+      return 2;
+  }
+}
+
+function readinessTone(
+  value: string | null | undefined,
+): "ready" | "soon" | "watch" | "blocked" | "neutral" {
+  switch (value) {
+    case "ready_now":
+      return "ready";
+    case "ready_soon":
+      return "soon";
+    case "blocked":
+    case "hold":
+    case "not_ready":
+      return "blocked";
+    case "watch":
+    case "monitor":
+    case "monitor_conditions":
+      return "watch";
+    default:
+      return "neutral";
+  }
+}
+
+function actionPriorityLabel(rank: number): string {
+  switch (rank) {
+    case 0:
+      return "First pass";
+    case 1:
+      return "Next pass";
+    case 2:
+      return "Stage soon";
+    case 3:
+      return "Hold";
+    default:
+      return "Review";
+  }
+}
+
+function readinessPayload(
+  payload: NormalizedGrowerDashboardPayload,
+): DashboardPayloadWithReadiness {
+  return payload as DashboardPayloadWithReadiness;
+}
+
+function cornPlanForField(
+  payload: NormalizedGrowerDashboardPayload,
+  fieldId: string,
+): DashboardReadinessPlanEntry | null {
+  return (
+    readinessPayload(payload).fieldCornPlans?.find((entry) => entry.fieldId === fieldId) ?? null
+  );
+}
+
+function soybeanPlanForField(
+  payload: NormalizedGrowerDashboardPayload,
+  fieldId: string,
+): DashboardReadinessPlanEntry | null {
+  return (
+    readinessPayload(payload).fieldSoybeanPlans?.find((entry) => entry.fieldId === fieldId) ?? null
+  );
+}
+
+function sharedReadinessForField(
+  payload: NormalizedGrowerDashboardPayload,
+  fieldId: string,
+): DashboardSharedReadinessEntry | null {
+  return (
+    readinessPayload(payload).fieldSharedReadiness?.find((entry) => entry.fieldId === fieldId) ??
+    null
+  );
+}
+
+function planConfidenceLabel(
+  payload: NormalizedGrowerDashboardPayload,
+  fieldId: string,
+  cornPlan: DashboardReadinessPlanEntry | null,
+  soybeanPlan: DashboardReadinessPlanEntry | null,
+): string {
+  const directConfidence =
+    cornPlan?.confidenceLabel ??
+    cornPlan?.confidence ??
+    soybeanPlan?.confidenceLabel ??
+    soybeanPlan?.confidence;
+  if (directConfidence) {
+    return formatCompactStatusLabel(directConfidence);
+  }
+
+  return formatCompactStatusLabel(
+    cropRotationForFieldPayload(payload, fieldId)?.rotationConfidence ?? "standard",
+  );
+}
+
+function limitingFactorSummary(
+  cornPlan: DashboardReadinessPlanEntry | null,
+  soybeanPlan: DashboardReadinessPlanEntry | null,
+  sharedReadiness: DashboardSharedReadinessEntry | null,
+): { label: string; meta: string } {
+  const explicitLimiter =
+    cornPlan?.limitingFactor ??
+    cornPlan?.limitingReason ??
+    soybeanPlan?.limitingFactor ??
+    soybeanPlan?.limitingReason;
+  if (explicitLimiter) {
+    return {
+      label: explicitLimiter,
+      meta: "Directly surfaced from the embedded plan summary.",
+    };
+  }
+
+  if (sharedReadiness) {
+    const access = sharedReadiness.accessStatus
+      ? `${formatCompactStatusLabel(sharedReadiness.accessStatus)} access`
+      : null;
+    const trafficability = sharedReadiness.trafficabilityStatus
+      ? `${formatCompactStatusLabel(sharedReadiness.trafficabilityStatus)} trafficability`
+      : null;
+    const drydown = sharedReadiness.drydownStatus
+      ? `${formatCompactStatusLabel(sharedReadiness.drydownStatus)} drydown`
+      : null;
+    const summaryParts = [access, trafficability, drydown].filter((value): value is string =>
+      Boolean(value),
+    );
+
+    if (summaryParts.length > 0) {
+      return {
+        label: summaryParts.slice(0, 2).join(" • "),
+        meta: `Shared field-fit state ${formatCompactStatusLabel(sharedReadiness.sharedReadinessState ?? "monitor")}.`,
+      };
+    }
+  }
+
+  return {
+    label: "No strong limiter surfaced",
+    meta: "Use the row windows and the selected-field detail panels for the next check.",
+  };
+}
+
+function cropActionCell(
+  state: string | null | undefined,
+  earliestSafeBand: string | null | undefined,
+  nextRecheckWindow: string | null | undefined,
+): { stateLabel: string; windowLabel: string; windowMeta: string; tone: string } {
+  return {
+    stateLabel: formatCompactStatusLabel(state ?? "monitor"),
+    windowLabel: formatEarliestSafeBandLabel(earliestSafeBand),
+    windowMeta: `Recheck ${formatNextWindowLabel(nextRecheckWindow)}`,
+    tone: readinessTone(state ?? earliestSafeBand),
+  };
+}
+
+function actionPriorityRank(
+  cornPlan: DashboardReadinessPlanEntry | null,
+  soybeanPlan: DashboardReadinessPlanEntry | null,
+  sharedReadiness: DashboardSharedReadinessEntry | null,
+): number {
+  const cropRank = Math.min(
+    earliestSafeBandPriority(cornPlan?.earliestSafeBand),
+    earliestSafeBandPriority(soybeanPlan?.earliestSafeBand),
+  );
+  const normalizedCropRank = Number.isFinite(cropRank) ? cropRank : 4;
+  const fieldFitRank = readinessStatePriority(sharedReadiness?.sharedReadinessState);
+  return Math.max(normalizedCropRank, fieldFitRank);
+}
+
+function buildActionTableRows(payload: NormalizedGrowerDashboardPayload): ActionTableRowView[] {
+  return payload.fields
+    .map((field) => {
+      const cornPlan = cornPlanForField(payload, field.fieldId);
+      const soybeanPlan = soybeanPlanForField(payload, field.fieldId);
+      const sharedReadiness = sharedReadinessForField(payload, field.fieldId);
+      const cornAction = cropActionCell(
+        cornPlan?.cornReadinessState,
+        cornPlan?.earliestSafeBand,
+        cornPlan?.nextRecheckWindow,
+      );
+      const soyAction = cropActionCell(
+        soybeanPlan?.soybeanReadinessState,
+        soybeanPlan?.earliestSafeBand,
+        soybeanPlan?.nextRecheckWindow,
+      );
+      const limiting = limitingFactorSummary(cornPlan, soybeanPlan, sharedReadiness);
+      const priorityRank = actionPriorityRank(cornPlan, soybeanPlan, sharedReadiness);
+
+      return {
+        field,
+        priorityRank,
+        priorityLabel: actionPriorityLabel(priorityRank),
+        cornStateLabel: cornAction.stateLabel,
+        cornWindowLabel: cornAction.windowLabel,
+        cornWindowMeta: cornAction.windowMeta,
+        cornTone: cornAction.tone,
+        soyStateLabel: soyAction.stateLabel,
+        soyWindowLabel: soyAction.windowLabel,
+        soyWindowMeta: soyAction.windowMeta,
+        soyTone: soyAction.tone,
+        limitingFactorLabel: limiting.label,
+        limitingFactorMeta: limiting.meta,
+        confidenceLabel: planConfidenceLabel(payload, field.fieldId, cornPlan, soybeanPlan),
+      };
+    })
+    .toSorted(
+      (left, right) =>
+        left.priorityRank - right.priorityRank ||
+        left.field.fieldName.localeCompare(right.field.fieldName),
+    );
+}
+
+function renderActionTableRows(
+  payload: NormalizedGrowerDashboardPayload,
+  initialFieldId: string,
+): string {
+  return buildActionTableRows(payload)
+    .map((row) => {
+      const isSelected = row.field.fieldId === initialFieldId;
+      return `<tr class="selection-table-row" data-selection-field-id="${escapeHtml(row.field.fieldId)}" data-selected="${isSelected ? "true" : "false"}" tabindex="0"><td class="action-field-cell"><div class="action-field-stack"><button type="button" class="field-table-button${isSelected ? " is-selected" : ""}" data-selection-field-id="${escapeHtml(row.field.fieldId)}"${isSelected ? ` data-field-id="${escapeHtml(row.field.fieldId)}"` : ""} aria-pressed="${isSelected ? "true" : "false"}"><span class="action-field-name">${escapeHtml(row.field.fieldName)}</span><span class="action-field-meta">${escapeHtml(`${formatNumber(row.field.areaAcres, 2)} acres • ${row.field.fieldId}`)}</span></button><span class="action-priority-badge priority-${escapeHtml(String(row.priorityRank))}">${escapeHtml(row.priorityLabel)}</span></div></td><td><div class="action-window-cell"><span class="action-state-pill tone-${escapeHtml(row.cornTone)}">${escapeHtml(row.cornStateLabel)}</span><span class="action-window-value">${escapeHtml(row.cornWindowLabel)}</span><span class="action-window-meta">${escapeHtml(row.cornWindowMeta)}</span></div></td><td><div class="action-window-cell"><span class="action-state-pill tone-${escapeHtml(row.soyTone)}">${escapeHtml(row.soyStateLabel)}</span><span class="action-window-value">${escapeHtml(row.soyWindowLabel)}</span><span class="action-window-meta">${escapeHtml(row.soyWindowMeta)}</span></div></td><td><div class="action-limiter-cell"><span class="action-limiter-value">${escapeHtml(row.limitingFactorLabel)}</span><span class="action-window-meta">${escapeHtml(row.limitingFactorMeta)}</span></div></td><td class="action-confidence-cell"><span class="action-confidence-badge">${escapeHtml(row.confidenceLabel)}</span></td></tr>`;
+    })
+    .join("");
+}
+
+function summarizePlanKpi<PlanEntry>(
+  plans: PlanEntry[] | undefined,
+  getState: (plan: PlanEntry) => string | null | undefined,
+  getEarliestBand: (plan: PlanEntry) => string | null | undefined,
+  getNextWindow: (plan: PlanEntry) => string | null | undefined,
+): {
+  readySoonCount: number;
+  earliestBandLabel: string;
+  nextWindowLabel: string;
+} {
+  let readySoonCount = 0;
+  let bestBand: string | null = null;
+  let bestPriority = Number.POSITIVE_INFINITY;
+  const nextWindows: string[] = [];
+
+  for (const plan of plans ?? []) {
+    const state = getState(plan);
+    if (state === "ready_now" || state === "ready_soon") {
+      readySoonCount += 1;
+    }
+
+    const band = getEarliestBand(plan);
+    const priority = earliestSafeBandPriority(band);
+    if (priority < bestPriority) {
+      bestPriority = priority;
+      bestBand = band ?? null;
+    }
+
+    const nextWindow = getNextWindow(plan);
+    if (nextWindow) {
+      nextWindows.push(nextWindow);
+    }
+  }
+
+  return {
+    readySoonCount,
+    earliestBandLabel: formatEarliestSafeBandLabel(bestBand),
+    nextWindowLabel: formatNextWindowLabel(dominantSummaryValue(nextWindows, "Monitor conditions")),
+  };
+}
+
+function summarizeFieldFitKpi(payload: NormalizedGrowerDashboardPayload): {
+  readySoonCount: number;
+  trafficability: string;
+  access: string;
+  drydown: string;
+} {
+  const rows = readinessPayload(payload).fieldSharedReadiness ?? [];
+  return {
+    readySoonCount: rows.filter(
+      (entry) =>
+        entry.sharedReadinessState === "ready_now" || entry.sharedReadinessState === "ready_soon",
+    ).length,
+    trafficability: dominantSummaryValue(
+      rows.map((entry) => entry.trafficabilityStatus),
+      "Unknown",
+    ),
+    access: dominantSummaryValue(
+      rows.map((entry) => entry.accessStatus),
+      "Unknown",
+    ),
+    drydown: dominantSummaryValue(
+      rows.map((entry) => entry.drydownStatus),
+      "Unknown",
+    ),
+  };
 }
 
 function latestCropYear(payload: NormalizedGrowerDashboardPayload): number | null {
@@ -2659,23 +3770,30 @@ export function renderGrowerDashboardHtml(payload: NormalizedGrowerDashboardPayl
   const title = `${payload.farm.farmName} Dashboard`;
   const embeddedPayload = serializeEmbeddedPayload(payload);
   const fieldCountLabel = formatNumber(payload.fields.length);
-  const acreageLabel = `${formatNumber(payload.farm.totalAcres, 2)} acres`;
   const generatedAtLabel = new Date(payload.generatedAt).toLocaleString("en-US", {
     dateStyle: "medium",
     timeStyle: "short",
     timeZone: payload.grower.timezone,
   });
   const imageryReadyFields = countImageryReadyFields(payload);
-  const cropMix = summarizeCropMix(payload);
-  const recentWeather = summarizeRecentWeather(payload);
-  const soilSummary = summarizeSoil(payload);
-  const rotationSummary = summarizeRotation(payload);
-  const recentWeatherDateLabel = recentWeather.latestDate
-    ? new Date(`${recentWeather.latestDate}T12:00:00Z`).toLocaleDateString("en-US", {
-        dateStyle: "medium",
-        timeZone: payload.grower.timezone,
-      })
-    : "Not available";
+  const readiness = readinessPayload(payload);
+  const cornKpi = summarizePlanKpi(
+    readiness.fieldCornPlans,
+    (plan) => plan.cornReadinessState,
+    (plan) => plan.earliestSafeBand,
+    (plan) => plan.nextRecheckWindow,
+  );
+  const soybeanKpi = summarizePlanKpi(
+    readiness.fieldSoybeanPlans,
+    (plan) => plan.soybeanReadinessState,
+    (plan) => plan.earliestSafeBand,
+    (plan) => plan.nextRecheckWindow,
+  );
+  const fieldFitKpi = summarizeFieldFitKpi(payload);
+  const nextWorkableWindowLabel = dominantSummaryValue(
+    [cornKpi.nextWindowLabel, soybeanKpi.nextWindowLabel],
+    "Monitor conditions",
+  );
   const mapFeatures = buildMapFeatures(payload);
   const initialField = payload.fields[0];
   const initialSoilSummary = soilSummaryForFieldPayload(payload, initialField.fieldId);
@@ -2684,9 +3802,34 @@ export function renderGrowerDashboardHtml(payload: NormalizedGrowerDashboardPayl
   const initialCropComposition = cropCompositionForFieldPayload(payload, initialField.fieldId);
   const initialCropLead = initialCropComposition.rows[0] ?? null;
   const initialRotation = cropRotationForFieldPayload(payload, initialField.fieldId);
+  const initialCornPlan = cornPlanForField(payload, initialField.fieldId);
+  const initialSoybeanPlan = soybeanPlanForField(payload, initialField.fieldId);
+  const initialSharedReadiness = sharedReadinessForField(payload, initialField.fieldId);
+  const initialCornAction = cropActionCell(
+    initialCornPlan?.cornReadinessState,
+    initialCornPlan?.earliestSafeBand,
+    initialCornPlan?.nextRecheckWindow,
+  );
+  const initialSoyAction = cropActionCell(
+    initialSoybeanPlan?.soybeanReadinessState,
+    initialSoybeanPlan?.earliestSafeBand,
+    initialSoybeanPlan?.nextRecheckWindow,
+  );
+  const initialLimitingFactor = limitingFactorSummary(
+    initialCornPlan,
+    initialSoybeanPlan,
+    initialSharedReadiness,
+  );
+  const initialPlanConfidence = planConfidenceLabel(
+    payload,
+    initialField.fieldId,
+    initialCornPlan,
+    initialSoybeanPlan,
+  );
   const initialImageryCoverage = imageryCoverageForFieldPayload(payload, initialField.fieldId);
   const initialImageryScenes = imageryScenesForFieldPayload(payload, initialField.fieldId);
   const initialLatestImageryScene = initialImageryScenes[0] ?? null;
+  const actionTableRows = renderActionTableRows(payload, initialField.fieldId);
   const diagnosticCounts = summarizeDiagnosticCounts(payload);
   const lineagePaths = uniqueLineagePaths(payload);
   const coverage = coverageSummary(payload);
@@ -2699,129 +3842,61 @@ export function renderGrowerDashboardHtml(payload: NormalizedGrowerDashboardPayl
     <title>${escapeHtml(title)}</title>
     <style>${INLINE_CSS}</style>
   </head>
-  <body>
+  <body data-selected-field-id="${escapeHtml(initialField.fieldId)}">
     <main>
       <section class="shell" aria-label="Grower dashboard hero overview">
         <section class="hero">
           <div class="hero-copy">
-            <p class="eyebrow">Offline classroom demo dashboard</p>
-            <h1>${escapeHtml(payload.farm.farmName)}</h1>
-            <p class="lede">
-              A single self-contained farm dashboard for ${escapeHtml(payload.grower.growerName)} that
-              opens directly from disk, keeps corn and soy visible as equal portfolio lenses, and
-              summarizes field-scale readiness before deeper panels arrive.
-            </p>
-            <p class="sublede">
-              ${escapeHtml(payload.farm.countyName ?? "Kansas county")} County, ${escapeHtml(payload.farm.stateCode)} • Generated ${escapeHtml(generatedAtLabel)}
-            </p>
-            <div class="chip-row" aria-label="Hero quick facts">
-              <span class="chip">${escapeHtml(fieldCountLabel)} fields</span>
-              <span class="chip">${escapeHtml(acreageLabel)}</span>
-              <span class="chip">${escapeHtml(String(imageryReadyFields))}/${escapeHtml(fieldCountLabel)} imagery-ready</span>
-              <span class="chip">Latest crop year ${escapeHtml(cropMix.latestYear == null ? "N/A" : String(cropMix.latestYear))}</span>
-            </div>
-          </div>
-
-          <div class="hero-aside">
-            <section class="portfolio" aria-label="Equal corn and soy framing">
-              <h2>Equal corn + soy opening lens</h2>
-              <p class="portfolio-copy">
-                Both portfolio anchors stay visible on first load so the classroom demo starts with a balanced crop story instead of a single-crop default.
-              </p>
-              <div class="portfolio-grid">
-                <article class="portfolio-card corn">
-                  <span class="portfolio-label">Corn lens</span>
-                  <span class="portfolio-value">${escapeHtml(formatNumber(cropMix.cornPct, 1))}%</span>
-                  <span class="portfolio-detail">Average latest-year corn share across the portfolio • present in ${escapeHtml(String(cropMix.cornFieldCount))} field(s)</span>
-                </article>
-                <article class="portfolio-card soy">
-                  <span class="portfolio-label">Soy lens</span>
-                  <span class="portfolio-value">${escapeHtml(formatNumber(cropMix.soyPct, 1))}%</span>
-                  <span class="portfolio-detail">Average latest-year soybean share across the portfolio • present in ${escapeHtml(String(cropMix.soyFieldCount))} field(s)</span>
-                </article>
+            <div class="hero-topline">
+              <div>
+                <p class="eyebrow">Offline classroom demo dashboard</p>
+                <h1>${escapeHtml(payload.farm.farmName)}</h1>
               </div>
-            </section>
-
-            <section class="hero-note" aria-label="Offline runtime note">
-              <h2>Offline-safe delivery</h2>
-              <p>
-                The HTML, CSS, JavaScript, and normalized payload are all embedded in this one document. No fetches, no CDN assets, and no browser storage dependencies are required.
-              </p>
-            </section>
+              <div class="hero-meta" aria-label="Farm overview metadata">
+                <span class="label">Grower</span>
+                <span class="value">${escapeHtml(payload.grower.growerName)}</span>
+                <span class="detail">Generated ${escapeHtml(generatedAtLabel)}</span>
+              </div>
+            </div>
+            <p class="lede">Compact readiness KPIs for corn, soy, field fit, and the next workable window.</p>
+            <p class="sublede">
+              ${escapeHtml(payload.farm.countyName ?? "Kansas county")} County, ${escapeHtml(payload.farm.stateCode)}
+            </p>
           </div>
         </section>
 
         <div class="shell-body">
         <section class="overview-grid" aria-label="Overview dashboard rail">
           <section class="summary-wrap" aria-label="Portfolio summary cards">
-            <p class="section-kicker">Portfolio summary</p>
+            <p class="section-kicker">Readiness snapshot</p>
             <div class="summary-grid">
               <article class="card">
-                <span class="label">Total acreage</span>
-                <span class="value">${escapeHtml(acreageLabel)}</span>
-                <span class="detail">Unified across all five normalized field records.</span>
+                <span class="label">Corn earliest band</span>
+                <span class="value">${escapeHtml(cornKpi.earliestBandLabel)}</span>
+                <span class="detail">${escapeHtml(`${formatNumber(cornKpi.readySoonCount)}/${fieldCountLabel} fields ready or soon`)}</span>
               </article>
               <article class="card">
-                <span class="label">Field count</span>
-                <span class="value">${escapeHtml(fieldCountLabel)}</span>
-                <span class="detail">Every field carries boundary, weather, soil, and crop data.</span>
+                <span class="label">Soy earliest band</span>
+                <span class="value">${escapeHtml(soybeanKpi.earliestBandLabel)}</span>
+                <span class="detail">${escapeHtml(`${formatNumber(soybeanKpi.readySoonCount)}/${fieldCountLabel} fields ready or soon`)}</span>
+              </article>
+              <article class="card">
+                <span class="label">Field fit readiness</span>
+                <span class="value">${escapeHtml(`${formatNumber(fieldFitKpi.readySoonCount)}/${fieldCountLabel}`)}</span>
+                <span class="detail">${escapeHtml(`${fieldFitKpi.trafficability} trafficability • ${fieldFitKpi.access} access • ${fieldFitKpi.drydown} drydown`)}</span>
+              </article>
+              <article class="card">
+                <span class="label">Next workable / access window</span>
+                <span class="value">${escapeHtml(nextWorkableWindowLabel)}</span>
+                <span class="detail">${escapeHtml(`${fieldFitKpi.access} access outlook • Corn ${cornKpi.nextWindowLabel} • Soy ${soybeanKpi.nextWindowLabel}`)}</span>
               </article>
               <article class="card">
                 <span class="label">Imagery-ready fields</span>
                 <span class="value">${escapeHtml(String(imageryReadyFields))}</span>
                 <span class="detail">Based on reconciled on-disk TIFF presence, not manifest claims alone.</span>
               </article>
-              <article class="card">
-                <span class="label">Rotation outlook leader</span>
-                <span class="value">${escapeHtml(rotationSummary.topNextCrop ?? "Not available")}</span>
-                <span class="detail">Confidence mix: ${escapeHtml(rotationSummary.confidenceMix)}</span>
-              </article>
             </div>
           </section>
-
-          <section class="signal-wrap" aria-label="Recent agronomic signals">
-            <p class="section-kicker">Recent agronomic signals</p>
-            <div class="signal-grid">
-              <article class="signal-card">
-                <h2 class="section-title">Latest weather snapshot</h2>
-                <p class="signal-copy">
-                  ${escapeHtml(recentWeatherDateLabel)} averages ${escapeHtml(formatSignedNumber(recentWeather.avgTempC, "°C"))} with ${escapeHtml(formatSignedNumber(recentWeather.precipitationMm, "mm"))} precipitation and ${escapeHtml(formatSignedNumber(recentWeather.windMps, "m/s"))} wind across the portfolio.
-                </p>
-              </article>
-              <article class="signal-card">
-                <h2 class="section-title">Soil footing</h2>
-                <p class="signal-copy">
-                  Average organic matter sits near ${escapeHtml(formatSignedNumber(soilSummary.avgOmPct, "%"))}, while the most common dominant soil family is ${escapeHtml(soilSummary.dominantSoil ?? "not available")}.
-                </p>
-              </article>
-              <article class="signal-card">
-                <h2 class="section-title">Crop signal</h2>
-                <p class="signal-copy">
-                  Latest composition year ${escapeHtml(cropMix.latestYear == null ? "N/A" : String(cropMix.latestYear))} keeps both corn and soy visible immediately: corn at ${escapeHtml(formatNumber(cropMix.cornPct, 1))}% average share and soy at ${escapeHtml(formatNumber(cropMix.soyPct, 1))}%.
-                </p>
-              </article>
-            </div>
-          </section>
-        </section>
-
-        <section class="selection-stage" aria-label="Selected field showcase context">
-          <div class="selection-shell">
-            <section class="selection-focus">
-              <p class="selection-kicker">Selected field focus</p>
-              <h2 id="selected-showcase-field" class="selection-title">${escapeHtml(initialField.fieldName)}</h2>
-              <p id="selected-showcase-summary" class="selection-copy">${escapeHtml(`${initialField.countyName ?? "County unavailable"} • ${formatNumber(initialField.areaAcres, 2)} acres • ${initialField.fieldId}`)}</p>
-              <div class="selection-chip-row">
-                <span id="selected-showcase-crop" class="selection-chip">${escapeHtml(formatFieldCropContext(payload, initialField.fieldId))}</span>
-                <span id="selected-showcase-imagery" class="selection-chip">${escapeHtml(`${initialImageryCoverage.length} ready source(s)`)}</span>
-              </div>
-            </section>
-            <section class="selection-guide">
-              <p class="section-kicker">Showcase flow</p>
-              <p class="selection-guide-copy">
-                Start with the field boundary map, then follow the same selected field through weather, soil, crop, and imagery panels. Every downstream section stays coordinated without leaving this one offline document.
-              </p>
-            </section>
-          </div>
         </section>
 
         <section class="downstream-grid" aria-label="Selected field dashboard rail">
@@ -2829,340 +3904,443 @@ export function renderGrowerDashboardHtml(payload: NormalizedGrowerDashboardPayl
           <p class="section-kicker">Field boundary schematic</p>
           <div class="map-grid">
             <section class="map-panel">
-              <div class="map-header">
-                <div>
-                  <h2>Clickable offline farm map</h2>
-                  <p class="map-copy">
-                    All five field boundaries are rendered as inline SVG. Hover and select states stay local to this document with no tiles or mapping libraries.
-                  </p>
+              <div class="map-topbar">
+                <div class="map-meta-stack">
+                  <div class="map-header">
+                    <div>
+                      <h2>Clickable offline farm map</h2>
+                      <p class="map-copy">
+                        All five field boundaries are rendered as inline SVG. Hover and select states stay local to this document with no tiles or mapping libraries.
+                      </p>
+                    </div>
+                    <span class="map-badge">SVG only</span>
+                  </div>
+                  <div class="legend" aria-label="Map legend">
+                    <span class="legend-item"><span class="legend-swatch corn"></span>Corn-led</span>
+                    <span class="legend-item"><span class="legend-swatch soy"></span>Soy-led</span>
+                    <span class="legend-item"><span class="legend-swatch other"></span>Other / mixed</span>
+                  </div>
                 </div>
-                <span class="map-badge">SVG only</span>
-              </div>
-              <div class="map-frame">
-                <svg id="field-map-root" class="map-svg" viewBox="0 0 760 430" role="group" aria-label="Farm field boundary schematic" data-initial-field-id="${escapeHtml(initialField.fieldId)}">
-                  ${mapFeatures
-                    .map(
-                      (feature) => `
-                  <g class="field-node" data-field-id="${escapeHtml(feature.field.fieldId)}" tabindex="0" role="button" aria-pressed="false" aria-label="${escapeHtml(feature.field.fieldName)}">
-                    <path class="field-shape tone-${feature.tone}" d="${feature.pathData}" />
-                    <text class="field-label" x="${feature.labelX}" y="${feature.labelY}">${escapeHtml(feature.shortLabel)}</text>
-                  </g>`,
-                    )
-                    .join("")}
-                </svg>
-              </div>
-              <div class="legend" aria-label="Map legend">
-                <span class="legend-item"><span class="legend-swatch corn"></span>Corn-led</span>
-                <span class="legend-item"><span class="legend-swatch soy"></span>Soy-led</span>
-                <span class="legend-item"><span class="legend-swatch other"></span>Other / mixed</span>
-              </div>
-            </section>
 
-            <section class="teaser-card" aria-label="Selected field teaser">
-              <div class="teaser-header">
-                <div>
-                  <h2 id="selected-field-name">${escapeHtml(initialField.fieldName)}</h2>
-                  <p class="teaser-copy">
-                    Click any field boundary to preview acreage, county, crop signal, and compact weather/soil hints before the full downstream panels are added.
-                  </p>
+              </div>
+
+              <div class="map-stage-grid">
+                <div class="map-stage-main">
+                  <div class="map-frame">
+                    <svg id="field-map-root" class="map-svg" viewBox="0 0 760 430" role="group" aria-label="Farm field boundary schematic" data-initial-field-id="${escapeHtml(initialField.fieldId)}">
+                      ${mapFeatures
+                        .map(
+                          (feature) => `
+                      <g class="field-node" data-field-id="${escapeHtml(feature.field.fieldId)}" tabindex="0" role="button" aria-pressed="false" aria-label="${escapeHtml(feature.field.fieldName)}">
+                        <path class="field-shape tone-${feature.tone}" d="${feature.pathData}" />
+                        <text class="field-label" x="${feature.labelX}" y="${feature.labelY}">${escapeHtml(feature.shortLabel)}</text>
+                      </g>`,
+                        )
+                        .join("")}
+                    </svg>
+                  </div>
+                  <div class="map-status-strip">
+                    <p class="teaser-copy">Map selection stays synchronized with the field-focus panel and action table.</p>
+                    <div id="runtime-status" class="runtime-status" aria-live="polite">Loading embedded payload…</div>
+                  </div>
                 </div>
-                <span class="teaser-badge">Selection teaser</span>
+
+                <section id="selected-field-focus" class="field-focus-panel" data-detail-state="selected" aria-label="Focused selected-field detail panel">
+                  <div class="field-focus-header">
+                    <div>
+                      <div class="field-focus-topline">
+                        <p class="section-kicker">Field focus</p>
+                        <button id="selected-field-reset" class="field-focus-reset" type="button">Reset to farm overview</button>
+                      </div>
+                      <h2 id="selected-showcase-field" class="field-focus-title">${escapeHtml(initialField.fieldName)}</h2>
+                      <p id="selected-showcase-summary" class="field-focus-copy">${escapeHtml(`${initialField.countyName ?? "County unavailable"} • ${formatNumber(initialField.areaAcres, 2)} acres • ${initialField.fieldId}`)}</p>
+                    </div>
+                  </div>
+
+                  <div class="field-focus-meta-grid">
+                    <article class="field-focus-meta-card">
+                      <span class="label">Field name</span>
+                      <span id="selected-field-name" class="value">${escapeHtml(initialField.fieldName)}</span>
+                    </article>
+                    <article class="field-focus-meta-card">
+                      <span class="label">Acreage</span>
+                      <span id="selected-field-acreage" class="value">${escapeHtml(`${formatNumber(initialField.areaAcres, 2)} acres`)}</span>
+                    </article>
+                    <article class="field-focus-meta-card">
+                      <span class="label">County</span>
+                      <span id="selected-field-county" class="value">${escapeHtml(initialField.countyName ?? "County unavailable")}</span>
+                    </article>
+                    <article class="field-focus-meta-card">
+                      <span class="label">Imagery readiness</span>
+                      <span id="selected-showcase-imagery" class="value">${escapeHtml(`${initialImageryCoverage.length} ready source(s)`)}</span>
+                    </article>
+                  </div>
+
+                  <div class="field-plan-grid">
+                    <article class="field-plan-card corn">
+                      <span class="label">Corn plan</span>
+                      <span id="selected-corn-state" class="action-state-pill tone-${escapeHtml(initialCornAction.tone)}">${escapeHtml(initialCornAction.stateLabel)}</span>
+                      <span id="selected-corn-window" class="field-plan-window">${escapeHtml(initialCornAction.windowLabel)}</span>
+                      <p id="selected-corn-meta" class="field-focus-support-copy">${escapeHtml(initialCornAction.windowMeta)}</p>
+                    </article>
+                    <article class="field-plan-card soy">
+                      <span class="label">Soy plan</span>
+                      <span id="selected-soy-state" class="action-state-pill tone-${escapeHtml(initialSoyAction.tone)}">${escapeHtml(initialSoyAction.stateLabel)}</span>
+                      <span id="selected-soy-window" class="field-plan-window">${escapeHtml(initialSoyAction.windowLabel)}</span>
+                      <p id="selected-soy-meta" class="field-focus-support-copy">${escapeHtml(initialSoyAction.windowMeta)}</p>
+                    </article>
+                  </div>
+
+                  <article class="field-limiter-card">
+                    <div class="field-focus-limiter">
+                      <div>
+                        <span class="label">Limiting factor</span>
+                        <span id="selected-limiting-factor" class="field-limiter-value">${escapeHtml(initialLimitingFactor.label)}</span>
+                        <p id="selected-limiting-meta" class="field-focus-support-copy">${escapeHtml(initialLimitingFactor.meta)}</p>
+                      </div>
+                      <span id="selected-plan-confidence" class="action-confidence-badge">${escapeHtml(initialPlanConfidence)}</span>
+                    </div>
+                  </article>
+
+                  <section aria-label="Concise supporting evidence block">
+                    <p class="section-kicker">Supporting evidence</p>
+                    <p class="field-overview-copy">Quick cues stay directly under the plan summaries so one field can be understood without scanning multiple downstream sections.</p>
+                    <div class="field-overview-grid">
+                      <article class="field-overview-card">
+                        <span class="label">Crop context</span>
+                        <span id="selected-field-crop" class="value">${escapeHtml(formatFieldCropContext(payload, initialField.fieldId))}</span>
+                      </article>
+                      <article class="field-overview-card">
+                        <span class="label">Weather cue</span>
+                        <span id="selected-field-weather" class="value">${escapeHtml(formatFieldWeatherHint(payload, initialField.fieldId))}</span>
+                      </article>
+                      <article class="field-overview-card">
+                        <span class="label">Soil cue</span>
+                        <span id="selected-field-soil" class="value">${escapeHtml(formatFieldSoilHint(payload, initialField.fieldId))}</span>
+                      </article>
+                      <article class="field-overview-card">
+                        <span class="label">Rotation cue</span>
+                        <span id="selected-field-signal" class="value">${escapeHtml(fieldRotationSignal(payload, initialField.fieldId))}</span>
+                      </article>
+                    </div>
+                  </section>
+
+                  <section class="field-evidence-stage" aria-label="Expanded selected-field evidence">
+                    <div class="field-evidence-header">
+                      <p class="section-kicker">Secondary evidence</p>
+                      <p class="field-overview-copy">Weather, soil, crop history, and NDVI-supporting imagery stay attached to the selected field here, but remain visually subordinate to the planting plans.</p>
+                    </div>
+
+                    <div class="field-evidence-grid">
+                      <details class="field-evidence-card" open>
+                        <summary>
+                          <div class="field-evidence-summary">
+                            <div>
+                              <h3 id="weather-selected-field">${escapeHtml(initialField.fieldName)}</h3>
+                              <p id="weather-selected-summary" class="field-evidence-summary-copy">Latest selected-field weather series rendered as inline SVG trend cards from the embedded payload only.</p>
+                            </div>
+                            <span class="field-evidence-badge">Weather</span>
+                          </div>
+                        </summary>
+                        <div class="field-evidence-body">
+                          <section class="weather-panel" aria-label="Selected field weather panel">
+                            <div class="weather-header">
+                              <div>
+                                <h2 class="section-title">Latest field snapshot</h2>
+                                <p class="weather-overview-copy">
+                                  Daily weather context updates instantly when you click a different field in the schematic above.
+                                </p>
+                              </div>
+                            </div>
+
+                            <div class="weather-overview">
+                              <section class="weather-overview-card">
+                                <div class="weather-overview-metrics">
+                                  <article class="weather-metric">
+                                    <span class="label">Latest date</span>
+                                    <span id="weather-latest-date" class="value">Loading…</span>
+                                  </article>
+                                  <article class="weather-metric">
+                                    <span class="label">Average temp</span>
+                                    <span id="weather-latest-temp" class="value">Loading…</span>
+                                  </article>
+                                  <article class="weather-metric">
+                                    <span class="label">Precipitation</span>
+                                    <span id="weather-latest-rain" class="value">Loading…</span>
+                                  </article>
+                                  <article class="weather-metric">
+                                    <span class="label">Solar</span>
+                                    <span id="weather-latest-solar" class="value">Loading…</span>
+                                  </article>
+                                  <article class="weather-metric">
+                                    <span class="label">Humidity</span>
+                                    <span id="weather-latest-humidity" class="value">Loading…</span>
+                                  </article>
+                                  <article class="weather-metric">
+                                    <span class="label">Wind</span>
+                                    <span id="weather-latest-wind" class="value">Loading…</span>
+                                  </article>
+                                </div>
+                              </section>
+
+                              <section class="weather-overview-card">
+                                <h2 class="section-title">Inline trend cards</h2>
+                                <p class="weather-overview-copy">
+                                  Each chart uses the latest embedded daily rows for the currently selected field and redraws without any page reload.
+                                </p>
+                              </section>
+                            </div>
+
+                            <div class="weather-grid">
+                              <article class="weather-chart-card">
+                                <span class="label">Temperature</span>
+                                <span id="weather-value-temperature" class="chart-value">Loading…</span>
+                                <p id="weather-subtitle-temperature" class="chart-subtitle">Preparing chart…</p>
+                                <div id="weather-chart-temperature" class="chart-frame"></div>
+                              </article>
+                              <article class="weather-chart-card">
+                                <span class="label">Precipitation</span>
+                                <span id="weather-value-precipitation" class="chart-value">Loading…</span>
+                                <p id="weather-subtitle-precipitation" class="chart-subtitle">Preparing chart…</p>
+                                <div id="weather-chart-precipitation" class="chart-frame"></div>
+                              </article>
+                              <article class="weather-chart-card">
+                                <span class="label">Solar</span>
+                                <span id="weather-value-solar" class="chart-value">Loading…</span>
+                                <p id="weather-subtitle-solar" class="chart-subtitle">Preparing chart…</p>
+                                <div id="weather-chart-solar" class="chart-frame"></div>
+                              </article>
+                              <article class="weather-chart-card">
+                                <span class="label">Humidity</span>
+                                <span id="weather-value-humidity" class="chart-value">Loading…</span>
+                                <p id="weather-subtitle-humidity" class="chart-subtitle">Preparing chart…</p>
+                                <div id="weather-chart-humidity" class="chart-frame"></div>
+                              </article>
+                              <article class="weather-chart-card">
+                                <span class="label">Wind</span>
+                                <span id="weather-value-wind" class="chart-value">Loading…</span>
+                                <p id="weather-subtitle-wind" class="chart-subtitle">Preparing chart…</p>
+                                <div id="weather-chart-wind" class="chart-frame"></div>
+                              </article>
+                            </div>
+                          </section>
+                        </div>
+                      </details>
+
+                      <details class="field-evidence-card">
+                        <summary>
+                          <div class="field-evidence-summary">
+                            <div>
+                              <h3 id="soil-selected-field">${escapeHtml(initialField.fieldName)}</h3>
+                              <p id="soil-selected-summary" class="field-evidence-summary-copy">Decision-relevant soil summary metrics and compact horizon detail for the currently selected field.</p>
+                            </div>
+                            <span class="field-evidence-badge">Soil</span>
+                          </div>
+                        </summary>
+                        <div class="field-evidence-body">
+                          <section class="soil-panel" aria-label="Selected field soil panel">
+                            <div class="soil-grid">
+                              <section class="soil-summary-card">
+                                <h2 class="section-title">Field soil summary</h2>
+                                <p class="soil-summary-copy">
+                                  Core soil signals stay visible for quick agronomic framing before deeper downstream panels are added.
+                                </p>
+                                <div class="soil-summary-metrics">
+                                  <article class="soil-metric">
+                                    <span class="label">Dominant soil</span>
+                                    <span id="soil-dominant" class="value">${escapeHtml(initialSoilSummary?.dominantSoil ?? "Not available")}</span>
+                                  </article>
+                                  <article class="soil-metric">
+                                    <span class="label">Organic matter</span>
+                                    <span id="soil-om" class="value">${escapeHtml(formatOptionalMetric(initialSoilSummary?.avgOrganicMatterPct ?? null, "%", 1))}</span>
+                                  </article>
+                                  <article class="soil-metric">
+                                    <span class="label">pH</span>
+                                    <span id="soil-ph" class="value">${escapeHtml(formatOptionalMetric(initialSoilSummary?.avgPh ?? null, "", 2))}</span>
+                                  </article>
+                                  <article class="soil-metric">
+                                    <span class="label">Total AWS</span>
+                                    <span id="soil-aws" class="value">${escapeHtml(formatOptionalMetric(initialSoilSummary?.totalAwsInches ?? null, " in", 2))}</span>
+                                  </article>
+                                  <article class="soil-metric">
+                                    <span class="label">Surface texture</span>
+                                    <span id="soil-texture" class="value">${escapeHtml(textureHintFromHorizon(initialSurfaceHorizon))}</span>
+                                  </article>
+                                  <article class="soil-metric">
+                                    <span class="label">Drainage</span>
+                                    <span id="soil-drainage" class="value">${escapeHtml(initialSoilSummary?.drainageClass ?? "Not available")}</span>
+                                  </article>
+                                </div>
+                              </section>
+
+                              <section class="soil-horizon-card">
+                                <h2 class="section-title">Compact horizon view</h2>
+                                <p class="soil-horizon-copy">
+                                  Normalized horizon rows are condensed into a quick read for depth, chemistry, water capacity, and texture.
+                                </p>
+                                <p class="soil-horizon-copy">
+                                  Horizon rows shown: <strong id="soil-horizon-count">${escapeHtml(String(initialSoilSummary?.horizonCount ?? 0))}</strong>
+                                </p>
+                                <div id="soil-horizon-list" class="horizon-list">${renderInitialSoilHorizonRows(payload, initialField.fieldId)}</div>
+                              </section>
+                            </div>
+                          </section>
+                        </div>
+                      </details>
+
+                      <details class="field-evidence-card">
+                        <summary>
+                          <div class="field-evidence-summary">
+                            <div>
+                              <h3 id="crop-selected-field">${escapeHtml(initialField.fieldName)}</h3>
+                              <p id="crop-selected-summary" class="field-evidence-summary-copy">Latest-year composition and normalized rotation outlook for the selected field, updated from the embedded payload only.</p>
+                            </div>
+                            <span class="field-evidence-badge">Crop history</span>
+                          </div>
+                        </summary>
+                        <div class="field-evidence-body">
+                          <section class="crop-panel" aria-label="Selected field crop and rotation panel">
+                            <div class="crop-grid">
+                              <section class="crop-composition-card">
+                                <h2 class="section-title">Latest composition snapshot</h2>
+                                <p class="crop-composition-copy">
+                                  Farmer-friendly composition rows for the latest available year stay tied to the current map selection.
+                                </p>
+                                <div class="rotation-list">
+                                  <article class="rotation-item">
+                                    <div class="rotation-topline">
+                                      <span class="rotation-name">Latest crop year</span>
+                                      <span id="crop-latest-year" class="rotation-value">${escapeHtml(initialCropComposition.latestYear == null ? "Not available" : String(initialCropComposition.latestYear))}</span>
+                                    </div>
+                                    <div id="crop-composition-lead" class="rotation-detail">${escapeHtml(initialCropLead ? `${initialCropLead.cropName} leads at ${initialCropLead.pct.toFixed(1)}%` : "No latest-year composition available")}</div>
+                                  </article>
+                                </div>
+                                <div id="crop-composition-list" class="composition-list">${renderInitialCropCompositionRows(payload, initialField.fieldId)}</div>
+                              </section>
+
+                              <section class="crop-rotation-card">
+                                <h2 class="section-title">Rotation outlook</h2>
+                                <p class="crop-rotation-copy">
+                                  Short historical context plus next-crop signal from the normalized rotation summary for the selected field.
+                                </p>
+                                <div class="rotation-list">
+                                  <article class="rotation-item">
+                                    <div class="rotation-topline">
+                                      <span class="rotation-name">Predicted next crop</span>
+                                      <span id="crop-rotation-next" class="rotation-value">${escapeHtml(initialRotation?.predictedNextCrop ?? "Not available")}</span>
+                                    </div>
+                                    <div id="crop-rotation-confidence" class="rotation-detail">Confidence: ${escapeHtml(initialRotation?.rotationConfidence ?? "Not available")}</div>
+                                  </article>
+                                  <article class="rotation-item">
+                                    <div class="rotation-topline">
+                                      <span class="rotation-name">Sequence</span>
+                                    </div>
+                                    <div id="crop-rotation-sequence" class="rotation-detail">${escapeHtml(initialRotation?.rotationSequence ?? "No normalized rotation sequence available")}</div>
+                                  </article>
+                                  <article class="rotation-item">
+                                    <div class="rotation-topline">
+                                      <span class="rotation-name">History window</span>
+                                    </div>
+                                    <div id="crop-rotation-history" class="rotation-detail">${escapeHtml(initialRotation ? `${initialRotation.historyStartYear ?? "—"} → ${initialRotation.historyEndYear ?? "—"} • diversity ${initialRotation.cropDiversity}` : "History unavailable")}</div>
+                                  </article>
+                                  <article class="rotation-item">
+                                    <div class="rotation-topline">
+                                      <span class="rotation-name">Observed patterns</span>
+                                    </div>
+                                    <div id="crop-rotation-patterns" class="rotation-pills">${initialRotation && initialRotation.rotationPatterns.length > 0 ? initialRotation.rotationPatterns.map((pattern) => `<span class="rotation-pill">${escapeHtml(pattern)}</span>`).join("") : '<span class="rotation-pill">No rotation patterns available</span>'}</div>
+                                  </article>
+                                  <article class="rotation-item">
+                                    <div class="rotation-topline">
+                                      <span class="rotation-name">Rotation outlook</span>
+                                    </div>
+                                    <div id="crop-rotation-outlook" class="rotation-detail">${escapeHtml(initialRotation?.rotationOutlook ?? "Rotation outlook unavailable")}</div>
+                                  </article>
+                                </div>
+                              </section>
+                            </div>
+                          </section>
+                        </div>
+                      </details>
+
+                      <details class="field-evidence-card">
+                        <summary>
+                          <div class="field-evidence-summary">
+                            <div>
+                              <h3 id="imagery-selected-field">${escapeHtml(initialField.fieldName)}</h3>
+                              <p id="imagery-selected-summary" class="field-evidence-summary-copy">Imagery-ready source coverage and recent normalized scene cues for the currently selected field.</p>
+                            </div>
+                            <span class="field-evidence-badge">NDVI + imagery</span>
+                          </div>
+                        </summary>
+                        <div class="field-evidence-body">
+                          <section class="imagery-panel" aria-label="Selected field imagery panel">
+                            <div class="imagery-grid">
+                              <section class="imagery-summary-card">
+                                <h2 class="section-title">Source availability</h2>
+                                <p class="imagery-summary-copy">
+                                  Farmer-friendly source readiness and date coverage for imagery-ready fields, updated by the map selection above.
+                                </p>
+                                <div class="imagery-metrics">
+                                  <article class="imagery-metric">
+                                    <span class="label">Ready sources</span>
+                                    <span id="imagery-ready-count" class="value">${escapeHtml(String(initialImageryCoverage.length))}</span>
+                                  </article>
+                                  <article class="imagery-metric">
+                                    <span class="label">Latest scene</span>
+                                    <span id="imagery-latest-scene" class="value">${escapeHtml(initialLatestImageryScene ? `${initialLatestImageryScene.sceneDate} • ${initialLatestImageryScene.source}` : "Not available")}</span>
+                                  </article>
+                                </div>
+                                <div id="imagery-sources" class="imagery-list">${renderInitialImagerySourceRows(payload, initialField.fieldId)}</div>
+                              </section>
+
+                              <section class="imagery-scenes-card">
+                                <h2 class="section-title">Recent scene cues</h2>
+                                <p class="imagery-scenes-copy">
+                                  Recent normalized scene metadata helps explain source freshness, cloud context, and asset availability without opening imagery yet.
+                                </p>
+                                <div id="imagery-scene-list" class="scene-list">${renderInitialImagerySceneRows(payload, initialField.fieldId)}</div>
+                              </section>
+                            </div>
+                          </section>
+                        </div>
+                      </details>
+                    </div>
+                  </section>
+                </section>
               </div>
-              <div class="teaser-metrics">
-                <article class="metric-card">
-                  <span class="label">Acreage</span>
-                  <span id="selected-field-acreage" class="value">${escapeHtml(`${formatNumber(initialField.areaAcres, 2)} acres`)}</span>
-                </article>
-                <article class="metric-card">
-                  <span class="label">County</span>
-                  <span id="selected-field-county" class="value">${escapeHtml(initialField.countyName ?? "County unavailable")}</span>
-                </article>
-                <article class="metric-card">
-                  <span class="label">Crop context</span>
-                  <span id="selected-field-crop" class="value">${escapeHtml(formatFieldCropContext(payload, initialField.fieldId))}</span>
-                </article>
-                <article class="metric-card">
-                  <span class="label">Weather hint</span>
-                  <span id="selected-field-weather" class="value">${escapeHtml(formatFieldWeatherHint(payload, initialField.fieldId))}</span>
-                </article>
-                <article class="metric-card">
-                  <span class="label">Soil hint</span>
-                  <span id="selected-field-soil" class="value">${escapeHtml(formatFieldSoilHint(payload, initialField.fieldId))}</span>
-                </article>
-                <article class="metric-card">
-                  <span class="label">Rotation signal</span>
-                  <span id="selected-field-signal" class="value">${escapeHtml(fieldRotationSignal(payload, initialField.fieldId))}</span>
-                </article>
-              </div>
-              <div id="runtime-status" class="runtime-status" aria-live="polite">Loading embedded payload…</div>
             </section>
           </div>
         </section>
 
-        <section class="weather-wrap" aria-label="Selected field weather panel">
-          <p class="section-kicker">Selected field weather</p>
-          <section class="weather-panel">
-            <div class="weather-header">
+        <section class="selection-stage" aria-label="Field action table">
+          <section class="selection-panel">
+            <div class="selection-header">
               <div>
-                <h2 id="weather-selected-field">${escapeHtml(initialField.fieldName)}</h2>
-                <p id="weather-selected-summary" class="weather-copy">
-                  Latest selected-field weather series rendered as inline SVG trend cards from the embedded payload only.
+                <p class="section-kicker">Field action table</p>
+                <h2 class="section-title">Compare the whole farm, then click into one field</h2>
+                <p class="selection-copy">The table stays in context below the map while the field-focus panel on the right concentrates the selected field's corn plan, soy plan, limiter, and supporting evidence.</p>
+              </div>
+              <div>
+                <p class="section-kicker">Queue logic</p>
+                <p class="selection-guide-copy">
+                  Compare corn and soybean windows row by row, use the limiting-factor column to see what is actually holding a field back, and click any row to sync the same selected field into the focused panel beside the map.
                 </p>
               </div>
-              <span class="weather-badge">Weather only</span>
             </div>
 
-            <div class="weather-overview">
-              <section class="weather-overview-card">
-                <h2 class="section-title">Latest field snapshot</h2>
-                <p class="weather-overview-copy">
-                  Daily weather context updates instantly when you click a different field in the schematic above.
-                </p>
-                <div class="weather-overview-metrics">
-                  <article class="weather-metric">
-                    <span class="label">Latest date</span>
-                    <span id="weather-latest-date" class="value">Loading…</span>
-                  </article>
-                  <article class="weather-metric">
-                    <span class="label">Average temp</span>
-                    <span id="weather-latest-temp" class="value">Loading…</span>
-                  </article>
-                  <article class="weather-metric">
-                    <span class="label">Precipitation</span>
-                    <span id="weather-latest-rain" class="value">Loading…</span>
-                  </article>
-                  <article class="weather-metric">
-                    <span class="label">Solar</span>
-                    <span id="weather-latest-solar" class="value">Loading…</span>
-                  </article>
-                  <article class="weather-metric">
-                    <span class="label">Humidity</span>
-                    <span id="weather-latest-humidity" class="value">Loading…</span>
-                  </article>
-                  <article class="weather-metric">
-                    <span class="label">Wind</span>
-                    <span id="weather-latest-wind" class="value">Loading…</span>
-                  </article>
-                </div>
-              </section>
-
-              <section class="weather-overview-card">
-                <h2 class="section-title">Inline trend cards</h2>
-                <p class="weather-overview-copy">
-                  Each chart uses the latest embedded daily rows for the currently selected field and redraws without any page reload.
-                </p>
-              </section>
-            </div>
-
-            <div class="weather-grid">
-              <article class="weather-chart-card">
-                <span class="label">Temperature</span>
-                <span id="weather-value-temperature" class="chart-value">Loading…</span>
-                <p id="weather-subtitle-temperature" class="chart-subtitle">Preparing chart…</p>
-                <div id="weather-chart-temperature" class="chart-frame"></div>
-              </article>
-              <article class="weather-chart-card">
-                <span class="label">Precipitation</span>
-                <span id="weather-value-precipitation" class="chart-value">Loading…</span>
-                <p id="weather-subtitle-precipitation" class="chart-subtitle">Preparing chart…</p>
-                <div id="weather-chart-precipitation" class="chart-frame"></div>
-              </article>
-              <article class="weather-chart-card">
-                <span class="label">Solar</span>
-                <span id="weather-value-solar" class="chart-value">Loading…</span>
-                <p id="weather-subtitle-solar" class="chart-subtitle">Preparing chart…</p>
-                <div id="weather-chart-solar" class="chart-frame"></div>
-              </article>
-              <article class="weather-chart-card">
-                <span class="label">Humidity</span>
-                <span id="weather-value-humidity" class="chart-value">Loading…</span>
-                <p id="weather-subtitle-humidity" class="chart-subtitle">Preparing chart…</p>
-                <div id="weather-chart-humidity" class="chart-frame"></div>
-              </article>
-              <article class="weather-chart-card">
-                <span class="label">Wind</span>
-                <span id="weather-value-wind" class="chart-value">Loading…</span>
-                <p id="weather-subtitle-wind" class="chart-subtitle">Preparing chart…</p>
-                <div id="weather-chart-wind" class="chart-frame"></div>
-              </article>
-            </div>
-          </section>
-        </section>
-
-        <section class="soil-wrap" aria-label="Selected field soil panel">
-          <p class="section-kicker">Selected field soil</p>
-          <section class="soil-panel">
-            <div class="soil-header">
-              <div>
-                <h2 id="soil-selected-field">${escapeHtml(initialField.fieldName)}</h2>
-                <p id="soil-selected-summary" class="soil-copy">
-                  Decision-relevant soil summary metrics and compact horizon detail for the currently selected field.
-                </p>
-              </div>
-              <span class="soil-badge">Soil only</span>
-            </div>
-
-            <div class="soil-grid">
-              <section class="soil-summary-card">
-                <h2 class="section-title">Field soil summary</h2>
-                <p class="soil-summary-copy">
-                  Core soil signals stay visible for quick agronomic framing before deeper downstream panels are added.
-                </p>
-                <div class="soil-summary-metrics">
-                  <article class="soil-metric">
-                    <span class="label">Dominant soil</span>
-                    <span id="soil-dominant" class="value">${escapeHtml(initialSoilSummary?.dominantSoil ?? "Not available")}</span>
-                  </article>
-                  <article class="soil-metric">
-                    <span class="label">Organic matter</span>
-                    <span id="soil-om" class="value">${escapeHtml(formatOptionalMetric(initialSoilSummary?.avgOrganicMatterPct ?? null, "%", 1))}</span>
-                  </article>
-                  <article class="soil-metric">
-                    <span class="label">pH</span>
-                    <span id="soil-ph" class="value">${escapeHtml(formatOptionalMetric(initialSoilSummary?.avgPh ?? null, "", 2))}</span>
-                  </article>
-                  <article class="soil-metric">
-                    <span class="label">Total AWS</span>
-                    <span id="soil-aws" class="value">${escapeHtml(formatOptionalMetric(initialSoilSummary?.totalAwsInches ?? null, " in", 2))}</span>
-                  </article>
-                  <article class="soil-metric">
-                    <span class="label">Surface texture</span>
-                    <span id="soil-texture" class="value">${escapeHtml(textureHintFromHorizon(initialSurfaceHorizon))}</span>
-                  </article>
-                  <article class="soil-metric">
-                    <span class="label">Drainage</span>
-                    <span id="soil-drainage" class="value">${escapeHtml(initialSoilSummary?.drainageClass ?? "Not available")}</span>
-                  </article>
-                </div>
-              </section>
-
-              <section class="soil-horizon-card">
-                <h2 class="section-title">Compact horizon view</h2>
-                <p class="soil-horizon-copy">
-                  Normalized horizon rows are condensed into a quick read for depth, chemistry, water capacity, and texture.
-                </p>
-                <p class="soil-horizon-copy">
-                  Horizon rows shown: <strong id="soil-horizon-count">${escapeHtml(String(initialSoilSummary?.horizonCount ?? 0))}</strong>
-                </p>
-                <div id="soil-horizon-list" class="horizon-list">${renderInitialSoilHorizonRows(payload, initialField.fieldId)}</div>
-              </section>
-            </div>
-          </section>
-        </section>
-
-        <section class="crop-wrap" aria-label="Selected field crop and rotation panel">
-          <p class="section-kicker">Selected field crop + rotation</p>
-          <section class="crop-panel">
-            <div class="crop-header">
-              <div>
-                <h2 id="crop-selected-field">${escapeHtml(initialField.fieldName)}</h2>
-                <p id="crop-selected-summary" class="crop-copy">
-                  Latest-year composition and normalized rotation outlook for the selected field, updated from the embedded payload only.
-                </p>
-              </div>
-              <span class="crop-badge">Crop only</span>
-            </div>
-
-            <div class="crop-grid">
-              <section class="crop-composition-card">
-                <h2 class="section-title">Latest composition snapshot</h2>
-                <p class="crop-composition-copy">
-                  Farmer-friendly composition rows for the latest available year stay tied to the current map selection.
-                </p>
-                <div class="rotation-list">
-                  <article class="rotation-item">
-                    <div class="rotation-topline">
-                      <span class="rotation-name">Latest crop year</span>
-                      <span id="crop-latest-year" class="rotation-value">${escapeHtml(initialCropComposition.latestYear == null ? "Not available" : String(initialCropComposition.latestYear))}</span>
-                    </div>
-                    <div id="crop-composition-lead" class="rotation-detail">${escapeHtml(initialCropLead ? `${initialCropLead.cropName} leads at ${initialCropLead.pct.toFixed(1)}%` : "No latest-year composition available")}</div>
-                  </article>
-                </div>
-                <div id="crop-composition-list" class="composition-list">${renderInitialCropCompositionRows(payload, initialField.fieldId)}</div>
-              </section>
-
-              <section class="crop-rotation-card">
-                <h2 class="section-title">Rotation outlook</h2>
-                <p class="crop-rotation-copy">
-                  Short historical context plus next-crop signal from the normalized rotation summary for the selected field.
-                </p>
-                <div class="rotation-list">
-                  <article class="rotation-item">
-                    <div class="rotation-topline">
-                      <span class="rotation-name">Predicted next crop</span>
-                      <span id="crop-rotation-next" class="rotation-value">${escapeHtml(initialRotation?.predictedNextCrop ?? "Not available")}</span>
-                    </div>
-                    <div id="crop-rotation-confidence" class="rotation-detail">Confidence: ${escapeHtml(initialRotation?.rotationConfidence ?? "Not available")}</div>
-                  </article>
-                  <article class="rotation-item">
-                    <div class="rotation-topline">
-                      <span class="rotation-name">Sequence</span>
-                    </div>
-                    <div id="crop-rotation-sequence" class="rotation-detail">${escapeHtml(initialRotation?.rotationSequence ?? "No normalized rotation sequence available")}</div>
-                  </article>
-                  <article class="rotation-item">
-                    <div class="rotation-topline">
-                      <span class="rotation-name">History window</span>
-                    </div>
-                    <div id="crop-rotation-history" class="rotation-detail">${escapeHtml(initialRotation ? `${initialRotation.historyStartYear ?? "—"} → ${initialRotation.historyEndYear ?? "—"} • diversity ${initialRotation.cropDiversity}` : "History unavailable")}</div>
-                  </article>
-                  <article class="rotation-item">
-                    <div class="rotation-topline">
-                      <span class="rotation-name">Observed patterns</span>
-                    </div>
-                    <div id="crop-rotation-patterns" class="rotation-pills">${initialRotation && initialRotation.rotationPatterns.length > 0 ? initialRotation.rotationPatterns.map((pattern) => `<span class="rotation-pill">${escapeHtml(pattern)}</span>`).join("") : '<span class="rotation-pill">No rotation patterns available</span>'}</div>
-                  </article>
-                  <article class="rotation-item">
-                    <div class="rotation-topline">
-                      <span class="rotation-name">Rotation outlook</span>
-                    </div>
-                    <div id="crop-rotation-outlook" class="rotation-detail">${escapeHtml(initialRotation?.rotationOutlook ?? "Rotation outlook unavailable")}</div>
-                  </article>
-                </div>
-              </section>
-            </div>
-          </section>
-        </section>
-
-        <section class="imagery-wrap" aria-label="Selected field imagery panel">
-          <p class="section-kicker">Selected field imagery</p>
-          <section class="imagery-panel">
-            <div class="imagery-header">
-              <div>
-                <h2 id="imagery-selected-field">${escapeHtml(initialField.fieldName)}</h2>
-                <p id="imagery-selected-summary" class="imagery-copy">
-                  Imagery-ready source coverage and recent normalized scene cues for the currently selected field.
-                </p>
-              </div>
-              <span class="imagery-badge">Imagery only</span>
-            </div>
-
-            <div class="imagery-grid">
-              <section class="imagery-summary-card">
-                <h2 class="section-title">Source availability</h2>
-                <p class="imagery-summary-copy">
-                  Farmer-friendly source readiness and date coverage for imagery-ready fields, updated by the map selection above.
-                </p>
-                <div class="imagery-metrics">
-                  <article class="imagery-metric">
-                    <span class="label">Ready sources</span>
-                    <span id="imagery-ready-count" class="value">${escapeHtml(String(initialImageryCoverage.length))}</span>
-                  </article>
-                  <article class="imagery-metric">
-                    <span class="label">Latest scene</span>
-                    <span id="imagery-latest-scene" class="value">${escapeHtml(initialLatestImageryScene ? `${initialLatestImageryScene.sceneDate} • ${initialLatestImageryScene.source}` : "Not available")}</span>
-                  </article>
-                </div>
-                <div id="imagery-sources" class="imagery-list">${renderInitialImagerySourceRows(payload, initialField.fieldId)}</div>
-              </section>
-
-              <section class="imagery-scenes-card">
-                <h2 class="section-title">Recent scene cues</h2>
-                <p class="imagery-scenes-copy">
-                  Recent normalized scene metadata helps explain source freshness, cloud context, and asset availability without opening imagery yet.
-                </p>
-                <div id="imagery-scene-list" class="scene-list">${renderInitialImagerySceneRows(payload, initialField.fieldId)}</div>
-              </section>
+            <div class="selection-table-scroll">
+              <table class="selection-table" aria-label="Primary field action table">
+                <thead>
+                  <tr>
+                    <th scope="col">Field</th>
+                    <th scope="col">Corn action</th>
+                    <th scope="col">Soy action</th>
+                    <th scope="col">Limiting factor</th>
+                    <th scope="col">Confidence</th>
+                  </tr>
+                </thead>
+                <tbody>${actionTableRows}</tbody>
+              </table>
             </div>
           </section>
         </section>
