@@ -1,0 +1,58 @@
+mukey,muname,compname,comppct_r,drainagecl,hzdept_r,hzdepb_r,om_r,ph1to1h2o_r,awc_r,claytotal_r,sandtotal_r,silttotal_r,dbthirdbar_r,cec7_r,field_id
+83968,"Mathon sandy loam, 0 to 6 percent slopes",Mathon,90,Well drained,0.0,13.0,0.75,7.9,0.12,11.5,65.2,23.3,1.35,11.0,32-33
+83968,"Mathon sandy loam, 0 to 6 percent slopes",Mathon,90,Well drained,0.0,13.0,0.75,7.9,0.12,11.5,65.2,23.3,1.35,11.0,31 North Wiper
+83956,"Harston coarse sandy loam, 0 to 2 percent slopes",Harston,85,Well drained,0.0,71.0,0.75,8.2,0.12,11.5,65.2,23.3,1.35,10.5,21-22
+83956,"Harston coarse sandy loam, 0 to 2 percent slopes",Harston,85,Well drained,0.0,71.0,0.75,8.2,0.12,11.5,65.2,23.3,1.35,10.5,23 Dog Leg
+83956,"Harston coarse sandy loam, 0 to 2 percent slopes",Harston,85,Well drained,0.0,71.0,0.75,8.2,0.12,11.5,65.2,23.3,1.35,10.5,24 N Hay Wheelines
+83956,"Harston coarse sandy loam, 0 to 2 percent slopes",Harston,85,Well drained,0.0,71.0,0.75,8.2,0.12,11.5,65.2,23.3,1.35,10.5,26 Hendricks
+83956,"Harston coarse sandy loam, 0 to 2 percent slopes",Harston,85,Well drained,0.0,71.0,0.75,8.2,0.12,11.5,65.2,23.3,1.35,10.5,27 Lynn's
+83968,"Mathon sandy loam, 0 to 6 percent slopes",Mathon,90,Well drained,0.0,13.0,0.75,7.9,0.12,11.5,65.2,23.3,1.35,11.0,Mickelson 1
+83968,"Mathon sandy loam, 0 to 6 percent slopes",Mathon,90,Well drained,0.0,13.0,0.75,7.9,0.12,11.5,65.2,23.3,1.35,11.0,Mickelson 2
+83968,"Mathon sandy loam, 0 to 6 percent slopes",Mathon,90,Well drained,0.0,13.0,0.75,7.9,0.12,11.5,65.2,23.3,1.35,11.0,Mickelson 3
+83968,"Mathon sandy loam, 0 to 6 percent slopes",Mathon,90,Well drained,0.0,13.0,0.75,7.9,0.12,11.5,65.2,23.3,1.35,11.0,Mickelson 4
+83968,"Mathon sandy loam, 0 to 6 percent slopes",Mathon,90,Well drained,0.0,13.0,0.75,7.9,0.12,11.5,65.2,23.3,1.35,11.0,Mickelson 5
+83968,"Mathon sandy loam, 0 to 6 percent slopes",Mathon,90,Well drained,0.0,13.0,0.75,7.9,0.12,11.5,65.2,23.3,1.35,11.0,Mickelson 6
+83829,Terreton sandy loam,Terreton,75,Well drained,0.0,15.0,2.0,8.2,0.12,12.5,67.9,19.6,1.45,27.5,175 Cornelison NE
+83921,"Matheson sandy loam, 1 to 6 percent slopes",Matheson,80,Well drained,0.0,25.0,0.75,7.9,0.12,10.0,66.6,23.4,1.3,7.5,176  Cornelison SE
+83828,Terreton loamy sand,Terreton,80,Well drained,0.0,15.0,1.5,8.2,0.08,7.5,83.5,9.0,1.6,27.5,177 Cornelison SW
+83917,"Matheson loamy sand, 2 to 8 percent slopes",Matheson,85,Well drained,0.0,25.0,0.75,7.9,0.07,7.5,83.5,9.0,1.3,7.5,174 Hunter
+83899,Levelton loamy sand,Levelton,80,Poorly drained,0.0,5.0,75.0,5.0,0.45,15.0,35.0,50.0,0.2,,173 Rawhide
+83917,"Matheson loamy sand, 2 to 8 percent slopes",Matheson,85,Well drained,0.0,25.0,0.75,7.9,0.07,7.5,83.5,9.0,1.3,7.5,171 Dalling NL North
+83917,"Matheson loamy sand, 2 to 8 percent slopes",Matheson,85,Well drained,0.0,25.0,0.75,7.9,0.07,7.5,83.5,9.0,1.3,7.5,172 Dalling NL South
+83901,"Levelton loam, drained, moderately saline-alkali",Levelton,85,Poorly drained,0.0,5.0,75.0,5.0,0.45,15.0,35.0,50.0,0.2,,145 Grohs 11 Tower
+83904,"Levelton silty clay loam, drained, moderately saline-alkali",Levelton,80,Poorly drained,0.0,5.0,75.0,5.0,0.45,15.0,35.0,50.0,0.2,,146 Grohs West Middle
+83900,Levelton loam,Levelton,70,Poorly drained,0.0,5.0,75.0,5.0,0.45,15.0,35.0,50.0,0.2,,147 Grohs NW
+83901,"Levelton loam, drained, moderately saline-alkali",Levelton,85,Poorly drained,0.0,5.0,75.0,5.0,0.45,15.0,35.0,50.0,0.2,,148 Grohs S Middle
+83902,Levelton clay loam,Levelton,85,Poorly drained,0.0,5.0,75.0,5.0,0.45,15.0,35.0,50.0,0.2,,149 Grohs N Middle
+83902,Levelton clay loam,Levelton,85,Poorly drained,0.0,5.0,75.0,5.0,0.45,15.0,35.0,50.0,0.2,,150 Grohs E Wiper
+83919,"Matheson sandy loam, 2 to 4 percent slopes",Matheson,90,Well drained,0.0,25.0,0.75,7.9,0.12,10.0,66.6,23.4,1.3,7.5,151 Jernberg North
+83919,"Matheson sandy loam, 2 to 4 percent slopes",Matheson,90,Well drained,0.0,25.0,0.75,7.9,0.12,10.0,66.6,23.4,1.3,7.5,152 Jernberg Northeast
+83908,"Lidy sandy loam, 2 to 4 percent slopes",Lidy,90,Well drained,0.0,13.0,1.5,8.2,0.12,11.0,65.7,23.3,1.55,11.0,154 Jernberg NE Small
+83908,"Lidy sandy loam, 2 to 4 percent slopes",Lidy,90,Well drained,0.0,13.0,1.5,8.2,0.12,11.0,65.7,23.3,1.55,11.0,156 Jernberg Wiper
+83908,"Lidy sandy loam, 2 to 4 percent slopes",Lidy,90,Well drained,0.0,13.0,1.5,8.2,0.12,11.0,65.7,23.3,1.55,11.0,157 Jernberg SE
+83908,"Lidy sandy loam, 2 to 4 percent slopes",Lidy,90,Well drained,0.0,13.0,1.5,8.2,0.12,11.0,65.7,23.3,1.55,11.0,153 Jernberg Northwest
+83920,"Matheson sandy loam, 4 to 8 percent slopes",Matheson,75,Well drained,0.0,25.0,0.75,7.9,0.12,10.0,66.6,23.4,1.3,7.5,155 Jernberg hand/wheel
+83913,Malm-Rock outcrop complex,Malm,45,Well drained,0.0,10.0,1.5,8.2,0.14,15.0,65.9,19.1,1.53,14.0,151-a Jernberg North
+83904,"Levelton silty clay loam, drained, moderately saline-alkali",Levelton,80,Poorly drained,0.0,5.0,75.0,5.0,0.45,15.0,35.0,50.0,0.2,,148 A
+83851,Zwiefel loamy sand,Zwiefel,90,Well drained,0.0,8.0,0.15,8.2,0.06,2.5,83.8,13.7,1.65,2.5,162 Hirschman
+83829,Terreton sandy loam,Terreton,75,Well drained,0.0,15.0,2.0,8.2,0.12,12.5,67.9,19.6,1.45,27.5,166 Kesler North
+83828,Terreton loamy sand,Terreton,80,Well drained,0.0,15.0,1.5,8.2,0.08,7.5,83.5,9.0,1.6,27.5,167 Kesler Middle
+83828,Terreton loamy sand,Terreton,80,Well drained,0.0,15.0,1.5,8.2,0.08,7.5,83.5,9.0,1.6,27.5,168 Kesler South
+83828,Terreton loamy sand,Terreton,80,Well drained,0.0,15.0,1.5,8.2,0.08,7.5,83.5,9.0,1.6,27.5,169 Kesler West and Corners
+83828,Terreton loamy sand,Terreton,80,Well drained,0.0,15.0,1.5,8.2,0.08,7.5,83.5,9.0,1.6,27.5,161 Marty E
+83833,Terreton silty clay loam,Terreton,85,Well drained,0.0,16.0,0.75,8.2,0.18,34.0,18.1,47.9,1.38,24.6,134 Kesler Highway
+83829,Terreton sandy loam,Terreton,75,Well drained,0.0,15.0,2.0,8.2,0.12,12.5,67.9,19.6,1.45,27.5,Kesler Hwy corner NW
+83828,Terreton loamy sand,Terreton,80,Well drained,0.0,15.0,1.5,8.2,0.08,7.5,83.5,9.0,1.6,27.5,Kesler HWY Corner SW
+83833,Terreton silty clay loam,Terreton,85,Well drained,0.0,16.0,0.75,8.2,0.18,34.0,18.1,47.9,1.38,24.6,Kesler Hwy Corner SE
+83828,Terreton loamy sand,Terreton,80,Well drained,0.0,15.0,1.5,8.2,0.08,7.5,83.5,9.0,1.6,27.5,Kesler HWY Corner NE
+83833,Terreton silty clay loam,Terreton,85,Well drained,0.0,16.0,0.75,8.2,0.18,34.0,18.1,47.9,1.38,24.6,142 Petersen Big
+83833,Terreton silty clay loam,Terreton,85,Well drained,0.0,16.0,0.75,8.2,0.18,34.0,18.1,47.9,1.38,24.6,143 Petersen Mini
+83973,"Panmod silt loam, 4 to 12 percent slopes",Panmod,80,Well drained,0.0,28.0,1.5,8.2,0.2,20.0,11.4,68.6,1.55,17.5,69 1/2
+83834,Terreton clay,Terreton,85,Well drained,0.0,15.0,2.5,8.2,0.15,43.0,28.0,29.0,1.37,33.0,161 Marty W
+83828,Terreton loamy sand,Terreton,80,Well drained,0.0,15.0,1.5,8.2,0.08,7.5,83.5,9.0,1.6,27.5,Shively #11
+83828,Terreton loamy sand,Terreton,80,Well drained,0.0,15.0,1.5,8.2,0.08,7.5,83.5,9.0,1.6,27.5,Murdock
+83850,"Zwiefel sand, 2 to 4 percent slopes",Zwiefel,90,Well drained,0.0,8.0,0.15,8.2,0.06,2.5,96.8,0.7,1.65,2.5,Shively #12
+83833,Terreton silty clay loam,Terreton,85,Well drained,0.0,16.0,0.75,8.2,0.18,34.0,18.1,47.9,1.38,24.6,Savage
+83941,"Montlid silty clay loam, moderately saline-alkali",Montlid,90,Moderately well drained,0.0,20.0,0.75,8.8,0.17,28.0,7.0,65.0,1.44,18.7,Egan 58
+83922,Matheson loam,Matheson,85,Well drained,0.0,25.0,0.75,7.9,0.07,10.0,46.0,44.0,1.56,8.2,Ward 123
+83922,Matheson loam,Matheson,85,Well drained,0.0,25.0,0.75,7.9,0.07,10.0,46.0,44.0,1.56,8.2,Ward 120
