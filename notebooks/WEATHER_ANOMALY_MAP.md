@@ -2,6 +2,12 @@
 
 Interactive HTML map showing weather anomalies for Jefferson Farm fields, comparing the 2024 and 2025 growing seasons (April 1 - September 30).
 
+## Access
+
+**PIN Code**: `2425`
+
+Enter the 4-digit code when prompted to view the map.
+
 ## Files
 
 | File | Description |

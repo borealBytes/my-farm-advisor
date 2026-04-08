@@ -107,9 +107,85 @@
         .tooltip-row { display: flex; justify-content: space-between; gap: 15px; margin: 3px 0; }
         .tooltip-label { color: #666; }
         .tooltip-value { font-weight: 500; }
+        
+        .pin-screen {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+        
+        .pin-screen.hidden {
+            display: none;
+        }
+        
+        .pin-box {
+            background: white;
+            padding: 40px 50px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        
+        .pin-box h2 {
+            margin-bottom: 25px;
+            color: #333;
+            font-size: 22px;
+        }
+        
+        .pin-box input {
+            font-size: 28px;
+            padding: 12px;
+            width: 140px;
+            text-align: center;
+            letter-spacing: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            outline: none;
+        }
+        
+        .pin-box input:focus {
+            border-color: #4a90a4;
+        }
+        
+        .pin-box .error {
+            color: #e74c3c;
+            margin-top: 15px;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .pin-box button {
+            margin-top: 25px;
+            padding: 12px 40px;
+            background: #4a90a4;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        
+        .pin-box button:hover {
+            background: #357585;
+        }
     </style>
 </head>
 <body>
+    <div id="pinScreen" class="pin-screen">
+        <div class="pin-box">
+            <h2>Enter Access Code</h2>
+            <input type="password" id="pinInput" maxlength="4" placeholder="••••">
+            <p class="error" id="pinError">Incorrect code. Please try again.</p>
+            <button onclick="checkPin()">Enter</button>
+        </div>
+    </div>
+    
     <div id="map"></div>
     
     <div class="info-box">
@@ -738,6 +814,23 @@
                         }
                     }
                 }
+            }
+        });
+        
+        function checkPin() {
+            var pin = document.getElementById('pinInput').value;
+            if (pin === '2425') {
+                document.getElementById('pinScreen').classList.add('hidden');
+            } else {
+                document.getElementById('pinError').style.display = 'block';
+                document.getElementById('pinInput').value = '';
+                document.getElementById('pinInput').focus();
+            }
+        }
+        
+        document.getElementById('pinInput').addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') {
+                checkPin();
             }
         });
     </script>
