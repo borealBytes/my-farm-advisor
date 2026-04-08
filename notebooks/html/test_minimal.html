@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Jefferson Farm - Minimal Test</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <style>
+        #map { height: 400px; width: 100%; }
+    </style>
+</head>
+<body>
+    <h1>Jefferson Farm NDVI - Minimal Test</h1>
+    <div id="map"></div>
+    <p>Check browser console (F12) for debug info</p>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        console.log("Starting...");
+        
+        const bounds = [-112.586407, 43.797088, -111.678382, 44.008001];
+        const center = [43.902545, -112.132395];
+        
+        console.log("Creating map...");
+        const map = L.map("map", { center: center, zoom: 12 });
+        
+        console.log("Adding satellite layer...");
+        L.tileLayer(
+            "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+            { attribution: "Esri" }
+        ).addTo(map);
+        
+        console.log("Adding control...");
+        L.control.layers({
+            "Satellite": L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"),
+            "Streets": L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png")
+        }).addTo(map);
+        
+        console.log("Adding bounds...");
+        map.fitBounds([[bounds[1], bounds[0]], [bounds[3], bounds[2]]]);
+        
+        // Simple test overlay
+        console.log("Adding test overlay...");
+        const testImage = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFBQIAX8jx0gAAAABJRU5ErkJggg==";
+        const imageBounds = [[bounds[1], bounds[0]], [bounds[3], bounds[2]]];
+        
+        const overlay = L.imageOverlay(testImage, imageBounds, { opacity: 0.5 });
+        overlay.addTo(map);
+        
+        console.log("All done!");
+        console.log("Overlay added:", !!overlay);
+    </script>
+</body>
+</html>
