@@ -1,0 +1,53 @@
+name: Self-hosted Runner Smoke
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/self-hosted-runner-smoke.yml"
+
+concurrency:
+  group: self-hosted-runner-smoke-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    runs-on:
+      - self-hosted
+      - Linux
+      - X64
+      - my-farm-advisor-local
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Capture runner identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf 'runner_name=%s\n' "$RUNNER_NAME"
+          printf 'runner_os=%s\n' "$RUNNER_OS"
+          printf 'runner_arch=%s\n' "$RUNNER_ARCH"
+          printf 'hostname=%s\n' "$(hostname)"
+          printf 'user=%s\n' "$(whoami)"
+          printf 'workspace=%s\n' "$GITHUB_WORKSPACE"
+
+      - name: Verify expected local runner
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "$RUNNER_NAME" != "tuxdesktop-local-gha" ]]; then
+            echo "::error::Expected tuxdesktop-local-gha, got $RUNNER_NAME"
+            exit 1
+          fi
+
+      - name: Verify repo checkout
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -d .git
+          test -f package.json
+          git rev-parse HEAD
