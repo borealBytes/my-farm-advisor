@@ -6,12 +6,6 @@ on:
       - main
     tags:
       - "v*"
-    paths-ignore:
-      - "docs/**"
-      - "**/*.md"
-      - "**/*.mdx"
-      - ".agents/**"
-      - "skills/**"
 
 concurrency:
   group: docker-release-${{ github.workflow }}-${{ github.ref }}
@@ -48,10 +42,9 @@ jobs:
       - name: Resolve image tags (amd64)
         id: tags
         shell: bash
-        env:
-          IMAGE: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
         run: |
           set -euo pipefail
+          IMAGE="${REGISTRY}/${IMAGE_NAME,,}"
           tags=()
           slim_tags=()
           if [[ "${GITHUB_REF}" == "refs/heads/main" ]]; then
@@ -149,10 +142,9 @@ jobs:
       - name: Resolve image tags (arm64)
         id: tags
         shell: bash
-        env:
-          IMAGE: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
         run: |
           set -euo pipefail
+          IMAGE="${REGISTRY}/${IMAGE_NAME,,}"
           tags=()
           slim_tags=()
           if [[ "${GITHUB_REF}" == "refs/heads/main" ]]; then
@@ -245,14 +237,14 @@ jobs:
       - name: Resolve manifest tags
         id: tags
         shell: bash
-        env:
-          IMAGE: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
         run: |
           set -euo pipefail
+          IMAGE="${REGISTRY}/${IMAGE_NAME,,}"
           tags=()
           slim_tags=()
           if [[ "${GITHUB_REF}" == "refs/heads/main" ]]; then
             tags+=("${IMAGE}:main")
+            tags+=("${IMAGE}:latest")
             slim_tags+=("${IMAGE}:main-slim")
           fi
           if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
@@ -260,7 +252,6 @@ jobs:
             tags+=("${IMAGE}:${version}")
             slim_tags+=("${IMAGE}:${version}-slim")
             if [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9]+)?$ ]]; then
-              tags+=("${IMAGE}:latest")
               slim_tags+=("${IMAGE}:slim")
             fi
           fi
