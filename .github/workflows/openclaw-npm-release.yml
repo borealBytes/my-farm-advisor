@@ -15,8 +15,10 @@ env:
 
 jobs:
   publish_openclaw_npm:
-    # npm trusted publishing + provenance requires a GitHub-hosted runner.
-    runs-on: ubuntu-latest
+    # Disabled under the self-hosted-only runner policy.
+    # npm trusted publishing + provenance still requires a GitHub-hosted runner.
+    if: false
+    runs-on: [self-hosted, Linux, X64, my-farm-advisor-local]
     permissions:
       contents: read
       id-token: write

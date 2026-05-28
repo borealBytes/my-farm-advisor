@@ -15,7 +15,7 @@ jobs:
     permissions:
       issues: write
       pull-requests: write
-    runs-on: blacksmith-16vcpu-ubuntu-2404
+    runs-on: [self-hosted, Linux, X64, my-farm-advisor-local]
     steps:
       - uses: actions/create-github-app-token@d72941d797fd3113feb6b93fd0dec494b13a2547 # v1
         id: app-token
