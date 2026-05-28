@@ -4,7 +4,24 @@ const path = require("node:path");
 const fs = require("node:fs");
 
 let monolithicSdk = null;
-let jitiLoader = null;
+let diagnosticEventsModule = null;
+const moduleLoaders = new Map();
+const pluginSdkSubpathsCache = new Map();
+const pluginSdkPackageNames = ["openclaw/plugin-sdk", "@openclaw/plugin-sdk"];
+const pluginSdkSourceExtensions = [".ts", ".mts", ".js", ".mjs", ".cts", ".cjs"];
+const privateQaExcludedPluginSdkSubpaths = new Set(["ssrf-runtime-internal"]);
+const DIAGNOSTIC_EVENTS_STATE_KEY = Symbol.for("openclaw.diagnosticEvents.state.v1");
+const isDistRootAlias = __filename.includes(
+  `${path.sep}dist${path.sep}plugin-sdk${path.sep}root-alias.cjs`,
+);
+// Source plugin entry loading must stay on the source graph end-to-end. Mixing a
+// source root alias with dist compat/runtime shims can split singleton deps
+// (for example matrix-js-sdk) across two module graphs.
+const shouldPreferSourceGraph =
+  !isDistRootAlias &&
+  (process.env.NODE_ENV !== "production" ||
+    Boolean(process.env.VITEST) ||
+    process.env.OPENCLAW_PLUGIN_SDK_SOURCE_IN_TESTS === "1");
 
 function emptyPluginConfigSchema() {
   function error(message) {
@@ -61,17 +78,269 @@ function resolveControlCommandGate(params) {
   return { commandAuthorized, shouldBlock };
 }
 
-function getJiti() {
-  if (jitiLoader) {
-    return jitiLoader;
+function createDiagnosticEventsState() {
+  return {
+    marker: DIAGNOSTIC_EVENTS_STATE_KEY,
+    enabled: true,
+    seq: 0,
+    listeners: new Set(),
+    dispatchDepth: 0,
+    asyncQueue: [],
+    asyncDrainScheduled: false,
+    asyncDroppedEvents: 0,
+    asyncDroppedTrustedEvents: 0,
+    asyncDroppedUntrustedEvents: 0,
+    asyncDroppedPriorityEvents: 0,
+  };
+}
+
+function isDiagnosticEventsState(value) {
+  return (
+    value &&
+    typeof value === "object" &&
+    value.marker === DIAGNOSTIC_EVENTS_STATE_KEY &&
+    typeof value.enabled === "boolean" &&
+    typeof value.seq === "number" &&
+    value.listeners instanceof Set &&
+    typeof value.dispatchDepth === "number" &&
+    Array.isArray(value.asyncQueue) &&
+    typeof value.asyncDrainScheduled === "boolean"
+  );
+}
+
+function getDiagnosticEventsState(create) {
+  const existing = globalThis[DIAGNOSTIC_EVENTS_STATE_KEY];
+  if (isDiagnosticEventsState(existing)) {
+    existing.asyncDroppedEvents ??= 0;
+    existing.asyncDroppedTrustedEvents ??= 0;
+    existing.asyncDroppedUntrustedEvents ??= 0;
+    existing.asyncDroppedPriorityEvents ??= 0;
+    return existing;
+  }
+  if (!create) {
+    return null;
+  }
+  const state = createDiagnosticEventsState();
+  Object.defineProperty(globalThis, DIAGNOSTIC_EVENTS_STATE_KEY, {
+    configurable: true,
+    enumerable: false,
+    value: state,
+    writable: false,
+  });
+  return state;
+}
+
+function onDiagnosticEventFromSharedState(listener) {
+  const state = getDiagnosticEventsState(true);
+  const internalListener = (event, metadata) => {
+    if (metadata && metadata.trusted) {
+      return;
+    }
+    if (event && event.type === "log.record") {
+      return;
+    }
+    listener(event);
+  };
+  state.listeners.add(internalListener);
+  return () => {
+    state.listeners.delete(internalListener);
+  };
+}
+
+function snapshotDiagnosticListeners(state) {
+  return state && state.listeners instanceof Set ? new Set(state.listeners) : null;
+}
+
+function removeAddedDiagnosticListeners(beforeListeners) {
+  const state = getDiagnosticEventsState(false);
+  if (!state || !(state.listeners instanceof Set)) {
+    return;
+  }
+  if (!beforeListeners) {
+    state.listeners.clear();
+    return;
+  }
+  for (const listener of state.listeners) {
+    if (!beforeListeners.has(listener)) {
+      state.listeners.delete(listener);
+    }
+  }
+}
+
+function trySubscribeDiagnosticEvents(diagnosticEvents, listener, beforeListeners) {
+  try {
+    const unsubscribe = diagnosticEvents.onDiagnosticEvent(listener);
+    if (typeof unsubscribe === "function") {
+      return unsubscribe;
+    }
+  } catch {
+    // Fall back to shared state if a stale dist chunk exposes a broken wrapper.
+  }
+  removeAddedDiagnosticListeners(beforeListeners);
+  return null;
+}
+
+function onDiagnosticEvent(listener) {
+  const beforeState = getDiagnosticEventsState(false);
+  const beforeListeners = snapshotDiagnosticListeners(beforeState);
+  const beforeSize = beforeState?.listeners?.size;
+  const diagnosticEvents = loadDiagnosticEventsModule();
+  if (!diagnosticEvents || typeof diagnosticEvents.onDiagnosticEvent !== "function") {
+    return onDiagnosticEventFromSharedState(listener);
+  }
+  const unsubscribeDiagnosticEvents = trySubscribeDiagnosticEvents(
+    diagnosticEvents,
+    listener,
+    beforeListeners,
+  );
+  if (!unsubscribeDiagnosticEvents) {
+    return onDiagnosticEventFromSharedState(listener);
+  }
+  const afterState = getDiagnosticEventsState(false);
+  if (afterState && afterState.listeners.size > (beforeSize ?? 0)) {
+    return unsubscribeDiagnosticEvents;
+  }
+  // Keep legacy root listeners connected when a built alias resolves the lazy
+  // diagnostic module in a separate graph from the active core emitter.
+  const unsubscribeSharedState = onDiagnosticEventFromSharedState(listener);
+  return () => {
+    try {
+      unsubscribeDiagnosticEvents();
+    } finally {
+      unsubscribeSharedState();
+    }
+  };
+}
+
+function getPackageRoot() {
+  return path.resolve(__dirname, "..", "..");
+}
+
+function findDistChunkByPrefix(prefix) {
+  const distRoot = path.join(getPackageRoot(), "dist");
+  try {
+    const entries = fs
+      .readdirSync(distRoot, { withFileTypes: true })
+      .toSorted((left, right) => left.name.localeCompare(right.name));
+    const match = entries.find(
+      (entry) =>
+        entry.isFile() && entry.name.startsWith(`${prefix}-`) && entry.name.endsWith(".js"),
+    );
+    return match ? path.join(distRoot, match.name) : null;
+  } catch {
+    return null;
+  }
+}
+
+function listPluginSdkExportedSubpaths() {
+  const packageRoot = getPackageRoot();
+  const cacheKey = `${packageRoot}::privateQa=${process.env.OPENCLAW_ENABLE_PRIVATE_QA_CLI === "1" ? "1" : "0"}`;
+  if (pluginSdkSubpathsCache.has(cacheKey)) {
+    return pluginSdkSubpathsCache.get(cacheKey);
+  }
+
+  let subpaths = [];
+  try {
+    const packageJsonPath = path.join(packageRoot, "package.json");
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
+    subpaths = Object.keys(packageJson.exports ?? {})
+      .filter((key) => key.startsWith("./plugin-sdk/"))
+      .map((key) => key.slice("./plugin-sdk/".length))
+      .filter((subpath) => /^[A-Za-z0-9][A-Za-z0-9_-]*$/.test(subpath))
+      .toSorted();
+  } catch {
+    subpaths = [];
+  }
+
+  pluginSdkSubpathsCache.set(cacheKey, subpaths);
+  return subpaths;
+}
+
+function listPrivateLocalOnlyPluginSdkSubpaths() {
+  if (process.env.OPENCLAW_ENABLE_PRIVATE_QA_CLI !== "1") {
+    return [];
+  }
+  try {
+    const raw = fs.readFileSync(
+      path.join(getPackageRoot(), "scripts", "lib", "plugin-sdk-private-local-only-subpaths.json"),
+      "utf8",
+    );
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) {
+      return [];
+    }
+    return parsed.filter(
+      (subpath) =>
+        typeof subpath === "string" &&
+        /^[A-Za-z0-9][A-Za-z0-9_-]*$/.test(subpath) &&
+        !privateQaExcludedPluginSdkSubpaths.has(subpath),
+    );
+  } catch {
+    return [];
+  }
+}
+
+function listPluginSdkRootAliasSubpaths() {
+  const exportedSubpaths = listPluginSdkExportedSubpaths();
+  return [...new Set([...exportedSubpaths, ...listPrivateLocalOnlyPluginSdkSubpaths()])].toSorted(
+    (left, right) => left.localeCompare(right),
+  );
+}
+
+function buildPluginSdkAliasMap(useDist) {
+  const packageRoot = getPackageRoot();
+  const pluginSdkDir = path.join(packageRoot, useDist ? "dist" : "src", "plugin-sdk");
+  const normalizeTarget = (target) =>
+    process.platform === "win32" ? target.replace(/\\/g, "/") : target;
+  const aliasMap = {};
+
+  for (const subpath of listPluginSdkRootAliasSubpaths()) {
+    if (useDist) {
+      const candidate = path.join(pluginSdkDir, `${subpath}.js`);
+      if (fs.existsSync(candidate)) {
+        for (const packageName of pluginSdkPackageNames) {
+          aliasMap[`${packageName}/${subpath}`] = normalizeTarget(candidate);
+        }
+      }
+      continue;
+    }
+    for (const ext of pluginSdkSourceExtensions) {
+      const candidate = path.join(pluginSdkDir, `${subpath}${ext}`);
+      if (!fs.existsSync(candidate)) {
+        continue;
+      }
+      for (const packageName of pluginSdkPackageNames) {
+        aliasMap[`${packageName}/${subpath}`] = normalizeTarget(candidate);
+      }
+      break;
+    }
+  }
+
+  // Keep the bare root alias last so subpath aliases win under resolvers that
+  // perform prefix matching instead of exact-key lookup.
+  for (const packageName of pluginSdkPackageNames) {
+    aliasMap[packageName] = normalizeTarget(__filename);
+  }
+
+  return aliasMap;
+}
+
+function getModuleLoader(tryNative) {
+  if (moduleLoaders.has(tryNative)) {
+    return moduleLoaders.get(tryNative);
   }
 
   const { createJiti } = require("jiti");
-  jitiLoader = createJiti(__filename, {
+  const moduleLoader = createJiti(__filename, {
+    alias: buildPluginSdkAliasMap(tryNative),
     interopDefault: true,
+    // Prefer Node's native sync ESM loader for built dist/plugin-sdk/*.js files
+    // so local plugins do not create a second transpiled OpenClaw core graph.
+    tryNative,
     extensions: [".ts", ".tsx", ".mts", ".cts", ".mtsx", ".ctsx", ".js", ".mjs", ".cjs", ".json"],
   });
-  return jitiLoader;
+  moduleLoaders.set(tryNative, moduleLoader);
+  return moduleLoader;
 }
 
 function loadMonolithicSdk() {
@@ -79,20 +348,74 @@ function loadMonolithicSdk() {
     return monolithicSdk;
   }
 
-  const jiti = getJiti();
-
-  const distCandidate = path.resolve(__dirname, "..", "..", "dist", "plugin-sdk", "index.js");
-  if (fs.existsSync(distCandidate)) {
+  const distCandidate = path.resolve(__dirname, "..", "..", "dist", "plugin-sdk", "compat.js");
+  if (!shouldPreferSourceGraph && fs.existsSync(distCandidate)) {
     try {
-      monolithicSdk = jiti(distCandidate);
+      monolithicSdk = getModuleLoader(true)(distCandidate);
       return monolithicSdk;
     } catch {
       // Fall through to source alias if dist is unavailable or stale.
     }
   }
 
-  monolithicSdk = jiti(path.join(__dirname, "index.ts"));
+  monolithicSdk = getModuleLoader(false)(
+    path.join(getPackageRoot(), "src", "plugin-sdk", "compat.ts"),
+  );
   return monolithicSdk;
+}
+
+function loadDiagnosticEventsModule() {
+  if (diagnosticEventsModule) {
+    return diagnosticEventsModule;
+  }
+
+  const directDistCandidate = path.resolve(
+    __dirname,
+    "..",
+    "..",
+    "dist",
+    "infra",
+    "diagnostic-events.js",
+  );
+  if (!shouldPreferSourceGraph) {
+    const distCandidate =
+      (fs.existsSync(directDistCandidate) && directDistCandidate) ||
+      findDistChunkByPrefix("diagnostic-events");
+    if (distCandidate) {
+      try {
+        diagnosticEventsModule = normalizeDiagnosticEventsModule(
+          getModuleLoader(true)(distCandidate),
+        );
+        return diagnosticEventsModule;
+      } catch {
+        // Fall through to source path if dist is unavailable or stale.
+      }
+    }
+  }
+
+  diagnosticEventsModule = normalizeDiagnosticEventsModule(
+    getModuleLoader(false)(path.join(getPackageRoot(), "src", "infra", "diagnostic-events.ts")),
+  );
+  return diagnosticEventsModule;
+}
+
+function normalizeDiagnosticEventsModule(mod) {
+  if (!mod || typeof mod !== "object") {
+    return mod;
+  }
+  if (typeof mod.onDiagnosticEvent === "function") {
+    return mod;
+  }
+  const fn = Object.values(mod).find(
+    (v) => typeof v === "function" && v.name === "onDiagnosticEvent",
+  );
+  if (fn) {
+    return {
+      ...mod,
+      onDiagnosticEvent: fn,
+    };
+  }
+  return mod;
 }
 
 function tryLoadMonolithicSdk() {
@@ -105,11 +428,19 @@ function tryLoadMonolithicSdk() {
 
 const fastExports = {
   emptyPluginConfigSchema,
+  onDiagnosticEvent,
   resolveControlCommandGate,
 };
 
 const target = { ...fastExports };
 let rootExports = null;
+
+function shouldResolveMonolithic(prop) {
+  if (typeof prop !== "string") {
+    return false;
+  }
+  return prop !== "then";
+}
 
 function getMonolithicSdk() {
   const loaded = tryLoadMonolithicSdk();
@@ -123,6 +454,9 @@ function getExportValue(prop) {
   if (Reflect.has(target, prop)) {
     return Reflect.get(target, prop);
   }
+  if (!shouldResolveMonolithic(prop)) {
+    return undefined;
+  }
   const monolithic = getMonolithicSdk();
   if (!monolithic) {
     return undefined;
@@ -134,6 +468,9 @@ function getExportDescriptor(prop) {
   const ownDescriptor = Reflect.getOwnPropertyDescriptor(target, prop);
   if (ownDescriptor) {
     return ownDescriptor;
+  }
+  if (!shouldResolveMonolithic(prop)) {
+    return undefined;
   }
 
   const monolithic = getMonolithicSdk();
@@ -164,14 +501,16 @@ rootExports = new Proxy(target, {
     if (Reflect.has(target, prop)) {
       return true;
     }
+    if (!shouldResolveMonolithic(prop)) {
+      return false;
+    }
     const monolithic = getMonolithicSdk();
     return monolithic ? Reflect.has(monolithic, prop) : false;
   },
   ownKeys() {
     const keys = new Set(Reflect.ownKeys(target));
-    const monolithic = getMonolithicSdk();
-    if (monolithic) {
-      for (const key of Reflect.ownKeys(monolithic)) {
+    if (monolithicSdk && typeof monolithicSdk === "object") {
+      for (const key of Reflect.ownKeys(monolithicSdk)) {
         if (!keys.has(key)) {
           keys.add(key);
         }

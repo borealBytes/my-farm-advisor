@@ -1,19 +1,19 @@
 import { describe, expect, it } from "vitest";
 import type { OpenClawConfig } from "../config/config.js";
 import {
-  applyOnboardingLocalWorkspaceConfig,
+  applyLocalSetupWorkspaceConfig,
   ONBOARDING_DEFAULT_DM_SCOPE,
   ONBOARDING_DEFAULT_TOOLS_PROFILE,
 } from "./onboard-config.js";
 
-describe("applyOnboardingLocalWorkspaceConfig", () => {
-  it("defaults local onboarding tool profile to coding", () => {
+describe("applyLocalSetupWorkspaceConfig", () => {
+  it("defaults local setup tool profile to coding", () => {
     expect(ONBOARDING_DEFAULT_TOOLS_PROFILE).toBe("coding");
   });
 
   it("sets secure dmScope default when unset", () => {
     const baseConfig: OpenClawConfig = {};
-    const result = applyOnboardingLocalWorkspaceConfig(baseConfig, "/tmp/workspace");
+    const result = applyLocalSetupWorkspaceConfig(baseConfig, "/tmp/workspace");
 
     expect(result.session?.dmScope).toBe(ONBOARDING_DEFAULT_DM_SCOPE);
     expect(result.gateway?.mode).toBe("local");
@@ -27,7 +27,7 @@ describe("applyOnboardingLocalWorkspaceConfig", () => {
         dmScope: "main",
       },
     };
-    const result = applyOnboardingLocalWorkspaceConfig(baseConfig, "/tmp/workspace");
+    const result = applyLocalSetupWorkspaceConfig(baseConfig, "/tmp/workspace");
 
     expect(result.session?.dmScope).toBe("main");
   });
@@ -38,7 +38,7 @@ describe("applyOnboardingLocalWorkspaceConfig", () => {
         dmScope: "per-account-channel-peer",
       },
     };
-    const result = applyOnboardingLocalWorkspaceConfig(baseConfig, "/tmp/workspace");
+    const result = applyLocalSetupWorkspaceConfig(baseConfig, "/tmp/workspace");
 
     expect(result.session?.dmScope).toBe("per-account-channel-peer");
   });
@@ -49,8 +49,32 @@ describe("applyOnboardingLocalWorkspaceConfig", () => {
         profile: "full",
       },
     };
-    const result = applyOnboardingLocalWorkspaceConfig(baseConfig, "/tmp/workspace");
+    const result = applyLocalSetupWorkspaceConfig(baseConfig, "/tmp/workspace");
 
     expect(result.tools?.profile).toBe("full");
+  });
+
+  it("preserves agents.list and bindings on onboard rerun (openclaw#84692)", () => {
+    const baseConfig: OpenClawConfig = {
+      agents: {
+        list: [
+          { id: "alpha", model: "anthropic/claude-3-5-sonnet" },
+          { id: "beta", model: "openai/gpt-4o" },
+        ],
+      },
+      bindings: [
+        {
+          type: "route",
+          agentId: "alpha",
+          match: { channel: "discord", peer: { kind: "direct", id: "user-1" } },
+        },
+      ],
+    } as OpenClawConfig;
+
+    const result = applyLocalSetupWorkspaceConfig(baseConfig, "/tmp/workspace");
+
+    expect(result.agents?.list).toHaveLength(2);
+    expect(result.agents?.list?.map((a) => a.id)).toEqual(["alpha", "beta"]);
+    expect(result.bindings).toEqual(baseConfig.bindings);
   });
 });

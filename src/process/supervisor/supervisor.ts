@@ -1,6 +1,6 @@
 import crypto from "node:crypto";
 import { getShellConfig } from "../../agents/shell-utils.js";
-import { createSubsystemLogger } from "../../logging/subsystem.js";
+import { normalizeOptionalString } from "../../shared/string-coerce.js";
 import { createChildAdapter } from "./adapters/child.js";
 import { createPtyAdapter } from "./adapters/pty.js";
 import { createRunRegistry } from "./registry.js";
@@ -13,12 +13,21 @@ import type {
   TerminationReason,
 } from "./types.js";
 
-const log = createSubsystemLogger("process/supervisor");
+type SupervisorLogRuntime = typeof import("./supervisor-log.runtime.js");
 
 type ActiveRun = {
   run: ManagedRun;
   scopeKey?: string;
 };
+
+const GRACEFUL_CANCEL_TIMEOUT_MS = 5000;
+
+let supervisorLogRuntimePromise: Promise<SupervisorLogRuntime> | undefined;
+
+function loadSupervisorLogRuntime(): Promise<SupervisorLogRuntime> {
+  supervisorLogRuntimePromise ??= import("./supervisor-log.runtime.js");
+  return supervisorLogRuntimePromise;
+}
 
 function clampTimeout(value?: number): number | undefined {
   if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) {
@@ -59,16 +68,17 @@ export function createProcessSupervisor(): ProcessSupervisor {
   };
 
   const spawn = async (input: SpawnInput): Promise<ManagedRun> => {
-    const runId = input.runId?.trim() || crypto.randomUUID();
-    if (input.replaceExistingScope && input.scopeKey?.trim()) {
-      cancelScope(input.scopeKey, "manual-cancel");
+    const runId = normalizeOptionalString(input.runId) ?? crypto.randomUUID();
+    const scopeKey = normalizeOptionalString(input.scopeKey);
+    if (input.replaceExistingScope && scopeKey) {
+      cancelScope(scopeKey, "manual-cancel");
     }
     const startedAtMs = Date.now();
     const record: RunRecord = {
       runId,
       sessionId: input.sessionId,
       backendId: input.backendId,
-      scopeKey: input.scopeKey?.trim() || undefined,
+      scopeKey,
       state: "starting",
       startedAtMs,
       lastOutputAtMs: startedAtMs,
@@ -83,6 +93,7 @@ export function createProcessSupervisor(): ProcessSupervisor {
     let stderr = "";
     let timeoutTimer: NodeJS.Timeout | null = null;
     let noOutputTimer: NodeJS.Timeout | null = null;
+    let forceKillTimer: NodeJS.Timeout | null = null;
     const captureOutput = input.captureOutput !== false;
 
     const overallTimeoutMs = clampTimeout(input.timeoutMs);
@@ -155,13 +166,23 @@ export function createProcessSupervisor(): ProcessSupervisor {
           clearTimeout(noOutputTimer);
           noOutputTimer = null;
         }
+        if (forceKillTimer) {
+          clearTimeout(forceKillTimer);
+          forceKillTimer = null;
+        }
       };
 
       cancelAdapter = (_reason: TerminationReason) => {
-        if (settled) {
+        if (settled || forceKillTimer) {
           return;
         }
-        adapter.kill("SIGKILL");
+        adapter.kill("SIGTERM");
+        forceKillTimer = setTimeout(() => {
+          if (!settled) {
+            adapter.kill("SIGKILL");
+          }
+        }, GRACEFUL_CANCEL_TIMEOUT_MS);
+        forceKillTimer.unref?.();
       };
 
       if (overallTimeoutMs) {
@@ -255,7 +276,7 @@ export function createProcessSupervisor(): ProcessSupervisor {
 
       active.set(runId, {
         run: managedRun,
-        scopeKey: input.scopeKey?.trim() || undefined,
+        scopeKey,
       });
       return managedRun;
     } catch (err) {
@@ -264,7 +285,8 @@ export function createProcessSupervisor(): ProcessSupervisor {
         exitCode: null,
         exitSignal: null,
       });
-      log.warn(`spawn failed: runId=${runId} reason=${String(err)}`);
+      const { warnProcessSupervisorSpawnFailure } = await loadSupervisorLogRuntime();
+      warnProcessSupervisorSpawnFailure(`spawn failed: runId=${runId} reason=${String(err)}`);
       throw err;
     }
   };

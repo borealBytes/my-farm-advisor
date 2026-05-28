@@ -1,14 +1,23 @@
-import { loadConfig } from "../config/config.js";
 import { resolveCommitHash } from "../infra/git-commit.js";
 import { visibleWidth } from "../terminal/ansi.js";
+import {
+  decorativeEmoji,
+  decorativePrefix,
+  stripDecorativeEmojiForTerminal,
+  supportsDecorativeEmoji,
+  type DecorativeEmojiOptions,
+} from "../terminal/decorative-emoji.js";
 import { isRich, theme } from "../terminal/theme.js";
 import { hasRootVersionAlias } from "./argv.js";
+import { parseTaglineMode, readCliBannerTaglineMode } from "./banner-config-lite.js";
 import { pickTagline, type TaglineMode, type TaglineOptions } from "./tagline.js";
 
 type BannerOptions = TaglineOptions & {
   argv?: string[];
   commit?: string | null;
   columns?: number;
+  isTty?: boolean;
+  platform?: NodeJS.Platform;
   richTty?: boolean;
 };
 
@@ -36,34 +45,35 @@ const hasJsonFlag = (argv: string[]) =>
 const hasVersionFlag = (argv: string[]) =>
   argv.some((arg) => arg === "--version" || arg === "-V") || hasRootVersionAlias(argv);
 
-function parseTaglineMode(value: unknown): TaglineMode | undefined {
-  if (value === "random" || value === "default" || value === "off") {
-    return value;
-  }
-  return undefined;
-}
-
 function resolveTaglineMode(options: BannerOptions): TaglineMode | undefined {
   const explicit = parseTaglineMode(options.mode);
   if (explicit) {
     return explicit;
   }
-  try {
-    return parseTaglineMode(loadConfig().cli?.banner?.taglineMode);
-  } catch {
-    // Fall back to default random behavior when config is missing/invalid.
-    return undefined;
-  }
+  return readCliBannerTaglineMode(options.env);
+}
+
+function resolveEmojiOptions(options: BannerOptions): DecorativeEmojiOptions {
+  return {
+    ...(options.env ? { env: options.env } : {}),
+    ...(options.isTty === undefined ? {} : { isTty: options.isTty }),
+    ...(options.platform ? { platform: options.platform } : {}),
+  };
 }
 
 export function formatCliBannerLine(version: string, options: BannerOptions = {}): string {
   const commit =
     options.commit ?? resolveCommitHash({ env: options.env, moduleUrl: import.meta.url });
   const commitLabel = commit ?? "unknown";
-  const tagline = pickTagline({ ...options, mode: resolveTaglineMode(options) });
+  const emojiOptions = resolveEmojiOptions(options);
+  const tagline = stripDecorativeEmojiForTerminal(
+    pickTagline({ ...options, mode: resolveTaglineMode(options) }),
+    emojiOptions,
+  );
   const rich = options.richTty ?? isRich();
-  const title = "🌱 My Farm Advisor";
-  const prefix = "🌱 ";
+  const title = decorativePrefix("🦞", "OpenClaw", emojiOptions);
+  const prefix = decorativeEmoji("🦞", emojiOptions);
+  const indent = prefix ? `${prefix} ` : "";
   const columns = options.columns ?? process.stdout.columns ?? 120;
   const plainBaseLine = `${title} ${version} (${commitLabel})`;
   const plainFullLine = tagline ? `${plainBaseLine} — ${tagline}` : plainBaseLine;
@@ -83,7 +93,7 @@ export function formatCliBannerLine(version: string, options: BannerOptions = {}
     if (!tagline) {
       return line1;
     }
-    const line2 = `${" ".repeat(prefix.length)}${theme.accentDim(tagline)}`;
+    const line2 = `${" ".repeat(indent.length)}${theme.accentDim(tagline)}`;
     return `${line1}\n${line2}`;
   }
   if (fitsOnOneLine) {
@@ -93,31 +103,37 @@ export function formatCliBannerLine(version: string, options: BannerOptions = {}
   if (!tagline) {
     return line1;
   }
-  const line2 = `${" ".repeat(prefix.length)}${tagline}`;
+  const line2 = `${" ".repeat(indent.length)}${tagline}`;
   return `${line1}\n${line2}`;
 }
 
-const ROOTED_ASCII = [
-  "      .-^-.",
-  "    .'/   \\\'.",
-  "   /  .-.  \\",
-  "  /  /   \\  \\",
-  "  |  \\___/  |",
-  "   \\   |   /",
-  "    \\  |  /",
-  "  ___\\ | /___",
-  " /____\\|/____\\",
-  "      / | \\",
-  "     /  |  \\",
-  "    /___|___\\",
-  "  MY FARM ADVISOR",
-  " ",
+const LOBSTER_ASCII_BODY = [
+  "▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄",
+  "██░▄▄▄░██░▄▄░██░▄▄▄██░▀██░██░▄▄▀██░████░▄▄▀██░███░██",
+  "██░███░██░▀▀░██░▄▄▄██░█░█░██░█████░████░▀▀░██░█░█░██",
+  "██░▀▀▀░██░█████░▀▀▀██░██▄░██░▀▀▄██░▀▀░█░██░██▄▀▄▀▄██",
+  "▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀",
 ];
+
+function centerText(text: string, width: number): string {
+  const pad = Math.max(0, width - visibleWidth(text));
+  const left = Math.floor(pad / 2);
+  const right = pad - left;
+  return `${" ".repeat(left)}${text}${" ".repeat(right)}`;
+}
+
+function formatCliBannerArtLines(options: BannerOptions): string[] {
+  const width = visibleWidth(LOBSTER_ASCII_BODY[0] ?? "");
+  const emojiOptions = resolveEmojiOptions(options);
+  const title = supportsDecorativeEmoji(emojiOptions) ? "🦞 OPENCLAW 🦞" : "OPENCLAW";
+  return [...LOBSTER_ASCII_BODY, centerText(title, width), " "];
+}
 
 export function formatCliBannerArt(options: BannerOptions = {}): string {
   const rich = options.richTty ?? isRich();
+  const lines = formatCliBannerArtLines(options);
   if (!rich) {
-    return ROOTED_ASCII.join("\n");
+    return lines.join("\n");
   }
 
   const colorChar = (ch: string) => {
@@ -133,13 +149,18 @@ export function formatCliBannerArt(options: BannerOptions = {}): string {
     return theme.muted(ch);
   };
 
-  const colored = ROOTED_ASCII.map((line) => {
-    if (line.includes("MY FARM ADVISOR")) {
+  const emojiOptions = resolveEmojiOptions(options);
+  const icon = decorativeEmoji("🦞", emojiOptions);
+  const colored = lines.map((line) => {
+    if (line.includes("OPENCLAW")) {
+      if (!icon) {
+        return theme.info(centerText("OPENCLAW", visibleWidth(line)));
+      }
       return (
-        theme.muted("  ") +
-        theme.accent("🌱") +
-        theme.info(" MY FARM ADVISOR ") +
-        theme.accent("🌱")
+        theme.muted("              ") +
+        theme.accent(icon) +
+        theme.info(" OPENCLAW ") +
+        theme.accent(icon)
       );
     }
     return splitGraphemes(line).map(colorChar).join("");
@@ -153,7 +174,8 @@ export function emitCliBanner(version: string, options: BannerOptions = {}) {
     return;
   }
   const argv = options.argv ?? process.argv;
-  if (!process.stdout.isTTY) {
+  const isTty = options.isTty ?? process.stdout.isTTY;
+  if (!isTty) {
     return;
   }
   if (hasJsonFlag(argv)) {

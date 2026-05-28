@@ -1,18 +1,19 @@
-import type { AgentToolResult } from "@mariozechner/pi-agent-core";
-import type { ImageContent } from "@mariozechner/pi-ai";
+import type { ImageContent } from "../llm/types.js";
 import { createSubsystemLogger } from "../logging/subsystem.js";
 import { canonicalizeBase64 } from "../media/base64.js";
 import {
   buildImageResizeSideGrid,
   getImageMetadata,
   IMAGE_REDUCE_QUALITY_STEPS,
+  isImageProcessorUnavailableError,
   resizeToJpeg,
-} from "../media/image-ops.js";
+} from "../media/media-services.js";
 import {
   DEFAULT_IMAGE_MAX_BYTES,
   DEFAULT_IMAGE_MAX_DIMENSION_PX,
   type ImageSanitizationLimits,
 } from "./image-sanitization.js";
+import type { AgentToolResult } from "./runtime/index.js";
 
 type ToolContentBlock = AgentToolResult<unknown>["content"][number];
 type ImageContentBlock = Extract<ToolContentBlock, { type: "image" }>;
@@ -95,14 +96,14 @@ function fileNameFromPathLike(pathLike: string): string | undefined {
 
   try {
     const url = new URL(value);
-    const candidate = url.pathname.split("/").filter(Boolean).at(-1);
+    const candidate = url.pathname.split("/").findLast(Boolean);
     return candidate && candidate.length > 0 ? candidate : undefined;
   } catch {
     // Not a URL; continue with path-like parsing.
   }
 
   const normalized = value.replaceAll("\\", "/");
-  const candidate = normalized.split("/").filter(Boolean).at(-1);
+  const candidate = normalized.split("/").findLast(Boolean);
   return candidate && candidate.length > 0 ? candidate : undefined;
 }
 
@@ -187,14 +188,24 @@ async function resizeImageBase64IfNeeded(params: {
   const sideGrid = buildImageResizeSideGrid(params.maxDimensionPx, sideStart);
 
   let smallest: { buffer: Buffer; size: number } | null = null;
+  let processorUnavailableError: unknown;
   for (const side of sideGrid) {
     for (const quality of IMAGE_REDUCE_QUALITY_STEPS) {
-      const out = await resizeToJpeg({
-        buffer: buf,
-        maxSide: side,
-        quality,
-        withoutEnlargement: true,
-      });
+      let out: Buffer;
+      try {
+        out = await resizeToJpeg({
+          buffer: buf,
+          maxSide: side,
+          quality,
+          withoutEnlargement: true,
+        });
+      } catch (err) {
+        if (isImageProcessorUnavailableError(err)) {
+          processorUnavailableError = err;
+          break;
+        }
+        throw err;
+      }
       if (!smallest || out.byteLength < smallest.size) {
         smallest = { buffer: out, size: out.byteLength };
       }
@@ -239,6 +250,13 @@ async function resizeImageBase64IfNeeded(params: {
         };
       }
     }
+    if (processorUnavailableError) {
+      break;
+    }
+  }
+
+  if (processorUnavailableError) {
+    throw processorUnavailableError;
   }
 
   const best = smallest?.buffer ?? buf;

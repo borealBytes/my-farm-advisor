@@ -1,0 +1,222 @@
+import { Agent, setGlobalDispatcher } from "undici";
+
+const baseUrl = process.env.OPENWEBUI_BASE_URL ?? "";
+const email = process.env.OPENWEBUI_ADMIN_EMAIL ?? "";
+const password = process.env.OPENWEBUI_ADMIN_PASSWORD ?? "";
+const expectedNonce = process.env.OPENWEBUI_EXPECTED_NONCE ?? "";
+const prompt = process.env.OPENWEBUI_PROMPT ?? "";
+const modelAttempts = readPositiveInt(process.env.OPENWEBUI_MODEL_ATTEMPTS, 72);
+const modelRetryMs = readNonNegativeInt(process.env.OPENWEBUI_MODEL_RETRY_MS, 5000);
+const fetchTimeoutMs = readPositiveInt(process.env.OPENWEBUI_FETCH_TIMEOUT_MS, 720000);
+const controlTimeoutMs = readPositiveInt(
+  process.env.OPENWEBUI_CONTROL_TIMEOUT_MS,
+  Math.min(fetchTimeoutMs, 30000),
+);
+const chatTimeoutMs = readPositiveInt(process.env.OPENWEBUI_CHAT_TIMEOUT_MS, fetchTimeoutMs);
+const smokeMode =
+  process.env.OPENWEBUI_SMOKE_MODE ?? process.env.OPENCLAW_OPENWEBUI_SMOKE_MODE ?? "chat";
+
+setGlobalDispatcher(
+  new Agent({
+    bodyTimeout: Math.max(controlTimeoutMs, chatTimeoutMs),
+    headersTimeout: Math.max(controlTimeoutMs, chatTimeoutMs),
+  }),
+);
+
+if (!baseUrl || !email || !password || !expectedNonce || !prompt) {
+  throw new Error("Missing required OPENWEBUI_* environment variables");
+}
+if (smokeMode !== "models" && smokeMode !== "chat") {
+  throw new Error(`Unsupported OPENWEBUI_SMOKE_MODE: ${smokeMode}`);
+}
+
+function readPositiveInt(raw, fallback) {
+  const parsed = Number.parseInt(String(raw || ""), 10);
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+function readNonNegativeInt(raw, fallback) {
+  const parsed = Number.parseInt(String(raw || ""), 10);
+  return Number.isInteger(parsed) && parsed >= 0 ? parsed : fallback;
+}
+
+function createTimeoutError(label, timeoutMs) {
+  const error = new Error(`${label} timed out after ${timeoutMs}ms`);
+  error.code = "ETIMEDOUT";
+  return error;
+}
+
+async function withRequestTimeout(label, timeoutMs, run) {
+  const controller = new AbortController();
+  const timeoutError = createTimeoutError(label, timeoutMs);
+  const timer = setTimeout(() => {
+    controller.abort(timeoutError);
+  }, timeoutMs);
+  timer.unref?.();
+  try {
+    return await run(controller.signal);
+  } catch (error) {
+    if (controller.signal.aborted) {
+      throw timeoutError;
+    }
+    throw error;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+function getCookieHeader(res) {
+  const raw = res.headers.get("set-cookie");
+  if (!raw) {
+    return "";
+  }
+  return raw
+    .split(/,(?=[^;]+=[^;]+)/g)
+    .map((part) => part.split(";", 1)[0]?.trim())
+    .filter(Boolean)
+    .join("; ");
+}
+
+function buildAuthHeaders(token, cookie) {
+  const headers = {};
+  if (token) {
+    headers.authorization = `Bearer ${token}`;
+  }
+  if (cookie) {
+    headers.cookie = cookie;
+  }
+  return headers;
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
+async function fetchSignin() {
+  return await withRequestTimeout("Open WebUI signin", controlTimeoutMs, async (signal) => {
+    const response = await fetch(`${baseUrl}/api/v1/auths/signin`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ email, password }),
+      signal,
+    });
+    if (!response.ok) {
+      const body = await response.text();
+      throw new Error(`signin failed: HTTP ${response.status} ${body}`);
+    }
+    return {
+      cookie: getCookieHeader(response),
+      json: await response.json(),
+    };
+  });
+}
+
+async function fetchModels(authHeaders, attempt) {
+  return await withRequestTimeout(
+    `Open WebUI models attempt ${attempt}`,
+    controlTimeoutMs,
+    async (signal) => {
+      const response = await fetch(`${baseUrl}/api/models`, { headers: authHeaders, signal });
+      if (!response.ok) {
+        return {
+          ok: false,
+          status: response.status,
+          text: await response.text(),
+        };
+      }
+      return {
+        json: await response.json(),
+        ok: true,
+      };
+    },
+  );
+}
+
+async function fetchChatCompletion(authHeaders, targetModel) {
+  return await withRequestTimeout("Open WebUI chat completion", chatTimeoutMs, async (signal) => {
+    const response = await fetch(`${baseUrl}/api/chat/completions`, {
+      method: "POST",
+      headers: {
+        ...authHeaders,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        model: targetModel,
+        messages: [{ role: "user", content: prompt }],
+      }),
+      signal,
+    });
+    if (!response.ok) {
+      throw new Error(
+        `/api/chat/completions failed: HTTP ${response.status} ${await response.text()}`,
+      );
+    }
+    return await response.json();
+  });
+}
+
+function extractModelIds(modelsJson) {
+  const models = Array.isArray(modelsJson)
+    ? modelsJson
+    : Array.isArray(modelsJson?.data)
+      ? modelsJson.data
+      : Array.isArray(modelsJson?.models)
+        ? modelsJson.models
+        : [];
+  return models
+    .map((entry) => entry?.id ?? entry?.model ?? entry?.name)
+    .filter((value) => typeof value === "string");
+}
+
+const signin = await fetchSignin();
+const signinJson = signin.json;
+const token =
+  signinJson?.token ?? signinJson?.access_token ?? signinJson?.jwt ?? signinJson?.data?.token ?? "";
+const authHeaders = {
+  ...buildAuthHeaders(token, signin.cookie),
+  accept: "application/json",
+};
+
+let modelIds = [];
+let targetModel = "";
+let lastModelsError = "";
+for (let attempt = 1; attempt <= modelAttempts; attempt += 1) {
+  const modelsResult = await fetchModels(authHeaders, attempt).catch((error) => {
+    lastModelsError = error instanceof Error ? error.message : String(error);
+    return undefined;
+  });
+  if (modelsResult?.ok) {
+    modelIds = extractModelIds(modelsResult.json);
+    targetModel =
+      modelIds.find((id) => id === "openclaw/default") ?? modelIds.find((id) => id === "openclaw");
+    if (targetModel) {
+      break;
+    }
+    lastModelsError = `missing openclaw model: ${JSON.stringify(modelIds)}`;
+  } else if (modelsResult) {
+    lastModelsError = `HTTP ${modelsResult.status} ${modelsResult.text}`;
+  }
+  if (attempt < modelAttempts) {
+    await sleep(modelRetryMs);
+  }
+}
+if (!targetModel) {
+  throw new Error(
+    `openclaw model missing from Open WebUI model list after retry: ${JSON.stringify(modelIds)} (${lastModelsError})`,
+  );
+}
+if (smokeMode === "models") {
+  console.log(JSON.stringify({ ok: true, mode: smokeMode, model: targetModel }, null, 2));
+  process.exit(0);
+}
+
+const chatJson = await fetchChatCompletion(authHeaders, targetModel);
+const reply =
+  chatJson?.choices?.[0]?.message?.content ?? chatJson?.message?.content ?? chatJson?.content ?? "";
+if (typeof reply !== "string" || !reply.includes(expectedNonce)) {
+  throw new Error(`chat reply missing nonce: ${JSON.stringify(reply)}`);
+}
+
+console.log(JSON.stringify({ ok: true, model: targetModel, reply }, null, 2));

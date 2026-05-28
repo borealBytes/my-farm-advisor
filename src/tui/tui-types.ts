@@ -1,4 +1,5 @@
 export type TuiOptions = {
+  local?: boolean;
   url?: string;
   token?: string;
   password?: string;
@@ -8,6 +9,18 @@ export type TuiOptions = {
   timeoutMs?: number;
   historyLimit?: number;
   message?: string;
+  /**
+   * Internal CLI guard: after the standalone TUI returns, force the child
+   * process out if imported runtime handles keep the event loop alive.
+   */
+  forceProcessExitOnReturn?: boolean;
+};
+
+export type TuiExitReason = "exit" | "return-to-crestodian";
+
+export type TuiResult = {
+  exitReason: TuiExitReason;
+  crestodianMessage?: string;
 };
 
 export type ChatEvent = {
@@ -16,6 +29,17 @@ export type ChatEvent = {
   state: "delta" | "final" | "aborted" | "error";
   message?: unknown;
   errorMessage?: string;
+};
+
+export type BtwEvent = {
+  kind: "btw";
+  runId?: string;
+  sessionKey?: string;
+  question: string;
+  text: string;
+  isError?: boolean;
+  seq?: number;
+  ts?: number;
 };
 
 export type AgentEvent = {
@@ -28,8 +52,10 @@ export type ResponseUsageMode = "on" | "off" | "tokens" | "full";
 
 export type SessionInfo = {
   thinkingLevel?: string;
+  thinkingLevels?: Array<{ id: string; label: string }>;
   fastMode?: boolean;
   verboseLevel?: string;
+  traceLevel?: string;
   reasoningLevel?: string;
   model?: string;
   modelProvider?: string;
@@ -47,6 +73,14 @@ export type SessionScope = "per-sender" | "global";
 export type AgentSummary = {
   id: string;
   name?: string;
+};
+
+export type QueuedMessageMode = "steer" | "followUp";
+
+export type QueuedMessage = {
+  runId: string;
+  text: string;
+  mode: QueuedMessageMode;
 };
 
 export type GatewayStatusSummary = {
@@ -97,6 +131,9 @@ export type TuiStateAccess = {
   currentSessionKey: string;
   currentSessionId: string | null;
   activeChatRunId: string | null;
+  pendingOptimisticUserMessage?: boolean;
+  pendingChatRunId?: string | null;
+  queuedMessages?: QueuedMessage[];
   historyLoaded: boolean;
   sessionInfo: SessionInfo;
   initialSessionApplied: boolean;

@@ -1,6 +1,7 @@
 import { spawn } from "node:child_process";
 import net from "node:net";
-import { isErrno } from "./errors.js";
+import { normalizeStringEntries } from "../shared/string-normalization.js";
+import { formatErrorMessage, isErrno } from "./errors.js";
 import { ensurePortAvailable } from "./ports.js";
 
 export type SshParsedTarget = {
@@ -157,10 +158,7 @@ export async function startSshPortForward(opts: {
   });
   child.stderr?.setEncoding("utf8");
   child.stderr?.on("data", (chunk) => {
-    const lines = String(chunk)
-      .split("\n")
-      .map((l) => l.trim())
-      .filter(Boolean);
+    const lines = normalizeStringEntries(String(chunk).split("\n"));
     stderr.push(...lines);
   });
 
@@ -196,7 +194,7 @@ export async function startSshPortForward(opts: {
   } catch (err) {
     await stop();
     const suffix = stderr.length > 0 ? `\n${stderr.join("\n")}` : "";
-    throw new Error(`${err instanceof Error ? err.message : String(err)}${suffix}`, { cause: err });
+    throw new Error(`${formatErrorMessage(err)}${suffix}`, { cause: err });
   }
 
   return {

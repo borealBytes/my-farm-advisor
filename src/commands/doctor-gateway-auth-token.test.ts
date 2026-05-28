@@ -1,10 +1,12 @@
 import { describe, expect, it } from "vitest";
 import type { OpenClawConfig } from "../config/config.js";
+import { withTempHome, writeStateDirDotEnv } from "../config/test-helpers.js";
 import { withEnvAsync } from "../test-utils/env.js";
 import {
   resolveGatewayAuthTokenForService,
   shouldRequireGatewayTokenForInstall,
 } from "./doctor-gateway-auth-token.js";
+import { resolveGatewayInstallToken } from "./gateway-install-token.js";
 
 const envVar = (...parts: string[]) => parts.join("_");
 
@@ -147,7 +149,9 @@ describe("resolveGatewayAuthTokenForService", () => {
     );
 
     expect(resolved.token).toBeUndefined();
-    expect(resolved.unavailableReason).toContain("gateway.auth.token SecretRef is configured");
+    expect(resolved.unavailableReason).toBe(
+      "gateway.auth.token SecretRef is configured but unresolved (gateway.auth.token SecretRef is unresolved (env:default:MISSING_GATEWAY_TOKEN).).",
+    );
   });
 });
 
@@ -238,6 +242,24 @@ describe("shouldRequireGatewayTokenForInstall", () => {
     expect(required).toBe(false);
   });
 
+  it("does not require token in inferred mode when password env exists in state-dir .env", async () => {
+    await withTempHome(async (_home) => {
+      await writeStateDirDotEnv("OPENCLAW_GATEWAY_PASSWORD=dotenv-password\n", {
+        env: process.env,
+      });
+
+      const required = shouldRequireGatewayTokenForInstall(
+        {
+          gateway: {
+            auth: {},
+          },
+        } as OpenClawConfig,
+        process.env,
+      );
+      expect(required).toBe(false);
+    });
+  });
+
   it("requires token in inferred mode when no password candidate exists", () => {
     const required = shouldRequireGatewayTokenForInstall(
       {
@@ -248,5 +270,22 @@ describe("shouldRequireGatewayTokenForInstall", () => {
       {} as NodeJS.ProcessEnv,
     );
     expect(required).toBe(true);
+  });
+
+  it("blocks install token resolution for tailscale serve with explicit no-auth", async () => {
+    const resolved = await resolveGatewayInstallToken({
+      config: {
+        gateway: {
+          auth: { mode: "none" },
+          tailscale: { mode: "serve" },
+        },
+      } as OpenClawConfig,
+      env: {} as NodeJS.ProcessEnv,
+    });
+
+    expect(resolved.token).toBeUndefined();
+    expect(resolved.unavailableReason).toBe(
+      "gateway.auth.mode=none cannot be used with gateway.tailscale.mode=serve; configure token, password, or trusted-proxy auth before exposing the gateway through Tailscale",
+    );
   });
 });
