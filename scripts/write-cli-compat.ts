@@ -10,16 +10,28 @@ const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..")
 const distDir = path.join(rootDir, "dist");
 const cliDir = path.join(distDir, "cli");
 
-const findCandidates = () =>
-  fs.readdirSync(distDir).filter((entry) => {
+const collectCandidatesFromDir = (dir: string, relPrefix = "") => {
+  if (!fs.existsSync(dir)) {
+    return [];
+  }
+  return fs.readdirSync(dir).flatMap((entry) => {
     const isDaemonCliBundle =
       entry === "daemon-cli.js" || entry === "daemon-cli.mjs" || entry.startsWith("daemon-cli-");
     if (!isDaemonCliBundle) {
-      return false;
+      return [];
     }
     // tsdown can emit either .js or .mjs depending on bundler settings/runtime.
-    return entry.endsWith(".js") || entry.endsWith(".mjs");
+    if (!entry.endsWith(".js") && !entry.endsWith(".mjs")) {
+      return [];
+    }
+    return [path.posix.join(relPrefix, entry)];
   });
+};
+
+const findCandidates = () => [
+  ...collectCandidatesFromDir(distDir),
+  ...collectCandidatesFromDir(cliDir, "cli"),
+];
 
 // In rare cases, build output can land slightly after this script starts (depending on FS timing).
 // Retry briefly to avoid flaky builds.
@@ -49,7 +61,7 @@ if (!resolved?.accessors) {
 }
 
 const target = resolved.entry;
-const relPath = `../${target}`;
+const relPath = target.startsWith("cli/") ? `../${target}` : `../${target}`;
 const { accessors } = resolved;
 const missingExportError = (name: string) =>
   `Legacy daemon CLI export "${name}" is unavailable in this build. Please upgrade OpenClaw.`;
