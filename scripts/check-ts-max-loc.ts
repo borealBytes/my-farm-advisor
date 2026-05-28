@@ -2,10 +2,6 @@ import { execFileSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 
-function writeStdoutLine(message: string): void {
-  process.stdout.write(`${message}\n`);
-}
-
 type ParsedArgs = {
   maxLines: number;
 };
@@ -74,7 +70,8 @@ async function main() {
 
   // Minimal, grep-friendly output.
   for (const offender of offenders) {
-    writeStdoutLine(`${offender.lines}\t${offender.filePath}`);
+    // eslint-disable-next-line no-console
+    console.log(`${offender.lines}\t${offender.filePath}`);
   }
 
   process.exitCode = 1;

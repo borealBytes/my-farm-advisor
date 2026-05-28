@@ -1,20 +1,4 @@
-import {
-  MIN_CLIENT_PROTOCOL_VERSION,
-  PROTOCOL_VERSION,
-} from "../../src/gateway/protocol/version.ts";
 import { createArgReader, createGatewayWsClient, resolveGatewayUrl } from "./gateway-ws-client.ts";
-
-function writeStdoutLine(message = ""): void {
-  process.stdout.write(`${message}\n`);
-}
-
-function writeStdoutJson(value: unknown): void {
-  process.stdout.write(`${JSON.stringify(value, null, 2)}\n`);
-}
-
-function writeStderrLine(message: string): void {
-  process.stderr.write(`${message}\n`);
-}
 
 type NodeListPayload = {
   ts?: number;
@@ -40,7 +24,8 @@ const dangerous = hasFlag("--dangerous") || process.env.OPENCLAW_RUN_DANGEROUS =
 const jsonOut = hasFlag("--json");
 
 if (!urlRaw || !token) {
-  writeStderrLine(
+  // eslint-disable-next-line no-console
+  console.error(
     "Usage: bun scripts/dev/ios-node-e2e.ts --url <wss://host[:port]> --token <gateway.auth.token> [--node <id|name-substring>] [--dangerous] [--json]\n" +
       "Or set env: OPENCLAW_GATEWAY_URL / OPENCLAW_GATEWAY_TOKEN",
   );
@@ -101,8 +86,8 @@ async function main() {
   await waitOpen();
 
   const connectRes = await request("connect", {
-    minProtocol: MIN_CLIENT_PROTOCOL_VERSION,
-    maxProtocol: PROTOCOL_VERSION,
+    minProtocol: 3,
+    maxProtocol: 3,
     client: {
       id: "cli",
       displayName: "openclaw ios node e2e",
@@ -120,21 +105,24 @@ async function main() {
   });
 
   if (!connectRes.ok) {
-    writeStderrLine(`connect failed: ${String(connectRes.error)}`);
+    // eslint-disable-next-line no-console
+    console.error("connect failed:", connectRes.error);
     close();
     process.exit(2);
   }
 
   const healthRes = await request("health");
   if (!healthRes.ok) {
-    writeStderrLine(`health failed: ${String(healthRes.error)}`);
+    // eslint-disable-next-line no-console
+    console.error("health failed:", healthRes.error);
     close();
     process.exit(3);
   }
 
   const nodesRes = await request("node.list");
   if (!nodesRes.ok) {
-    writeStderrLine(`node.list failed: ${String(nodesRes.error)}`);
+    // eslint-disable-next-line no-console
+    console.error("node.list failed:", nodesRes.error);
     close();
     process.exit(4);
   }
@@ -154,7 +142,8 @@ async function main() {
     }
   }
   if (!node) {
-    writeStderrLine("No connected iOS nodes found. (Is the iOS app connected to the gateway?)");
+    // eslint-disable-next-line no-console
+    console.error("No connected iOS nodes found. (Is the iOS app connected to the gateway?)");
     close();
     process.exit(5);
   }
@@ -246,16 +235,23 @@ async function main() {
   }
 
   if (jsonOut) {
-    writeStdoutJson({
-      gateway: url.toString(),
-      node: {
-        nodeId: node.nodeId,
-        displayName: node.displayName,
-        platform: node.platform,
-      },
-      dangerous,
-      results,
-    });
+    // eslint-disable-next-line no-console
+    console.log(
+      JSON.stringify(
+        {
+          gateway: url.toString(),
+          node: {
+            nodeId: node.nodeId,
+            displayName: node.displayName,
+            platform: node.platform,
+          },
+          dangerous,
+          results,
+        },
+        null,
+        2,
+      ),
+    );
   } else {
     const pad = (s: string, n: number) => (s.length >= n ? s : s + " ".repeat(n - s.length));
     const rows = results.map((r) => ({
@@ -264,11 +260,15 @@ async function main() {
       note: r.ok ? "" : formatErr(r.error ?? "error"),
     }));
     const width = Math.min(64, Math.max(12, ...rows.map((r) => r.cmd.length)));
-    writeStdoutLine(`node: ${node.displayName ?? node.nodeId} (${node.platform ?? "unknown"})`);
-    writeStdoutLine(`dangerous: ${dangerous ? "on" : "off"}`);
-    writeStdoutLine();
+    // eslint-disable-next-line no-console
+    console.log(`node: ${node.displayName ?? node.nodeId} (${node.platform ?? "unknown"})`);
+    // eslint-disable-next-line no-console
+    console.log(`dangerous: ${dangerous ? "on" : "off"}`);
+    // eslint-disable-next-line no-console
+    console.log("");
     for (const r of rows) {
-      writeStdoutLine(`${pad(r.cmd, width)}  ${pad(r.ok, 4)}  ${r.note}`);
+      // eslint-disable-next-line no-console
+      console.log(`${pad(r.cmd, width)}  ${pad(r.ok, 4)}  ${r.note}`);
     }
   }
 

@@ -1,23 +1,12 @@
-import {
-  MIN_CLIENT_PROTOCOL_VERSION,
-  PROTOCOL_VERSION,
-} from "../../src/gateway/protocol/version.ts";
 import { createArgReader, createGatewayWsClient, resolveGatewayUrl } from "./gateway-ws-client.ts";
-
-function writeStdoutLine(message: string): void {
-  process.stdout.write(`${message}\n`);
-}
-
-function writeStderrLine(message: string): void {
-  process.stderr.write(`${message}\n`);
-}
 
 const { get: getArg } = createArgReader();
 const urlRaw = getArg("--url") ?? process.env.OPENCLAW_GATEWAY_URL;
 const token = getArg("--token") ?? process.env.OPENCLAW_GATEWAY_TOKEN;
 
 if (!urlRaw || !token) {
-  writeStderrLine(
+  // eslint-disable-next-line no-console
+  console.error(
     "Usage: bun scripts/dev/gateway-smoke.ts --url <wss://host[:port]> --token <gateway.auth.token>\n" +
       "Or set env: OPENCLAW_GATEWAY_URL / OPENCLAW_GATEWAY_TOKEN",
   );
@@ -40,8 +29,8 @@ async function main() {
 
   // Match iOS "operator" session defaults: token auth, no device identity.
   const connectRes = await request("connect", {
-    minProtocol: MIN_CLIENT_PROTOCOL_VERSION,
-    maxProtocol: PROTOCOL_VERSION,
+    minProtocol: 3,
+    maxProtocol: 3,
     client: {
       id: "openclaw-ios",
       displayName: "openclaw gateway smoke test",
@@ -59,23 +48,27 @@ async function main() {
   });
 
   if (!connectRes.ok) {
-    writeStderrLine(`connect failed: ${String(connectRes.error)}`);
+    // eslint-disable-next-line no-console
+    console.error("connect failed:", connectRes.error);
     process.exit(2);
   }
 
   const healthRes = await request("health");
   if (!healthRes.ok) {
-    writeStderrLine(`health failed: ${String(healthRes.error)}`);
+    // eslint-disable-next-line no-console
+    console.error("health failed:", healthRes.error);
     process.exit(3);
   }
 
   const historyRes = await request("chat.history", { sessionKey: "main" }, 15000);
   if (!historyRes.ok) {
-    writeStderrLine(`chat.history failed: ${String(historyRes.error)}`);
+    // eslint-disable-next-line no-console
+    console.error("chat.history failed:", historyRes.error);
     process.exit(4);
   }
 
-  writeStdoutLine("ok: connected + health + chat.history");
+  // eslint-disable-next-line no-console
+  console.log("ok: connected + health + chat.history");
   close();
 }
 

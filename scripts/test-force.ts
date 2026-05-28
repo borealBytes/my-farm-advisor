@@ -3,7 +3,8 @@ import { spawnSync } from "node:child_process";
 import os from "node:os";
 import path from "node:path";
 import { forceFreePort, type PortProcess } from "../src/cli/ports.js";
-import { resolveGatewayPort } from "../src/config/config.js";
+
+const DEFAULT_PORT = 18789;
 
 function killGatewayListeners(port: number): PortProcess[] {
   try {
@@ -28,7 +29,7 @@ function runTests() {
   const isolatedLock =
     process.env.OPENCLAW_GATEWAY_LOCK ??
     path.join(os.tmpdir(), `openclaw-gateway.lock.test.${Date.now()}`);
-  const result = spawnSync(process.execPath, ["scripts/test-projects.mjs"], {
+  const result = spawnSync("pnpm", ["vitest", "run"], {
     stdio: "inherit",
     env: {
       ...process.env,
@@ -36,14 +37,14 @@ function runTests() {
     },
   });
   if (result.error) {
-    console.error(`test runner failed to start: ${String(result.error)}`);
+    console.error(`pnpm test failed to start: ${String(result.error)}`);
     process.exit(1);
   }
   process.exit(result.status ?? 1);
 }
 
 function main() {
-  const port = resolveGatewayPort(undefined, process.env);
+  const port = Number.parseInt(process.env.OPENCLAW_GATEWAY_PORT ?? `${DEFAULT_PORT}`, 10);
 
   console.log(`🧹 test:force - clearing gateway on port ${port}`);
   const killed = killGatewayListeners(port);
