@@ -11,7 +11,7 @@ concurrency:
 
 jobs:
   no-tabs:
-    runs-on: blacksmith-16vcpu-ubuntu-2404
+    runs-on: [self-hosted, Linux, X64, my-farm-advisor-local]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -42,7 +42,7 @@ jobs:
           PY
 
   actionlint:
-    runs-on: blacksmith-16vcpu-ubuntu-2404
+    runs-on: [self-hosted, Linux, X64, my-farm-advisor-local]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -51,6 +51,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          install -d -m 0755 "$HOME/.local/bin"
           ACTIONLINT_VERSION="1.7.11"
           archive="actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz"
           base_url="https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}"
@@ -58,7 +59,7 @@ jobs:
           curl -sSfL -o checksums.txt "${base_url}/actionlint_${ACTIONLINT_VERSION}_checksums.txt"
           grep " ${archive}\$" checksums.txt | sha256sum -c -
           tar -xzf "${archive}" actionlint
-          sudo install -m 0755 actionlint /usr/local/bin/actionlint
+          install -m 0755 actionlint "$HOME/.local/bin/actionlint"
 
       - name: Lint workflows
         run: actionlint

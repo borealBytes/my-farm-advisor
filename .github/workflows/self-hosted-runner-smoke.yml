@@ -51,3 +51,10 @@ jobs:
           test -d .git
           test -f package.json
           git rev-parse HEAD
+
+      - name: Verify docker access
+        shell: bash
+        run: |
+          set -euo pipefail
+          which docker
+          docker version
