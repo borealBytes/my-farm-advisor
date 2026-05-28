@@ -18,7 +18,7 @@ jobs:
 
       - name: Fail on tabs in workflow files
         run: |
-          python - <<'PY'
+          python3 - <<'PY'
           from __future__ import annotations
 
           import pathlib

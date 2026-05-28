@@ -3,6 +3,8 @@
 
 self-hosted-runner:
   labels:
+    # Local self-hosted runner
+    - my-farm-advisor-local
     # Blacksmith CI runners
     - blacksmith-8vcpu-ubuntu-2404
     - blacksmith-8vcpu-windows-2025
