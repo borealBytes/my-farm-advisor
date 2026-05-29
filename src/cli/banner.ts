@@ -71,8 +71,8 @@ export function formatCliBannerLine(version: string, options: BannerOptions = {}
     emojiOptions,
   );
   const rich = options.richTty ?? isRich();
-  const title = decorativePrefix("🦞", "OpenClaw", emojiOptions);
-  const prefix = decorativeEmoji("🦞", emojiOptions);
+  const title = decorativePrefix("🌾", "MY Farm Advisor", emojiOptions);
+  const prefix = decorativeEmoji("🌾", emojiOptions);
   const indent = prefix ? `${prefix} ` : "";
   const columns = options.columns ?? process.stdout.columns ?? 120;
   const plainBaseLine = `${title} ${version} (${commitLabel})`;
@@ -125,7 +125,7 @@ function centerText(text: string, width: number): string {
 function formatCliBannerArtLines(options: BannerOptions): string[] {
   const width = visibleWidth(LOBSTER_ASCII_BODY[0] ?? "");
   const emojiOptions = resolveEmojiOptions(options);
-  const title = supportsDecorativeEmoji(emojiOptions) ? "🦞 OPENCLAW 🦞" : "OPENCLAW";
+  const title = supportsDecorativeEmoji(emojiOptions) ? "🌾 MY FARM ADVISOR 🌾" : "MY FARM ADVISOR";
   return [...LOBSTER_ASCII_BODY, centerText(title, width), " "];
 }
 
@@ -150,16 +150,16 @@ export function formatCliBannerArt(options: BannerOptions = {}): string {
   };
 
   const emojiOptions = resolveEmojiOptions(options);
-  const icon = decorativeEmoji("🦞", emojiOptions);
+  const icon = decorativeEmoji("🌾", emojiOptions);
   const colored = lines.map((line) => {
-    if (line.includes("OPENCLAW")) {
+    if (line.includes("MY FARM ADVISOR")) {
       if (!icon) {
-        return theme.info(centerText("OPENCLAW", visibleWidth(line)));
+        return theme.info(centerText("MY FARM ADVISOR", visibleWidth(line)));
       }
       return (
-        theme.muted("              ") +
+        theme.muted("         ") +
         theme.accent(icon) +
-        theme.info(" OPENCLAW ") +
+        theme.info(" MY FARM ADVISOR ") +
         theme.accent(icon)
       );
     }

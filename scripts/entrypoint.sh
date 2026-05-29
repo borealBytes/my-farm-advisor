@@ -198,6 +198,22 @@ const dataPipelineTelegramToken = process.env.TELEGRAM_DATA_PIPELINE_BOT_TOKEN?.
 const fieldOperationsAccountKey = 'field-operations';
 const legacyFieldOperationsAccountKey = 'main';
 const dataPipelineAccountKey = 'data-pipeline';
+const MAIN_AGENT_GENERIC_NAMES = new Set([
+  '',
+  'main',
+  'default',
+  'assistant',
+  'openclaw',
+  'openclaw agent',
+  'openclaw assistant',
+]);
+const IDENTITY_GENERIC_NAMES = new Set([
+  '',
+  'assistant',
+  'openclaw',
+  'openclaw agent',
+  'openclaw assistant',
+]);
 
 const parseAllowList = value => {
   if (!value) return [];
@@ -504,8 +520,18 @@ config.wizard.lastRunAt = nowIso;
 const ensureAgent = (id, baseConfig) => {
   const list = config.agents.list ?? [];
   const index = list.findIndex(entry => entry && typeof entry === 'object' && entry.id === id);
+  const normalizeGenericValue = value =>
+    typeof value === 'string' ? value.trim().toLowerCase() : '';
+  const shouldUseBootstrapValue = (value, genericValues) =>
+    genericValues.has(normalizeGenericValue(value));
   const normalizeIdentity = (defaults, existing) => {
     const merged = { ...(defaults ?? {}), ...(existing ?? {}) };
+    if (defaults?.name && shouldUseBootstrapValue(existing?.name, IDENTITY_GENERIC_NAMES)) {
+      merged.name = defaults.name;
+    }
+    if (defaults?.emoji && !String(existing?.emoji ?? '').trim()) {
+      merged.emoji = defaults.emoji;
+    }
     const keys = Object.keys(merged);
     if (keys.length === 0) {
       return undefined;
@@ -528,7 +554,9 @@ const ensureAgent = (id, baseConfig) => {
     ...existing,
   };
   merged.workspace = existing.workspace ?? baseConfig.workspace;
-  merged.name = existing.name ?? baseConfig.name;
+  merged.name = shouldUseBootstrapValue(existing.name, MAIN_AGENT_GENERIC_NAMES)
+    ? baseConfig.name
+    : existing.name ?? baseConfig.name;
   merged.default = existing.default ?? baseConfig.default;
   merged.identity = normalizeIdentity(baseConfig.identity, existing.identity);
   merged.model = existing.model ?? baseConfig.model;
@@ -541,6 +569,10 @@ ensureAgent('main', {
   default: true,
   name: 'Field Operations Agent',
   workspace: '/data/workspace',
+  identity: {
+    name: 'MY Farm Advisor',
+    emoji: '🌾',
+  },
 });
 
 ensureAgent('data-pipeline', {
@@ -746,11 +778,33 @@ if (!hasAnyAccountAllowFrom) {
 });
 EOF
 
+copy_if_missing_or_generic() {
+    local src="$1"
+    local dest="$2"
+    local marker="$3"
+
+    if [ ! -f "$src" ]; then
+        return 0
+    fi
+
+    if [ ! -e "$dest" ]; then
+        cp "$src" "$dest"
+        return 0
+    fi
+
+    if grep -Fq "$marker" "$dest" 2>/dev/null; then
+        cp "$src" "$dest"
+    fi
+}
+
 for file in SOUL.md USER.md AGENTS.md TOOLS.md IDENTITY.md IDENTITY.data-pipeline.md; do
     if [ -f "/app/$file" ] && [ ! -e "/data/workspace/$file" ]; then
         cp "/app/$file" "/data/workspace/$file"
     fi
 done
+
+copy_if_missing_or_generic "/app/IDENTITY.md" "/data/workspace/IDENTITY.md" "# IDENTITY.md - Who Am I?"
+copy_if_missing_or_generic "/app/AGENTS.md" "/data/workspace/AGENTS.md" "# AGENTS.md - Your Workspace"
 
 PIPELINE_WORKSPACE="/data/workspace-data-pipeline"
 mkdir -p "$PIPELINE_WORKSPACE"
@@ -762,6 +816,9 @@ done
 if [ -f "/app/IDENTITY.data-pipeline.md" ] && [ ! -e "$PIPELINE_WORKSPACE/IDENTITY.md" ]; then
     cp "/app/IDENTITY.data-pipeline.md" "$PIPELINE_WORKSPACE/IDENTITY.md"
 fi
+
+copy_if_missing_or_generic "/app/IDENTITY.data-pipeline.md" "$PIPELINE_WORKSPACE/IDENTITY.md" "# IDENTITY.md - Who Am I?"
+copy_if_missing_or_generic "/app/AGENTS.md" "$PIPELINE_WORKSPACE/AGENTS.md" "# AGENTS.md - Your Workspace"
 
 for file in IDENTITY HEARTBEAT BOOT BOOTSTRAP AGENTS; do
   template="/app/$file.md.template"
