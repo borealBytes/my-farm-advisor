@@ -66,6 +66,24 @@ EXTENDED_COLUMNS = [
 
 SDA_COLUMNS = EXTENDED_COLUMNS
 
+SDA_COLUMNS = [
+    "mukey",
+    "muname",
+    "compname",
+    "comppct_r",
+    "drainagecl",
+    "hzdept_r",
+    "hzdepb_r",
+    "om_r",
+    "ph1to1h2o_r",
+    "awc_r",
+    "claytotal_r",
+    "sandtotal_r",
+    "silttotal_r",
+    "dbthirdbar_r",
+    "cec7_r",
+]
+
 # Extended numeric columns
 EXTENDED_NUMERIC_COLUMNS = [
     "comppct_r",
@@ -214,7 +232,7 @@ def get_soil_at_point(
 
     df = pd.DataFrame(rows)
     if not df.empty:
-        for col in NUMERIC_COLUMNS:
+        for col in EXTENDED_NUMERIC_COLUMNS:
             if col in df.columns:
                 df[col] = pd.to_numeric(df[col], errors="coerce")
     return df
@@ -246,7 +264,7 @@ def get_soil_for_polygon(
 
     df = pd.DataFrame(rows)
     if not df.empty:
-        for col in NUMERIC_COLUMNS:
+        for col in EXTENDED_NUMERIC_COLUMNS:
             if col in df.columns:
                 df[col] = pd.to_numeric(df[col], errors="coerce")
     return df
