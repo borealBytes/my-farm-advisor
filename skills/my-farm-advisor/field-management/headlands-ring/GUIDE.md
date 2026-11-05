@@ -6,13 +6,13 @@ author: Boreal Bytes
 tags: [geospatial, headlands, field-operations, masking, clipping, analysis]
 ---
 
-# Skill: headlands-ring
+# Workflow: headlands-ring
 
 ## Description
 
-Create headlands-ring and interior geometries from field boundaries so the edge area of a field can be measured, visualized, or excluded from analysis. This skill is intentionally generic: it can be used with soil polygons, point samples, NDVI rasters, yield zones, or any other geometry-driven workflow where the border of the field should be compared with or excluded from the interior.
+Create headlands-ring and interior geometries from field boundaries so the edge area of a field can be measured, visualized, or excluded from analysis. This workflow is intentionally generic: it can be used with soil polygons, point samples, NDVI rasters, yield zones, or any other geometry-driven workflow where the border of the field should be compared with or excluded from the interior.
 
-## When to Use This Skill
+## When to Use This Workflow
 
 - **Headlands exclusion**: Exclude edge effects from agronomic or remote-sensing analysis
 - **Operational analysis**: Quantify headlands acres and the share of a field devoted to turning or overlap zones
@@ -28,7 +28,7 @@ import geopandas as gpd
 
 from headlands_ring import create_headlands_ring, summarize_headlands
 
-fields = gpd.read_file('.opencode/skills/field-boundaries/examples/sample_2_fields.geojson')
+fields = gpd.read_file('my-farm-advisor/field-management/field-boundaries/examples/real_10_fields_iowa.geojson')
 field = fields.iloc[[0]].to_crs('EPSG:32615')
 
 ring = create_headlands_ring(field, width_m=9.0)

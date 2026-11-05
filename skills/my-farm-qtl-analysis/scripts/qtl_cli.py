@@ -297,7 +297,7 @@ def calc_kinship(args):
         )
 
         # Calculate dominant kinship
-        geno = pd.read_csv("temp_geno.raw", sep="\s+", header=0)
+        geno = pd.read_csv("temp_geno.raw", sep=r"\s+", header=0)
         geno_mat = geno.iloc[:, 6:].values  # Skip first 6 columns
         geno_mat = np.nan_to_num(geno_mat)
 
@@ -316,11 +316,11 @@ def calc_kinship(args):
 def run_builtin_example(args):
     """Run one of the packaged example scripts."""
     script_map = {
-        "bayesian-gp": "examples/bayesian-gp/run_bayesian.py",
-        "multi-trait": "examples/multi-trait-gwas/run_multitrait.py",
-        "sample-qc": "examples/sample-qc/run_sample_qc.py",
-        "annotate": "examples/snp-annotation/run_snp_annotation.py",
-        "report": "examples/analysis-report/run_report.py",
+        "bayesian-gp": "examples/prediction/bayesian-gp/run_bayesian.py",
+        "multi-trait": "examples/mapping/multi-trait-gwas/run_multitrait.py",
+        "sample-qc": "examples/qc/sample-qc/run_sample_qc.py",
+        "annotate": "examples/qc/snp-annotation/run_snp_annotation.py",
+        "report": "examples/reporting/analysis-report/run_report.py",
     }
     script_rel = script_map[args.command]
     script_abs = os.path.join(os.path.dirname(os.path.dirname(__file__)), script_rel)

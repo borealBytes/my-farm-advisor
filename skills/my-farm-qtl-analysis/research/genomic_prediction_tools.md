@@ -11,9 +11,9 @@ Comprehensive guide to open-source alternatives for genomic prediction and BLUP 
 
 1. [Overview](#overview)
 2. [rrBLUP (R)](#1-rrblup-r)
-3. [BGLR - Bayesian Generalized Linear Regression (R)](#2-bglr---bayesian-generalized-linear-regression-r)
-4. [glmnet - Elastic Net (R & Python)](#3-glmnet---elastic-net-r--python)
-5. [sommer - Mixed Models (R)](#4-sommer---mixed-models-r)
+3. [BGLR - Bayesian Generalized Linear Regression (R)](#2-bglr-bayesian-generalized-linear-regression-r)
+4. [glmnet - Elastic Net (R & Python)](#3-glmnet-elastic-net-r-python)
+5. [sommer - Mixed Models (R)](#4-sommer-mixed-models-r)
 6. [Python scikit-learn Alternatives](#5-python-scikit-learn-alternatives)
 7. [Tool Comparison](#tool-comparison)
 8. [SNP Data Formats](#snp-data-formats)
@@ -32,7 +32,6 @@ Genomic prediction uses genome-wide markers (SNPs) to predict breeding values or
 ### Why Replace QTLmax?
 
 QTLmax is proprietary software for QTL mapping and genomic prediction. Open-source alternatives provide:
-
 - **Cost**: Free and open-source
 - **Flexibility**: Customizable code and methods
 - **Community**: Active development and support
@@ -60,12 +59,12 @@ install.packages("rrBLUP")
 
 ### Core Functions
 
-| Function         | Purpose                                 |
-| ---------------- | --------------------------------------- |
-| `mixed.solve()`  | General mixed model solver (REML/ML)    |
+| Function | Purpose |
+|----------|---------|
+| `mixed.solve()` | General mixed model solver (REML/ML) |
 | `kinship.BLUP()` | Genomic prediction using kinship matrix |
-| `A.mat()`        | Calculate additive relationship matrix  |
-| `GWAS()`         | Genome-wide association analysis        |
+| `A.mat()` | Calculate additive relationship matrix |
+| `GWAS()` | Genome-wide association analysis |
 
 ### Minimal Working Example
 
@@ -136,18 +135,18 @@ for (i in 1:5) {
   # Training and validation sets
   train_idx <- which(folds != i)
   valid_idx <- which(folds == i)
-
+  
   y_train <- wheat.Y[train_idx, 1]
   y_valid <- wheat.Y[valid_idx, 1]
   X_train <- wheat.X[train_idx, ]
   X_valid <- wheat.X[valid_idx, ]
-
+  
   # Fit model on training data
   fit <- mixed.solve(y = y_train, Z = X_train)
-
+  
   # Predict validation set
   pred <- X_valid %*% fit$u
-
+  
   # Accuracy
   accuracy[i] <- cor(y_valid, pred)
 }
@@ -159,13 +158,11 @@ cat("Standard deviation:", sd(accuracy), "\n")
 ### Input/Output Formats
 
 **Input**:
-
 - Phenotypes: Numeric vector or matrix (n × t traits)
 - Genotypes: Numeric matrix (n × m markers), typically coded as -1, 0, 1
 - Covariates: Optional design matrix for fixed effects
 
 **Output**:
-
 - `u`: Marker effects (for RR-BLUP) or breeding values (for GBLUP)
 - `Vu`/`Vg`: Variance component for markers/genetic
 - `Ve`: Residual variance
@@ -192,13 +189,13 @@ install.packages("BGLR")
 
 ### Key Features
 
-| Model  | Prior              | Use Case                                           |
-| ------ | ------------------ | -------------------------------------------------- |
-| BRR    | Gaussian           | Ridge regression (equivalent to RR-BLUP)           |
-| BayesA | Scaled-t           | Heavy-tailed marker effects                        |
-| BayesB | Mixture            | Variable selection (some markers have zero effect) |
-| BayesC | Mixture            | Similar to BayesB but common variance              |
-| BL     | Double exponential | Bayesian LASSO                                     |
+| Model | Prior | Use Case |
+|-------|-------|----------|
+| BRR | Gaussian | Ridge regression (equivalent to RR-BLUP) |
+| BayesA | Scaled-t | Heavy-tailed marker effects |
+| BayesB | Mixture | Variable selection (some markers have zero effect) |
+| BayesC | Mixture | Similar to BayesB but common variance |
+| BL | Double exponential | Bayesian LASSO |
 
 ### Minimal Working Example
 
@@ -328,14 +325,12 @@ print(fm_multi$ETA$pedigree$varU)   # Pedigree variance
 ### Input/Output Formats
 
 **Input**:
-
 - `y`: Phenotype vector (numeric, can have missing values as NA)
 - `ETA`: List of random effects (markers, pedigree, etc.)
 - `X`: Marker matrix (n × m, numeric)
 - `pedigree`: Data frame with id, sire, dam columns
 
 **Output**:
-
 - `yHat`: Predicted values
 - `ETA[[i]]$b`: Marker effects for component i
 - `varE`: Residual variance
@@ -524,14 +519,12 @@ print(f"True QTL found: {true_positives}/{len(qtl_idx)}")
 ### Input/Output Formats
 
 **Input**:
-
 - `x`: Matrix of predictors (n × p, numeric)
 - `y`: Response vector (numeric)
 - `alpha`: Elastic net mixing parameter (0=ridge, 1=lasso)
 - `lambda`: Regularization parameter (optional, auto-selected by CV)
 
 **Output**:
-
 - `lambda.min`: Optimal lambda from cross-validation
 - `lambda.1se`: Lambda within 1 SE of minimum
 - `coef`: Coefficient matrix
@@ -667,7 +660,7 @@ for (i in 1:5) {
   # Mask validation set
   Y_train <- CPpheno
   Y_train$color[folds == i] <- NA
-
+  
   # Fit model
   ans_cv <- mmer(
     fixed = color ~ 1,
@@ -675,11 +668,11 @@ for (i in 1:5) {
     rcov = ~ units,
     data = Y_train
   )
-
+  
   # Predictions
   pred <- ans_cv$U$`u:id`$color
   valid_idx <- which(folds == i)
-
+  
   # Accuracy
   accuracy[i] <- cor(CPpheno$color[valid_idx], pred[valid_idx])
 }
@@ -690,7 +683,6 @@ cat("CV accuracy:", mean(accuracy), "±", sd(accuracy), "\n")
 ### Input/Output Formats
 
 **Input**:
-
 - `fixed`: Formula for fixed effects
 - `random`: Formula for random effects (can include covariance structures)
 - `rcov`: Formula for residual covariance
@@ -698,7 +690,6 @@ cat("CV accuracy:", mean(accuracy), "±", sd(accuracy), "\n")
 - `Gu`: Relationship matrix (optional)
 
 **Output**:
-
 - `U`: BLUPs for random effects
 - `sigma`: Variance components
 - `Beta`: BLUEs for fixed effects
@@ -807,30 +798,30 @@ print(f"SVR accuracy: {accuracy:.4f}")
 
 ## Tool Comparison
 
-| Feature         | rrBLUP     | BGLR        | glmnet       | sommer  | Python sklearn |
-| --------------- | ---------- | ----------- | ------------ | ------- | -------------- |
-| **Language**    | R          | R           | R/Python     | R       | Python         |
-| **Method**      | REML/ML    | Bayesian    | Penalized ML | REML/ML | Various        |
-| **RR-BLUP**     | ✅         | ✅          | ✅ (α=0)     | ✅      | ✅             |
-| **LASSO**       | ❌         | ✅ (BayesL) | ✅ (α=1)     | ❌      | ✅             |
-| **Elastic Net** | ❌         | ❌          | ✅           | ❌      | ✅             |
-| **BayesA/B/C**  | ❌         | ✅          | ❌           | ❌      | ❌             |
-| **Multi-trait** | ❌         | ✅          | ❌           | ✅      | ❌             |
-| **Dominance**   | ❌         | ✅          | ❌           | ✅      | ❌             |
-| **Speed**       | Fast       | Slow        | Fast         | Medium  | Fast           |
-| **Large data**  | Medium     | Poor        | Good         | Good    | Good           |
-| **Ease of use** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐    | ⭐⭐⭐⭐⭐   | ⭐⭐⭐  | ⭐⭐⭐⭐⭐     |
+| Feature | rrBLUP | BGLR | glmnet | sommer | Python sklearn |
+|---------|--------|------|--------|--------|----------------|
+| **Language** | R | R | R/Python | R | Python |
+| **Method** | REML/ML | Bayesian | Penalized ML | REML/ML | Various |
+| **RR-BLUP** | ✅ | ✅ | ✅ (α=0) | ✅ | ✅ |
+| **LASSO** | ❌ | ✅ (BayesL) | ✅ (α=1) | ❌ | ✅ |
+| **Elastic Net** | ❌ | ❌ | ✅ | ❌ | ✅ |
+| **BayesA/B/C** | ❌ | ✅ | ❌ | ❌ | ❌ |
+| **Multi-trait** | ❌ | ✅ | ❌ | ✅ | ❌ |
+| **Dominance** | ❌ | ✅ | ❌ | ✅ | ❌ |
+| **Speed** | Fast | Slow | Fast | Medium | Fast |
+| **Large data** | Medium | Poor | Good | Good | Good |
+| **Ease of use** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
 
 ### When to Use Each Tool
 
-| Scenario                          | Recommended Tool         |
-| --------------------------------- | ------------------------ |
-| Quick GBLUP/RR-BLUP               | **rrBLUP**               |
-| Bayesian methods, complex priors  | **BGLR**                 |
-| Variable selection (LASSO)        | **glmnet**               |
-| Multi-trait, dominance, epistasis | **sommer**               |
-| Python workflow, ML methods       | **sklearn**              |
-| Large datasets (>10K samples)     | **rrBLUP** or **glmnet** |
+| Scenario | Recommended Tool |
+|----------|-----------------|
+| Quick GBLUP/RR-BLUP | **rrBLUP** |
+| Bayesian methods, complex priors | **BGLR** |
+| Variable selection (LASSO) | **glmnet** |
+| Multi-trait, dominance, epistasis | **sommer** |
+| Python workflow, ML methods | **sklearn** |
+| Large datasets (>10K samples) | **rrBLUP** or **glmnet** |
 
 ---
 
@@ -851,7 +842,6 @@ Ind3    0   0   2   0  ...
 ```
 
 **R code to convert**:
-
 ```r
 # From PLINK .raw format
 library(rrBLUP)
@@ -928,7 +918,6 @@ A <- A.mat(geno_filtered, min.MAF = 0.05)
 ### Output Formats
 
 **Marker Effects**:
-
 ```r
 # Save marker effects
 effects <- data.frame(
@@ -939,7 +928,6 @@ write.csv(effects, "marker_effects.csv", row.names = FALSE)
 ```
 
 **Genomic Breeding Values**:
-
 ```r
 # Save GEBVs
 gebv <- data.frame(
@@ -950,7 +938,6 @@ write.csv(gebv, "genomic_breeding_values.csv", row.names = FALSE)
 ```
 
 **Variance Components**:
-
 ```r
 # Save variance components
 var_comp <- data.frame(
@@ -1010,12 +997,12 @@ results <- data.frame(
 for (i in 1:5) {
   train <- folds != i
   valid <- folds == i
-
+  
   # rrBLUP
   fit_rr <- mixed.solve(y[train], Z = X[train, ])
   pred_rr <- X[valid, ] %*% fit_rr$u
   results$rrBLUP[i] <- cor(y[valid], pred_rr)
-
+  
   # glmnet
   fit_glm <- cv.glmnet(X[train, ], y[train], alpha = 0.5)
   pred_glm <- predict(fit_glm, newx = X[valid, ], s = "lambda.min")
@@ -1031,17 +1018,17 @@ print(apply(results, 2, sd))
 
 ## References
 
-1. **rrBLUP**: Endelman, J.B. (2011). Ridge regression and other kernels for genomic selection. _The Plant Genome_, 4(3), 250-255.
+1. **rrBLUP**: Endelman, J.B. (2011). Ridge regression and other kernels for genomic selection. *The Plant Genome*, 4(3), 250-255.
 
-2. **BGLR**: Pérez, P., & de los Campos, G. (2014). Genome-wide regression and prediction with the BGLR statistical package. _Genetics_, 198(2), 483-495.
+2. **BGLR**: Pérez, P., & de los Campos, G. (2014). Genome-wide regression and prediction with the BGLR statistical package. *Genetics*, 198(2), 483-495.
 
-3. **glmnet**: Friedman, J., Hastie, T., & Tibshirani, R. (2010). Regularization paths for generalized linear models via coordinate descent. _Journal of Statistical Software_, 33(1), 1.
+3. **glmnet**: Friedman, J., Hastie, T., & Tibshirani, R. (2010). Regularization paths for generalized linear models via coordinate descent. *Journal of Statistical Software*, 33(1), 1.
 
-4. **sommer**: Covarrubias-Pazaran, G. (2016). Genome-assisted prediction of quantitative traits using the R package sommer. _PLoS ONE_, 11(6), e0156744.
+4. **sommer**: Covarrubias-Pazaran, G. (2016). Genome-assisted prediction of quantitative traits using the R package sommer. *PLoS ONE*, 11(6), e0156744.
 
-5. **Review**: de Vlaming, R., & Groenen, P.J. (2014). The current and future use of ridge regression for prediction in quantitative genetics. _BioMed Research International_.
+5. **Review**: de Vlaming, R., & Groenen, P.J. (2014). The current and future use of ridge regression for prediction in quantitative genetics. *BioMed Research International*.
 
 ---
 
-_Document created: 2024_  
-_Last updated: Compatible with R 4.0+ and Python 3.8+_
+*Document created: 2024*  
+*Last updated: Compatible with R 4.0+ and Python 3.8+*

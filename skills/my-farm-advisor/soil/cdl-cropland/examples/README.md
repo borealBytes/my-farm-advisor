@@ -27,7 +27,7 @@ Both fields show a classic corn-soybean rotation common in the Corn Belt.
 
 | Column         | Description                                                              |
 | -------------- | ------------------------------------------------------------------------ |
-| `field_id`     | Matches field IDs in `field-boundaries/examples/sample_2_fields.geojson` |
+| `field_id`     | Legacy two-field test ID used by this bundled CSV                         |
 | `year`         | CDL classification year                                                  |
 | `crop_code`    | USDA CDL numeric crop code (1=Corn, 5=Soybeans, etc.)                    |
 | `crop_name`    | Human-readable crop name                                                 |
@@ -54,10 +54,10 @@ for field_id, group in cdl.groupby('field_id'):
 
 ## Relationship to field-boundaries Skill
 
-The field boundaries used to clip these CDL rasters come from:
+For new spatial runs, use current field-boundary examples from:
 
 ```
-.skills/field-boundaries/examples/sample_2_fields.geojson
+my-farm-advisor/field-management/field-boundaries/examples/real_10_fields_iowa.geojson
 ```
 
 Load both together for spatial analysis:
@@ -66,8 +66,10 @@ Load both together for spatial analysis:
 import geopandas as gpd
 import pandas as pd
 
-fields = gpd.read_file('../field-boundaries/examples/sample_2_fields.geojson')
+fields = gpd.read_file('my-farm-advisor/field-management/field-boundaries/examples/real_10_fields_iowa.geojson')
 cdl = pd.read_csv('sample_cdl_2_fields.csv')
+
+# For the current Iowa field example, regenerate CDL rows before merging.
 
 # Merge CDL data onto field geometries
 merged = fields.merge(cdl[cdl['year'] == 2023], on='field_id')

@@ -6,13 +6,13 @@ author: Boreal Bytes
 tags: [correlation, statistics, pandas, scipy, analysis]
 ---
 
-# Skill: eda-correlate
+# Workflow: eda-correlate
 
 ## Description
 
 Analyze correlations between variables in agricultural datasets using standard pandas and scipy. Calculate correlation coefficients, identify significant relationships, and create correlation matrices with heatmaps using real library code.
 
-## When to Use This Skill
+## When to Use This Workflow
 
 - **Finding relationships**: Discover which variables are related
 - **Feature selection**: Identify redundant variables for modeling
@@ -35,7 +35,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Load your data
-df = pd.read_csv('data/my-farm-advisor/soil_measurements.csv')
+df = pd.read_csv('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/correlate/soil_measurements.csv')
 
 # Calculate correlation matrix for numeric columns
 numeric_cols = ['ph_water', 'organic_matter', 'clay', 'sand']
@@ -65,7 +65,7 @@ plt.close()
 import pandas as pd
 
 # Load data
-df = pd.read_csv('data/my-farm-advisor/soil_data.csv')
+df = pd.read_csv('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/correlate/soil_data.csv')
 
 # Select numeric columns
 numeric_cols = df.select_dtypes(include=[np.number]).columns
@@ -74,7 +74,7 @@ numeric_cols = df.select_dtypes(include=[np.number]).columns
 corr_matrix = df[numeric_cols].corr()
 
 # Save to CSV
-corr_matrix.to_csv('output/correlation_matrix.csv')
+corr_matrix.to_csv('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/correlate/output/correlation_matrix.csv')
 
 print("Correlation Matrix:")
 print(corr_matrix.round(3))
@@ -93,7 +93,7 @@ import pandas as pd
 import numpy as np
 
 # Load data
-df = pd.read_csv('data/my-farm-advisor/soil_data.csv')
+df = pd.read_csv('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/correlate/soil_data.csv')
 
 # Calculate correlation matrix
 numeric_cols = df.select_dtypes(include=[np.number]).columns
@@ -129,7 +129,7 @@ import pandas as pd
 from scipy.stats import pearsonr
 
 # Load data
-df = pd.read_csv('data/my-farm-advisor/soil_data.csv')
+df = pd.read_csv('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/correlate/soil_data.csv')
 
 # Test correlation between two variables
 var1 = 'ph_water'
@@ -178,7 +178,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Load data
-df = pd.read_csv('data/my-farm-advisor/soil_data.csv')
+df = pd.read_csv('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/correlate/soil_data.csv')
 
 # Select numeric columns
 numeric_cols = ['ph_water', 'organic_matter', 'clay', 'sand', 'silt']
@@ -201,10 +201,10 @@ sns.heatmap(
 
 plt.title('Soil Properties Correlation Matrix', fontsize=14, fontweight='bold')
 plt.tight_layout()
-plt.savefig('output/correlation_heatmap.png', dpi=300, bbox_inches='tight')
+plt.savefig('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/correlate/output/correlation_heatmap.png', dpi=300, bbox_inches='tight')
 plt.close()
 
-print("Saved: output/correlation_heatmap.png")
+print("Saved: ${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/correlate/output/correlation_heatmap.png")
 ```
 
 ### Task 5: Compare Correlation Methods
@@ -220,7 +220,7 @@ import pandas as pd
 from scipy.stats import pearsonr, spearmanr, kendalltau
 
 # Load data
-df = pd.read_csv('data/my-farm-advisor/soil_data.csv')
+df = pd.read_csv('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/correlate/soil_data.csv')
 
 var1 = 'ph_water'
 var2 = 'organic_matter'
@@ -259,11 +259,11 @@ from scipy.stats import pearsonr
 import os
 
 # Ensure output directory exists
-os.makedirs('output/correlations', exist_ok=True)
+os.makedirs('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/correlate/output/correlations', exist_ok=True)
 
 # Load data
 print("Loading data...")
-df = pd.read_csv('data/my-farm-advisor/agricultural_data.csv')
+df = pd.read_csv('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/correlate/agricultural_data.csv')
 
 # Select numeric columns
 numeric_cols = ['field_size', 'ph_water', 'organic_matter', 'clay', 'sand', 'yield']
@@ -272,7 +272,7 @@ print(f"Analyzing {len(numeric_cols)} variables: {', '.join(numeric_cols)}")
 # 1. Calculate full correlation matrix
 print("\n1. Calculating correlation matrix...")
 corr_matrix = df[numeric_cols].corr()
-corr_matrix.to_csv('output/correlations/correlation_matrix.csv')
+corr_matrix.to_csv('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/correlate/output/correlations/correlation_matrix.csv')
 print("Saved: correlation_matrix.csv")
 
 # 2. Find strongest correlations
@@ -283,7 +283,7 @@ correlations = corr_matrix.where(mask).stack().reset_index()
 correlations.columns = ['var1', 'var2', 'correlation']
 correlations = correlations.sort_values('correlation', key=abs, ascending=False)
 
-correlations.to_csv('output/correlations/strongest_correlations.csv', index=False)
+correlations.to_csv('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/correlate/output/correlations/strongest_correlations.csv', index=False)
 print("Top 5 correlations:")
 for idx, row in correlations.head(5).iterrows():
     print(f"  {row['var1']} ↔ {row['var2']}: {row['correlation']:.3f}")
@@ -294,7 +294,7 @@ plt.figure(figsize=(10, 8))
 sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', center=0, square=True)
 plt.title('Agricultural Data Correlations')
 plt.tight_layout()
-plt.savefig('output/correlations/correlation_heatmap.png', dpi=300)
+plt.savefig('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/correlate/output/correlations/correlation_heatmap.png', dpi=300)
 plt.close()
 print("Saved: correlation_heatmap.png")
 
@@ -324,7 +324,7 @@ z = np.polyfit(df[var1].dropna(), df[var2].dropna(), 1)
 p = np.poly1d(z)
 plt.plot(df[var1], p(df[var1]), "r--", alpha=0.8)
 
-plt.savefig(f'output/correlations/{var1}_vs_{var2}.png', dpi=300)
+    plt.savefig(f'${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/correlate/output/correlations/{var1}_vs_{var2}.png', dpi=300)
 plt.close()
 print(f"Saved: {var1}_vs_{var2}.png")
 

@@ -6,15 +6,15 @@ author: Boreal Bytes
 tags: [usda, nass, cdl, cropland, raster, geospatial, download]
 ---
 
-# Skill: cdl-cropland
+# Workflow: cdl-cropland
 
 ## Description
 
-Download and analyze USDA NASS Cropland Data Layer (CDL) annual crop type rasters. The CDL is a 30-meter resolution raster covering the contiguous US, classifying every pixel into one of 130+ crop and land cover types. This skill clips CDL rasters to field boundaries and extracts per-field crop classifications.
+Download and analyze USDA NASS Cropland Data Layer (CDL) annual crop type rasters. The CDL is a 30-meter resolution raster covering the contiguous US, classifying every pixel into one of 130+ crop and land cover types. This workflow clips CDL rasters to field boundaries and extracts per-field crop classifications.
 
-The skill now also supports reporting-oriented outputs that keep the full crop composition for each field-year so downstream dashboards and posters can render 100% stacked crop history charts rather than relying only on dominant crop summaries.
+The workflow now also supports reporting-oriented outputs that keep the full crop composition for each field-year so downstream dashboards and posters can render 100% stacked crop history charts rather than relying only on dominant crop summaries.
 
-## When to Use This Skill
+## When to Use This Workflow
 
 - **Crop identification**: Determine what crop was planted in a field for a given year
 - **Rotation analysis**: Build multi-year crop sequences (e.g., corn-soybean rotation)
@@ -35,7 +35,7 @@ Sample data is included in the `examples/` directory:
 
 - `examples/sample_cdl_2_fields.csv` - CDL crop classifications for 2 Minnesota fields (2020-2024)
 
-These match the 2 fields from the `field-boundaries` skill (`examples/sample_2_fields.geojson`).
+These match field-boundary examples from `my-farm-advisor/field-management/field-boundaries/examples/`.
 
 ```python
 import pandas as pd
@@ -54,6 +54,26 @@ print(cdl[['field_id', 'year', 'crop_code', 'crop_name', 'dominant_pct']])
 
 ## Quick Start
 
+For data-pipeline first runs, initialize the shared last-five-year CONUS CDL rasters through the data-pipeline installer:
+
+```bash
+export DATA_PIPELINE_DATA_ROOT=/absolute/path/to/my-farm-advisor-runtime
+cd my-farm-advisor/data-pipeline
+./scripts/install.sh --prepare-shared-data
+```
+
+Runtime equivalent after install:
+
+```bash
+cd "${DATA_PIPELINE_DATA_ROOT}/data-pipeline/src"
+"${DATA_PIPELINE_DATA_ROOT}/data-pipeline/.venv/bin/python" \
+  scripts/ingest/download_cdl.py \
+  --raster-only \
+  --cdl-scope conus \
+  --cdl-latest-year 2025 \
+  --cdl-window-years 5
+```
+
 ```bash
 # Download CDL GeoTIFF and extract crop types for field boundaries
 uv run --with rasterio --with geopandas --with rasterstats --with requests python << 'EOF'
@@ -66,7 +86,7 @@ from collections import Counter
 from pathlib import Path
 
 # Load field boundaries (from field-boundaries skill)
-fields = gpd.read_file('../field-boundaries/examples/sample_2_fields.geojson')
+fields = gpd.read_file('my-farm-advisor/field-management/field-boundaries/examples/real_10_fields_iowa.geojson')
 
 year = 2023
 state_fips = '29'  # Example only; set this to the farm state FIPS
@@ -76,7 +96,7 @@ state_fips = '29'  # Example only; set this to the farm state FIPS
 cdl_url = (
     f'https://nassgeodata.gmu.edu/nass_data_cache/byfips/CDL_{year}_{state_fips}.tif'
 )
-cdl_path = Path(f'data/my-farm-advisor/CDL_{year}_{state_fips}.tif')
+cdl_path = Path(f'${DATA_PIPELINE_DATA_ROOT}/data-pipeline/shared/cdl/rasters/CDL_{year}_{state_fips}.tif')
 cdl_path.parent.mkdir(parents=True, exist_ok=True)
 
 if not cdl_path.exists():
@@ -124,17 +144,17 @@ for r in results:
 import pandas as pd
 df = pd.DataFrame(results)
 print(df[['field_id', 'year', 'crop_code', 'crop_name', 'dominant_pct']])
-df.to_csv(f'data/my-farm-advisor/shared/cdl/derived/tables/cdl_{year}_fields.csv', index=False)
+df.to_csv(f'${DATA_PIPELINE_DATA_ROOT}/data-pipeline/shared/cdl/derived/tables/cdl_{year}_fields.csv', index=False)
 EOF
 ```
 
 ## Installation (Isolated Environment)
 
-This skill runs in an isolated environment to avoid dependency conflicts:
+This workflow runs in an isolated environment to avoid dependency conflicts:
 
 ```bash
-# Create dedicated environment for this skill
-cd .skills/cdl-cropland
+# Create dedicated environment for this workflow
+cd my-farm-advisor/soil/cdl-cropland
 uv venv .venv
 source .venv/bin/activate
 
@@ -159,7 +179,7 @@ uv pip install rasterio geopandas rasterstats requests pandas matplotlib
 | Method        | URL Pattern                                                                      | Notes                         |
 | ------------- | -------------------------------------------------------------------------------- | ----------------------------- |
 | State GeoTIFF | `https://nassgeodata.gmu.edu/nass_data_cache/byfips/CDL_{year}_{state_fips}.tif` | Fastest for single-state work |
-| CONUS GeoTIFF | `https://nassgeodata.gmu.edu/nass_data_cache/byfips/CDL_{year}_CONUS.tif`        | Large (~2 GB), full US        |
+| CONUS GeoTIFF | `https://nassgeodata.gmu.edu/nass_data_cache/byfips/CDL_{year}_CONUS.tif`        | All-state shared initialization |
 | CropScape API | `https://nassgeodata.gmu.edu/CropScapeService/wps_cdldata.asmx`                  | Bounding-box queries          |
 
 ## Major Crop Classes
@@ -188,10 +208,10 @@ from collections import Counter
 from pathlib import Path
 
 # Load field boundaries (from field-boundaries skill)
-fields = gpd.read_file('.skills/field-boundaries/examples/sample_2_fields.geojson')
+fields = gpd.read_file('my-farm-advisor/field-management/field-boundaries/examples/real_10_fields_iowa.geojson')
 
 year = 2023
-cdl_path = Path(f'data/my-farm-advisor/CDL_{year}_27.tif')
+cdl_path = Path(f'${DATA_PIPELINE_DATA_ROOT}/data-pipeline/shared/cdl/rasters/CDL_{year}_27.tif')
 
 with rasterio.open(cdl_path) as src:
     fields_proj = fields.to_crs(src.crs)
@@ -216,7 +236,7 @@ years = [2020, 2021, 2022, 2023, 2024]
 all_results = []
 
 for year in years:
-    cdl_path = f'data/my-farm-advisor/CDL_{year}_27.tif'
+    cdl_path = f'${DATA_PIPELINE_DATA_ROOT}/data-pipeline/shared/cdl/rasters/CDL_{year}_27.tif'
     # ... extract crops per field (see Quick Start) ...
     # all_results.extend(year_results)
 
@@ -235,8 +255,8 @@ for field_id, group in df.groupby('field_id'):
 import geopandas as gpd
 from rasterstats import zonal_stats
 
-fields = gpd.read_file('.skills/field-boundaries/examples/sample_2_fields.geojson')
-cdl_path = 'data/my-farm-advisor/CDL_2023_27.tif'
+fields = gpd.read_file('my-farm-advisor/field-management/field-boundaries/examples/real_10_fields_iowa.geojson')
+cdl_path = '${DATA_PIPELINE_DATA_ROOT}/data-pipeline/shared/cdl/rasters/CDL_2023_27.tif'
 
 # Get pixel counts per crop code within each field
 stats = zonal_stats(
@@ -290,7 +310,7 @@ CSV columns: `field_id`, `year`, `crop_code`, `crop_name`, `dominant_pct`, `tota
 
 ## Environment Variables
 
-No special environment variables required. The skill uses public USDA data.
+No special environment variables required. The workflow uses public USDA data.
 
 ## Resources
 
@@ -299,3 +319,31 @@ No special environment variables required. The skill uses public USDA data.
 - [CDL FAQ](https://www.nass.usda.gov/Research_and_Science/Cropland/sarsfaqs2.php)
 - [Rasterio Documentation](https://rasterio.readthedocs.io/)
 - [rasterstats Documentation](https://pythonhosted.org/rasterstats/)
+
+## Canada — AAFC Annual Crop Inventory (ACI)
+
+Canada has no CDL. The pipeline routes fields whose boundary carries
+`country == "CA"` (written by boundary ingestion; the boundary ingestion step sets it)
+to the AAFC **Annual Crop Inventory**, 30 m per-year crop class maps,
+2009+ Canada-wide, published by Agriculture and Agri-Food Canada.
+
+- Per-year ImageServer exports:
+  `https://agriculture.canada.ca/imagery-images/rest/services/annual_crop_inventory/{year}/ImageServer/exportImage`
+  (no auth; verified 2026-11-02). Batch province zips:
+  `https://agriculture.canada.ca/atlas/data_donnees/annualCropInventory/data_donnees/tif/{year}/aci_{year}_{prov}_v5.zip`.
+- Code map + extraction live in `src/aci_reporting.py`; `ACI_CODE_MAP` maps
+  raw ACI classes to CDL-aligned names (147 → Corn, 158 → Soybeans,
+  145 → Winter Wheat, ...). The pinned 2019 bilingual legend is
+  `src/aci_legend_canada_2019.csv` (re-fetch from
+  `aci_crop_classifications_iac_classifications_des_cultures.csv` when
+  re-pinning — AAFC adds codes by year; unmapped codes fall back to `Other`
+  and the raw code is always preserved in `crop_code`).
+- Per-field ~30 m exports are cached under `shared/cdl/aci/<year>/`
+  (field bbox + 60 m buffer, native resolution) with a
+  `fetch_manifest.json` recording url/sha256/bytes/fetch-time.
+- Output rows are schema-identical to CDL extraction plus `crop_source`
+  ('cdl' | 'aci'); rotation summarization is shared. US and CA fields can
+  coexist in one farm — routing is per-field.
+- Verified on `demo-canada` (6 Ontario fields): five-year rotations resolve
+  to realistic Corn/Soybean/Winter-wheat sequences (2023: 3 Corn, 2 Winter
+  Wheat, 1 Soybeans).

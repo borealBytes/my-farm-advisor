@@ -91,6 +91,7 @@ These sit on top of the upstream OpenClaw skill system rather than replacing it.
 ### Highlighted Skill Packs
 
 - [`skills/my-farm-advisor/README.md`](skills/my-farm-advisor/README.md) is the main farm umbrella skill. It routes requests into field management, imagery, soil, weather, strategy, data rebuilds, reporting, and admin workflows so the system can act like a real farm advisor instead of a generic chat assistant.
+- Global coverage: the same pipeline now builds US, Canadian, Australian, and anywhere-else fields with **zero accounts** — country-routed soil (SSURGO / Ontario DSS / Australia's ASF / SoilGrids floor), per-year rotation history (CDL / AAFC ACI / WorldCereal default models on keyless Planetary Computer imagery), global 30 m Copernicus DEM terrain, NASA POWER weather, and GADM/geoadmin admin layers. See [`skills/my-farm-advisor/README.md`](skills/my-farm-advisor/README.md#global-data-coverage-any-country-zero-accounts).
 - [`skills/superior-byte-works-wrighter/README.md`](skills/superior-byte-works-wrighter/README.md) is the structured writing and documentation engine for the repo. It explains how we produce docs, reports, Mermaid diagrams, research syntheses, and delivery-ready artifacts through a text-first workflow.
 
 Together, those two skill packs cover the project's two most important custom layers:

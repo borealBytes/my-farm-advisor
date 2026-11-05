@@ -6,13 +6,13 @@ author: Boreal Bytes
 tags: [visualization, plotting, matplotlib, seaborn, pandas]
 ---
 
-# Skill: eda-visualize
+# Workflow: eda-visualize
 
 ## Description
 
-Create professional data visualizations for agricultural datasets using standard Python libraries (pandas, matplotlib, seaborn). This skill provides copy-paste ready code examples for common visualization tasks - no custom wrappers, just real library code.
+Create professional data visualizations for agricultural datasets using standard Python libraries (pandas, matplotlib, seaborn). This workflow provides copy-paste ready code examples for common visualization tasks - no custom wrappers, just real library code.
 
-## When to Use This Skill
+## When to Use This Workflow
 
 - **Exploring distributions**: Use histograms to see how values are spread
 - **Finding relationships**: Use scatter plots to see correlations
@@ -34,7 +34,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Load your data
-df = pd.read_csv('data/my-farm-advisor/soil_measurements.csv')
+df = pd.read_csv('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/visualize/soil_measurements.csv')
 
 # Create a histogram
 plt.figure(figsize=(10, 6))
@@ -62,7 +62,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Load data
-df = pd.read_csv('data/my-farm-advisor/soil_data.csv')
+df = pd.read_csv('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/visualize/soil_data.csv')
 
 # Create histogram
 plt.figure(figsize=(10, 6))
@@ -71,10 +71,10 @@ plt.title('Soil pH Distribution', fontsize=14, fontweight='bold')
 plt.xlabel('pH Level', fontsize=12)
 plt.ylabel('Frequency', fontsize=12)
 plt.grid(axis='y', alpha=0.3)
-plt.savefig('output/ph_distribution.png', dpi=300, bbox_inches='tight')
+plt.savefig('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/visualize/output/ph_distribution.png', dpi=300, bbox_inches='tight')
 plt.close()
 
-print("Created: output/ph_distribution.png")
+print("Created: ${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/visualize/output/ph_distribution.png")
 ```
 
 ### Task 2: Create a Scatter Plot
@@ -91,7 +91,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Load data
-df = pd.read_csv('data/my-farm-advisor/fields_with_soil.csv')
+df = pd.read_csv('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/visualize/fields_with_soil.csv')
 
 # Create scatter plot
 plt.figure(figsize=(10, 6))
@@ -102,10 +102,10 @@ plt.xlabel('pH Level', fontsize=12)
 plt.ylabel('Organic Matter (%)', fontsize=12)
 plt.legend(title='Region', bbox_to_anchor=(1.05, 1), loc='upper left')
 plt.tight_layout()
-plt.savefig('output/ph_vs_om.png', dpi=300, bbox_inches='tight')
+plt.savefig('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/visualize/output/ph_vs_om.png', dpi=300, bbox_inches='tight')
 plt.close()
 
-print("Created: output/ph_vs_om.png")
+print("Created: ${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/visualize/output/ph_vs_om.png")
 ```
 
 ### Task 3: Create a Box Plot
@@ -122,7 +122,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Load data
-df = pd.read_csv('data/my-farm-advisor/field_data.csv')
+df = pd.read_csv('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/visualize/field_data.csv')
 
 # Create box plot
 plt.figure(figsize=(12, 6))
@@ -132,10 +132,10 @@ plt.xlabel('Region', fontsize=12)
 plt.ylabel('Field Size (acres)', fontsize=12)
 plt.xticks(rotation=45)
 plt.tight_layout()
-plt.savefig('output/size_by_region.png', dpi=300, bbox_inches='tight')
+plt.savefig('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/visualize/output/size_by_region.png', dpi=300, bbox_inches='tight')
 plt.close()
 
-print("Created: output/size_by_region.png")
+print("Created: ${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/visualize/output/size_by_region.png")
 ```
 
 ### Task 4: Create a Bar Chart
@@ -152,7 +152,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Load data
-df = pd.read_csv('data/my-farm-advisor/crop_data.csv')
+df = pd.read_csv('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/visualize/crop_data.csv')
 
 # Count crops and create bar chart
 plt.figure(figsize=(10, 6))
@@ -163,10 +163,10 @@ plt.xlabel('Crop Type', fontsize=12)
 plt.ylabel('Number of Fields', fontsize=12)
 plt.xticks(rotation=45)
 plt.tight_layout()
-plt.savefig('output/crop_counts.png', dpi=300, bbox_inches='tight')
+plt.savefig('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/visualize/output/crop_counts.png', dpi=300, bbox_inches='tight')
 plt.close()
 
-print("Created: output/crop_counts.png")
+print("Created: ${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/visualize/output/crop_counts.png")
 ```
 
 ### Task 5: Create a Correlation Heatmap
@@ -183,7 +183,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Load data
-df = pd.read_csv('data/my-farm-advisor/soil_data.csv')
+df = pd.read_csv('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/visualize/soil_data.csv')
 
 # Select numeric columns
 numeric_cols = ['ph_water', 'organic_matter', 'clay', 'sand', 'silt']
@@ -197,10 +197,10 @@ sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', center=0,
             square=True, fmt='.2f', cbar_kws={"shrink": .8})
 plt.title('Soil Properties Correlation Matrix', fontsize=14, fontweight='bold')
 plt.tight_layout()
-plt.savefig('output/correlation_heatmap.png', dpi=300, bbox_inches='tight')
+plt.savefig('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/visualize/output/correlation_heatmap.png', dpi=300, bbox_inches='tight')
 plt.close()
 
-print("Created: output/correlation_heatmap.png")
+print("Created: ${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/visualize/output/correlation_heatmap.png")
 ```
 
 ## Complete Examples
@@ -214,10 +214,10 @@ import seaborn as sns
 import os
 
 # Ensure output directory exists
-os.makedirs('output/visualizations', exist_ok=True)
+os.makedirs('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/visualize/output/visualizations', exist_ok=True)
 
 # Load data
-df = pd.read_csv('data/my-farm-advisor/agricultural_data.csv')
+df = pd.read_csv('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/visualize/agricultural_data.csv')
 
 print(f"Dataset shape: {df.shape}")
 print(f"\nCreating visualization suite...")
@@ -228,14 +228,14 @@ sns.histplot(df['field_size'], bins=30, kde=True, color='steelblue')
 plt.title('Field Size Distribution')
 plt.xlabel('Size (acres)')
 plt.ylabel('Count')
-plt.savefig('output/visualizations/field_size_dist.png', dpi=300, bbox_inches='tight')
+plt.savefig('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/visualize/output/visualizations/field_size_dist.png', dpi=300, bbox_inches='tight')
 plt.close()
 
 # 2. Scatter: pH vs Organic Matter
 plt.figure(figsize=(10, 6))
 sns.scatterplot(data=df, x='ph_water', y='organic_matter', alpha=0.6)
 plt.title('pH vs Organic Matter')
-plt.savefig('output/visualizations/ph_om_scatter.png', dpi=300, bbox_inches='tight')
+plt.savefig('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/visualize/output/visualizations/ph_om_scatter.png', dpi=300, bbox_inches='tight')
 plt.close()
 
 # 3. Box plot by region
@@ -244,7 +244,7 @@ sns.boxplot(data=df, x='region', y='yield')
 plt.title('Yield by Region')
 plt.xticks(rotation=45)
 plt.tight_layout()
-plt.savefig('output/visualizations/yield_by_region.png', dpi=300, bbox_inches='tight')
+plt.savefig('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/visualize/output/visualizations/yield_by_region.png', dpi=300, bbox_inches='tight')
 plt.close()
 
 # 4. Correlation heatmap
@@ -253,10 +253,10 @@ plt.figure(figsize=(8, 6))
 sns.heatmap(df[numeric_cols].corr(), annot=True, cmap='coolwarm', center=0)
 plt.title('Variable Correlations')
 plt.tight_layout()
-plt.savefig('output/visualizations/correlation_heatmap.png', dpi=300, bbox_inches='tight')
+plt.savefig('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/visualize/output/visualizations/correlation_heatmap.png', dpi=300, bbox_inches='tight')
 plt.close()
 
-print("✓ Created 4 visualizations in output/visualizations/")
+print("✓ Created 4 visualizations in ${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/visualize/output/visualizations/")
 ```
 
 ## Best Practices
@@ -312,10 +312,10 @@ Always save the Python script that generates your plots:
 """Create visualization suite for field data.
 
 Creates:
-- data/my-farm-advisor/plots/field_size_distribution.png
-- data/my-farm-advisor/plots/ph_vs_organic_matter.png
-- data/my-farm-advisor/plots/yield_by_region.png
-- data/my-farm-advisor/plots/correlation_heatmap.png
+- ${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/visualize/plots/field_size_distribution.png
+- ${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/visualize/plots/ph_vs_organic_matter.png
+- ${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/visualize/plots/yield_by_region.png
+- ${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/visualize/plots/correlation_heatmap.png
 """
 
 import pandas as pd
@@ -324,10 +324,10 @@ import seaborn as sns
 from pathlib import Path
 
 # Create directories
-Path('data/my-farm-advisor/plots').mkdir(parents=True, exist_ok=True)
+Path('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/visualize/plots').mkdir(parents=True, exist_ok=True)
 
 # Load data
-df = pd.read_csv('data/my-farm-advisor/soil_measurements.csv')
+df = pd.read_csv('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/visualize/soil_measurements.csv')
 
 # Plot 1: Field size distribution
 plt.figure(figsize=(10, 6))
@@ -335,28 +335,28 @@ sns.histplot(df['area_acres'], bins=20, kde=True)
 plt.title('Field Size Distribution')
 plt.xlabel('Area (acres)')
 plt.ylabel('Count')
-plt.savefig('data/my-farm-advisor/plots/field_size_distribution.png', dpi=300, bbox_inches='tight')
+plt.savefig('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/visualize/plots/field_size_distribution.png', dpi=300, bbox_inches='tight')
 plt.close()
 
-print("Created: data/my-farm-advisor/plots/field_size_distribution.png")
+print("Created: ${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/visualize/plots/field_size_distribution.png")
 
 # Plot 2: pH vs Organic Matter
 plt.figure(figsize=(10, 6))
 sns.scatterplot(data=df, x='ph_water', y='organic_matter', hue='region')
 plt.title('pH vs Organic Matter by Region')
-plt.savefig('data/my-farm-advisor/plots/ph_vs_organic_matter.png', dpi=300, bbox_inches='tight')
+plt.savefig('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/visualize/plots/ph_vs_organic_matter.png', dpi=300, bbox_inches='tight')
 plt.close()
 
-print("Created: data/my-farm-advisor/plots/ph_vs_organic_matter.png")
+print("Created: ${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/visualize/plots/ph_vs_organic_matter.png")
 
-print("All plots saved to: data/my-farm-advisor/plots/")
+print("All plots saved to: ${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/visualize/plots/")
 ```
 
 ### Output Directory Structure
 
 ```
 eda-visualize/
-├── data/my-farm-advisor/
+├── ${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/visualize/
 │   ├── plots/                      # Generated visualizations
 │   │   ├── field_size_distribution.png
 │   │   ├── ph_vs_organic_matter.png
@@ -369,7 +369,7 @@ eda-visualize/
 └── GUIDE.md
 ```
 
-### README Template for data/my-farm-advisor/plots/
+### README Template for ${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/visualize/plots/
 
 ````markdown
 # Visualization Outputs

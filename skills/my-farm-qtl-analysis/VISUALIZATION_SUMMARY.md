@@ -12,7 +12,6 @@ This research provides comprehensive coverage of phenotype visualization for QTL
 ## 📦 Packages Researched
 
 ### Python Packages
-
 1. **matplotlib** - Foundation plotting library
 2. **seaborn** - Statistical visualization built on matplotlib
 3. **plotly** - Interactive web-based visualizations
@@ -21,7 +20,6 @@ This research provides comprehensive coverage of phenotype visualization for QTL
 6. **scipy** - Statistical functions for QQ plots
 
 ### R Packages
-
 1. **ggplot2** - Primary visualization grammar
 2. **lattice** - Trellis graphics system
 3. **corrplot** - Correlation matrix visualization
@@ -36,19 +34,16 @@ This research provides comprehensive coverage of phenotype visualization for QTL
 ## 📊 Visualization Types Covered
 
 ### 1. Basic Phenotype Plots
-
 - **Box plots** - Distribution comparison by group
 - **Density plots** - Distribution shape visualization
 - **Violin plots** - Combined box plot and density
 
 ### 2. Correlation Visualizations
-
 - **Heatmaps** - Correlation matrices, genotype data
 - **Scatter plot matrices** - Multi-trait relationships
 - **Clustermaps** - Hierarchical clustering visualization
 
 ### 3. GWAS/QTL Specific
-
 - **Manhattan plots** - Genome-wide association results
 - **QQ plots** - P-value distribution assessment
 - **LOD score plots** - QTL scan results
@@ -61,7 +56,6 @@ This research provides comprehensive coverage of phenotype visualization for QTL
 ## 📁 Deliverables
 
 ### Documentation (3 files)
-
 1. **`qtl_visualization_guide.md`** (54 KB)
    - Complete guide with 10+ detailed code examples
    - Python and R implementations
@@ -81,14 +75,12 @@ This research provides comprehensive coverage of phenotype visualization for QTL
    - Publication guidelines
 
 ### Code (1 file)
-
 4. **`generate_sample_qtl_data.py`** (7.7 KB)
    - Generates 6 types of sample datasets
    - Reproducible with random seeds
    - Realistic QTL data patterns
 
-### Sample Data (6 files in `sample_qtl_data/moltbot/`)
-
+### Sample Data (6 files in `sample_qtl_data/`)
 5. **`phenotype_data.csv`** (23 KB)
    - 200 samples
    - 8 traits (Height, Yield, Quality, etc.)
@@ -120,7 +112,6 @@ This research provides comprehensive coverage of phenotype visualization for QTL
 ## 🎯 Key Features
 
 ### Code Quality
-
 - ✅ Complete, runnable examples
 - ✅ Sample data generation
 - ✅ Comments and documentation
@@ -128,7 +119,6 @@ This research provides comprehensive coverage of phenotype visualization for QTL
 - ✅ Reproducible (random seeds set)
 
 ### Coverage
-
 - ✅ Python implementations
 - ✅ R implementations
 - ✅ 12+ visualization types
@@ -136,7 +126,6 @@ This research provides comprehensive coverage of phenotype visualization for QTL
 - ✅ Publication-ready examples
 
 ### Documentation
-
 - ✅ Installation instructions
 - ✅ Package comparisons
 - ✅ Best practices
@@ -147,12 +136,12 @@ This research provides comprehensive coverage of phenotype visualization for QTL
 
 ## 📈 Example Count
 
-| Category       | Python Examples | R Examples | Total  |
-| -------------- | --------------- | ---------- | ------ |
-| Basic Plots    | 3               | 3          | 6      |
-| Advanced Plots | 2               | 2          | 4      |
-| QTL-Specific   | 5               | 3          | 8      |
-| **Total**      | **10**          | **8**      | **18** |
+| Category | Python Examples | R Examples | Total |
+|----------|----------------|------------|-------|
+| Basic Plots | 3 | 3 | 6 |
+| Advanced Plots | 2 | 2 | 4 |
+| QTL-Specific | 5 | 3 | 8 |
+| **Total** | **10** | **8** | **18** |
 
 ---
 
@@ -173,7 +162,7 @@ This research provides comprehensive coverage of phenotype visualization for QTL
    - Python: Better for interactive plots (plotly)
    - R: Better for statistical graphics (ggplot2)
 
-2. **Specialized Packages**:
+2. **Specialized Packages**: 
    - qqman (R) and qmplot (Python) simplify GWAS plots
    - qtl2 (R) provides comprehensive QTL visualization
 

@@ -6,11 +6,11 @@ author: Boreal Bytes
 tags: [web-map, visualization, leaflet, geospatial, interactive, dashboard, choropleth]
 ---
 
-# Skill: interactive-web-map
+# Workflow: interactive-web-map
 
 ## Description
 
-Create professional, self-contained interactive web maps for agricultural data analysis. This skill teaches you to create **standalone HTML files** that can be opened directly in any web browser, shared via email, or deployed to any web server.
+Create professional, self-contained interactive web maps for agricultural data analysis. This workflow teaches you to create **standalone HTML files** that can be opened directly in any web browser, shared via email, or deployed to any web server.
 
 **Key Features:**
 
@@ -23,7 +23,7 @@ Create professional, self-contained interactive web maps for agricultural data a
 - **Performance optimized**: Handles 200+ fields smoothly using Canvas rendering
 - **Responsive design**: Works on desktop, tablet, and mobile
 
-## When to Use This Skill
+## When to Use This Workflow
 
 - **Sharing results**: Send a complete interactive dashboard to collaborators
 - **Field work**: Load maps on tablets for offline field reference
@@ -58,7 +58,7 @@ import pandas as pd
 import geopandas as gpd
 
 # Load field boundaries
-fields = gpd.read_file('data/my-farm-advisor/fields.geojson')
+fields = gpd.read_file('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/field-boundaries/fields.geojson')
 
 # Convert to GeoJSON for embedding
 geojson_data = json.loads(fields.to_json())
@@ -127,7 +127,7 @@ import pandas as pd
 import geopandas as gpd
 
 # Load field boundaries
-fields = gpd.read_file('field-boundaries/examples/sample_2_fields.geojson')
+fields = gpd.read_file('my-farm-advisor/field-management/field-boundaries/examples/real_10_fields_iowa.geojson')
 
 # Calculate center
 bounds = fields.total_bounds

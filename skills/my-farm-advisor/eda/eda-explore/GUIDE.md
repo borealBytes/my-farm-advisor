@@ -6,13 +6,13 @@ author: Boreal Bytes
 tags: [eda, exploration, pandas, statistics, analysis]
 ---
 
-# Skill: eda-explore
+# Workflow: eda-explore
 
 ## Description
 
-Explore and understand agricultural datasets using standard pandas operations. This skill teaches you how to generate comprehensive data summaries, identify data quality issues, and profile your data using real pandas code.
+Explore and understand agricultural datasets using standard pandas operations. This workflow teaches you how to generate comprehensive data summaries, identify data quality issues, and profile your data using real pandas code.
 
-## When to Use This Skill
+## When to Use This Workflow
 
 - **First look at data**: Get a quick overview of what's in your dataset
 - **Data quality check**: Find missing values, duplicates, and outliers
@@ -33,7 +33,7 @@ import pandas as pd
 import numpy as np
 
 # Load your data
-df = pd.read_csv('data/my-farm-advisor/soil_measurements.csv')
+df = pd.read_csv('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/explore/soil_measurements.csv')
 
 # Get comprehensive summary
 print(df.describe())
@@ -55,13 +55,13 @@ print(f"Missing values:\n{df.isnull().sum()}")
 import pandas as pd
 
 # Load data
-df = pd.read_csv('data/my-farm-advisor/field_data.csv')
+df = pd.read_csv('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/explore/field_data.csv')
 
 # Generate descriptive statistics
 summary = df.describe()
 
 # Save to CSV
-summary.to_csv('output/summary_statistics.csv')
+summary.to_csv('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/explore/output/summary_statistics.csv')
 
 print("Summary Statistics:")
 print(summary)
@@ -84,7 +84,7 @@ print(f"Categorical columns: {len(df.select_dtypes(include=['object']).columns)}
 import pandas as pd
 
 # Load data
-df = pd.read_csv('data/my-farm-advisor/weather_data.csv')
+df = pd.read_csv('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/explore/weather_data.csv')
 
 # Get data types
 print("Data Types:")
@@ -135,7 +135,7 @@ def find_outliers_iqr(df, column):
     return outliers
 
 # Load data
-df = pd.read_csv('data/my-farm-advisor/soil_data.csv')
+df = pd.read_csv('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/explore/soil_data.csv')
 
 # Check multiple columns for outliers
 columns_to_check = ['ph_water', 'organic_matter', 'clay_content']
@@ -163,7 +163,7 @@ for col in columns_to_check:
 import pandas as pd
 
 # Load data
-df = pd.read_csv('data/my-farm-advisor/crop_data.csv')
+df = pd.read_csv('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/explore/crop_data.csv')
 
 # Get categorical columns
 categorical_cols = df.select_dtypes(include=['object']).columns
@@ -192,7 +192,7 @@ import numpy as np
 from datetime import datetime
 
 # Load data
-df = pd.read_csv('data/my-farm-advisor/agricultural_data.csv')
+df = pd.read_csv('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/explore/agricultural_data.csv')
 
 # Create report
 report = []
@@ -246,11 +246,11 @@ if numeric_cols:
 
 # Save report
 report_text = "\n".join(report)
-with open('output/eda_report.txt', 'w') as f:
+with open('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/explore/output/eda_report.txt', 'w') as f:
     f.write(report_text)
 
 print(report_text)
-print("\n✓ Report saved to: output/eda_report.txt")
+print("\n✓ Report saved to: ${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/explore/output/eda_report.txt")
 ```
 
 ## Complete Example
@@ -263,17 +263,17 @@ import numpy as np
 import os
 
 # Ensure output directory exists
-os.makedirs('output/exploration', exist_ok=True)
+os.makedirs('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/explore/output/exploration', exist_ok=True)
 
 # Load data
 print("Loading data...")
-df = pd.read_csv('data/my-farm-advisor/soil_measurements.csv')
+df = pd.read_csv('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/explore/soil_measurements.csv')
 
 # 1. Basic info
 print(f"\nDataset loaded: {df.shape[0]} rows × {df.shape[1]} columns")
 
 # 2. Save column list
-with open('output/exploration/columns.txt', 'w') as f:
+with open('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/explore/output/exploration/columns.txt', 'w') as f:
     f.write("Columns:\n")
     for i, col in enumerate(df.columns, 1):
         f.write(f"{i}. {col}\n")
@@ -281,14 +281,14 @@ with open('output/exploration/columns.txt', 'w') as f:
 # 3. Generate and save descriptive statistics
 print("\nGenerating statistics...")
 desc = df.describe()
-desc.to_csv('output/exploration/descriptive_statistics.csv')
+desc.to_csv('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/explore/output/exploration/descriptive_statistics.csv')
 
 # 4. Check data types
-df.dtypes.to_csv('output/exploration/data_types.csv', header=['dtype'])
+df.dtypes.to_csv('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/explore/output/exploration/data_types.csv', header=['dtype'])
 
 # 5. Missing values analysis
 missing = df.isnull().sum()
-missing[missing > 0].to_csv('output/exploration/missing_values.csv', header=['count'])
+missing[missing > 0].to_csv('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/explore/output/exploration/missing_values.csv', header=['count'])
 
 # 6. Outlier detection (example for ph_water)
 if 'ph_water' in df.columns:
@@ -296,16 +296,16 @@ if 'ph_water' in df.columns:
     Q3 = df['ph_water'].quantile(0.75)
     IQR = Q3 - Q1
     outliers = df[(df['ph_water'] < Q1 - 1.5*IQR) | (df['ph_water'] > Q3 + 1.5*IQR)]
-    outliers.to_csv('output/exploration/ph_outliers.csv', index=False)
+    outliers.to_csv('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/explore/output/exploration/ph_outliers.csv', index=False)
     print(f"Found {len(outliers)} pH outliers")
 
 # 7. Categorical summaries
 categorical_cols = df.select_dtypes(include=['object']).columns
 for col in categorical_cols:
-    df[col].value_counts().to_csv(f'output/exploration/{col}_distribution.csv')
+    df[col].value_counts().to_csv(f'${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/explore/output/exploration/{col}_distribution.csv')
 
-print("\n✓ Exploration complete. Results saved to output/exploration/")
-print(f"Files created: {len(os.listdir('output/exploration'))}")
+print("\n✓ Exploration complete. Results saved to ${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/explore/output/exploration/")
+print(f"Files created: {len(os.listdir('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/explore/output/exploration'))}")
 ```
 
 ## Key Methods Reference

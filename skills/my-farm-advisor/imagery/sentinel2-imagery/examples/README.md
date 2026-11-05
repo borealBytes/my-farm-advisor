@@ -4,7 +4,7 @@ This directory contains sample data and metadata for Sentinel-2 imagery processi
 
 ## Files
 
-- **sample_aoi.geojson** - Bounding box AOI (~1km buffer) around field 271623002471299 from field-boundaries examples
+- **iowa_10_fields_aoi.geojson** - AOI around current Iowa field-boundaries examples
 - **sample_ndvi_metadata.json** - Metadata for a sample NDVI calculation
 - **sample_field_stats.csv** - Example field-level NDVI statistics (time series across 4 dates)
 - **sample_ndvi_pixels.csv** - Tiny sample of per-pixel NDVI values (for demos/tests; not a real raster)
@@ -22,7 +22,7 @@ This directory contains sample data and metadata for Sentinel-2 imagery processi
 
 The AOI and field IDs in these examples are derived from the `field-boundaries` skill:
 
-- `sample_aoi.geojson` is a bounding box around field `271623002471299` from `../field-boundaries/examples/sample_2_fields.geojson`
+- `iowa_10_fields_aoi.geojson` is an AOI for `my-farm-advisor/field-management/field-boundaries/examples/real_10_fields_iowa.geojson`
 - Field IDs in `sample_field_stats.csv` match those in the field-boundaries examples
 - Use both skills together: field-boundaries for AOI, sentinel2-imagery for satellite data
 
@@ -43,7 +43,7 @@ import pandas as pd
 from sentinelsat import read_geojson, geojson_to_wkt
 
 # Load AOI for Sentinel-2 search
-aoi = read_geojson('sample_aoi.geojson')
+aoi = read_geojson('iowa_10_fields_aoi.geojson')
 footprint = geojson_to_wkt(aoi)
 print(f"Search footprint: {footprint[:60]}...")
 
@@ -60,7 +60,7 @@ print(stats[['field_id', 'acquisition_date', 'mean_ndvi', 'crop_name']])
 
 ## Notes
 
-- These are small example metadata/my-farm-advisor/stat files for testing and development
+- These are small example metadata and stat files for testing and development
 - Actual Sentinel-2 imagery must be downloaded from Copernicus
 - Use the main guide for complete download instructions
 - Field IDs correspond to the field-boundaries skill examples

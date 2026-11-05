@@ -10,7 +10,7 @@ metadata:
   tags: [csb, usda, nass, field-boundaries, sampling, agriculture, deterministic]
 ---
 
-# CSB Field Sampling Skill
+# CSB Field Sampling Workflow
 
 _Deterministic sampling from USDA NASS Crop Sequence Boundaries._
 
@@ -27,10 +27,10 @@ _Deterministic sampling from USDA NASS Crop Sequence Boundaries._
 
 ## Dataset metadata
 
-This skill uses the existing field-boundaries sample data as its source:
+This workflow uses the existing field-boundaries sample data as its source:
 
-- **Path**: `../field-boundaries/examples/sample_2_fields.geojson`
-- **Fields**: Real Minnesota crop fields with verified boundaries
+- **Path**: `my-farm-advisor/field-management/field-boundaries/examples/real_10_fields_iowa.geojson`
+- **Fields**: Real Iowa crop fields with verified boundaries
 - **CRS**: EPSG:4326 (WGS84)
 
 For production use with full CSB dataset, see [USDA NASS CSB](https://www.nass.usda.gov/Research_and_Science/Crop-Sequence-Boundaries/index.php).
@@ -40,7 +40,7 @@ For production use with full CSB dataset, see [USDA NASS CSB](https://www.nass.u
 ## Quick Start
 
 ```bash
-cd .skills/csb-field-sampling
+cd my-farm-advisor/field-management/csb-field-sampling
 
 uv run --with geopandas --with shapely python << 'EOF'
 from src.csb_sampling import sample_fields, get_random_fields, get_fields_by_aoi
@@ -78,7 +78,7 @@ from src.csb_sampling import sample_fields
 
 # Deterministic sample
 fields = sample_fields(n_fields=10, seed=42, regions=['corn_belt'])
-fields.to_file('output/sampled_fields.geojson')
+fields.to_file('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/field-management/csb-field-sampling/output/sampled_fields.geojson')
 ```
 
 ---
@@ -143,7 +143,7 @@ Sample outputs included:
 
 ---
 
-## Integration with Other Skills
+## Integration with Other Workflows
 
 ```python
 # Sample fields, then get satellite imagery
@@ -180,7 +180,7 @@ Sampled fields include these attributes:
 
 - **Provider**: USDA NASS
 - **Dataset**: Crop Sequence Boundaries (CSB)
-- **Sample Data**: `.skills/field-boundaries/examples/sample_2_fields.geojson`
+- **Sample Data**: `my-farm-advisor/field-management/field-boundaries/examples/real_10_fields_iowa.geojson`
 - **CRS**: EPSG:4326 (WGS84)
 
 ---

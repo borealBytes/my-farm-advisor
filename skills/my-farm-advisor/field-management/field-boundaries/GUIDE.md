@@ -6,13 +6,13 @@ author: Boreal Bytes
 tags: [usda, nass, boundaries, geospatial, download]
 ---
 
-# Skill: field-boundaries
+# Workflow: field-boundaries
 
 ## Description
 
-Download and work with USDA NASS Crop Sequence Boundaries for agricultural analysis. This skill provides functions to download field boundary data for specific regions and crops, with built-in visualization and export capabilities.
+Download and work with USDA NASS Crop Sequence Boundaries for agricultural analysis. This workflow provides functions to download field boundary data for specific regions and crops, with built-in visualization and export capabilities.
 
-## When to Use This Skill
+## When to Use This Workflow
 
 - **Getting field boundaries**: Download polygon data for agricultural fields
 - **Regional analysis**: Filter by corn belt, great plains, or southeast
@@ -31,7 +31,7 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 
 Sample data is included in the `examples/` directory:
 
-- `examples/sample_2_fields.geojson` - 2 real field boundaries from Minnesota
+- `examples/real_10_fields_iowa.geojson` - 10 real field boundaries from Iowa
 
 Use these for testing and development:
 
@@ -39,7 +39,7 @@ Use these for testing and development:
 import geopandas as gpd
 
 # Load example data
-fields = gpd.read_file('examples/sample_2_fields.geojson')
+fields = gpd.read_file('examples/real_10_fields_iowa.geojson')
 print(fields[['field_id', 'area_acres', 'crop_name']])
 
 # Output:
@@ -62,7 +62,7 @@ fields = download_fields(
     count=20,
     regions=['corn_belt'],
     crops=['corn', 'soybeans'],
-    output_path='data/my-farm-advisor/fields_EPSG4326.geojson'
+    output_path='${DATA_PIPELINE_DATA_ROOT}/data-pipeline/field-boundaries/fields_EPSG4326.geojson'
 )
 
 # Get summary
@@ -73,11 +73,11 @@ EOF
 
 ## Installation (Isolated Environment)
 
-This skill runs in an isolated environment to avoid dependency conflicts:
+This workflow runs in an isolated environment to avoid dependency conflicts:
 
 ```bash
-# Create dedicated environment for this skill
-cd .skills/field-boundaries
+# Create dedicated environment for this workflow
+cd my-farm-advisor/field-management/field-boundaries
 uv venv .venv
 source .venv/bin/activate
 
@@ -97,7 +97,7 @@ fields = download_fields(
     count=20,
     regions=['corn_belt'],
     crops=['corn', 'soybeans'],
-    output_path='data/my-farm-advisor/my_fields.geojson'
+    output_path='${DATA_PIPELINE_DATA_ROOT}/data-pipeline/field-boundaries/my_fields.geojson'
 )
 
 # Get summary
@@ -110,7 +110,7 @@ plot_fields(
     fields,
     title="Sample Corn and Soybean Fields",
     color_by='crop_name',
-    save_path='data/my-farm-advisor/fields_map.png'
+    save_path='${DATA_PIPELINE_DATA_ROOT}/data-pipeline/field-boundaries/fields_map.png'
 )
 ```
 
@@ -127,8 +127,8 @@ large_fields = filter_by_size(fields, min_acres=100)
 print(f"Large fields: {len(large_fields)}")
 
 # Export in multiple formats
-export_fields(large_fields, 'data/my-farm-advisor/large_fields.geojson', 'geojson')
-export_fields(large_fields, 'data/my-farm-advisor/large_fields.parquet', 'geoparquet')
+export_fields(large_fields, '${DATA_PIPELINE_DATA_ROOT}/data-pipeline/field-boundaries/large_fields.geojson', 'geojson')
+export_fields(large_fields, '${DATA_PIPELINE_DATA_ROOT}/data-pipeline/field-boundaries/large_fields.parquet', 'geoparquet')
 ```
 
 ## Python API Reference
@@ -199,7 +199,7 @@ Export fields to file.
 ## Composable onboarding notes
 
 - For county-specific onboarding anywhere in the U.S., use the canonical bootstrap script:
-  `python data/my-farm-advisor/scripts/ingest/bootstrap_farm_from_county.py --state-fips <SS> --county-name "<County>" ...`
+  `python "${DATA_PIPELINE_DATA_ROOT}/data-pipeline/src/scripts/ingest/bootstrap_farm_from_county.py" --state-fips <SS> --county-name "<County>" ...`
 - To add fields to an existing grower/farm, use the same script with `--append` and rerun the pipeline.
 
 ## Output Files
@@ -209,8 +209,7 @@ Export fields to file.
 
 ## Environment Variables
 
-No special environment variables required. The skill uses public USDA data.
-No special environment variables required. The skill uses public USDA data.
+No special environment variables required. The workflow uses public USDA data.
 
 ## Data Output Standards
 
@@ -223,45 +222,45 @@ Always save the Python script that downloads your data:
 """Download field boundaries for my analysis.
 
 Creates:
-- data/my-farm-advisor/fields_cornbelt_2024.geojson
-- data/my-farm-advisor/fields_cornbelt_2024.parquet
+- ${DATA_PIPELINE_DATA_ROOT}/data-pipeline/field-boundaries/fields_cornbelt_2024.geojson
+- ${DATA_PIPELINE_DATA_ROOT}/data-pipeline/field-boundaries/fields_cornbelt_2024.parquet
 """
 
 from field_boundaries import download_fields
 from pathlib import Path
 
 # Create data directory
-Path('data').mkdir(exist_ok=True)
+Path('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/field-boundaries').mkdir(parents=True, exist_ok=True)
 
 # Download fields
 fields = download_fields(
     count=50,
     regions=['corn_belt'],
     crops=['corn', 'soybeans'],
-    output_path='data/my-farm-advisor/fields_cornbelt_2024.geojson'
+    output_path='${DATA_PIPELINE_DATA_ROOT}/data-pipeline/field-boundaries/fields_cornbelt_2024.geojson'
 )
 
 print(f"Downloaded {len(fields)} fields")
 print(f"Total area: {fields['area_acres'].sum():.1f} acres")
-print(f"Saved to: data/my-farm-advisor/fields_cornbelt_2024.geojson")
+print(f"Saved to: ${DATA_PIPELINE_DATA_ROOT}/data-pipeline/field-boundaries/fields_cornbelt_2024.geojson")
 ```
 
 ### Output Directory Structure
 
 ```
 field-boundaries/
-├── data/my-farm-advisor/                           # Gitignored
+├── ${DATA_PIPELINE_DATA_ROOT}/data-pipeline/field-boundaries/  # Runtime, outside Git
 │   ├── fields_cornbelt_2024.geojson
 │   ├── fields_cornbelt_2024.parquet
 │   └── README.md                   # Document your downloads
 ├── scripts/                        # Python scripts
 │   └── download_my_fields.py
 ├── examples/                       # Committed sample
-│   └── sample_2_fields.geojson
+│   └── real_10_fields_iowa.geojson
 └── GUIDE.md
 ```
 
-### README Template for data/my-farm-advisor/
+### README Template for ${DATA_PIPELINE_DATA_ROOT}/data-pipeline/field-boundaries/
 
 ````markdown
 # Field Boundary Downloads

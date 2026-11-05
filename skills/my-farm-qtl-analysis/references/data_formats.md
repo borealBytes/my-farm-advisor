@@ -24,32 +24,31 @@ Standard format for storing gene sequence variations.
 
 ### Required Columns
 
-| Column      | Description               | Example           |
-| ----------- | ------------------------- | ----------------- |
-| `#CHROM`    | Chromosome identifier     | `1`, `chr1`       |
-| `POS`       | Position (1-based)        | `1000`, `1234567` |
-| `ID`        | Variant identifier        | `rs12345`, `.`    |
-| `REF`       | Reference allele          | `A`, `CG`         |
-| `ALT`       | Alternative allele(s)     | `G`, `T,A`        |
-| `QUAL`      | Phred-scaled quality      | `99`, `.`         |
-| `FILTER`    | Filter status             | `PASS`, `LowQual` |
-| `INFO`      | Additional information    | `NS=3;AF=0.5`     |
-| `FORMAT`    | Format of genotype fields | `GT:DP:GQ`        |
-| `[Samples]` | Genotype data per sample  | `0/1:30:99`       |
+| Column | Description | Example |
+|--------|-------------|---------|
+| `#CHROM` | Chromosome identifier | `1`, `chr1` |
+| `POS` | Position (1-based) | `1000`, `1234567` |
+| `ID` | Variant identifier | `rs12345`, `.` |
+| `REF` | Reference allele | `A`, `CG` |
+| `ALT` | Alternative allele(s) | `G`, `T,A` |
+| `QUAL` | Phred-scaled quality | `99`, `.` |
+| `FILTER` | Filter status | `PASS`, `LowQual` |
+| `INFO` | Additional information | `NS=3;AF=0.5` |
+| `FORMAT` | Format of genotype fields | `GT:DP:GQ` |
+| `[Samples]` | Genotype data per sample | `0/1:30:99` |
 
 ### Genotype Encoding
 
-| Code  | Meaning              |
-| ----- | -------------------- |
+| Code | Meaning |
+|------|---------|
 | `0/0` | Homozygous reference |
-| `0/1` | Heterozygous         |
+| `0/1` | Heterozygous |
 | `1/1` | Homozygous alternate |
-| `./.` | Missing              |
-| `0`   | Haploid reference    |
-| `1`   | Haploid alternate    |
+| `./.` | Missing |
+| `0` | Haploid reference |
+| `1` | Haploid alternate |
 
 ### Compression and Indexing
-
 ```bash
 # Compress with bgzip
 bgzip variants.vcf
@@ -77,34 +76,32 @@ Compact binary format for genotype data.
 
 Tab-delimited, 6 columns:
 
-| Column | Name        | Description                             |
-| ------ | ----------- | --------------------------------------- |
-| 1      | Chromosome  | Chromosome code (1-22, X, Y, XY, MT, 0) |
-| 2      | SNP ID      | Variant identifier                      |
-| 3      | CM position | Genetic distance (cM) or 0              |
-| 4      | BP position | Base-pair position                      |
-| 5      | Allele 1    | Minor allele (usually)                  |
-| 6      | Allele 2    | Major allele (usually)                  |
+| Column | Name | Description |
+|--------|------|-------------|
+| 1 | Chromosome | Chromosome code (1-22, X, Y, XY, MT, 0) |
+| 2 | SNP ID | Variant identifier |
+| 3 | CM position | Genetic distance (cM) or 0 |
+| 4 | BP position | Base-pair position |
+| 5 | Allele 1 | Minor allele (usually) |
+| 6 | Allele 2 | Major allele (usually) |
 
 ### .fam (Family Information)
 
 Tab/space-delimited, 6 columns:
 
-| Column | Name          | Description                                                 |
-| ------ | ------------- | ----------------------------------------------------------- |
-| 1      | Family ID     | Family or population ID                                     |
-| 2      | Individual ID | Sample identifier                                           |
-| 3      | Paternal ID   | Father's ID (0 if unknown)                                  |
-| 4      | Maternal ID   | Mother's ID (0 if unknown)                                  |
-| 5      | Sex           | 1=male, 2=female, 0=unknown                                 |
-| 6      | Phenotype     | -9/0=missing, 1=unaffected, 2=affected, or continuous value |
+| Column | Name | Description |
+|--------|------|-------------|
+| 1 | Family ID | Family or population ID |
+| 2 | Individual ID | Sample identifier |
+| 3 | Paternal ID | Father's ID (0 if unknown) |
+| 4 | Maternal ID | Mother's ID (0 if unknown) |
+| 5 | Sex | 1=male, 2=female, 0=unknown |
+| 6 | Phenotype | -9/0=missing, 1=unaffected, 2=affected, or continuous value |
 
 ### PLINK 1.9 Text Format (.ped/.map)
 
 #### .ped Format
-
 Space/tab-delimited, 6+ columns:
-
 - Cols 1-6: Same as .fam
 - Cols 7+: Genotypes (two columns per SNP: allele1 allele2)
 
@@ -115,9 +112,7 @@ FID IID PID MID Sex Pheno rs1_A rs1_G rs2_C rs2_T
 ```
 
 #### .map Format
-
 Tab-delimited, 4 columns:
-
 - Chromosome, SNP ID, Genetic position (cM), Physical position (bp)
 
 ```
@@ -151,15 +146,15 @@ Sample2      4.89               6.92               ...
 
 Tab-delimited, first 4 columns fixed:
 
-| Column         | Description      |
-| -------------- | ---------------- |
-| `#Chr`         | Chromosome       |
-| `start`        | Start position   |
-| `end`          | End position     |
-| `phenotype_id` | Gene/probe ID    |
-| `Sample1`      | Expression value |
-| `Sample2`      | Expression value |
-| ...            | ...              |
+| Column | Description |
+|--------|-------------|
+| `#Chr` | Chromosome |
+| `start` | Start position |
+| `end` | End position |
+| `phenotype_id` | Gene/probe ID |
+| `Sample1` | Expression value |
+| `Sample2` | Expression value |
+| ... | ... |
 
 ```
 #Chr start end phenotype_id Sample1 Sample2 Sample3
@@ -168,7 +163,6 @@ Tab-delimited, first 4 columns fixed:
 ```
 
 **Requirements:**
-
 - First 4 columns must match above
 - Coordinates are 0-based, half-open [start, end)
 - Must be sorted by chromosome and position
@@ -231,7 +225,6 @@ Sample4 0.2 0.1 0.6 1.0
 ### GCTA GRM Format
 
 Binary format:
-
 - `.grm.bin`: Kinship values (N(N+1)/2 elements, 4-byte float)
 - `.grm.id`: Sample IDs
 - `.grm.N`: Number of SNPs used per pair
@@ -277,19 +270,19 @@ Tab-delimited:
 
 Tab-delimited from `map_cis`:
 
-| Column         | Description                             |
-| -------------- | --------------------------------------- |
-| `phenotype_id` | Gene/expression ID                      |
-| `variant_id`   | Lead variant ID                         |
-| `tss_distance` | Distance from TSS (bp)                  |
-| `ma_samples`   | Number of samples with minor allele     |
-| `ma_count`     | Minor allele count                      |
-| `maf`          | Minor allele frequency                  |
-| `pval_nominal` | Nominal p-value                         |
-| `slope`        | Effect size (beta)                      |
-| `slope_se`     | Standard error                          |
-| `pval_perm`    | Empirical p-value (if permutations run) |
-| `pval_beta`    | Beta-approximated p-value               |
+| Column | Description |
+|--------|-------------|
+| `phenotype_id` | Gene/expression ID |
+| `variant_id` | Lead variant ID |
+| `tss_distance` | Distance from TSS (bp) |
+| `ma_samples` | Number of samples with minor allele |
+| `ma_count` | Minor allele count |
+| `maf` | Minor allele frequency |
+| `pval_nominal` | Nominal p-value |
+| `slope` | Effect size (beta) |
+| `slope_se` | Standard error |
+| `pval_perm` | Empirical p-value (if permutations run) |
+| `pval_beta` | Beta-approximated p-value |
 
 ---
 
@@ -342,7 +335,6 @@ rs2,H,S,S,...
 ```
 
 Genotype codes:
-
 - `S`, `B`: Parental homozygotes
 - `H`: Heterozygote
 - `-`: Missing
@@ -372,14 +364,14 @@ Sample2,12.1,18.7,...
 
 ## Format Conversion Quick Reference
 
-| From  | To     | Tool      | Command                                    |
-| ----- | ------ | --------- | ------------------------------------------ |
-| VCF   | PLINK  | PLINK2    | `plink2 --vcf in.vcf --make-bed --out out` |
-| PLINK | VCF    | PLINK2    | `plink2 --bfile in --recode vcf --out out` |
-| VCF   | BGEN   | QCTOOL    | `qctool -g in.vcf -og out.bgen`            |
-| PLINK | BED    | tensorQTL | `tensorqtl.read_plink(prefix)`             |
-| CSV   | PLINK  | Custom    | R/Python scripts                           |
-| Text  | Binary | PLINK     | `plink --file text --make-bed --out bin`   |
+| From | To | Tool | Command |
+|------|-----|------|---------|
+| VCF | PLINK | PLINK2 | `plink2 --vcf in.vcf --make-bed --out out` |
+| PLINK | VCF | PLINK2 | `plink2 --bfile in --recode vcf --out out` |
+| VCF | BGEN | QCTOOL | `qctool -g in.vcf -og out.bgen` |
+| PLINK | BED | tensorQTL | `tensorqtl.read_plink(prefix)` |
+| CSV | PLINK | Custom | R/Python scripts |
+| Text | Binary | PLINK | `plink --file text --make-bed --out bin` |
 
 ---
 

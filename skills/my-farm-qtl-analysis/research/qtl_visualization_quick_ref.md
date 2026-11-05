@@ -6,13 +6,11 @@
 ## Python Quick Start
 
 ### Installation
-
 ```bash
 pip install matplotlib seaborn plotly pandas numpy scipy qmplot
 ```
 
 ### Essential Imports
-
 ```python
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -26,7 +24,6 @@ from scipy import stats
 ## Quick Code Snippets
 
 ### 1. Box Plot (Python)
-
 ```python
 # Basic box plot
 sns.boxplot(data=df, x='Genotype', y='Phenotype')
@@ -38,21 +35,18 @@ plt.show()
 ```
 
 ### 2. Violin Plot (Python)
-
 ```python
 sns.violinplot(data=df, x='Genotype', y='Phenotype', inner='box')
 plt.show()
 ```
 
 ### 3. Density Plot (Python)
-
 ```python
 sns.kdeplot(data=df, x='Phenotype', hue='Genotype', fill=True)
 plt.show()
 ```
 
 ### 4. Heatmap (Python)
-
 ```python
 # Correlation heatmap
 corr = df.corr()
@@ -65,14 +59,12 @@ plt.show()
 ```
 
 ### 5. Scatter Matrix (Python)
-
 ```python
 sns.pairplot(df, hue='Genotype')
 plt.show()
 ```
 
 ### 6. Manhattan Plot (Python)
-
 ```python
 # Using qmplot
 from qmplot import manhattanplot
@@ -87,7 +79,7 @@ def manhattan_plot(df, ax):
     for i, chrom in enumerate(sorted(df['CHR'].unique())):
         chrom_data = df[df['CHR'] == chrom]
         x = chrom_data['BP'] / 1e6 + offset
-        ax.scatter(x, -np.log10(chrom_data['P']),
+        ax.scatter(x, -np.log10(chrom_data['P']), 
                   c=colors[i % 2], s=10)
         offset += chrom_data['BP'].max() / 1e6 + 10
     ax.axhline(y=-np.log10(5e-8), color='red', linestyle='--')
@@ -96,7 +88,6 @@ def manhattan_plot(df, ax):
 ```
 
 ### 7. QQ Plot (Python)
-
 ```python
 from scipy import stats
 import numpy as np
@@ -116,12 +107,11 @@ plt.show()
 ```
 
 ### 8. LOD Score Plot (Python)
-
 ```python
 # Genome-wide scan
 for chrom in qtl_df['Chromosome'].unique():
     chrom_data = qtl_df[qtl_df['Chromosome'] == chrom]
-    plt.plot(chrom_data['Position'], chrom_data['LOD'],
+    plt.plot(chrom_data['Position'], chrom_data['LOD'], 
              label=f'Chr{chrom}')
 plt.axhline(y=3, color='red', linestyle='--', label='Threshold')
 plt.xlabel('Position')
@@ -135,7 +125,6 @@ plt.show()
 ## R Quick Start
 
 ### Installation
-
 ```r
 install.packages(c("ggplot2", "qqman", "corrplot", "GGally"))
 if (!require("BiocManager")) install.packages("BiocManager")
@@ -143,7 +132,6 @@ BiocManager::install("qtl2")
 ```
 
 ### Essential Imports
-
 ```r
 library(ggplot2)
 library(qqman)
@@ -156,7 +144,6 @@ library(qtl2)
 ## Quick Code Snippets (R)
 
 ### 1. Box Plot (R)
-
 ```r
 # Basic
 ggplot(df, aes(x=Genotype, y=Phenotype, fill=Genotype)) +
@@ -170,7 +157,6 @@ ggplot(df, aes(x=Genotype, y=Phenotype, fill=Environment)) +
 ```
 
 ### 2. Violin Plot (R)
-
 ```r
 ggplot(df, aes(x=Genotype, y=Phenotype, fill=Genotype)) +
   geom_violin() +
@@ -178,14 +164,12 @@ ggplot(df, aes(x=Genotype, y=Phenotype, fill=Genotype)) +
 ```
 
 ### 3. Density Plot (R)
-
 ```r
 ggplot(df, aes(x=Phenotype, fill=Genotype)) +
   geom_density(alpha=0.5)
 ```
 
 ### 4. Heatmap (R)
-
 ```r
 # Correlation
 corrplot(cor(df), method="color", addCoef.col="black")
@@ -197,7 +181,6 @@ ggplot(melted_df, aes(Var1, Var2, fill=value)) +
 ```
 
 ### 5. Scatter Matrix (R)
-
 ```r
 pairs(df)
 # or with GGally
@@ -205,7 +188,6 @@ ggpairs(df, aes(color=Genotype))
 ```
 
 ### 6. Manhattan Plot (R)
-
 ```r
 # Using qqman
 manhattan(gwas_df, chr="CHR", bp="BP", snp="SNP", p="P")
@@ -218,7 +200,6 @@ qq(gwas_df$P)
 ```
 
 ### 7. LOD Plot (R)
-
 ```r
 # Using qtl2
 plot(scan1_output, map)
@@ -229,7 +210,6 @@ plot(scan1_output, map, chr=3)
 ```
 
 ### 8. Effect Plot (R)
-
 ```r
 ggplot(effects_df, aes(x=Effect, y=QTL)) +
   geom_point() +
@@ -242,7 +222,6 @@ ggplot(effects_df, aes(x=Effect, y=QTL)) +
 ## Common Customizations
 
 ### Python
-
 ```python
 # Figure size
 plt.figure(figsize=(10, 6))
@@ -266,7 +245,6 @@ plt.legend(title='Legend Title', bbox_to_anchor=(1.05, 1), loc='upper left')
 ```
 
 ### R
-
 ```r
 # Theme customization
 theme_minimal()  # or theme_bw(), theme_classic()
@@ -290,7 +268,6 @@ facet_wrap(~Genotype)  # or facet_grid(Environment ~ Genotype)
 ## Data Format Requirements
 
 ### GWAS/Manhattan Plot Data
-
 ```
 Required columns:
 - SNP: SNP identifier
@@ -300,7 +277,6 @@ Required columns:
 ```
 
 ### QTL Scan Data
-
 ```
 Required:
 - Chromosome positions (cM or bp)
@@ -309,7 +285,6 @@ Required:
 ```
 
 ### Phenotype Data
-
 ```
 Typical structure:
 - Sample/Individual ID
@@ -323,14 +298,12 @@ Typical structure:
 ## Troubleshooting
 
 ### Python
-
 - **ImportError**: Install missing package with `pip install package_name`
 - **Empty plot**: Call `plt.show()` at the end
 - **Overlapping labels**: Use `plt.tight_layout()` or rotate labels
 - **Memory error**: Reduce data size or use `plt.close()` between plots
 
 ### R
-
 - **Package not found**: Install with `install.packages()` or `BiocManager::install()`
 - **Plot not showing**: Ensure graphics device is open
 - **Legend cut off**: Adjust `ggsave()` dimensions or use `theme(legend.position="bottom")`
@@ -341,17 +314,14 @@ Typical structure:
 ## Recommended Color Palettes
 
 ### Colorblind-Friendly
-
 - **Python**: `sns.color_palette("colorblind")`, `sns.color_palette("viridis")`
 - **R**: `scale_color_brewer(palette="Dark2")`, `viridis::scale_color_viridis()`
 
 ### Categorical (≤8 categories)
-
 - **Python**: `"Set1"`, `"Set2"`, `"Dark2"`
 - **R**: `"Set1"`, `"Set2"`, `"Dark2"`, `"Paired"`
 
 ### Continuous/Diverging
-
 - **Python**: `"viridis"`, `"coolwarm"`, `"RdBu_r"`
 - **R**: `"RdBu"`, `"BrBG"`, `"PRGn"`
 
