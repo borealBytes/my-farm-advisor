@@ -1,0 +1,5 @@
+{
+  "dataset_name": "soybean_maturity",
+  "status": "runtime-generated",
+  "notes": "Annual heuristic soybean maturity-group outputs by FIPS live here; default shared initializer builds lower48 2021-2025 outputs"
+}
