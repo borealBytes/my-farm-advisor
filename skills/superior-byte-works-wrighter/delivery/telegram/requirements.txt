@@ -1,2 +1,0 @@
-# Python helpers for local installation scripts
-pip>=23

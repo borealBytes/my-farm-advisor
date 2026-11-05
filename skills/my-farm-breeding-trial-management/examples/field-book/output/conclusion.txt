@@ -1,4 +1,0 @@
-Field book conclusion
-====================
-The map aligns plot IDs, genotype entries, and label payloads for field crews.
-This supports consistent scoring and sampling in grower-scale trial operations.

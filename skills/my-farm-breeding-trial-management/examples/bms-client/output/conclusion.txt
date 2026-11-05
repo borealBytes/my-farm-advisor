@@ -1,4 +1,0 @@
-BMS client conclusion
-=====================
-Mock BMS trial transactions are paired with site footprints for operational review.
-This format supports quick checks by breeders, agronomists, and data managers.
