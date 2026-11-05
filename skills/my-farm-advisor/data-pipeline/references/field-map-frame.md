@@ -5,7 +5,7 @@ maps, trial-placement plans, NDVI/terrain field maps — uses this frame. Never
 plot a single field on geodetic degree axes; at field scale degrees are
 uninterpretable ticks with no meaning.
 
-## The standard (implemented in `generate_soil_texture_triangles.py`)
+## The standard (implemented in `src/scripts/lib/field_frame.py` — all renderers call it)
 
 1. **Project to the local UTM zone**: `zone = floor((lon + 180) / 6) + 1`,
    EPSG `32600 + zone` (north) / `32700 + zone` (south). Metres are the only
@@ -14,7 +14,10 @@ uninterpretable ticks with no meaning.
    field bounding box so the field starts at `(0, 0)`. Axis labels:
    `"m E from SW corner (UTM {zone})"` and `"m N"`. Every coordinate the
    reader sees is "how far into my field".
-3. **North arrow, boxed, top-right**: bold `N` in a white rounded box with a
+3. **Pad the viewport**: `field_frame.view_extent()` grows every panel's axis
+   bounds by 4% of the long side so the boundary never touches an edge — a
+   flush boundary reads as "cut off", not "fills the frame".
+4. **North arrow, boxed, top-right**: bold `N` in a white rounded box with a
    heavy upward shaft, placed in axes-fraction coords so it never moves with
    data zoom. Non-negotiable — a metre-axis field map without a north arrow
    forces the reader to guess orientation.
@@ -138,12 +141,12 @@ banded soil classes):
 
 | Feature | Type | Scale (standard adopted) |
 | --- | --- | --- |
-| Soil clay/silt/sand %, pH, CEC, OC (gridded) | banded soil classes | **ISRIC SoilGrids `soil.legends` discrete steps** (`BoundaryNorm`, vendored TSVs) — the same breaks ISRIC maps itself |
+| Soil clay/silt/sand %, pH, CEC, OC (gridded) | continuous (banded ticks) | **continuous ISRIC-style single-hue monotonic-L* ramp** (colors + break values from vendored `soil.legends`/`soil.legends`-equivalent boundaries), colorbar **ticks at the ISRIC and agronomic breakpoints** (pH diverging on 7; SOC 5/20/50 gC/kg; clay 20/27/40 %; see `colormap-recommendations.md`). Stepped `BoundaryNorm` is retired — the ISRIC SLDs are discretized samples of a smooth ramp |
 | Soil texture class (triangle panel) | categorical (12 classes) | USDA texture-triangle fills, categorical |
 | Crop type / land class | categorical | WorldCereal official palette codes; unknown = white swatch with grey edge |
-| Elevation (DEM) | continuous | `terrain` (green→brown→white→blue) — relief convention, perceptually ordered |
-| Hillshade | continuous | grayscale |
-| Slope, TWI | continuous, positive-skew | sequential (`YlOrBr`, `YlGnBu`) |
+| Elevation (DEM) | continuous | **relief-adaptive** (see `colormap-recommendations.md`): low relief (<10 m, tile land) → `cividis`/single-hue stretched P2–P98, hillshade ×2–3 z under ~50 %-opacity tint, or relative-elevation diverging on 0; high relief (>50 m, uplands) → `terrain`/hypsometric multi-hue with breaks at meaningful terrain stats. `terrain` on 1–2 m of relief maps the whole scene into one ramp segment — that's why it "hid the signal" |
+| Hillshade | continuous | grayscale, azimuth 315° / altitude 45° (Esri defaults); elevation tint overlaid semi-transparent |
+| Slope, TWI | continuous, positive-skew | sequential (`YlOrBr`, `YlGnBu`); slope ticks at 2/5/10/18 %, TWI on field-relative quantiles; cap vmax at P98 on flat fields |
 | Flow accumulation, LS | continuous, power-law | sequential on **log10** — axis says so (`log₁₀ upstream cells`) |
 | TPI, relative elevation | continuous, signed about 0 | diverging `RdBu_r`, midpoint at 0 |
 | Aspect | **cyclic** | HSV hue wheel, vmin/vmax fixed 0–360 (a sequential map on a cyclic quantity fakes a seam at N) |
@@ -154,3 +157,7 @@ meaningfully and orders spatially → sequential/diverging continuous; if it
 names something → categorical palette from the governing standard; if it is
 already published with official breaks (SoilGrids) → reuse the breaks,
 verbatim. Colorbars then carry units and (for log scales) the transform.
+
+The full decision table with sources — incl. per-attribute fixed breakpoints,
+low- vs high-relief DEM ramps, and the stepped-vs-continuous ISRIC ruling —
+lives in [colormap-recommendations.md](colormap-recommendations.md).

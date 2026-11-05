@@ -23,6 +23,7 @@ import numpy as np
 import rasterio
 from matplotlib.colors import LightSource
 import geopandas as gpd
+import palettes
 
 _SCRIPTS_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_SCRIPTS_DIR))
@@ -122,10 +123,11 @@ def _panel_frame_labels(ax, ff, _fflib) -> None:
     ax.tick_params(labelsize=5.8)
     ax.grid(alpha=0.15, lw=0.4)
     ax.set_aspect("equal", adjustable="datalim")
-    ax.set_xlim(0, float(ff.geometry.total_bounds[2]))
-    ax.set_ylim(0, float(ff.geometry.total_bounds[3]))
+    _L, _R, _B, _T = _fflib.view_extent(0, float(ff.geometry.total_bounds[2]), 0, float(ff.geometry.total_bounds[3]))
+    ax.set_xlim(_L, _R)
+    ax.set_ylim(_B, _T)
     _fflib.decorate(ax, ff, arrow_r=0.085, arrow_fs=8.5, callout=False,
-                    arrow_xy=(0.955, 0.05))
+                    arrow_xy=(0.955, 0.05), scale_x=15)
 
 
 _BAND_LEGEND = {  # ISRIC/SoilGrids standard legend files (vendored, data/isric_legends/)
@@ -270,19 +272,21 @@ def render_field(
     ax0 = axes[0]
     if dem_path and dem_path.exists():
         arr, ext = _frame_show(dem_path, default_m=30.0)
-        hs = np.ma.masked_invalid(ls.hillshade(np.ma.filled(arr, float("nan")), vert_exag=1.2))
+        flat = arr.compressed()
+        _dcm, _dnorm, _relief, _klass = palettes.dem_scale(flat)
+        hs = np.ma.masked_invalid(ls.hillshade(
+            np.ma.filled(arr, float("nan")),
+            vert_exag=2.5 if _relief < 10 else (1.5 if _relief < 50 else 1.0)))
         ax0.imshow(hs, cmap="gray", vmin=0, vmax=1,
                    extent=[ext[0], ext[1], ext[2], ext[3]], origin="upper")
-        flat = arr.compressed()
-        norm = (plt.Normalize(np.percentile(flat, 2), np.percentile(flat, 98))
-                if flat.size else plt.Normalize(0, 1))
-        ax0.imshow(arr, cmap="terrain", alpha=0.12,
-                   extent=[ext[0], ext[1], ext[2], ext[3]], origin="upper", norm=norm)
-        cb0 = fig.colorbar(plt.cm.ScalarMappable(norm=norm, cmap="terrain"), ax=ax0,
+        ax0.imshow(arr, cmap=_dcm, alpha=0.55,
+                   extent=[ext[0], ext[1], ext[2], ext[3]], origin="upper", norm=_dnorm)
+        cb0 = fig.colorbar(plt.cm.ScalarMappable(norm=_dnorm, cmap=_dcm), ax=ax0,
                            fraction=0.046, pad=0.03)
         cb0.set_label("elevation (m)", fontsize=6)
         cb0.ax.tick_params(labelsize=6)
-        ax0.set_title("Terrain (DEM hillshade)", fontsize=9)
+        ax0.set_title(f"Terrain + hillshade ({_relief:.0f} m relief)",
+                      fontsize=8)
     else:
         ax0.text(0.5, 0.5, "no DEM", ha="center")
     ff.geometry.dissolve().boundary.plot(ax=ax0, color="red", lw=1.4)
@@ -296,25 +300,13 @@ def render_field(
         if key == "cec" and not raster_paths[key].name.startswith("soilgrids_"):
             # ASF CEC arrives in its own native scale; do not assert SoilGrids units.
             label, unit = "CEC 0–5 cm (ASF native units)", ""
-        bn = _band_norm(key)
-        if bn is not None:
-            bn_cm, bn_norm, bn_b = bn
-            _lo, _hi = float(np.nanmin(arr)), float(np.nanmax(arr))
-            _i0 = max(int(np.searchsorted(bn_b, _lo)) - 3, 0)
-            _i1 = min(int(np.searchsorted(bn_b, _hi)) + 4, len(bn_b) - 1)
-            _b = bn_b[_i0:_i1 + 1]
-            _cmap2 = __import__("matplotlib.colors", fromlist=["ListedColormap"])                .ListedColormap([bn_cm.colors[i] for i in range(_i0, _i1)])
-            _norm2 = __import__("matplotlib.colors", fromlist=["BoundaryNorm"])                .BoundaryNorm(_b, _i1 - _i0)
-            im = ax.imshow(arr, cmap=_cmap2, norm=_norm2,
-                           extent=[ext[0], ext[1], ext[2], ext[3]],
-                           origin="upper")
-            _step = max(1, (_i1 - _i0) // 5)
-            cb = fig.colorbar(im, ax=ax, fraction=0.046, pad=0.03,
-                              ticks=list(_b[::_step]))
-        else:
-            im = ax.imshow(arr, cmap=_band_cmap(key),
-                           extent=[ext[0], ext[1], ext[2], ext[3]], origin="upper")
-            cb = fig.colorbar(im, ax=ax, fraction=0.046, pad=0.03)
+        with rasterio.open(raster_paths[key]) as _ds:
+            _cell = _ds.res[0] * (111320 if _ds.crs.is_geographic else 1.0)
+        _cm, _norm, _ticks = palettes.soil_scale(key, arr, domain=_cell >= 150)
+        im = ax.imshow(arr, cmap=_cm, norm=_norm,
+                       extent=[ext[0], ext[1], ext[2], ext[3]], origin="upper")
+        cb = fig.colorbar(im, ax=ax, fraction=0.046, pad=0.03,
+                          **({"ticks": _ticks} if _ticks else {}))
         cb.set_label(unit, fontsize=6)
         cb.ax.tick_params(labelsize=5.6)
         _d = np.array(np.ma.getdata(arr), copy=True, dtype="float64")
@@ -339,8 +331,9 @@ def render_field(
                          _p.y0 + (_p.height - _side) / 2, _side, _side])
     _ = ff.geometry.total_bounds
     for _a in _used:
-        _a.set_xlim(0, float(_[2]))
-        _a.set_ylim(0, float(_[3]))
+        _L, _R, _B, _T = _fflib.view_extent(0, float(_[2]), 0, float(_[3]))
+        _a.set_xlim(_L, _R)
+        _a.set_ylim(_B, _T)
     out_png.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(out_png, dpi=170)
     plt.close(fig)
