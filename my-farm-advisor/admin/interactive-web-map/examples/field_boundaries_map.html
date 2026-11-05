@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_6e43f9347895a717a09d5607ea25f130 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
+
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
+
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
+
+        
+    
+                    <style>
+                        .foliumtooltip {
+                            
+                        }
+                       .foliumtooltip table{
+                            margin: auto;
+                        }
+                        .foliumtooltip tr{
+                            text-align: left;
+                        }
+                        .foliumtooltip th{
+                            padding: 2px; padding-right: 8px;
+                        }
+                    </style>
+            
+    
+                    <style>
+                        .foliumpopup {
+                            margin: auto;
+                        }
+                       .foliumpopup table{
+                            margin: auto;
+                        }
+                        .foliumpopup tr{
+                            text-align: left;
+                        }
+                        .foliumpopup th{
+                            padding: 2px; padding-right: 8px;
+                        }
+                    </style>
+            
+</head>
+<body>
+    
+    
+<div style="position:fixed;top:10px;left:60px;z-index:9999;
+     background:white;padding:8px 16px;border-radius:4px;
+     box-shadow:0 2px 6px rgba(0,0,0,0.3);font-family:sans-serif;">
+  <b>🌾 Agricultural Fields — Minnesota</b>
+</div>
+    
+            <div class="folium-map" id="map_6e43f9347895a717a09d5607ea25f130" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_6e43f9347895a717a09d5607ea25f130 = L.map(
+                "map_6e43f9347895a717a09d5607ea25f130",
+                {
+                    center: [45.80998086012974, -94.41544227660346],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 7,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_4c78e185514834b5321ae266c6e0f4f9 = L.tileLayer(
+                "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 19,
+  "maxNativeZoom": 19,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_4c78e185514834b5321ae266c6e0f4f9.addTo(map_6e43f9347895a717a09d5607ea25f130);
+        
+    
+            var tile_layer_ef2737251ac79c3015022d80cd597cc3 = L.tileLayer(
+                "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+                {
+  "minZoom": 0,
+  "maxZoom": 18,
+  "maxNativeZoom": 18,
+  "noWrap": false,
+  "attribution": "Esri",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_ef2737251ac79c3015022d80cd597cc3.addTo(map_6e43f9347895a717a09d5607ea25f130);
+        
+    
+        function geo_json_f2d7feea66a10aae062653a1d2f16945_styler(feature) {
+            switch(feature.id) {
+                default:
+                    return {"color": "#2c3e50", "fillColor": "#f1c40f", "fillOpacity": 0.5, "weight": 2};
+            }
+        }
+
+        function geo_json_f2d7feea66a10aae062653a1d2f16945_onEachFeature(feature, layer) {
+
+            layer.on({
+            });
+        };
+        var geo_json_f2d7feea66a10aae062653a1d2f16945 = L.geoJson(null, {
+                onEachFeature: geo_json_f2d7feea66a10aae062653a1d2f16945_onEachFeature,
+            
+                style: geo_json_f2d7feea66a10aae062653a1d2f16945_styler,
+            ...{
+}
+        });
+
+        function geo_json_f2d7feea66a10aae062653a1d2f16945_add (data) {
+            geo_json_f2d7feea66a10aae062653a1d2f16945
+                .addData(data);
+        }
+            geo_json_f2d7feea66a10aae062653a1d2f16945_add({"bbox": [-95.94827892997152, 44.554393989758495, -92.88384195820556, 47.06446096019569], "features": [{"bbox": [-95.94827892997152, 47.06410163356354, -95.94333819555317, 47.06446096019569], "geometry": {"coordinates": [[[-95.94333819559107, 47.06410163356354], [-95.94827892997152, 47.06410163409941], [-95.94827892949893, 47.06446096019569], [-95.94333819555317, 47.06446095967067], [-95.94333819559107, 47.06410163356354]]], "type": "Polygon"}, "id": "0", "properties": {"area_acres": 3.7048435597777787, "crop_code": "1", "crop_code_list": "https://github.com/fiboa/cli/blob/main/fiboa_cli/datasets/data-files/us_usda_cropland.csv", "crop_name": "Corn", "field_id": "271623002471299", "region": "corn_belt", "state_fips": "27"}, "type": "Feature"}, {"bbox": [-92.88608774728259, 44.554393989758495, -92.88384195820556, 44.55663977869429], "geometry": {"coordinates": [[[-92.88384195820556, 44.55601095686244], [-92.88384195875962, 44.55538213753212], [-92.88483010503423, 44.55538213761131], [-92.88483010480073, 44.55601095763297], [-92.88518943107023, 44.55601095847398], [-92.88518943101182, 44.55502281014264], [-92.88483010486648, 44.55502281097848], [-92.88483010518266, 44.554393990506085], [-92.88518943176956, 44.554393989758495], [-92.88518943128341, 44.55475331674122], [-92.88608774725274, 44.554753315459784], [-92.88608774728259, 44.55538213615598], [-92.88608774652596, 44.55574146378892], [-92.8860877466798, 44.55637028313716], [-92.8851894320104, 44.55637028315354], [-92.88483010509253, 44.556370282341945], [-92.88483010582816, 44.55663977853918], [-92.88447077991755, 44.55663977861423], [-92.88420128482308, 44.55663977869429], [-92.88384195820556, 44.55601095686244]]], "type": "Polygon"}, "id": "1", "properties": {"area_acres": 6.408550663458559, "crop_code": "1", "crop_code_list": "https://github.com/fiboa/cli/blob/main/fiboa_cli/datasets/data-files/us_usda_cropland.csv", "crop_name": "Corn", "field_id": "271623001561551", "region": "corn_belt", "state_fips": "27"}, "type": "Feature"}], "type": "FeatureCollection"});
+
+        
+    
+    geo_json_f2d7feea66a10aae062653a1d2f16945.bindTooltip(
+    function(layer){
+    let div = L.DomUtil.create('div');
+    
+    let handleObject = feature => {
+        if (feature === null) {
+            return '';
+        } else if (typeof(feature)=='object') {
+            return JSON.stringify(feature);
+        } else {
+            return feature;
+        }
+    }
+    let fields = ["field_id", "crop_name", "area_acres"];
+    let aliases = ["Field ID:", "Crop:", "Area (ac):"];
+    let table = '<table>' +
+        String(
+        fields.map(
+        (v,i)=>
+        `<tr>
+            <th>${aliases[i]}</th>
+            
+            <td>${handleObject(layer.feature.properties[v])}</td>
+        </tr>`).join(''))
+    +'</table>';
+    div.innerHTML=table;
+    
+    return div
+    }
+    ,{
+  "sticky": true,
+  "className": "foliumtooltip",
+});
+                     
+    
+    geo_json_f2d7feea66a10aae062653a1d2f16945.bindPopup(
+    function(layer){
+    let div = L.DomUtil.create('div');
+    
+    let handleObject = feature => {
+        if (feature === null) {
+            return '';
+        } else if (typeof(feature)=='object') {
+            return JSON.stringify(feature);
+        } else {
+            return feature;
+        }
+    }
+    let fields = ["field_id", "crop_name", "area_acres", "region", "state_fips"];
+    let aliases = ["Field ID:", "Crop:", "Area (ac):", "Region:", "State FIPS:"];
+    let table = '<table>' +
+        String(
+        fields.map(
+        (v,i)=>
+        `<tr>
+            <th>${aliases[i].toLocaleString()}</th>
+            
+            <td>${handleObject(layer.feature.properties[v]).toLocaleString()}</td>
+        </tr>`).join(''))
+    +'</table>';
+    div.innerHTML=table;
+    
+    return div
+    }
+    ,{
+  "className": "foliumpopup",
+});
+                     
+    
+            geo_json_f2d7feea66a10aae062653a1d2f16945.addTo(map_6e43f9347895a717a09d5607ea25f130);
+        
+    
+            map_6e43f9347895a717a09d5607ea25f130.fitBounds(
+                [[44.554393989758495, -95.94827892997152], [47.06446096019569, -92.88384195820556]],
+                {"padding": [20, 20]}
+            );
+        
+    
+            var layer_control_55170d79dce8f9918a6e23504e5d5c3c_layers = {
+                base_layers : {
+                    "openstreetmap" : tile_layer_4c78e185514834b5321ae266c6e0f4f9,
+                    "Satellite" : tile_layer_ef2737251ac79c3015022d80cd597cc3,
+                },
+                overlays :  {
+                    "Fields" : geo_json_f2d7feea66a10aae062653a1d2f16945,
+                },
+            };
+            let layer_control_55170d79dce8f9918a6e23504e5d5c3c = L.control.layers(
+                layer_control_55170d79dce8f9918a6e23504e5d5c3c_layers.base_layers,
+                layer_control_55170d79dce8f9918a6e23504e5d5c3c_layers.overlays,
+                {
+  "position": "topright",
+  "collapsed": false,
+  "autoZIndex": true,
+}
+            ).addTo(map_6e43f9347895a717a09d5607ea25f130);
+
+        
+</script>
+</html>
