@@ -79,8 +79,33 @@ national atlases where they do, and the global 250 m floor everywhere:
 
 | US — SSURGO survey polygons | Canada — Ontario Detailed Soil Survey (polygon) | Australia — national Soil Atlas | Global floor — SoilGrids 250 m (Brazil) |
 | --- | --- | --- | --- |
-| ![SSURGO components](my-farm-advisor/data-pipeline/examples/soil-maps/output/ia-r1_ssurgo_component_map.png)<br>![Soil card](my-farm-advisor/data-pipeline/examples/soil-maps/output/ia-r1_soil_properties_grid.png) | ![Canada survey polygons](my-farm-advisor/data-pipeline/examples/soil-maps/output/on-r1_canada_survey_polygons.png) | ![AU Soil Atlas panels](my-farm-advisor/data-pipeline/examples/soil-maps/output/au-r3_soil_atlas_maps.png) | ![SoilGrids panels](my-farm-advisor/data-pipeline/examples/soil-maps/output/br-r1_soilgrids_maps.png) |
-| 16 mapped soil components inside one boundary — names, MUKEYs, horizon tables behind every color | The same polygon treatment where SSURGO doesn't reach: ON-DSS components (Brookston/Perth/Normandale) rendered from the cached national survey, no USDA query, dataset named honestly in the title | vertisol reality check: 42.8 % clay at 0–5 cm, pH 6.6; unscaled bands labeled honestly as native units | Cerrado field where no national layer exists: 6 properties + relief at 250 m (clay 32.2 %, pH 5.38) — the floor every country gets |
+| ![SSURGO components](my-farm-advisor/data-pipeline/examples/soil-maps/output/ia-r1_ssurgo_component_map.png) | ![Canada survey polygons](my-farm-advisor/data-pipeline/examples/soil-maps/output/on-r1_canada_survey_polygons.png) | ![AU Soil Atlas panels](my-farm-advisor/data-pipeline/examples/soil-maps/output/au-r3_soil_atlas_maps.png) | ![SoilGrids panels](my-farm-advisor/data-pipeline/examples/soil-maps/output/br-r1_soilgrids_maps.png) |
+| 16 mapped components inside one boundary, one color per soil map | The same polygon treatment where SSURGO doesn't reach: ON-DSS components (Brookston/Perth/Normandale) from the cached national survey | The continent's official soil map as the survey tier — raster clip inside the field | Anywhere no national layer exists: 6 properties + relief at 250 m, the universal floor |
+
+**Texture triangles — field-area weighted, one per provenance ([`generate_soil_texture_triangles.py`](my-farm-advisor/data-pipeline/src/scripts/reporting/generate_soil_texture_triangles.py)):**
+
+| SSURGO (US) | Ontario DSS (CA) | Soil Atlas raster cells (AU) | SoilGrids 250 m cells (BR) |
+| --- | --- | --- | --- |
+| ![ia triangle](my-farm-advisor/data-pipeline/examples/soil-maps/output/ia-r1_texture_triangle.png) | ![on triangle](my-farm-advisor/data-pipeline/examples/soil-maps/output/on-r1_texture_triangle.png) | ![au triangle](my-farm-advisor/data-pipeline/examples/soil-maps/output/au-r4_texture_triangle.png) | ![br triangle](my-farm-advisor/data-pipeline/examples/soil-maps/output/br-r1_texture_triangle.png) |
+| Every pin = one mukey×component: **series name + % of the field** (map-unit polygon area × within-unit component share), exact-class duplicates merged, labels collision-placed, star = the area-weighted field mean (loam, clay 26 / silt 40 / sand 33). Canonical 12-class geometry from the CRAN `soiltexture` package | The Ontario survey speaks the same schema — same renderer, same triangle | The triangle as a **derivation** for gridded sources: every 100 m atlas cell inside the boundary is one point (30 displayed max), star = cell-weighted mean | The global floor too: SoilGrids sand/silt/clay cells of a Cerrado field → sandy clay loam mean. Four provenance levels, one classifier |
+
+**Whole-field weighted property maps — the area-weighted field number, drawn as a surface:**
+
+| Iowa (SSURGO) | Ontario (DSS) |
+| --- | --- |
+| ![ia weighted](my-farm-advisor/data-pipeline/examples/soil-maps/output/ia-r1_weighted_property_map.png) | ![on weighted](my-farm-advisor/data-pipeline/examples/soil-maps/output/on-r1_weighted_property_map.png) |
+| Each map-unit polygon colored by **its component mix's topsoil value** (comppct-weighted within the unit): OM, pH, AWC, clay as continuous surfaces instead of dominant-component tiles — the weighted mean printed on every panel | Same schema, same math: Ontario census of Brookston/Perth/Kintyre weighted averages rendered per polygon |
+
+**Horizon detail — the rows behind every map, triangle and weighted panel above.**
+All of it — property maps, triangles, horizon tables, interpolated profiles — fires
+automatically for **every field** in `run_farm_pipeline.py` (`--all-fields` mode:
+survey triangle + horizon table + weighted map where polygons exist, the grid
+triangle for raster providers):
+
+| US — SSURGO horizons | Canada — ON-DSS horizons |
+| --- | --- |
+| ![Iowa horizon table](my-farm-advisor/data-pipeline/examples/soil-maps/output/ia-r1_horizon_table.png) | ![Ontario horizon table](my-farm-advisor/data-pipeline/examples/soil-maps/output/on-r1_horizon_table.png) |
+| Cells color-coded within column; at right the same table **interpolated to continuous depth** (piecewise-linear across horizon midpoints, comppct-weighted, 5 cm bins, 0–100 cm) — the classic SSURGO interval interpolation, honest about being constant beyond measured table | Same schema, same renderer: Ontario series (Brookston, Perth, Normandale, Kintyre) with real horizon splits and the same interpolated profiles |
 
 ### Terrain derivatives — ready the moment the DEM lands
 
@@ -98,7 +123,7 @@ same 9-layer view for each demo field, masked to the boundary. Iowa is the
 | Corn relative maturity (model-derived) | Soybean MG (model-derived) |
 | --- | --- |
 | ![Corn RM North America](my-farm-advisor/data-pipeline/examples/maturity/output/corn_rm_northamerica_2023.png) | ![Soybean MG North America](my-farm-advisor/data-pipeline/examples/maturity/output/soybean_mg_northamerica_2023.png) |
-| County GDD from our POWER pipeline → RM surface; recomputed per year; black country border + grey state/province lines drawn from the cached L0/L1 layers; subtitle states its own limits | Latitude + heat-unit heuristic; planning layer, not a prescription — the caption says so |
+| County GDD from our POWER pipeline → RM surface; recomputed per year; white L0/L1 borders with dark casing drawn from the cached admin layers (legible on the dark-green south); subtitle states its own limits | Latitude + heat-unit heuristic; planning layer, not a prescription — the caption says so |
 
 Both maps are the admin-geometry demo at every level: **L0 countries, L1
 states/provinces, L2 counties and Canadian census divisions** feed the
@@ -108,17 +133,14 @@ the border — the Prairie corn/soy belt is in, the boreal void isn't, so the
 picture stays about what actually grows. US-only, Canada-only, and combined
 views all render from one flag (`--country usa|canada|north-america`).
 
-### One page per field — and every component readable on its own
+### Field intelligence, component by component
 
-[`generate_field_posters.py`](my-farm-advisor/data-pipeline/src/scripts/reporting/generate_field_posters.py)
-assembles the whole page; every panel it composites also emits as a
-standalone figure, so nothing is only legible under a magnifying glass.
-
-![Full-season field report](my-farm-advisor/data-pipeline/examples/field-poster/output/ia-r1_field_report.png)
-
-Identity, rotation history, soil horizons, frost windows, five-season weather,
-five-season NDVI (86 keyless Sentinel-2/Landsat scenes behind it) — every
-number traceable to its cached source layer.
+Every panel below stands alone at readable size — identity, rotation, soil,
+frost windows, five-season weather, five-season NDVI (86 keyless
+Sentinel-2/Landsat scenes behind it), every number traceable to its cached
+source layer. The whole-page poster assembler
+([`generate_field_posters.py`](my-farm-advisor/data-pipeline/src/scripts/reporting/generate_field_posters.py))
+still ships for dashboards; the gallery shows its components, not the poster.
 
 **Weather — [`generate_weather_charts.py`](my-farm-advisor/data-pipeline/src/scripts/reporting/generate_weather_charts.py), every title derived from the data it plots:**
 
@@ -134,9 +156,10 @@ number traceable to its cached source layer.
 | ![Cumulative NDVI](my-farm-advisor/data-pipeline/examples/field-components/output/ia-r1_ndvi_cumulative.png) | ![Average NDVI](my-farm-advisor/data-pipeline/examples/field-components/output/ia-r1_ndvi_crop_average.png) | ![Peak NDVI](my-farm-advisor/data-pipeline/examples/field-components/output/ia-r1_ndvi_peak95_corn.png) |
 | Per-crop subplots, mean lines with 5th–95th percentile envelopes, only years whose CDL crop-year label matches | Field-masked mean over all crop-year scenes | Mid-season peak window — the biomass ceiling |
 
-A fixed-field soil card (properties, water & CEC, complexity counts, drainage
-summary) sits beside the SSURGO component map under the soil tiers above —
-[`generate_ssurgo_cards.py`](my-farm-advisor/data-pipeline/src/scripts/reporting/generate_ssurgo_cards.py).
+The soil card generator ([`generate_ssurgo_cards.py`](my-farm-advisor/data-pipeline/src/scripts/reporting/generate_ssurgo_cards.py))
+still feeds the compact soil panel of the full-season field report; the standalone
+per-field soil figure is the USDA **texture triangle** above — sand/silt/clay lives in
+the triangle, not in bar charts of unrelated numbers side by side.
 
 ### Per-year crop classification anywhere — keyless satellite imagery
 
@@ -164,7 +187,7 @@ Sentinel-2 (no accounts, no keys), cross-checked against the USDA CDL.
 | Multi-year genomic values | Trial site footprint (BMS) |
 | --- | --- |
 | ![GEBV ranking](my-farm-breeding-trial-management/examples/breeding-value-ranking/output/gebv_top15_ci_plot.png) | ![BMS sites](my-farm-breeding-trial-management/examples/bms-client/output/bms_trial_site_map.png) |
-| Top-15 genotypes with 95 % CIs after BLUP | Where trials live, straight from a breeding-management-system client |
+| Top-15 genotypes with 95 % CIs after BLUP | Trial sites on a real satellite basemap — green = read from the client, orange = written through it |
 
 ### Quantitative genetics — mapping and diagnostics
 
@@ -202,6 +225,7 @@ keys, logins, or paid services anywhere in the default path.
 | **Imagery** | Sentinel-2 L2A (10 m, ~5-day revisit) + Landsat Collection 2 L2 (30 m; collection back to 1982 — pipeline defaults to Landsat 8+9 for the combined 8-day window) | Same archives are global via keyless Planetary Computer STAC; Sentinel-1 C-band SAR (VV/VH) is wired into the WorldCereal input cube — real radar via the free optional CDSE backend, constant NODATA in the keyless default (documented trade-off) |
 | **Weather** | NASA POWER field-centroid Zarr (station-assimilated, any coordinate) | Same |
 | **Admin & context** | geoadmin + combined FIPS (US) | L0 every country (Natural Earth); L1/L2 **any** ISO3 via `--gadm-iso` (GADM 4.1, one-key-free download, merged into the same combined lookup) |
+| Small-footprint site maps | `lib/geoadmin_context.py` on cached layers | L0/L1/L2 borders + county names drawn around plotted points — any client map locates itself |
 | **Maturity zones (derived, not licensed)** | Corn RM / soybean MG computed **in-house per year** for US FIPS counties + provincial analog (CA) | No open official source exists — every seed company keeps proprietary maps; we rebuild ours from literature-based heat-unit models driven by our own NASA POWER weather (default 2021–2025 window, annual parquets you can re-run). More crops and regions are on the roadmap |
 
 **Rotation history for any country, any year.** Where no national map exists,
