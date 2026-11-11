@@ -1,15 +1,18 @@
 # My Farm QTL Analysis
 
-My Farm QTL Analysis is the genetics and quantitative-analysis skill pack for this repo. It covers GWAS, eQTL mapping, classical QTL workflows, kinship, population structure, genomic prediction, and the reporting patterns needed to turn marker-level results into breeding insight.
 
-Use this skill when the problem is trait-genetics analysis, association mapping, or breeding-genomics interpretation.
+> **Status:** initial stab — real, runnable workflows and examples; this tree
+> will expand the most as the data-pipeline foundation underneath it matures.
+My Farm QTL Analysis is the genetics and quantitative-analysis skill pack for this repo. It covers GWAS, eQTL mapping, classical QTL workflows, kinship, population structure, genomic prediction, and reporting patterns that turn marker-level results into breeding insight.
+
+Use this skill when the problem is trait-genetics analysis, association mapping, breeding-genomics interpretation, or downstream selection support.
 
 ## What This Skill Does
 
 - Routes each QTL-style problem to the right analysis family instead of forcing one tool to do everything.
 - Combines the strongest open-source tools for GWAS, eQTLs, classical QTL, kinship, PCA, and genomic prediction.
-- Provides worked example modules for common and advanced breeding-genomics tasks.
-- Supports both command-line execution and reproducible workflow framing.
+- Preserves an example-first workflow library with grouped local taxonomy: `mapping/`, `qc/`, `structure/`, `prediction/`, and `reporting/`.
+- Includes local visualization and GPU/HPC readiness helpers in addition to the remote baseline CLI wrapper.
 - Bridges raw genotype/phenotype data to biological interpretation and breeding decisions.
 
 ## Tooling Model
@@ -49,14 +52,33 @@ The point of this skill is not one monolithic tool. It is the orchestration laye
 
 ## Core Capability Areas
 
-| Area                 | What it covers                                 | Typical output                                |
-| -------------------- | ---------------------------------------------- | --------------------------------------------- |
-| GWAS                 | Linear mixed model and GLM association studies | Manhattan plots, QQ plots, hit tables         |
-| eQTL                 | cis/trans expression QTL mapping               | gene-variant association results              |
-| Classical QTL        | Experimental-cross QTL workflows               | LOD scans and linkage-based QTL calls         |
-| Population Structure | PCA, admixture, kinship, relatedness           | structure plots and kinship matrices          |
-| Genomic Prediction   | GBLUP and breeding prediction workflows        | prediction accuracy and selection guidance    |
-| QC and Annotation    | SNP filtering, validation, and annotation      | cleaned genotype inputs and annotated markers |
+| Area | What it covers | Typical output |
+| --- | --- | --- |
+| GWAS | Linear mixed model and GLM association studies | Manhattan plots, QQ plots, hit tables |
+| eQTL | cis/trans expression QTL mapping | gene-variant association results |
+| Classical QTL | Experimental-cross QTL workflows | LOD scans and linkage-based QTL calls |
+| Population Structure | PCA, admixture, kinship, relatedness | structure plots and kinship matrices |
+| Genomic Prediction | GBLUP and breeding prediction workflows | prediction accuracy and selection guidance |
+| QC and Annotation | SNP filtering, validation, and annotation | cleaned genotype inputs and annotated markers |
+
+## Grouped Example Taxonomy
+
+The imported local structure groups examples by workflow family instead of a flat `examples/` catalog.
+
+| Group | Representative examples |
+| --- | --- |
+| `examples/mapping/` | `gwas-lmm/`, `gwas-glm/`, `eqtl-cis/`, `classical-qtl/`, `multi-trait-gwas/` |
+| `examples/qc/` | `vcf-validation/`, `snp-filtering/`, `sample-qc/`, `snp-annotation/`, `imputation/` |
+| `examples/structure/` | `population-structure/`, `admixture/`, `ld-decay/`, `haplotype-analysis/`, `genomic-nrm/` |
+| `examples/prediction/` | `genomic-prediction/`, `marker-selection/`, `blup/`, `bayesian-gp/`, `backcross-selection/` |
+| `examples/reporting/` | `qmapper-ideogram/`, `analysis-report/`, `real-dataset/` |
+
+## Local Wins Preserved
+
+- `scripts/verify_gpu_hpc.py` provides a local CUDA/HPC readiness check before tensorQTL-style workflows.
+- `VISUALIZATION_SUMMARY.md` preserves the local visualization research bundle.
+- Example modules remain organized by grouped taxonomy rather than being flattened back to the remote baseline layout.
+- `scripts/qtl_cli.py` is available as an optional helper, but the primary usage model remains example-first.
 
 ## End-to-End Analysis Flow
 
@@ -79,14 +101,6 @@ flowchart LR
     class qc,structure_step,analysis,visuals process
     class decisions outcome
 ```
-
-## Example Families Included
-
-- Core GWAS and structure work: `examples/gwas-lmm/`, `examples/gwas-glm/`, `examples/population-structure/`, `examples/admixture/`
-- Kinship and relatedness: `examples/pedigree-kinship/`, `examples/genomic-nrm/`, `examples/genetic-similarity/`
-- Prediction and selection: `examples/genomic-prediction/`, `examples/marker-selection/`, `examples/blup/`, `examples/backcross-selection/`
-- Advanced association work: `examples/multi-trait-gwas/`, `examples/gxe-gwas/`, `examples/covariate-gwas/`, `examples/rare-variant-tests/`
-- Reporting and support: `examples/analysis-report/`, `examples/sample-qc/`, `examples/snp-annotation/`
 
 ## Why It Matters In This Repo
 
@@ -115,6 +129,7 @@ This skill is the analysis-heavy counterpart to breeding trial management. Trial
 ## Start Here
 
 - Main entrypoint: [`SKILL.md`](SKILL.md)
-- Tool selection guide in `SKILL.md`
-- Full worked examples under [`examples/`](examples/)
-- Common baselines: `examples/gwas-lmm/`, `examples/eqtl-cis/`, `examples/classical-qtl/`, `examples/genomic-prediction/`
+- Progressive router: [`INDEX.md`](INDEX.md)
+- Visualization research summary: [`VISUALIZATION_SUMMARY.md`](VISUALIZATION_SUMMARY.md)
+- Optional helper CLI: [`scripts/qtl_cli.py`](scripts/qtl_cli.py)
+- Common baselines: `examples/mapping/gwas-lmm/`, `examples/mapping/eqtl-cis/`, `examples/mapping/classical-qtl/`, `examples/prediction/genomic-prediction/`

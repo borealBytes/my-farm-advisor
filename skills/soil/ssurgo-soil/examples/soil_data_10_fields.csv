@@ -1,0 +1,508 @@
+mukey,muname,compname,comppct_r,drainagecl,hzdept_r,hzdepb_r,om_r,ph1to1h2o_r,awc_r,claytotal_r,sandtotal_r,silttotal_r,dbthirdbar_r,cec7_r,field_id
+404809,"Tuskeego silt loam, 0 to 2 percent slopes, rarely flooded",Tuskeego,95,Poorly drained,0.0,20.0,3.5,6.2,0.21,26.0,6.0,68.0,1.39,21.6,OSM_1428284928
+404815,"Coppock silt loam, 0 to 2 percent slopes, occasionally flooded",Coppock,95,Poorly drained,0.0,20.0,3.0,6.7,0.22,21.0,11.0,68.0,1.36,18.1,OSM_1428284928
+404826,"Chequest silty clay loam, 0 to 2 percent slopes",Chequest,95,Poorly drained,0.0,30.0,3.5,6.5,0.19,32.5,19.7,47.8,1.33,27.5,OSM_1428284928
+404809,"Tuskeego silt loam, 0 to 2 percent slopes, rarely flooded",Tuskeego,95,Poorly drained,20.0,48.0,1.5,6.2,0.21,19.0,7.0,74.0,1.44,16.1,OSM_1428284928
+404815,"Coppock silt loam, 0 to 2 percent slopes, occasionally flooded",Coppock,95,Poorly drained,20.0,64.0,0.5,6.5,0.2,22.0,11.0,67.0,1.47,17.6,OSM_1428284928
+404790,"Olmitz loam, heavy till, 2 to 5 percent slopes",Olmitz,90,Moderately well drained,0.0,15.0,3.5,6.6,0.18,26.0,43.0,31.0,1.45,22.3,OSM_1428284928
+404810,"Lawson silt loam, heavy till, 0 to 2 percent slopes, occasionally flooded",Lawson,90,Somewhat poorly drained,0.0,20.0,5.0,6.7,0.23,22.0,12.0,66.0,1.3,19.3,OSM_1428284928
+404823,"Zook silt loam, heavy till, 0 to 2 percent slopes, occasionally flooded, overwash",Zook,90,Poorly drained,0.0,20.0,2.5,6.1,0.22,23.0,12.5,64.5,1.37,19.3,OSM_1428284928
+404790,"Olmitz loam, heavy till, 2 to 5 percent slopes",Olmitz,90,Moderately well drained,15.0,25.0,2.5,6.6,0.18,27.0,45.0,28.0,1.44,22.3,OSM_1428284928
+404810,"Lawson silt loam, heavy till, 0 to 2 percent slopes, occasionally flooded",Lawson,90,Somewhat poorly drained,20.0,76.0,5.0,7.0,0.2,20.0,11.0,69.0,1.23,17.7,OSM_1428284928
+404823,"Zook silt loam, heavy till, 0 to 2 percent slopes, occasionally flooded, overwash",Zook,90,Poorly drained,20.0,84.0,6.0,6.7,0.19,36.0,7.5,56.5,1.21,29.2,OSM_1428284928
+404790,"Olmitz loam, heavy till, 2 to 5 percent slopes",Olmitz,90,Moderately well drained,25.0,40.0,2.0,6.6,0.18,27.0,45.0,28.0,1.44,22.3,OSM_1428284928
+404775,"Nodaway silt loam, heavy till, 0 to 2 percent slopes, occasionally flooded",Nodaway,85,Moderately well drained,0.0,18.0,2.5,6.7,0.22,20.0,6.0,74.0,1.3,17.2,OSM_1428284928
+404824,"Cantril loam, 2 to 5 percent slopes",Cantril,85,Somewhat poorly drained,0.0,20.0,3.0,6.2,0.18,21.0,41.0,38.0,1.39,18.1,OSM_1428284928
+404775,"Nodaway silt loam, heavy till, 0 to 2 percent slopes, occasionally flooded",Nodaway,85,Moderately well drained,18.0,79.0,1.0,6.7,0.22,20.0,6.0,74.0,1.3,16.6,OSM_1428284928
+404824,"Cantril loam, 2 to 5 percent slopes",Cantril,85,Somewhat poorly drained,20.0,30.0,1.5,5.3,0.18,21.0,41.0,38.0,1.48,,OSM_1428284928
+3004689,"Nodaway-Lawson-Klum complex, 0 to 3 percent slopes, occasionally flooded",Nodaway,45,Moderately well drained,0.0,18.0,2.5,6.7,0.22,20.0,6.0,74.0,1.42,17.2,OSM_1428284928
+3004689,"Nodaway-Lawson-Klum complex, 0 to 3 percent slopes, occasionally flooded",Nodaway,45,Moderately well drained,18.0,79.0,1.0,6.7,0.22,20.0,6.0,74.0,1.4,16.6,OSM_1428284928
+3004689,"Nodaway-Lawson-Klum complex, 0 to 3 percent slopes, occasionally flooded",Lawson,35,Somewhat poorly drained,0.0,20.0,5.0,6.7,0.23,22.0,12.0,66.0,1.3,19.3,OSM_1428284928
+3004689,"Nodaway-Lawson-Klum complex, 0 to 3 percent slopes, occasionally flooded",Lawson,35,Somewhat poorly drained,20.0,76.0,5.0,7.0,0.2,20.0,11.0,69.0,1.23,17.7,OSM_1428284928
+3004689,"Nodaway-Lawson-Klum complex, 0 to 3 percent slopes, occasionally flooded",Klum,15,Moderately well drained,0.0,20.0,1.75,6.5,0.17,12.0,62.0,26.0,1.54,10.7,OSM_1428284928
+3004689,"Nodaway-Lawson-Klum complex, 0 to 3 percent slopes, occasionally flooded",Klum,15,Moderately well drained,20.0,31.0,0.25,6.5,0.16,12.0,62.0,26.0,1.54,9.9,OSM_1428284928
+404823,"Zook silt loam, heavy till, 0 to 2 percent slopes, occasionally flooded, overwash",Chequest,10,Poorly drained,0.0,20.0,2.5,6.1,0.22,23.0,12.5,64.5,1.37,19.3,OSM_1428284928
+404823,"Zook silt loam, heavy till, 0 to 2 percent slopes, occasionally flooded, overwash",Chequest,10,Poorly drained,20.0,40.0,3.0,6.1,0.22,23.0,12.5,64.5,1.31,19.4,OSM_1428284928
+404775,"Nodaway silt loam, heavy till, 0 to 2 percent slopes, occasionally flooded",Aquents,5,Very poorly drained,0.0,200.0,,,,,,,,,OSM_1428284928
+404775,"Nodaway silt loam, heavy till, 0 to 2 percent slopes, occasionally flooded",Colo,5,Poorly drained,0.0,20.0,6.0,6.3,0.22,30.0,6.0,64.0,1.28,25.6,OSM_1428284928
+404775,"Nodaway silt loam, heavy till, 0 to 2 percent slopes, occasionally flooded",Klum,5,Moderately well drained,0.0,20.0,1.75,6.5,0.17,12.0,62.0,26.0,1.54,10.7,OSM_1428284928
+404790,"Olmitz loam, heavy till, 2 to 5 percent slopes",Colo,5,Poorly drained,0.0,20.0,6.0,7.1,0.22,32.0,6.0,62.0,1.3,27.2,OSM_1428284928
+404790,"Olmitz loam, heavy till, 2 to 5 percent slopes",Vesser,5,Poorly drained,0.0,30.0,2.9,7.2,0.23,22.0,8.0,70.0,1.34,19.1,OSM_1428284928
+404809,"Tuskeego silt loam, 0 to 2 percent slopes, rarely flooded",Coppock,5,Poorly drained,0.0,20.0,3.0,6.7,0.22,21.0,11.0,68.0,1.36,18.1,OSM_1428284928
+404810,"Lawson silt loam, heavy till, 0 to 2 percent slopes, occasionally flooded",Colo,5,Poorly drained,0.0,20.0,6.0,6.5,0.22,32.0,7.0,61.0,1.3,27.2,OSM_1428284928
+404810,"Lawson silt loam, heavy till, 0 to 2 percent slopes, occasionally flooded",Nodaway,5,Moderately well drained,0.0,20.0,2.5,6.7,0.22,18.0,15.0,67.0,1.4,14.9,OSM_1428284928
+404815,"Coppock silt loam, 0 to 2 percent slopes, occasionally flooded",Tuskeego,5,Poorly drained,0.0,20.0,3.5,6.2,0.21,26.0,6.0,68.0,1.39,21.6,OSM_1428284928
+404824,"Cantril loam, 2 to 5 percent slopes",Colo,5,Poorly drained,0.0,20.0,6.0,6.3,0.22,30.0,6.0,64.0,1.28,25.6,OSM_1428284928
+404824,"Cantril loam, 2 to 5 percent slopes",Coppock,5,Poorly drained,0.0,20.0,3.0,6.7,0.22,21.0,11.0,68.0,1.36,18.1,OSM_1428284928
+404824,"Cantril loam, 2 to 5 percent slopes",Nodaway,5,Moderately well drained,0.0,18.0,2.5,6.7,0.22,20.0,6.0,74.0,1.3,17.2,OSM_1428284928
+404826,"Chequest silty clay loam, 0 to 2 percent slopes",Wabash,5,Very poorly drained,0.0,53.0,5.0,6.2,0.13,43.0,7.7,49.3,1.35,41.0,OSM_1428284928
+404824,"Cantril loam, 2 to 5 percent slopes",Nodaway,5,Moderately well drained,18.0,79.0,1.0,6.7,0.22,20.0,6.0,74.0,1.3,16.6,OSM_1428284928
+404775,"Nodaway silt loam, heavy till, 0 to 2 percent slopes, occasionally flooded",Colo,5,Poorly drained,20.0,86.0,3.0,6.4,0.19,31.0,6.0,63.0,1.23,25.7,OSM_1428284928
+404775,"Nodaway silt loam, heavy till, 0 to 2 percent slopes, occasionally flooded",Klum,5,Moderately well drained,20.0,31.0,0.25,6.5,0.16,12.0,62.0,26.0,1.54,9.9,OSM_1428284928
+404790,"Olmitz loam, heavy till, 2 to 5 percent slopes",Colo,5,Poorly drained,20.0,102.0,3.5,7.1,0.19,33.0,6.0,61.0,1.3,27.4,OSM_1428284928
+404809,"Tuskeego silt loam, 0 to 2 percent slopes, rarely flooded",Coppock,5,Poorly drained,20.0,64.0,0.5,6.5,0.2,22.0,11.0,67.0,1.47,17.6,OSM_1428284928
+404810,"Lawson silt loam, heavy till, 0 to 2 percent slopes, occasionally flooded",Colo,5,Poorly drained,20.0,102.0,3.5,6.5,0.19,33.0,7.0,60.0,1.27,27.4,OSM_1428284928
+404810,"Lawson silt loam, heavy till, 0 to 2 percent slopes, occasionally flooded",Nodaway,5,Moderately well drained,20.0,200.0,0.25,6.7,0.22,21.0,4.0,75.0,1.44,16.4,OSM_1428284928
+404815,"Coppock silt loam, 0 to 2 percent slopes, occasionally flooded",Tuskeego,5,Poorly drained,20.0,48.0,1.5,6.2,0.21,19.0,7.0,74.0,1.44,16.1,OSM_1428284928
+404824,"Cantril loam, 2 to 5 percent slopes",Colo,5,Poorly drained,20.0,86.0,3.0,6.4,0.19,31.0,6.0,63.0,1.23,25.7,OSM_1428284928
+404824,"Cantril loam, 2 to 5 percent slopes",Coppock,5,Poorly drained,20.0,64.0,0.5,6.5,0.2,22.0,11.0,67.0,1.47,17.6,OSM_1428284928
+3004689,"Nodaway-Lawson-Klum complex, 0 to 3 percent slopes, occasionally flooded",Wabash,3,Very poorly drained,0.0,15.0,5.0,6.2,0.12,50.0,4.0,46.0,1.31,38.5,OSM_1428284928
+3004689,"Nodaway-Lawson-Klum complex, 0 to 3 percent slopes, occasionally flooded",Wabash,3,Very poorly drained,15.0,48.0,3.0,6.2,0.12,50.0,4.0,46.0,1.24,37.8,OSM_1428284928
+3004689,"Nodaway-Lawson-Klum complex, 0 to 3 percent slopes, occasionally flooded",Chequest,2,Poorly drained,0.0,18.0,3.5,6.9,0.19,32.0,14.0,54.0,1.29,25.9,OSM_1428284928
+3004689,"Nodaway-Lawson-Klum complex, 0 to 3 percent slopes, occasionally flooded",Chequest,2,Poorly drained,18.0,30.0,3.5,6.5,0.19,33.0,15.0,52.0,1.29,26.6,OSM_1428284928
+1860497,Water,Water,100,,,,,,,,,,,,OSM_998713335
+1860773,"Grundy silty clay loam, 2 to 5 percent slopes",Grundy,90,Somewhat poorly drained,0.0,31.0,3.3,6.0,0.22,29.0,5.0,66.0,1.27,24.3,OSM_998713335
+1860776,"Haig silt loam, 0 to 2 percent slopes",Haig,90,Poorly drained,0.0,18.0,4.0,6.1,0.23,25.0,10.0,65.0,1.34,21.0,OSM_998713335
+1860789,"Lamoni silty clay loam, 9 to 14 percent slopes, moderately eroded",Lamoni,90,Somewhat poorly drained,0.0,27.0,3.0,6.4,0.19,33.0,19.0,48.0,1.34,26.4,OSM_998713335
+2420357,"Edina silt loam, 0 to 2 percent slopes",Edina,90,Poorly drained,0.0,23.0,2.5,6.2,0.23,21.0,5.0,74.0,1.36,17.8,OSM_998713335
+1860776,"Haig silt loam, 0 to 2 percent slopes",Haig,90,Poorly drained,18.0,33.0,1.5,5.8,0.22,37.0,8.0,55.0,1.37,28.5,OSM_998713335
+2420357,"Edina silt loam, 0 to 2 percent slopes",Edina,90,Poorly drained,23.0,46.0,0.75,6.2,0.21,20.0,5.0,75.0,1.46,17.1,OSM_998713335
+1860789,"Lamoni silty clay loam, 9 to 14 percent slopes, moderately eroded",Lamoni,90,Somewhat poorly drained,27.0,61.0,0.25,5.8,0.15,44.0,27.0,29.0,1.44,31.2,OSM_998713335
+1860430,"Shelby loam, 9 to 14 percent slopes",Shelby,85,Well drained,0.0,25.0,3.5,5.6,0.16,25.0,44.0,31.0,1.53,19.7,OSM_998713335
+1860468,"Clarinda silty clay loam, 5 to 9 percent slopes, moderately eroded",Clarinda,85,Poorly drained,0.0,20.0,2.5,6.2,0.16,33.0,5.0,62.0,1.39,26.3,OSM_998713335
+2420355,"Arispe silty clay loam, 5 to 9 percent slopes, moderately eroded",Arispe,85,Somewhat poorly drained,0.0,20.0,3.0,6.5,0.19,33.0,4.0,63.0,1.42,26.4,OSM_998713335
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Arispe,85,Somewhat poorly drained,0.0,20.0,3.5,6.5,0.19,33.0,4.0,63.0,1.41,26.6,OSM_998713335
+2422545,"Clarinda silty clay loam, 5 to 9 percent slopes",Clarinda,85,Poorly drained,0.0,20.0,3.2,6.2,0.16,32.0,4.0,64.0,1.48,25.8,OSM_998713335
+1860468,"Clarinda silty clay loam, 5 to 9 percent slopes, moderately eroded",Clarinda,85,Poorly drained,20.0,41.0,0.25,5.5,0.11,47.0,8.0,45.0,1.38,33.0,OSM_998713335
+2420355,"Arispe silty clay loam, 5 to 9 percent slopes, moderately eroded",Arispe,85,Somewhat poorly drained,20.0,125.0,0.75,6.5,0.19,39.0,3.0,58.0,1.4,29.2,OSM_998713335
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Arispe,85,Somewhat poorly drained,20.0,33.0,2.5,6.5,0.22,34.0,4.0,62.0,1.33,27.0,OSM_998713335
+2422545,"Clarinda silty clay loam, 5 to 9 percent slopes",Clarinda,85,Poorly drained,20.0,28.0,3.0,6.2,0.16,33.0,5.0,62.0,1.48,26.4,OSM_998713335
+1860430,"Shelby loam, 9 to 14 percent slopes",Shelby,85,Well drained,25.0,97.0,0.81,6.4,0.15,33.0,34.0,33.0,1.6,23.7,OSM_998713335
+2422545,"Clarinda silty clay loam, 5 to 9 percent slopes",Clarinda,85,Poorly drained,28.0,48.0,0.25,5.5,0.11,47.0,8.0,45.0,1.58,33.0,OSM_998713335
+1860431,"Shelby clay loam, 9 to 14 percent slopes, moderately eroded",Shelby,80,Well drained,0.0,18.0,2.5,6.5,0.16,31.0,35.0,34.0,1.53,25.0,OSM_998713335
+1860431,"Shelby clay loam, 9 to 14 percent slopes, moderately eroded",Shelby,80,Well drained,18.0,125.0,0.81,6.4,0.15,33.0,34.0,33.0,1.6,23.7,OSM_998713335
+2422539,"Zook-Olmitz-Vesser complex, 0 to 5 percent slopes",Zook,50,Poorly drained,0.0,20.0,6.0,6.1,0.22,34.0,7.0,59.0,1.28,27.8,OSM_998713335
+2422539,"Zook-Olmitz-Vesser complex, 0 to 5 percent slopes",Zook,50,Poorly drained,20.0,51.0,6.0,6.1,0.22,36.0,7.0,57.0,1.25,29.2,OSM_998713335
+2422539,"Zook-Olmitz-Vesser complex, 0 to 5 percent slopes",Olmitz,20,Moderately well drained,0.0,18.0,3.5,6.6,0.18,26.0,43.0,31.0,1.45,22.3,OSM_998713335
+2422539,"Zook-Olmitz-Vesser complex, 0 to 5 percent slopes",Olmitz,20,Moderately well drained,18.0,38.0,2.5,6.6,0.18,27.0,45.0,28.0,1.44,22.3,OSM_998713335
+2422539,"Zook-Olmitz-Vesser complex, 0 to 5 percent slopes",Vesser,15,Poorly drained,0.0,20.0,3.5,6.5,0.22,23.0,11.0,66.0,1.36,19.8,OSM_998713335
+2422539,"Zook-Olmitz-Vesser complex, 0 to 5 percent slopes",Vesser,15,Poorly drained,20.0,38.0,2.5,6.5,0.22,23.0,11.0,66.0,1.34,19.5,OSM_998713335
+1860431,"Shelby clay loam, 9 to 14 percent slopes, moderately eroded",Lamoni,10,Somewhat poorly drained,0.0,18.0,4.3,6.1,0.18,38.0,25.0,37.0,1.33,30.2,OSM_998713335
+1860468,"Clarinda silty clay loam, 5 to 9 percent slopes, moderately eroded",Clearfield,10,Poorly drained,0.0,20.0,3.5,6.5,0.21,33.0,3.0,64.0,1.38,26.6,OSM_998713335
+1860776,"Haig silt loam, 0 to 2 percent slopes",Edina,10,Poorly drained,0.0,20.0,2.6,6.8,0.23,18.0,3.0,79.0,1.31,15.6,OSM_998713335
+2420355,"Arispe silty clay loam, 5 to 9 percent slopes, moderately eroded",Clarinda,10,Poorly drained,0.0,20.0,2.5,6.2,0.16,33.0,5.0,62.0,1.39,26.3,OSM_998713335
+2420357,"Edina silt loam, 0 to 2 percent slopes",Haig,10,Poorly drained,0.0,18.0,4.0,6.1,0.23,26.0,4.0,70.0,1.34,21.7,OSM_998713335
+2422539,"Zook-Olmitz-Vesser complex, 0 to 5 percent slopes",Zook,10,Poorly drained,0.0,20.0,2.5,6.1,0.22,23.0,12.5,64.5,1.37,19.3,OSM_998713335
+2422545,"Clarinda silty clay loam, 5 to 9 percent slopes",Clearfield,10,Poorly drained,0.0,20.0,3.5,6.5,0.22,33.0,3.0,64.0,1.35,26.6,OSM_998713335
+1860431,"Shelby clay loam, 9 to 14 percent slopes, moderately eroded",Lamoni,10,Somewhat poorly drained,18.0,79.0,1.37,5.5,0.1,50.0,23.0,27.0,1.43,36.8,OSM_998713335
+2420357,"Edina silt loam, 0 to 2 percent slopes",Haig,10,Poorly drained,18.0,33.0,1.5,5.8,0.22,39.0,2.0,59.0,1.33,29.8,OSM_998713335
+1860468,"Clarinda silty clay loam, 5 to 9 percent slopes, moderately eroded",Clearfield,10,Poorly drained,20.0,43.0,2.75,6.5,0.19,35.0,3.0,62.0,1.32,27.7,OSM_998713335
+1860776,"Haig silt loam, 0 to 2 percent slopes",Edina,10,Poorly drained,20.0,36.0,1.0,6.4,0.21,23.0,5.0,72.0,1.42,18.7,OSM_998713335
+2420355,"Arispe silty clay loam, 5 to 9 percent slopes, moderately eroded",Clarinda,10,Poorly drained,20.0,41.0,0.25,5.5,0.11,47.0,8.0,45.0,1.38,33.0,OSM_998713335
+2422539,"Zook-Olmitz-Vesser complex, 0 to 5 percent slopes",Zook,10,Poorly drained,20.0,33.0,3.0,6.1,0.22,23.0,12.5,64.5,1.31,19.4,OSM_998713335
+2422545,"Clarinda silty clay loam, 5 to 9 percent slopes",Clearfield,10,Poorly drained,20.0,43.0,2.75,6.5,0.19,35.0,3.0,62.0,1.38,27.7,OSM_998713335
+1860430,"Shelby loam, 9 to 14 percent slopes",Lamoni,5,Somewhat poorly drained,0.0,18.0,4.3,6.1,0.18,38.0,25.0,37.0,1.33,30.2,OSM_998713335
+1860430,"Shelby loam, 9 to 14 percent slopes",Olmitz,5,Moderately well drained,0.0,25.0,3.5,6.5,0.21,26.0,38.0,36.0,1.43,22.1,OSM_998713335
+1860430,"Shelby loam, 9 to 14 percent slopes",Shelby,5,Well drained,0.0,18.0,2.5,6.5,0.16,31.0,35.0,34.0,1.53,25.0,OSM_998713335
+1860431,"Shelby clay loam, 9 to 14 percent slopes, moderately eroded",Olmitz,5,Moderately well drained,0.0,25.0,3.5,6.5,0.21,26.0,38.0,36.0,1.43,22.1,OSM_998713335
+1860431,"Shelby clay loam, 9 to 14 percent slopes, moderately eroded",Shelby,5,Well drained,0.0,13.0,1.5,6.5,0.16,31.0,35.0,34.0,1.53,25.0,OSM_998713335
+1860468,"Clarinda silty clay loam, 5 to 9 percent slopes, moderately eroded",Clarinda,5,Poorly drained,0.0,15.0,2.5,6.2,0.16,33.0,5.0,62.0,1.39,26.3,OSM_998713335
+1860773,"Grundy silty clay loam, 2 to 5 percent slopes",Edina,5,Poorly drained,0.0,23.0,4.0,6.2,0.23,23.0,26.0,51.0,1.4,19.6,OSM_998713335
+1860773,"Grundy silty clay loam, 2 to 5 percent slopes",Haig,5,Poorly drained,0.0,18.0,3.5,6.1,0.23,25.0,10.0,65.0,1.34,20.9,OSM_998713335
+1860789,"Lamoni silty clay loam, 9 to 14 percent slopes, moderately eroded",Clarinda,5,Poorly drained,0.0,20.0,3.2,6.2,0.16,32.0,4.0,64.0,1.4,25.8,OSM_998713335
+1860789,"Lamoni silty clay loam, 9 to 14 percent slopes, moderately eroded",Clearfield,5,Poorly drained,0.0,20.0,3.5,6.5,0.22,33.0,3.0,64.0,1.38,26.6,OSM_998713335
+2420355,"Arispe silty clay loam, 5 to 9 percent slopes, moderately eroded",Lagonda,5,Somewhat poorly drained,0.0,18.0,2.75,7.4,0.22,28.0,6.0,66.0,1.36,22.9,OSM_998713335
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Arispe,5,Somewhat poorly drained,0.0,20.0,3.5,6.5,0.19,33.0,4.0,63.0,1.41,26.6,OSM_998713335
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Clarinda,5,Poorly drained,0.0,20.0,3.2,6.2,0.16,32.0,4.0,64.0,1.4,25.8,OSM_998713335
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Lagonda,5,Somewhat poorly drained,0.0,18.0,2.75,7.4,0.22,28.0,6.0,66.0,1.36,22.9,OSM_998713335
+2422539,"Zook-Olmitz-Vesser complex, 0 to 5 percent slopes",Zook,5,Poorly drained,0.0,20.0,6.0,6.1,0.22,34.0,7.0,59.0,1.28,27.8,OSM_998713335
+2422545,"Clarinda silty clay loam, 5 to 9 percent slopes",Clarinda,5,Poorly drained,0.0,20.0,2.5,6.2,0.16,33.0,5.0,62.0,1.48,25.8,OSM_998713335
+1860431,"Shelby clay loam, 9 to 14 percent slopes, moderately eroded",Shelby,5,Well drained,13.0,97.0,0.81,6.4,0.15,33.0,34.0,33.0,1.6,23.7,OSM_998713335
+1860468,"Clarinda silty clay loam, 5 to 9 percent slopes, moderately eroded",Clarinda,5,Poorly drained,15.0,30.0,0.25,5.5,0.11,47.0,8.0,45.0,1.38,33.0,OSM_998713335
+1860430,"Shelby loam, 9 to 14 percent slopes",Lamoni,5,Somewhat poorly drained,18.0,79.0,1.37,5.5,0.1,50.0,23.0,27.0,1.43,36.8,OSM_998713335
+1860430,"Shelby loam, 9 to 14 percent slopes",Shelby,5,Well drained,18.0,125.0,0.81,6.4,0.15,33.0,34.0,33.0,1.6,23.7,OSM_998713335
+1860773,"Grundy silty clay loam, 2 to 5 percent slopes",Haig,5,Poorly drained,18.0,33.0,1.5,5.8,0.22,37.0,8.0,55.0,1.37,28.5,OSM_998713335
+2420355,"Arispe silty clay loam, 5 to 9 percent slopes, moderately eroded",Lagonda,5,Somewhat poorly drained,18.0,30.0,2.2,6.0,0.12,34.0,8.0,58.0,1.34,26.9,OSM_998713335
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Lagonda,5,Somewhat poorly drained,18.0,30.0,2.2,6.0,0.12,34.0,8.0,58.0,1.34,26.9,OSM_998713335
+1860789,"Lamoni silty clay loam, 9 to 14 percent slopes, moderately eroded",Clarinda,5,Poorly drained,20.0,28.0,3.0,6.2,0.16,33.0,5.0,62.0,1.33,26.4,OSM_998713335
+1860789,"Lamoni silty clay loam, 9 to 14 percent slopes, moderately eroded",Clearfield,5,Poorly drained,20.0,43.0,2.75,6.5,0.19,35.0,3.0,62.0,1.32,27.7,OSM_998713335
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Arispe,5,Somewhat poorly drained,20.0,125.0,0.75,6.5,0.19,39.0,3.0,58.0,1.4,29.2,OSM_998713335
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Clarinda,5,Poorly drained,20.0,28.0,3.0,6.2,0.16,33.0,5.0,62.0,1.33,26.4,OSM_998713335
+2422539,"Zook-Olmitz-Vesser complex, 0 to 5 percent slopes",Zook,5,Poorly drained,20.0,51.0,6.0,6.1,0.22,36.0,7.0,57.0,1.25,29.2,OSM_998713335
+2422545,"Clarinda silty clay loam, 5 to 9 percent slopes",Clarinda,5,Poorly drained,20.0,41.0,0.25,5.5,0.11,47.0,8.0,45.0,1.58,33.0,OSM_998713335
+1860773,"Grundy silty clay loam, 2 to 5 percent slopes",Edina,5,Poorly drained,23.0,41.0,0.75,6.2,0.21,20.0,26.0,54.0,1.4,16.4,OSM_998713335
+1860430,"Shelby loam, 9 to 14 percent slopes",Olmitz,5,Moderately well drained,25.0,66.0,2.5,6.5,0.16,28.0,30.0,42.0,1.43,23.3,OSM_998713335
+1860431,"Shelby clay loam, 9 to 14 percent slopes, moderately eroded",Olmitz,5,Moderately well drained,25.0,66.0,2.5,6.5,0.16,28.0,30.0,42.0,1.43,23.3,OSM_998713335
+1860789,"Lamoni silty clay loam, 9 to 14 percent slopes, moderately eroded",Clarinda,5,Poorly drained,28.0,48.0,0.25,5.5,0.11,47.0,8.0,45.0,1.38,33.0,OSM_998713335
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Clarinda,5,Poorly drained,28.0,48.0,0.25,5.5,0.11,47.0,8.0,45.0,1.38,33.0,OSM_998713335
+1860800,"Seymour silt loam, 2 to 5 percent slopes",Seymour,95,Somewhat poorly drained,0.0,20.0,3.5,6.5,0.23,25.0,1.0,74.0,1.39,20.9,OSM_998706549
+1860800,"Seymour silt loam, 2 to 5 percent slopes",Seymour,95,Somewhat poorly drained,20.0,32.0,2.5,6.5,0.19,34.0,2.0,64.0,1.28,27.0,OSM_998706549
+1860469,"Clarinda silty clay, 5 to 9 percent slopes, severely eroded",Clarinda,90,Poorly drained,0.0,20.0,1.5,6.2,0.1,42.0,5.0,53.0,1.4,31.8,OSM_998706549
+1860773,"Grundy silty clay loam, 2 to 5 percent slopes",Grundy,90,Somewhat poorly drained,0.0,31.0,3.3,6.0,0.22,29.0,5.0,66.0,1.27,24.3,OSM_998706549
+1860776,"Haig silt loam, 0 to 2 percent slopes",Haig,90,Poorly drained,0.0,18.0,4.0,6.1,0.23,25.0,10.0,65.0,1.34,21.0,OSM_998706549
+2420357,"Edina silt loam, 0 to 2 percent slopes",Edina,90,Poorly drained,0.0,23.0,2.5,6.2,0.23,21.0,5.0,74.0,1.36,17.8,OSM_998706549
+1860776,"Haig silt loam, 0 to 2 percent slopes",Haig,90,Poorly drained,18.0,33.0,1.5,5.8,0.22,37.0,8.0,55.0,1.37,28.5,OSM_998706549
+1860469,"Clarinda silty clay, 5 to 9 percent slopes, severely eroded",Clarinda,90,Poorly drained,20.0,30.0,0.25,5.5,0.09,47.0,8.0,45.0,1.42,33.0,OSM_998706549
+2420357,"Edina silt loam, 0 to 2 percent slopes",Edina,90,Poorly drained,23.0,46.0,0.75,6.2,0.21,20.0,5.0,75.0,1.46,17.1,OSM_998706549
+1860801,"Seymour silt loam, 5 to 9 percent slopes",Seymour,85,Somewhat poorly drained,0.0,20.0,3.5,6.5,0.23,25.0,1.0,74.0,1.39,20.9,OSM_998706549
+2420355,"Arispe silty clay loam, 5 to 9 percent slopes, moderately eroded",Arispe,85,Somewhat poorly drained,0.0,20.0,3.0,6.5,0.19,33.0,4.0,63.0,1.42,26.4,OSM_998706549
+1860801,"Seymour silt loam, 5 to 9 percent slopes",Seymour,85,Somewhat poorly drained,20.0,32.0,2.5,6.5,0.19,34.0,2.0,64.0,1.32,27.0,OSM_998706549
+2420355,"Arispe silty clay loam, 5 to 9 percent slopes, moderately eroded",Arispe,85,Somewhat poorly drained,20.0,125.0,0.75,6.5,0.19,39.0,3.0,58.0,1.4,29.2,OSM_998706549
+2422539,"Zook-Olmitz-Vesser complex, 0 to 5 percent slopes",Zook,50,Poorly drained,0.0,20.0,6.0,6.1,0.22,34.0,7.0,59.0,1.28,27.8,OSM_998706549
+2422539,"Zook-Olmitz-Vesser complex, 0 to 5 percent slopes",Zook,50,Poorly drained,20.0,51.0,6.0,6.1,0.22,36.0,7.0,57.0,1.25,29.2,OSM_998706549
+2422539,"Zook-Olmitz-Vesser complex, 0 to 5 percent slopes",Olmitz,20,Moderately well drained,0.0,18.0,3.5,6.6,0.18,26.0,43.0,31.0,1.45,22.3,OSM_998706549
+2422539,"Zook-Olmitz-Vesser complex, 0 to 5 percent slopes",Olmitz,20,Moderately well drained,18.0,38.0,2.5,6.6,0.18,27.0,45.0,28.0,1.44,22.3,OSM_998706549
+2422539,"Zook-Olmitz-Vesser complex, 0 to 5 percent slopes",Vesser,15,Poorly drained,0.0,20.0,3.5,6.5,0.22,23.0,11.0,66.0,1.36,19.8,OSM_998706549
+2422539,"Zook-Olmitz-Vesser complex, 0 to 5 percent slopes",Vesser,15,Poorly drained,20.0,38.0,2.5,6.5,0.22,23.0,11.0,66.0,1.34,19.5,OSM_998706549
+1860776,"Haig silt loam, 0 to 2 percent slopes",Edina,10,Poorly drained,0.0,20.0,2.6,6.8,0.23,18.0,3.0,79.0,1.31,15.6,OSM_998706549
+2420355,"Arispe silty clay loam, 5 to 9 percent slopes, moderately eroded",Clarinda,10,Poorly drained,0.0,20.0,2.5,6.2,0.16,33.0,5.0,62.0,1.39,26.3,OSM_998706549
+2420357,"Edina silt loam, 0 to 2 percent slopes",Haig,10,Poorly drained,0.0,18.0,4.0,6.1,0.23,26.0,4.0,70.0,1.34,21.7,OSM_998706549
+2422539,"Zook-Olmitz-Vesser complex, 0 to 5 percent slopes",Zook,10,Poorly drained,0.0,20.0,2.5,6.1,0.22,23.0,12.5,64.5,1.37,19.3,OSM_998706549
+2420357,"Edina silt loam, 0 to 2 percent slopes",Haig,10,Poorly drained,18.0,33.0,1.5,5.8,0.22,39.0,2.0,59.0,1.33,29.8,OSM_998706549
+1860776,"Haig silt loam, 0 to 2 percent slopes",Edina,10,Poorly drained,20.0,36.0,1.0,6.4,0.21,23.0,5.0,72.0,1.42,18.7,OSM_998706549
+2420355,"Arispe silty clay loam, 5 to 9 percent slopes, moderately eroded",Clarinda,10,Poorly drained,20.0,41.0,0.25,5.5,0.11,47.0,8.0,45.0,1.38,33.0,OSM_998706549
+2422539,"Zook-Olmitz-Vesser complex, 0 to 5 percent slopes",Zook,10,Poorly drained,20.0,33.0,3.0,6.1,0.22,23.0,12.5,64.5,1.31,19.4,OSM_998706549
+1860469,"Clarinda silty clay, 5 to 9 percent slopes, severely eroded",Clearfield,5,Poorly drained,0.0,20.0,2.5,6.5,0.21,33.0,3.0,64.0,1.4,26.3,OSM_998706549
+1860469,"Clarinda silty clay, 5 to 9 percent slopes, severely eroded",Lamoni,5,Somewhat poorly drained,0.0,20.0,2.7,6.2,0.19,34.0,34.0,32.0,1.36,27.0,OSM_998706549
+1860773,"Grundy silty clay loam, 2 to 5 percent slopes",Edina,5,Poorly drained,0.0,23.0,4.0,6.2,0.23,23.0,26.0,51.0,1.4,19.6,OSM_998706549
+1860773,"Grundy silty clay loam, 2 to 5 percent slopes",Haig,5,Poorly drained,0.0,18.0,3.5,6.1,0.23,25.0,10.0,65.0,1.34,20.9,OSM_998706549
+1860800,"Seymour silt loam, 2 to 5 percent slopes",Edina,5,Poorly drained,0.0,20.0,2.6,6.8,0.23,18.0,3.0,79.0,1.42,15.6,OSM_998706549
+1860801,"Seymour silt loam, 5 to 9 percent slopes",Clarinda,5,Poorly drained,0.0,20.0,3.2,6.2,0.16,32.0,4.0,64.0,1.4,25.8,OSM_998706549
+1860801,"Seymour silt loam, 5 to 9 percent slopes",Clearfield,5,Poorly drained,0.0,20.0,3.5,6.5,0.21,33.0,3.0,64.0,1.38,26.6,OSM_998706549
+1860801,"Seymour silt loam, 5 to 9 percent slopes",Seymour,5,Somewhat poorly drained,0.0,20.0,2.5,6.5,0.19,34.0,2.0,64.0,1.38,27.0,OSM_998706549
+2420355,"Arispe silty clay loam, 5 to 9 percent slopes, moderately eroded",Lagonda,5,Somewhat poorly drained,0.0,18.0,2.75,7.4,0.22,28.0,6.0,66.0,1.36,22.9,OSM_998706549
+2422539,"Zook-Olmitz-Vesser complex, 0 to 5 percent slopes",Zook,5,Poorly drained,0.0,20.0,6.0,6.1,0.22,34.0,7.0,59.0,1.28,27.8,OSM_998706549
+1860773,"Grundy silty clay loam, 2 to 5 percent slopes",Haig,5,Poorly drained,18.0,33.0,1.5,5.8,0.22,37.0,8.0,55.0,1.37,28.5,OSM_998706549
+2420355,"Arispe silty clay loam, 5 to 9 percent slopes, moderately eroded",Lagonda,5,Somewhat poorly drained,18.0,30.0,2.2,6.0,0.12,34.0,8.0,58.0,1.34,26.9,OSM_998706549
+1860469,"Clarinda silty clay, 5 to 9 percent slopes, severely eroded",Clearfield,5,Poorly drained,20.0,27.0,2.0,6.5,0.19,35.0,3.0,62.0,1.34,27.4,OSM_998706549
+1860469,"Clarinda silty clay, 5 to 9 percent slopes, severely eroded",Lamoni,5,Somewhat poorly drained,20.0,61.0,0.25,5.8,0.15,44.0,27.0,29.0,1.44,31.2,OSM_998706549
+1860800,"Seymour silt loam, 2 to 5 percent slopes",Edina,5,Poorly drained,20.0,36.0,1.0,6.4,0.21,23.0,5.0,72.0,1.45,18.7,OSM_998706549
+1860801,"Seymour silt loam, 5 to 9 percent slopes",Clarinda,5,Poorly drained,20.0,28.0,3.0,6.2,0.16,33.0,5.0,62.0,1.33,26.4,OSM_998706549
+1860801,"Seymour silt loam, 5 to 9 percent slopes",Clearfield,5,Poorly drained,20.0,43.0,2.75,6.5,0.19,35.0,3.0,62.0,1.32,27.7,OSM_998706549
+1860801,"Seymour silt loam, 5 to 9 percent slopes",Seymour,5,Somewhat poorly drained,20.0,38.0,0.75,5.8,0.15,39.0,2.0,59.0,1.4,29.2,OSM_998706549
+2422539,"Zook-Olmitz-Vesser complex, 0 to 5 percent slopes",Zook,5,Poorly drained,20.0,51.0,6.0,6.1,0.22,36.0,7.0,57.0,1.25,29.2,OSM_998706549
+1860773,"Grundy silty clay loam, 2 to 5 percent slopes",Edina,5,Poorly drained,23.0,41.0,0.75,6.2,0.21,20.0,26.0,54.0,1.4,16.4,OSM_998706549
+1860469,"Clarinda silty clay, 5 to 9 percent slopes, severely eroded",Clearfield,5,Poorly drained,27.0,100.0,0.75,6.1,0.16,38.0,4.0,58.0,1.4,28.5,OSM_998706549
+1860801,"Seymour silt loam, 5 to 9 percent slopes",Clarinda,5,Poorly drained,28.0,48.0,0.25,5.5,0.11,47.0,8.0,45.0,1.38,33.0,OSM_998706549
+1860800,"Seymour silt loam, 2 to 5 percent slopes",Seymour,95,Somewhat poorly drained,0.0,20.0,3.5,6.5,0.23,25.0,1.0,74.0,1.39,20.9,OSM_998713346
+1860800,"Seymour silt loam, 2 to 5 percent slopes",Seymour,95,Somewhat poorly drained,20.0,32.0,2.5,6.5,0.19,34.0,2.0,64.0,1.28,27.0,OSM_998713346
+1860773,"Grundy silty clay loam, 2 to 5 percent slopes",Grundy,90,Somewhat poorly drained,0.0,31.0,3.3,6.0,0.22,29.0,5.0,66.0,1.27,24.3,OSM_998713346
+1860776,"Haig silt loam, 0 to 2 percent slopes",Haig,90,Poorly drained,0.0,18.0,4.0,6.1,0.23,25.0,10.0,65.0,1.34,21.0,OSM_998713346
+2420357,"Edina silt loam, 0 to 2 percent slopes",Edina,90,Poorly drained,0.0,23.0,2.5,6.2,0.23,21.0,5.0,74.0,1.36,17.8,OSM_998713346
+1860776,"Haig silt loam, 0 to 2 percent slopes",Haig,90,Poorly drained,18.0,33.0,1.5,5.8,0.22,37.0,8.0,55.0,1.37,28.5,OSM_998713346
+2420357,"Edina silt loam, 0 to 2 percent slopes",Edina,90,Poorly drained,23.0,46.0,0.75,6.2,0.21,20.0,5.0,75.0,1.46,17.1,OSM_998713346
+1860468,"Clarinda silty clay loam, 5 to 9 percent slopes, moderately eroded",Clarinda,85,Poorly drained,0.0,20.0,2.5,6.2,0.16,33.0,5.0,62.0,1.39,26.3,OSM_998713346
+1860801,"Seymour silt loam, 5 to 9 percent slopes",Seymour,85,Somewhat poorly drained,0.0,20.0,3.5,6.5,0.23,25.0,1.0,74.0,1.39,20.9,OSM_998713346
+1860802,"Seymour silty clay loam, 5 to 9 percent slopes, moderately eroded",Seymour,85,Somewhat poorly drained,0.0,20.0,2.5,6.5,0.19,34.0,2.0,64.0,1.38,27.0,OSM_998713346
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Arispe,85,Somewhat poorly drained,0.0,20.0,3.5,6.5,0.19,33.0,4.0,63.0,1.41,26.6,OSM_998713346
+2422545,"Clarinda silty clay loam, 5 to 9 percent slopes",Clarinda,85,Poorly drained,0.0,20.0,3.2,6.2,0.16,32.0,4.0,64.0,1.48,25.8,OSM_998713346
+1860468,"Clarinda silty clay loam, 5 to 9 percent slopes, moderately eroded",Clarinda,85,Poorly drained,20.0,41.0,0.25,5.5,0.11,47.0,8.0,45.0,1.38,33.0,OSM_998713346
+1860801,"Seymour silt loam, 5 to 9 percent slopes",Seymour,85,Somewhat poorly drained,20.0,32.0,2.5,6.5,0.19,34.0,2.0,64.0,1.32,27.0,OSM_998713346
+1860802,"Seymour silty clay loam, 5 to 9 percent slopes, moderately eroded",Seymour,85,Somewhat poorly drained,20.0,38.0,0.75,5.8,0.15,39.0,2.0,59.0,1.4,29.2,OSM_998713346
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Arispe,85,Somewhat poorly drained,20.0,33.0,2.5,6.5,0.22,34.0,4.0,62.0,1.33,27.0,OSM_998713346
+2422545,"Clarinda silty clay loam, 5 to 9 percent slopes",Clarinda,85,Poorly drained,20.0,28.0,3.0,6.2,0.16,33.0,5.0,62.0,1.48,26.4,OSM_998713346
+2422545,"Clarinda silty clay loam, 5 to 9 percent slopes",Clarinda,85,Poorly drained,28.0,48.0,0.25,5.5,0.11,47.0,8.0,45.0,1.58,33.0,OSM_998713346
+1860468,"Clarinda silty clay loam, 5 to 9 percent slopes, moderately eroded",Clearfield,10,Poorly drained,0.0,20.0,3.5,6.5,0.21,33.0,3.0,64.0,1.38,26.6,OSM_998713346
+1860776,"Haig silt loam, 0 to 2 percent slopes",Edina,10,Poorly drained,0.0,20.0,2.6,6.8,0.23,18.0,3.0,79.0,1.31,15.6,OSM_998713346
+2420357,"Edina silt loam, 0 to 2 percent slopes",Haig,10,Poorly drained,0.0,18.0,4.0,6.1,0.23,26.0,4.0,70.0,1.34,21.7,OSM_998713346
+2422545,"Clarinda silty clay loam, 5 to 9 percent slopes",Clearfield,10,Poorly drained,0.0,20.0,3.5,6.5,0.22,33.0,3.0,64.0,1.35,26.6,OSM_998713346
+2420357,"Edina silt loam, 0 to 2 percent slopes",Haig,10,Poorly drained,18.0,33.0,1.5,5.8,0.22,39.0,2.0,59.0,1.33,29.8,OSM_998713346
+1860468,"Clarinda silty clay loam, 5 to 9 percent slopes, moderately eroded",Clearfield,10,Poorly drained,20.0,43.0,2.75,6.5,0.19,35.0,3.0,62.0,1.32,27.7,OSM_998713346
+1860776,"Haig silt loam, 0 to 2 percent slopes",Edina,10,Poorly drained,20.0,36.0,1.0,6.4,0.21,23.0,5.0,72.0,1.42,18.7,OSM_998713346
+2422545,"Clarinda silty clay loam, 5 to 9 percent slopes",Clearfield,10,Poorly drained,20.0,43.0,2.75,6.5,0.19,35.0,3.0,62.0,1.38,27.7,OSM_998713346
+1860468,"Clarinda silty clay loam, 5 to 9 percent slopes, moderately eroded",Clarinda,5,Poorly drained,0.0,15.0,2.5,6.2,0.16,33.0,5.0,62.0,1.39,26.3,OSM_998713346
+1860773,"Grundy silty clay loam, 2 to 5 percent slopes",Edina,5,Poorly drained,0.0,23.0,4.0,6.2,0.23,23.0,26.0,51.0,1.4,19.6,OSM_998713346
+1860773,"Grundy silty clay loam, 2 to 5 percent slopes",Haig,5,Poorly drained,0.0,18.0,3.5,6.1,0.23,25.0,10.0,65.0,1.34,20.9,OSM_998713346
+1860800,"Seymour silt loam, 2 to 5 percent slopes",Edina,5,Poorly drained,0.0,20.0,2.6,6.8,0.23,18.0,3.0,79.0,1.42,15.6,OSM_998713346
+1860801,"Seymour silt loam, 5 to 9 percent slopes",Clarinda,5,Poorly drained,0.0,20.0,3.2,6.2,0.16,32.0,4.0,64.0,1.4,25.8,OSM_998713346
+1860801,"Seymour silt loam, 5 to 9 percent slopes",Clearfield,5,Poorly drained,0.0,20.0,3.5,6.5,0.21,33.0,3.0,64.0,1.38,26.6,OSM_998713346
+1860801,"Seymour silt loam, 5 to 9 percent slopes",Seymour,5,Somewhat poorly drained,0.0,20.0,2.5,6.5,0.19,34.0,2.0,64.0,1.38,27.0,OSM_998713346
+1860802,"Seymour silty clay loam, 5 to 9 percent slopes, moderately eroded",Clarinda,5,Poorly drained,0.0,20.0,2.5,6.2,0.16,33.0,5.0,62.0,1.39,26.3,OSM_998713346
+1860802,"Seymour silty clay loam, 5 to 9 percent slopes, moderately eroded",Clearfield,5,Poorly drained,0.0,20.0,3.5,6.5,0.21,33.0,3.0,64.0,1.38,26.6,OSM_998713346
+1860802,"Seymour silty clay loam, 5 to 9 percent slopes, moderately eroded",Seymour,5,Somewhat poorly drained,0.0,15.0,2.5,6.5,0.19,34.0,2.0,64.0,1.38,27.0,OSM_998713346
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Arispe,5,Somewhat poorly drained,0.0,20.0,3.5,6.5,0.19,33.0,4.0,63.0,1.41,26.6,OSM_998713346
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Clarinda,5,Poorly drained,0.0,20.0,3.2,6.2,0.16,32.0,4.0,64.0,1.4,25.8,OSM_998713346
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Lagonda,5,Somewhat poorly drained,0.0,18.0,2.75,7.4,0.22,28.0,6.0,66.0,1.36,22.9,OSM_998713346
+2422545,"Clarinda silty clay loam, 5 to 9 percent slopes",Clarinda,5,Poorly drained,0.0,20.0,2.5,6.2,0.16,33.0,5.0,62.0,1.48,25.8,OSM_998713346
+1860468,"Clarinda silty clay loam, 5 to 9 percent slopes, moderately eroded",Clarinda,5,Poorly drained,15.0,30.0,0.25,5.5,0.11,47.0,8.0,45.0,1.38,33.0,OSM_998713346
+1860802,"Seymour silty clay loam, 5 to 9 percent slopes, moderately eroded",Seymour,5,Somewhat poorly drained,15.0,80.0,0.25,5.8,0.15,42.0,2.0,56.0,1.36,31.8,OSM_998713346
+1860773,"Grundy silty clay loam, 2 to 5 percent slopes",Haig,5,Poorly drained,18.0,33.0,1.5,5.8,0.22,37.0,8.0,55.0,1.37,28.5,OSM_998713346
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Lagonda,5,Somewhat poorly drained,18.0,30.0,2.2,6.0,0.12,34.0,8.0,58.0,1.34,26.9,OSM_998713346
+1860800,"Seymour silt loam, 2 to 5 percent slopes",Edina,5,Poorly drained,20.0,36.0,1.0,6.4,0.21,23.0,5.0,72.0,1.45,18.7,OSM_998713346
+1860801,"Seymour silt loam, 5 to 9 percent slopes",Clarinda,5,Poorly drained,20.0,28.0,3.0,6.2,0.16,33.0,5.0,62.0,1.33,26.4,OSM_998713346
+1860801,"Seymour silt loam, 5 to 9 percent slopes",Clearfield,5,Poorly drained,20.0,43.0,2.75,6.5,0.19,35.0,3.0,62.0,1.32,27.7,OSM_998713346
+1860801,"Seymour silt loam, 5 to 9 percent slopes",Seymour,5,Somewhat poorly drained,20.0,38.0,0.75,5.8,0.15,39.0,2.0,59.0,1.4,29.2,OSM_998713346
+1860802,"Seymour silty clay loam, 5 to 9 percent slopes, moderately eroded",Clarinda,5,Poorly drained,20.0,41.0,0.25,5.5,0.11,47.0,8.0,45.0,1.38,33.0,OSM_998713346
+1860802,"Seymour silty clay loam, 5 to 9 percent slopes, moderately eroded",Clearfield,5,Poorly drained,20.0,33.0,2.75,6.5,0.19,35.0,3.0,62.0,1.32,27.7,OSM_998713346
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Arispe,5,Somewhat poorly drained,20.0,125.0,0.75,6.5,0.19,39.0,3.0,58.0,1.4,29.2,OSM_998713346
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Clarinda,5,Poorly drained,20.0,28.0,3.0,6.2,0.16,33.0,5.0,62.0,1.33,26.4,OSM_998713346
+2422545,"Clarinda silty clay loam, 5 to 9 percent slopes",Clarinda,5,Poorly drained,20.0,41.0,0.25,5.5,0.11,47.0,8.0,45.0,1.58,33.0,OSM_998713346
+1860773,"Grundy silty clay loam, 2 to 5 percent slopes",Edina,5,Poorly drained,23.0,41.0,0.75,6.2,0.21,20.0,26.0,54.0,1.4,16.4,OSM_998713346
+1860801,"Seymour silt loam, 5 to 9 percent slopes",Clarinda,5,Poorly drained,28.0,48.0,0.25,5.5,0.11,47.0,8.0,45.0,1.38,33.0,OSM_998713346
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Clarinda,5,Poorly drained,28.0,48.0,0.25,5.5,0.11,47.0,8.0,45.0,1.38,33.0,OSM_998713346
+1860773,"Grundy silty clay loam, 2 to 5 percent slopes",Grundy,90,Somewhat poorly drained,0.0,31.0,3.3,6.0,0.22,29.0,5.0,66.0,1.27,24.3,OSM_998706547
+1860776,"Haig silt loam, 0 to 2 percent slopes",Haig,90,Poorly drained,0.0,18.0,4.0,6.1,0.23,25.0,10.0,65.0,1.34,21.0,OSM_998706547
+2420357,"Edina silt loam, 0 to 2 percent slopes",Edina,90,Poorly drained,0.0,23.0,2.5,6.2,0.23,21.0,5.0,74.0,1.36,17.8,OSM_998706547
+1860776,"Haig silt loam, 0 to 2 percent slopes",Haig,90,Poorly drained,18.0,33.0,1.5,5.8,0.22,37.0,8.0,55.0,1.37,28.5,OSM_998706547
+2420357,"Edina silt loam, 0 to 2 percent slopes",Edina,90,Poorly drained,23.0,46.0,0.75,6.2,0.21,20.0,5.0,75.0,1.46,17.1,OSM_998706547
+1860468,"Clarinda silty clay loam, 5 to 9 percent slopes, moderately eroded",Clarinda,85,Poorly drained,0.0,20.0,2.5,6.2,0.16,33.0,5.0,62.0,1.39,26.3,OSM_998706547
+2420355,"Arispe silty clay loam, 5 to 9 percent slopes, moderately eroded",Arispe,85,Somewhat poorly drained,0.0,20.0,3.0,6.5,0.19,33.0,4.0,63.0,1.42,26.4,OSM_998706547
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Arispe,85,Somewhat poorly drained,0.0,20.0,3.5,6.5,0.19,33.0,4.0,63.0,1.41,26.6,OSM_998706547
+1860468,"Clarinda silty clay loam, 5 to 9 percent slopes, moderately eroded",Clarinda,85,Poorly drained,20.0,41.0,0.25,5.5,0.11,47.0,8.0,45.0,1.38,33.0,OSM_998706547
+2420355,"Arispe silty clay loam, 5 to 9 percent slopes, moderately eroded",Arispe,85,Somewhat poorly drained,20.0,125.0,0.75,6.5,0.19,39.0,3.0,58.0,1.4,29.2,OSM_998706547
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Arispe,85,Somewhat poorly drained,20.0,33.0,2.5,6.5,0.22,34.0,4.0,62.0,1.33,27.0,OSM_998706547
+2422539,"Zook-Olmitz-Vesser complex, 0 to 5 percent slopes",Zook,50,Poorly drained,0.0,20.0,6.0,6.1,0.22,34.0,7.0,59.0,1.28,27.8,OSM_998706547
+2422539,"Zook-Olmitz-Vesser complex, 0 to 5 percent slopes",Zook,50,Poorly drained,20.0,51.0,6.0,6.1,0.22,36.0,7.0,57.0,1.25,29.2,OSM_998706547
+2422539,"Zook-Olmitz-Vesser complex, 0 to 5 percent slopes",Olmitz,20,Moderately well drained,0.0,18.0,3.5,6.6,0.18,26.0,43.0,31.0,1.45,22.3,OSM_998706547
+2422539,"Zook-Olmitz-Vesser complex, 0 to 5 percent slopes",Olmitz,20,Moderately well drained,18.0,38.0,2.5,6.6,0.18,27.0,45.0,28.0,1.44,22.3,OSM_998706547
+2422539,"Zook-Olmitz-Vesser complex, 0 to 5 percent slopes",Vesser,15,Poorly drained,0.0,20.0,3.5,6.5,0.22,23.0,11.0,66.0,1.36,19.8,OSM_998706547
+2422539,"Zook-Olmitz-Vesser complex, 0 to 5 percent slopes",Vesser,15,Poorly drained,20.0,38.0,2.5,6.5,0.22,23.0,11.0,66.0,1.34,19.5,OSM_998706547
+1860468,"Clarinda silty clay loam, 5 to 9 percent slopes, moderately eroded",Clearfield,10,Poorly drained,0.0,20.0,3.5,6.5,0.21,33.0,3.0,64.0,1.38,26.6,OSM_998706547
+1860776,"Haig silt loam, 0 to 2 percent slopes",Edina,10,Poorly drained,0.0,20.0,2.6,6.8,0.23,18.0,3.0,79.0,1.31,15.6,OSM_998706547
+2420355,"Arispe silty clay loam, 5 to 9 percent slopes, moderately eroded",Clarinda,10,Poorly drained,0.0,20.0,2.5,6.2,0.16,33.0,5.0,62.0,1.39,26.3,OSM_998706547
+2420357,"Edina silt loam, 0 to 2 percent slopes",Haig,10,Poorly drained,0.0,18.0,4.0,6.1,0.23,26.0,4.0,70.0,1.34,21.7,OSM_998706547
+2422539,"Zook-Olmitz-Vesser complex, 0 to 5 percent slopes",Zook,10,Poorly drained,0.0,20.0,2.5,6.1,0.22,23.0,12.5,64.5,1.37,19.3,OSM_998706547
+2420357,"Edina silt loam, 0 to 2 percent slopes",Haig,10,Poorly drained,18.0,33.0,1.5,5.8,0.22,39.0,2.0,59.0,1.33,29.8,OSM_998706547
+1860468,"Clarinda silty clay loam, 5 to 9 percent slopes, moderately eroded",Clearfield,10,Poorly drained,20.0,43.0,2.75,6.5,0.19,35.0,3.0,62.0,1.32,27.7,OSM_998706547
+1860776,"Haig silt loam, 0 to 2 percent slopes",Edina,10,Poorly drained,20.0,36.0,1.0,6.4,0.21,23.0,5.0,72.0,1.42,18.7,OSM_998706547
+2420355,"Arispe silty clay loam, 5 to 9 percent slopes, moderately eroded",Clarinda,10,Poorly drained,20.0,41.0,0.25,5.5,0.11,47.0,8.0,45.0,1.38,33.0,OSM_998706547
+2422539,"Zook-Olmitz-Vesser complex, 0 to 5 percent slopes",Zook,10,Poorly drained,20.0,33.0,3.0,6.1,0.22,23.0,12.5,64.5,1.31,19.4,OSM_998706547
+1860468,"Clarinda silty clay loam, 5 to 9 percent slopes, moderately eroded",Clarinda,5,Poorly drained,0.0,15.0,2.5,6.2,0.16,33.0,5.0,62.0,1.39,26.3,OSM_998706547
+1860773,"Grundy silty clay loam, 2 to 5 percent slopes",Edina,5,Poorly drained,0.0,23.0,4.0,6.2,0.23,23.0,26.0,51.0,1.4,19.6,OSM_998706547
+1860773,"Grundy silty clay loam, 2 to 5 percent slopes",Haig,5,Poorly drained,0.0,18.0,3.5,6.1,0.23,25.0,10.0,65.0,1.34,20.9,OSM_998706547
+2420355,"Arispe silty clay loam, 5 to 9 percent slopes, moderately eroded",Lagonda,5,Somewhat poorly drained,0.0,18.0,2.75,7.4,0.22,28.0,6.0,66.0,1.36,22.9,OSM_998706547
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Arispe,5,Somewhat poorly drained,0.0,20.0,3.5,6.5,0.19,33.0,4.0,63.0,1.41,26.6,OSM_998706547
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Clarinda,5,Poorly drained,0.0,20.0,3.2,6.2,0.16,32.0,4.0,64.0,1.4,25.8,OSM_998706547
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Lagonda,5,Somewhat poorly drained,0.0,18.0,2.75,7.4,0.22,28.0,6.0,66.0,1.36,22.9,OSM_998706547
+2422539,"Zook-Olmitz-Vesser complex, 0 to 5 percent slopes",Zook,5,Poorly drained,0.0,20.0,6.0,6.1,0.22,34.0,7.0,59.0,1.28,27.8,OSM_998706547
+1860468,"Clarinda silty clay loam, 5 to 9 percent slopes, moderately eroded",Clarinda,5,Poorly drained,15.0,30.0,0.25,5.5,0.11,47.0,8.0,45.0,1.38,33.0,OSM_998706547
+1860773,"Grundy silty clay loam, 2 to 5 percent slopes",Haig,5,Poorly drained,18.0,33.0,1.5,5.8,0.22,37.0,8.0,55.0,1.37,28.5,OSM_998706547
+2420355,"Arispe silty clay loam, 5 to 9 percent slopes, moderately eroded",Lagonda,5,Somewhat poorly drained,18.0,30.0,2.2,6.0,0.12,34.0,8.0,58.0,1.34,26.9,OSM_998706547
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Lagonda,5,Somewhat poorly drained,18.0,30.0,2.2,6.0,0.12,34.0,8.0,58.0,1.34,26.9,OSM_998706547
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Arispe,5,Somewhat poorly drained,20.0,125.0,0.75,6.5,0.19,39.0,3.0,58.0,1.4,29.2,OSM_998706547
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Clarinda,5,Poorly drained,20.0,28.0,3.0,6.2,0.16,33.0,5.0,62.0,1.33,26.4,OSM_998706547
+2422539,"Zook-Olmitz-Vesser complex, 0 to 5 percent slopes",Zook,5,Poorly drained,20.0,51.0,6.0,6.1,0.22,36.0,7.0,57.0,1.25,29.2,OSM_998706547
+1860773,"Grundy silty clay loam, 2 to 5 percent slopes",Edina,5,Poorly drained,23.0,41.0,0.75,6.2,0.21,20.0,26.0,54.0,1.4,16.4,OSM_998706547
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Clarinda,5,Poorly drained,28.0,48.0,0.25,5.5,0.11,47.0,8.0,45.0,1.38,33.0,OSM_998706547
+1860800,"Seymour silt loam, 2 to 5 percent slopes",Seymour,95,Somewhat poorly drained,0.0,20.0,3.5,6.5,0.23,25.0,1.0,74.0,1.39,20.9,OSM_998706550
+1860800,"Seymour silt loam, 2 to 5 percent slopes",Seymour,95,Somewhat poorly drained,20.0,32.0,2.5,6.5,0.19,34.0,2.0,64.0,1.28,27.0,OSM_998706550
+1860773,"Grundy silty clay loam, 2 to 5 percent slopes",Grundy,90,Somewhat poorly drained,0.0,31.0,3.3,6.0,0.22,29.0,5.0,66.0,1.27,24.3,OSM_998706550
+1860776,"Haig silt loam, 0 to 2 percent slopes",Haig,90,Poorly drained,0.0,18.0,4.0,6.1,0.23,25.0,10.0,65.0,1.34,21.0,OSM_998706550
+2420357,"Edina silt loam, 0 to 2 percent slopes",Edina,90,Poorly drained,0.0,23.0,2.5,6.2,0.23,21.0,5.0,74.0,1.36,17.8,OSM_998706550
+1860776,"Haig silt loam, 0 to 2 percent slopes",Haig,90,Poorly drained,18.0,33.0,1.5,5.8,0.22,37.0,8.0,55.0,1.37,28.5,OSM_998706550
+2420357,"Edina silt loam, 0 to 2 percent slopes",Edina,90,Poorly drained,23.0,46.0,0.75,6.2,0.21,20.0,5.0,75.0,1.46,17.1,OSM_998706550
+1860801,"Seymour silt loam, 5 to 9 percent slopes",Seymour,85,Somewhat poorly drained,0.0,20.0,3.5,6.5,0.23,25.0,1.0,74.0,1.39,20.9,OSM_998706550
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Arispe,85,Somewhat poorly drained,0.0,20.0,3.5,6.5,0.19,33.0,4.0,63.0,1.41,26.6,OSM_998706550
+1860801,"Seymour silt loam, 5 to 9 percent slopes",Seymour,85,Somewhat poorly drained,20.0,32.0,2.5,6.5,0.19,34.0,2.0,64.0,1.32,27.0,OSM_998706550
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Arispe,85,Somewhat poorly drained,20.0,33.0,2.5,6.5,0.22,34.0,4.0,62.0,1.33,27.0,OSM_998706550
+1860776,"Haig silt loam, 0 to 2 percent slopes",Edina,10,Poorly drained,0.0,20.0,2.6,6.8,0.23,18.0,3.0,79.0,1.31,15.6,OSM_998706550
+2420357,"Edina silt loam, 0 to 2 percent slopes",Haig,10,Poorly drained,0.0,18.0,4.0,6.1,0.23,26.0,4.0,70.0,1.34,21.7,OSM_998706550
+2420357,"Edina silt loam, 0 to 2 percent slopes",Haig,10,Poorly drained,18.0,33.0,1.5,5.8,0.22,39.0,2.0,59.0,1.33,29.8,OSM_998706550
+1860776,"Haig silt loam, 0 to 2 percent slopes",Edina,10,Poorly drained,20.0,36.0,1.0,6.4,0.21,23.0,5.0,72.0,1.42,18.7,OSM_998706550
+1860773,"Grundy silty clay loam, 2 to 5 percent slopes",Edina,5,Poorly drained,0.0,23.0,4.0,6.2,0.23,23.0,26.0,51.0,1.4,19.6,OSM_998706550
+1860773,"Grundy silty clay loam, 2 to 5 percent slopes",Haig,5,Poorly drained,0.0,18.0,3.5,6.1,0.23,25.0,10.0,65.0,1.34,20.9,OSM_998706550
+1860800,"Seymour silt loam, 2 to 5 percent slopes",Edina,5,Poorly drained,0.0,20.0,2.6,6.8,0.23,18.0,3.0,79.0,1.42,15.6,OSM_998706550
+1860801,"Seymour silt loam, 5 to 9 percent slopes",Clarinda,5,Poorly drained,0.0,20.0,3.2,6.2,0.16,32.0,4.0,64.0,1.4,25.8,OSM_998706550
+1860801,"Seymour silt loam, 5 to 9 percent slopes",Clearfield,5,Poorly drained,0.0,20.0,3.5,6.5,0.21,33.0,3.0,64.0,1.38,26.6,OSM_998706550
+1860801,"Seymour silt loam, 5 to 9 percent slopes",Seymour,5,Somewhat poorly drained,0.0,20.0,2.5,6.5,0.19,34.0,2.0,64.0,1.38,27.0,OSM_998706550
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Arispe,5,Somewhat poorly drained,0.0,20.0,3.5,6.5,0.19,33.0,4.0,63.0,1.41,26.6,OSM_998706550
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Clarinda,5,Poorly drained,0.0,20.0,3.2,6.2,0.16,32.0,4.0,64.0,1.4,25.8,OSM_998706550
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Lagonda,5,Somewhat poorly drained,0.0,18.0,2.75,7.4,0.22,28.0,6.0,66.0,1.36,22.9,OSM_998706550
+1860773,"Grundy silty clay loam, 2 to 5 percent slopes",Haig,5,Poorly drained,18.0,33.0,1.5,5.8,0.22,37.0,8.0,55.0,1.37,28.5,OSM_998706550
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Lagonda,5,Somewhat poorly drained,18.0,30.0,2.2,6.0,0.12,34.0,8.0,58.0,1.34,26.9,OSM_998706550
+1860800,"Seymour silt loam, 2 to 5 percent slopes",Edina,5,Poorly drained,20.0,36.0,1.0,6.4,0.21,23.0,5.0,72.0,1.45,18.7,OSM_998706550
+1860801,"Seymour silt loam, 5 to 9 percent slopes",Clarinda,5,Poorly drained,20.0,28.0,3.0,6.2,0.16,33.0,5.0,62.0,1.33,26.4,OSM_998706550
+1860801,"Seymour silt loam, 5 to 9 percent slopes",Clearfield,5,Poorly drained,20.0,43.0,2.75,6.5,0.19,35.0,3.0,62.0,1.32,27.7,OSM_998706550
+1860801,"Seymour silt loam, 5 to 9 percent slopes",Seymour,5,Somewhat poorly drained,20.0,38.0,0.75,5.8,0.15,39.0,2.0,59.0,1.4,29.2,OSM_998706550
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Arispe,5,Somewhat poorly drained,20.0,125.0,0.75,6.5,0.19,39.0,3.0,58.0,1.4,29.2,OSM_998706550
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Clarinda,5,Poorly drained,20.0,28.0,3.0,6.2,0.16,33.0,5.0,62.0,1.33,26.4,OSM_998706550
+1860773,"Grundy silty clay loam, 2 to 5 percent slopes",Edina,5,Poorly drained,23.0,41.0,0.75,6.2,0.21,20.0,26.0,54.0,1.4,16.4,OSM_998706550
+1860801,"Seymour silt loam, 5 to 9 percent slopes",Clarinda,5,Poorly drained,28.0,48.0,0.25,5.5,0.11,47.0,8.0,45.0,1.38,33.0,OSM_998706550
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Clarinda,5,Poorly drained,28.0,48.0,0.25,5.5,0.11,47.0,8.0,45.0,1.38,33.0,OSM_998706550
+2531876,"Shelby clay loam, 14 to 18 percent slopes, severely eroded",Shelby,90,Well drained,0.0,13.0,1.5,6.5,0.16,31.0,35.0,34.0,1.42,25.0,OSM_1434730614
+2531876,"Shelby clay loam, 14 to 18 percent slopes, severely eroded",Shelby,90,Well drained,13.0,97.0,0.81,6.4,0.15,33.0,34.0,33.0,1.44,25.8,OSM_1434730614
+2528513,"Adair loam, 3 to 9 percent slopes",Adair,88,Somewhat poorly drained,0.0,30.0,3.7,6.1,0.21,24.1,40.1,35.8,1.27,27.5,OSM_1434730614
+2528511,"Adair clay loam, heavy till, 5 to 9 percent slopes, moderately eroded",Adair,85,Somewhat poorly drained,0.0,20.0,2.5,6.2,0.18,31.0,21.0,48.0,1.39,24.9,OSM_1434730614
+2531880,"Shelby clay loam, 9 to 14 percent slopes, severely eroded",Shelby,85,Well drained,0.0,13.0,1.5,6.5,0.16,31.0,35.0,34.0,1.53,25.0,OSM_1434730614
+2531897,"Shelby loam, 9 to 14 percent slopes",Shelby,85,Well drained,0.0,25.0,3.5,5.6,0.16,25.0,44.0,31.0,1.53,19.7,OSM_1434730614
+2531880,"Shelby clay loam, 9 to 14 percent slopes, severely eroded",Shelby,85,Well drained,13.0,97.0,0.81,6.4,0.15,33.0,34.0,33.0,1.6,23.7,OSM_1434730614
+2528511,"Adair clay loam, heavy till, 5 to 9 percent slopes, moderately eroded",Adair,85,Somewhat poorly drained,20.0,43.0,0.75,5.8,0.1,49.0,25.0,26.0,1.4,35.5,OSM_1434730614
+2531897,"Shelby loam, 9 to 14 percent slopes",Shelby,85,Well drained,25.0,97.0,0.81,6.4,0.15,33.0,34.0,33.0,1.6,23.7,OSM_1434730614
+2531886,"Shelby loam, 14 to 18 percent slopes",Shelby,80,Well drained,0.0,25.0,3.5,5.6,0.16,25.0,44.0,31.0,1.53,19.7,OSM_1434730614
+2531886,"Shelby loam, 14 to 18 percent slopes",Shelby,80,Well drained,25.0,97.0,0.81,6.4,0.15,34.0,34.0,32.0,1.6,23.7,OSM_1434730614
+2544603,"Zook-Colo silty clay loams, 1 to 3 percent slopes, frequently flooded",Zook,55,Poorly drained,0.0,122.0,5.0,6.4,0.19,34.8,16.0,49.2,1.33,34.5,OSM_1434730614
+2544603,"Zook-Colo silty clay loams, 1 to 3 percent slopes, frequently flooded",Colo,33,Poorly drained,0.0,117.0,6.0,6.1,0.19,32.9,1.6,65.5,1.3,38.5,OSM_1434730614
+2528513,"Adair loam, 3 to 9 percent slopes",Shelby,12,Well drained,0.0,25.0,3.5,5.6,0.16,25.0,44.0,31.0,1.53,19.7,OSM_1434730614
+2528513,"Adair loam, 3 to 9 percent slopes",Shelby,12,Well drained,25.0,97.0,0.81,6.4,0.15,33.0,34.0,33.0,1.6,23.7,OSM_1434730614
+2531880,"Shelby clay loam, 9 to 14 percent slopes, severely eroded",Adair,10,Somewhat poorly drained,0.0,18.0,4.3,6.1,0.18,38.0,25.0,37.0,1.33,30.2,OSM_1434730614
+2531880,"Shelby clay loam, 9 to 14 percent slopes, severely eroded",Adair,10,Somewhat poorly drained,18.0,79.0,1.37,5.5,0.1,50.0,23.0,27.0,1.43,36.8,OSM_1434730614
+2544603,"Zook-Colo silty clay loams, 1 to 3 percent slopes, frequently flooded",Kennebec,7,Moderately well drained,0.0,48.0,3.2,6.5,0.23,25.1,5.2,69.7,1.3,22.6,OSM_1434730614
+2528511,"Adair clay loam, heavy till, 5 to 9 percent slopes, moderately eroded",Adair,5,Somewhat poorly drained,0.0,20.0,1.5,6.2,0.22,31.0,25.0,44.0,1.4,24.5,OSM_1434730614
+2528511,"Adair clay loam, heavy till, 5 to 9 percent slopes, moderately eroded",Clarinda,5,Poorly drained,0.0,20.0,2.5,6.2,0.16,33.0,5.0,62.0,1.39,26.3,OSM_1434730614
+2528511,"Adair clay loam, heavy till, 5 to 9 percent slopes, moderately eroded",Clearfield,5,Poorly drained,0.0,20.0,3.5,6.5,0.21,33.0,3.0,64.0,1.38,26.6,OSM_1434730614
+2531876,"Shelby clay loam, 14 to 18 percent slopes, severely eroded",Adair,5,Somewhat poorly drained,0.0,20.0,1.5,6.2,0.22,31.0,25.0,44.0,1.4,24.5,OSM_1434730614
+2531876,"Shelby clay loam, 14 to 18 percent slopes, severely eroded",Olmitz,5,Moderately well drained,0.0,18.0,3.5,6.6,0.18,26.0,43.0,31.0,1.45,22.3,OSM_1434730614
+2531880,"Shelby clay loam, 9 to 14 percent slopes, severely eroded",Olmitz,5,Moderately well drained,0.0,25.0,3.5,6.5,0.21,26.0,38.0,36.0,1.43,22.1,OSM_1434730614
+2531886,"Shelby loam, 14 to 18 percent slopes",Adair,5,Somewhat poorly drained,0.0,18.0,4.3,6.1,0.18,38.0,25.0,37.0,1.33,30.2,OSM_1434730614
+2531886,"Shelby loam, 14 to 18 percent slopes",Lamoni,5,Somewhat poorly drained,0.0,18.0,4.3,6.1,0.18,38.0,25.0,37.0,1.33,30.2,OSM_1434730614
+2531886,"Shelby loam, 14 to 18 percent slopes",Olmitz,5,Moderately well drained,0.0,25.0,3.5,6.5,0.21,26.0,38.0,36.0,1.43,22.1,OSM_1434730614
+2531886,"Shelby loam, 14 to 18 percent slopes",Shelby,5,Well drained,0.0,18.0,2.5,6.5,0.16,31.0,35.0,34.0,1.53,25.0,OSM_1434730614
+2531897,"Shelby loam, 9 to 14 percent slopes",Lamoni,5,Somewhat poorly drained,0.0,18.0,4.3,6.1,0.18,38.0,25.0,37.0,1.33,30.2,OSM_1434730614
+2531897,"Shelby loam, 9 to 14 percent slopes",Olmitz,5,Moderately well drained,0.0,25.0,3.5,6.5,0.21,26.0,38.0,36.0,1.43,22.1,OSM_1434730614
+2531897,"Shelby loam, 9 to 14 percent slopes",Shelby,5,Well drained,0.0,18.0,2.5,6.5,0.16,31.0,35.0,34.0,1.53,25.0,OSM_1434730614
+2544603,"Zook-Colo silty clay loams, 1 to 3 percent slopes, frequently flooded",Nodaway,5,Moderately well drained,0.0,20.0,2.5,6.7,0.22,17.0,14.8,68.2,1.3,14.9,OSM_1434730614
+2531876,"Shelby clay loam, 14 to 18 percent slopes, severely eroded",Olmitz,5,Moderately well drained,18.0,38.0,2.5,6.6,0.18,27.0,45.0,28.0,1.44,22.3,OSM_1434730614
+2531886,"Shelby loam, 14 to 18 percent slopes",Adair,5,Somewhat poorly drained,18.0,79.0,1.37,5.5,0.1,50.0,23.0,27.0,1.43,36.8,OSM_1434730614
+2531886,"Shelby loam, 14 to 18 percent slopes",Lamoni,5,Somewhat poorly drained,18.0,79.0,1.37,5.5,0.1,50.0,23.0,27.0,1.43,36.8,OSM_1434730614
+2531886,"Shelby loam, 14 to 18 percent slopes",Shelby,5,Well drained,18.0,97.0,0.81,6.4,0.15,34.0,34.0,32.0,1.6,23.7,OSM_1434730614
+2531897,"Shelby loam, 9 to 14 percent slopes",Lamoni,5,Somewhat poorly drained,18.0,79.0,1.37,5.5,0.1,50.0,23.0,27.0,1.43,36.8,OSM_1434730614
+2531897,"Shelby loam, 9 to 14 percent slopes",Shelby,5,Well drained,18.0,125.0,0.81,6.4,0.15,33.0,34.0,33.0,1.6,23.7,OSM_1434730614
+2528511,"Adair clay loam, heavy till, 5 to 9 percent slopes, moderately eroded",Adair,5,Somewhat poorly drained,20.0,30.0,0.25,5.8,0.15,49.0,25.0,26.0,1.44,34.2,OSM_1434730614
+2528511,"Adair clay loam, heavy till, 5 to 9 percent slopes, moderately eroded",Clarinda,5,Poorly drained,20.0,41.0,0.25,5.5,0.11,47.0,8.0,45.0,1.38,,OSM_1434730614
+2528511,"Adair clay loam, heavy till, 5 to 9 percent slopes, moderately eroded",Clearfield,5,Poorly drained,20.0,33.0,2.75,6.5,0.19,35.0,3.0,62.0,1.32,27.7,OSM_1434730614
+2531876,"Shelby clay loam, 14 to 18 percent slopes, severely eroded",Adair,5,Somewhat poorly drained,20.0,30.0,0.25,5.8,0.15,49.0,25.0,26.0,1.44,34.2,OSM_1434730614
+2544603,"Zook-Colo silty clay loams, 1 to 3 percent slopes, frequently flooded",Nodaway,5,Moderately well drained,20.0,152.0,0.25,6.7,0.22,21.6,3.6,74.8,1.3,16.8,OSM_1434730614
+2531880,"Shelby clay loam, 9 to 14 percent slopes, severely eroded",Olmitz,5,Moderately well drained,25.0,66.0,2.5,6.5,0.16,28.0,30.0,42.0,1.43,23.3,OSM_1434730614
+2531886,"Shelby loam, 14 to 18 percent slopes",Olmitz,5,Moderately well drained,25.0,66.0,2.5,6.5,0.16,28.0,30.0,42.0,1.43,23.3,OSM_1434730614
+2531897,"Shelby loam, 9 to 14 percent slopes",Olmitz,5,Moderately well drained,25.0,66.0,2.5,6.5,0.16,28.0,30.0,42.0,1.43,23.3,OSM_1434730614
+1860773,"Grundy silty clay loam, 2 to 5 percent slopes",Grundy,90,Somewhat poorly drained,0.0,31.0,3.3,6.0,0.22,29.0,5.0,66.0,1.27,24.3,OSM_998713337
+1860776,"Haig silt loam, 0 to 2 percent slopes",Haig,90,Poorly drained,0.0,18.0,4.0,6.1,0.23,25.0,10.0,65.0,1.34,21.0,OSM_998713337
+1860789,"Lamoni silty clay loam, 9 to 14 percent slopes, moderately eroded",Lamoni,90,Somewhat poorly drained,0.0,27.0,3.0,6.4,0.19,33.0,19.0,48.0,1.34,26.4,OSM_998713337
+2420357,"Edina silt loam, 0 to 2 percent slopes",Edina,90,Poorly drained,0.0,23.0,2.5,6.2,0.23,21.0,5.0,74.0,1.36,17.8,OSM_998713337
+1860776,"Haig silt loam, 0 to 2 percent slopes",Haig,90,Poorly drained,18.0,33.0,1.5,5.8,0.22,37.0,8.0,55.0,1.37,28.5,OSM_998713337
+2420357,"Edina silt loam, 0 to 2 percent slopes",Edina,90,Poorly drained,23.0,46.0,0.75,6.2,0.21,20.0,5.0,75.0,1.46,17.1,OSM_998713337
+1860789,"Lamoni silty clay loam, 9 to 14 percent slopes, moderately eroded",Lamoni,90,Somewhat poorly drained,27.0,61.0,0.25,5.8,0.15,44.0,27.0,29.0,1.44,31.2,OSM_998713337
+1860468,"Clarinda silty clay loam, 5 to 9 percent slopes, moderately eroded",Clarinda,85,Poorly drained,0.0,20.0,2.5,6.2,0.16,33.0,5.0,62.0,1.39,26.3,OSM_998713337
+2420355,"Arispe silty clay loam, 5 to 9 percent slopes, moderately eroded",Arispe,85,Somewhat poorly drained,0.0,20.0,3.0,6.5,0.19,33.0,4.0,63.0,1.42,26.4,OSM_998713337
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Arispe,85,Somewhat poorly drained,0.0,20.0,3.5,6.5,0.19,33.0,4.0,63.0,1.41,26.6,OSM_998713337
+2422545,"Clarinda silty clay loam, 5 to 9 percent slopes",Clarinda,85,Poorly drained,0.0,20.0,3.2,6.2,0.16,32.0,4.0,64.0,1.48,25.8,OSM_998713337
+1860468,"Clarinda silty clay loam, 5 to 9 percent slopes, moderately eroded",Clarinda,85,Poorly drained,20.0,41.0,0.25,5.5,0.11,47.0,8.0,45.0,1.38,33.0,OSM_998713337
+2420355,"Arispe silty clay loam, 5 to 9 percent slopes, moderately eroded",Arispe,85,Somewhat poorly drained,20.0,125.0,0.75,6.5,0.19,39.0,3.0,58.0,1.4,29.2,OSM_998713337
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Arispe,85,Somewhat poorly drained,20.0,33.0,2.5,6.5,0.22,34.0,4.0,62.0,1.33,27.0,OSM_998713337
+2422545,"Clarinda silty clay loam, 5 to 9 percent slopes",Clarinda,85,Poorly drained,20.0,28.0,3.0,6.2,0.16,33.0,5.0,62.0,1.48,26.4,OSM_998713337
+2422545,"Clarinda silty clay loam, 5 to 9 percent slopes",Clarinda,85,Poorly drained,28.0,48.0,0.25,5.5,0.11,47.0,8.0,45.0,1.58,33.0,OSM_998713337
+1860431,"Shelby clay loam, 9 to 14 percent slopes, moderately eroded",Shelby,80,Well drained,0.0,18.0,2.5,6.5,0.16,31.0,35.0,34.0,1.53,25.0,OSM_998713337
+1860431,"Shelby clay loam, 9 to 14 percent slopes, moderately eroded",Shelby,80,Well drained,18.0,125.0,0.81,6.4,0.15,33.0,34.0,33.0,1.6,23.7,OSM_998713337
+2422539,"Zook-Olmitz-Vesser complex, 0 to 5 percent slopes",Zook,50,Poorly drained,0.0,20.0,6.0,6.1,0.22,34.0,7.0,59.0,1.28,27.8,OSM_998713337
+2422539,"Zook-Olmitz-Vesser complex, 0 to 5 percent slopes",Zook,50,Poorly drained,20.0,51.0,6.0,6.1,0.22,36.0,7.0,57.0,1.25,29.2,OSM_998713337
+2422539,"Zook-Olmitz-Vesser complex, 0 to 5 percent slopes",Olmitz,20,Moderately well drained,0.0,18.0,3.5,6.6,0.18,26.0,43.0,31.0,1.45,22.3,OSM_998713337
+2422539,"Zook-Olmitz-Vesser complex, 0 to 5 percent slopes",Olmitz,20,Moderately well drained,18.0,38.0,2.5,6.6,0.18,27.0,45.0,28.0,1.44,22.3,OSM_998713337
+2422539,"Zook-Olmitz-Vesser complex, 0 to 5 percent slopes",Vesser,15,Poorly drained,0.0,20.0,3.5,6.5,0.22,23.0,11.0,66.0,1.36,19.8,OSM_998713337
+2422539,"Zook-Olmitz-Vesser complex, 0 to 5 percent slopes",Vesser,15,Poorly drained,20.0,38.0,2.5,6.5,0.22,23.0,11.0,66.0,1.34,19.5,OSM_998713337
+1860431,"Shelby clay loam, 9 to 14 percent slopes, moderately eroded",Lamoni,10,Somewhat poorly drained,0.0,18.0,4.3,6.1,0.18,38.0,25.0,37.0,1.33,30.2,OSM_998713337
+1860468,"Clarinda silty clay loam, 5 to 9 percent slopes, moderately eroded",Clearfield,10,Poorly drained,0.0,20.0,3.5,6.5,0.21,33.0,3.0,64.0,1.38,26.6,OSM_998713337
+1860776,"Haig silt loam, 0 to 2 percent slopes",Edina,10,Poorly drained,0.0,20.0,2.6,6.8,0.23,18.0,3.0,79.0,1.31,15.6,OSM_998713337
+2420355,"Arispe silty clay loam, 5 to 9 percent slopes, moderately eroded",Clarinda,10,Poorly drained,0.0,20.0,2.5,6.2,0.16,33.0,5.0,62.0,1.39,26.3,OSM_998713337
+2420357,"Edina silt loam, 0 to 2 percent slopes",Haig,10,Poorly drained,0.0,18.0,4.0,6.1,0.23,26.0,4.0,70.0,1.34,21.7,OSM_998713337
+2422539,"Zook-Olmitz-Vesser complex, 0 to 5 percent slopes",Zook,10,Poorly drained,0.0,20.0,2.5,6.1,0.22,23.0,12.5,64.5,1.37,19.3,OSM_998713337
+2422545,"Clarinda silty clay loam, 5 to 9 percent slopes",Clearfield,10,Poorly drained,0.0,20.0,3.5,6.5,0.22,33.0,3.0,64.0,1.35,26.6,OSM_998713337
+1860431,"Shelby clay loam, 9 to 14 percent slopes, moderately eroded",Lamoni,10,Somewhat poorly drained,18.0,79.0,1.37,5.5,0.1,50.0,23.0,27.0,1.43,36.8,OSM_998713337
+2420357,"Edina silt loam, 0 to 2 percent slopes",Haig,10,Poorly drained,18.0,33.0,1.5,5.8,0.22,39.0,2.0,59.0,1.33,29.8,OSM_998713337
+1860468,"Clarinda silty clay loam, 5 to 9 percent slopes, moderately eroded",Clearfield,10,Poorly drained,20.0,43.0,2.75,6.5,0.19,35.0,3.0,62.0,1.32,27.7,OSM_998713337
+1860776,"Haig silt loam, 0 to 2 percent slopes",Edina,10,Poorly drained,20.0,36.0,1.0,6.4,0.21,23.0,5.0,72.0,1.42,18.7,OSM_998713337
+2420355,"Arispe silty clay loam, 5 to 9 percent slopes, moderately eroded",Clarinda,10,Poorly drained,20.0,41.0,0.25,5.5,0.11,47.0,8.0,45.0,1.38,33.0,OSM_998713337
+2422539,"Zook-Olmitz-Vesser complex, 0 to 5 percent slopes",Zook,10,Poorly drained,20.0,33.0,3.0,6.1,0.22,23.0,12.5,64.5,1.31,19.4,OSM_998713337
+2422545,"Clarinda silty clay loam, 5 to 9 percent slopes",Clearfield,10,Poorly drained,20.0,43.0,2.75,6.5,0.19,35.0,3.0,62.0,1.38,27.7,OSM_998713337
+1860431,"Shelby clay loam, 9 to 14 percent slopes, moderately eroded",Olmitz,5,Moderately well drained,0.0,25.0,3.5,6.5,0.21,26.0,38.0,36.0,1.43,22.1,OSM_998713337
+1860431,"Shelby clay loam, 9 to 14 percent slopes, moderately eroded",Shelby,5,Well drained,0.0,13.0,1.5,6.5,0.16,31.0,35.0,34.0,1.53,25.0,OSM_998713337
+1860468,"Clarinda silty clay loam, 5 to 9 percent slopes, moderately eroded",Clarinda,5,Poorly drained,0.0,15.0,2.5,6.2,0.16,33.0,5.0,62.0,1.39,26.3,OSM_998713337
+1860773,"Grundy silty clay loam, 2 to 5 percent slopes",Edina,5,Poorly drained,0.0,23.0,4.0,6.2,0.23,23.0,26.0,51.0,1.4,19.6,OSM_998713337
+1860773,"Grundy silty clay loam, 2 to 5 percent slopes",Haig,5,Poorly drained,0.0,18.0,3.5,6.1,0.23,25.0,10.0,65.0,1.34,20.9,OSM_998713337
+1860789,"Lamoni silty clay loam, 9 to 14 percent slopes, moderately eroded",Clarinda,5,Poorly drained,0.0,20.0,3.2,6.2,0.16,32.0,4.0,64.0,1.4,25.8,OSM_998713337
+1860789,"Lamoni silty clay loam, 9 to 14 percent slopes, moderately eroded",Clearfield,5,Poorly drained,0.0,20.0,3.5,6.5,0.22,33.0,3.0,64.0,1.38,26.6,OSM_998713337
+2420355,"Arispe silty clay loam, 5 to 9 percent slopes, moderately eroded",Lagonda,5,Somewhat poorly drained,0.0,18.0,2.75,7.4,0.22,28.0,6.0,66.0,1.36,22.9,OSM_998713337
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Arispe,5,Somewhat poorly drained,0.0,20.0,3.5,6.5,0.19,33.0,4.0,63.0,1.41,26.6,OSM_998713337
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Clarinda,5,Poorly drained,0.0,20.0,3.2,6.2,0.16,32.0,4.0,64.0,1.4,25.8,OSM_998713337
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Lagonda,5,Somewhat poorly drained,0.0,18.0,2.75,7.4,0.22,28.0,6.0,66.0,1.36,22.9,OSM_998713337
+2422539,"Zook-Olmitz-Vesser complex, 0 to 5 percent slopes",Zook,5,Poorly drained,0.0,20.0,6.0,6.1,0.22,34.0,7.0,59.0,1.28,27.8,OSM_998713337
+2422545,"Clarinda silty clay loam, 5 to 9 percent slopes",Clarinda,5,Poorly drained,0.0,20.0,2.5,6.2,0.16,33.0,5.0,62.0,1.48,25.8,OSM_998713337
+1860431,"Shelby clay loam, 9 to 14 percent slopes, moderately eroded",Shelby,5,Well drained,13.0,97.0,0.81,6.4,0.15,33.0,34.0,33.0,1.6,23.7,OSM_998713337
+1860468,"Clarinda silty clay loam, 5 to 9 percent slopes, moderately eroded",Clarinda,5,Poorly drained,15.0,30.0,0.25,5.5,0.11,47.0,8.0,45.0,1.38,33.0,OSM_998713337
+1860773,"Grundy silty clay loam, 2 to 5 percent slopes",Haig,5,Poorly drained,18.0,33.0,1.5,5.8,0.22,37.0,8.0,55.0,1.37,28.5,OSM_998713337
+2420355,"Arispe silty clay loam, 5 to 9 percent slopes, moderately eroded",Lagonda,5,Somewhat poorly drained,18.0,30.0,2.2,6.0,0.12,34.0,8.0,58.0,1.34,26.9,OSM_998713337
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Lagonda,5,Somewhat poorly drained,18.0,30.0,2.2,6.0,0.12,34.0,8.0,58.0,1.34,26.9,OSM_998713337
+1860789,"Lamoni silty clay loam, 9 to 14 percent slopes, moderately eroded",Clarinda,5,Poorly drained,20.0,28.0,3.0,6.2,0.16,33.0,5.0,62.0,1.33,26.4,OSM_998713337
+1860789,"Lamoni silty clay loam, 9 to 14 percent slopes, moderately eroded",Clearfield,5,Poorly drained,20.0,43.0,2.75,6.5,0.19,35.0,3.0,62.0,1.32,27.7,OSM_998713337
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Arispe,5,Somewhat poorly drained,20.0,125.0,0.75,6.5,0.19,39.0,3.0,58.0,1.4,29.2,OSM_998713337
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Clarinda,5,Poorly drained,20.0,28.0,3.0,6.2,0.16,33.0,5.0,62.0,1.33,26.4,OSM_998713337
+2422539,"Zook-Olmitz-Vesser complex, 0 to 5 percent slopes",Zook,5,Poorly drained,20.0,51.0,6.0,6.1,0.22,36.0,7.0,57.0,1.25,29.2,OSM_998713337
+2422545,"Clarinda silty clay loam, 5 to 9 percent slopes",Clarinda,5,Poorly drained,20.0,41.0,0.25,5.5,0.11,47.0,8.0,45.0,1.58,33.0,OSM_998713337
+1860773,"Grundy silty clay loam, 2 to 5 percent slopes",Edina,5,Poorly drained,23.0,41.0,0.75,6.2,0.21,20.0,26.0,54.0,1.4,16.4,OSM_998713337
+1860431,"Shelby clay loam, 9 to 14 percent slopes, moderately eroded",Olmitz,5,Moderately well drained,25.0,66.0,2.5,6.5,0.16,28.0,30.0,42.0,1.43,23.3,OSM_998713337
+1860789,"Lamoni silty clay loam, 9 to 14 percent slopes, moderately eroded",Clarinda,5,Poorly drained,28.0,48.0,0.25,5.5,0.11,47.0,8.0,45.0,1.38,33.0,OSM_998713337
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Clarinda,5,Poorly drained,28.0,48.0,0.25,5.5,0.11,47.0,8.0,45.0,1.38,33.0,OSM_998713337
+2531089,"Gara loam, 14 to 18 percent slopes",Gara,92,Well drained,0.0,18.0,2.23,6.8,0.2,18.0,50.0,32.0,1.47,27.5,OSM_1434730620
+2531089,"Gara loam, 14 to 18 percent slopes",Gara,92,Well drained,18.0,25.0,2.23,6.8,0.2,18.0,50.0,32.0,1.47,27.5,OSM_1434730620
+2531089,"Gara loam, 14 to 18 percent slopes",Gara,92,Well drained,25.0,79.0,0.5,6.1,0.13,33.0,34.0,33.0,1.46,27.5,OSM_1434730620
+2531361,"Lamoni clay loam, 5 to 9 percent slopes, eroded",Lamoni,90,Somewhat poorly drained,0.0,18.0,2.0,6.1,0.18,38.0,25.0,37.0,1.33,30.2,OSM_1434730620
+2531361,"Lamoni clay loam, 5 to 9 percent slopes, eroded",Lamoni,90,Somewhat poorly drained,18.0,79.0,1.37,5.5,0.1,50.0,23.0,27.0,1.43,,OSM_1434730620
+2528513,"Adair loam, 3 to 9 percent slopes",Adair,88,Somewhat poorly drained,0.0,30.0,3.7,6.1,0.21,24.1,40.1,35.8,1.27,27.5,OSM_1434730620
+2528439,"Nodaway silt loam, heavy till, 0 to 2 percent slopes, occasionally flooded",Nodaway,85,Moderately well drained,0.0,20.0,2.5,6.7,0.22,17.0,15.0,68.0,1.3,14.9,OSM_1434730620
+2531897,"Shelby loam, 9 to 14 percent slopes",Shelby,85,Well drained,0.0,25.0,3.5,5.6,0.16,25.0,44.0,31.0,1.53,19.7,OSM_1434730620
+2528439,"Nodaway silt loam, heavy till, 0 to 2 percent slopes, occasionally flooded",Nodaway,85,Moderately well drained,20.0,200.0,0.25,6.7,0.22,21.0,4.0,75.0,1.3,16.4,OSM_1434730620
+2531897,"Shelby loam, 9 to 14 percent slopes",Shelby,85,Well drained,25.0,97.0,0.81,6.4,0.15,33.0,34.0,33.0,1.6,23.7,OSM_1434730620
+2531886,"Shelby loam, 14 to 18 percent slopes",Shelby,80,Well drained,0.0,25.0,3.5,5.6,0.16,25.0,44.0,31.0,1.53,19.7,OSM_1434730620
+2531886,"Shelby loam, 14 to 18 percent slopes",Shelby,80,Well drained,25.0,97.0,0.81,6.4,0.15,34.0,34.0,32.0,1.6,23.7,OSM_1434730620
+2544603,"Zook-Colo silty clay loams, 1 to 3 percent slopes, frequently flooded",Zook,55,Poorly drained,0.0,122.0,5.0,6.4,0.19,34.8,16.0,49.2,1.33,34.5,OSM_1434730620
+2544603,"Zook-Colo silty clay loams, 1 to 3 percent slopes, frequently flooded",Colo,33,Poorly drained,0.0,117.0,6.0,6.1,0.19,32.9,1.6,65.5,1.3,38.5,OSM_1434730620
+2528513,"Adair loam, 3 to 9 percent slopes",Shelby,12,Well drained,0.0,25.0,3.5,5.6,0.16,25.0,44.0,31.0,1.53,19.7,OSM_1434730620
+2528513,"Adair loam, 3 to 9 percent slopes",Shelby,12,Well drained,25.0,97.0,0.81,6.4,0.15,33.0,34.0,33.0,1.6,23.7,OSM_1434730620
+2528439,"Nodaway silt loam, heavy till, 0 to 2 percent slopes, occasionally flooded",Zook,10,Poorly drained,0.0,66.0,2.8,7.3,0.12,44.0,5.0,51.0,1.25,33.8,OSM_1434730620
+2544603,"Zook-Colo silty clay loams, 1 to 3 percent slopes, frequently flooded",Kennebec,7,Moderately well drained,0.0,48.0,3.2,6.5,0.23,25.1,5.2,69.7,1.3,22.6,OSM_1434730620
+2528439,"Nodaway silt loam, heavy till, 0 to 2 percent slopes, occasionally flooded",Mt. Sterling,5,Poorly drained,0.0,18.0,2.0,6.5,0.23,22.0,10.0,68.0,1.5,18.6,OSM_1434730620
+2531361,"Lamoni clay loam, 5 to 9 percent slopes, eroded",Shelby,5,Moderately well drained,0.0,30.0,3.3,7.0,0.17,27.0,33.0,40.0,1.53,22.8,OSM_1434730620
+2531886,"Shelby loam, 14 to 18 percent slopes",Adair,5,Somewhat poorly drained,0.0,18.0,4.3,6.1,0.18,38.0,25.0,37.0,1.33,30.2,OSM_1434730620
+2531886,"Shelby loam, 14 to 18 percent slopes",Lamoni,5,Somewhat poorly drained,0.0,18.0,4.3,6.1,0.18,38.0,25.0,37.0,1.33,30.2,OSM_1434730620
+2531886,"Shelby loam, 14 to 18 percent slopes",Olmitz,5,Moderately well drained,0.0,25.0,3.5,6.5,0.21,26.0,38.0,36.0,1.43,22.1,OSM_1434730620
+2531886,"Shelby loam, 14 to 18 percent slopes",Shelby,5,Well drained,0.0,18.0,2.5,6.5,0.16,31.0,35.0,34.0,1.53,25.0,OSM_1434730620
+2531897,"Shelby loam, 9 to 14 percent slopes",Lamoni,5,Somewhat poorly drained,0.0,18.0,4.3,6.1,0.18,38.0,25.0,37.0,1.33,30.2,OSM_1434730620
+2531897,"Shelby loam, 9 to 14 percent slopes",Olmitz,5,Moderately well drained,0.0,25.0,3.5,6.5,0.21,26.0,38.0,36.0,1.43,22.1,OSM_1434730620
+2531897,"Shelby loam, 9 to 14 percent slopes",Shelby,5,Well drained,0.0,18.0,2.5,6.5,0.16,31.0,35.0,34.0,1.53,25.0,OSM_1434730620
+2544603,"Zook-Colo silty clay loams, 1 to 3 percent slopes, frequently flooded",Nodaway,5,Moderately well drained,0.0,20.0,2.5,6.7,0.22,17.0,14.8,68.2,1.3,14.9,OSM_1434730620
+2528439,"Nodaway silt loam, heavy till, 0 to 2 percent slopes, occasionally flooded",Mt. Sterling,5,Poorly drained,18.0,66.0,0.75,6.5,0.21,24.0,10.0,66.0,1.5,19.3,OSM_1434730620
+2531886,"Shelby loam, 14 to 18 percent slopes",Adair,5,Somewhat poorly drained,18.0,79.0,1.37,5.5,0.1,50.0,23.0,27.0,1.43,36.8,OSM_1434730620
+2531886,"Shelby loam, 14 to 18 percent slopes",Lamoni,5,Somewhat poorly drained,18.0,79.0,1.37,5.5,0.1,50.0,23.0,27.0,1.43,36.8,OSM_1434730620
+2531886,"Shelby loam, 14 to 18 percent slopes",Shelby,5,Well drained,18.0,97.0,0.81,6.4,0.15,34.0,34.0,32.0,1.6,23.7,OSM_1434730620
+2531897,"Shelby loam, 9 to 14 percent slopes",Lamoni,5,Somewhat poorly drained,18.0,79.0,1.37,5.5,0.1,50.0,23.0,27.0,1.43,36.8,OSM_1434730620
+2531897,"Shelby loam, 9 to 14 percent slopes",Shelby,5,Well drained,18.0,125.0,0.81,6.4,0.15,33.0,34.0,33.0,1.6,23.7,OSM_1434730620
+2544603,"Zook-Colo silty clay loams, 1 to 3 percent slopes, frequently flooded",Nodaway,5,Moderately well drained,20.0,152.0,0.25,6.7,0.22,21.6,3.6,74.8,1.3,16.8,OSM_1434730620
+2531886,"Shelby loam, 14 to 18 percent slopes",Olmitz,5,Moderately well drained,25.0,66.0,2.5,6.5,0.16,28.0,30.0,42.0,1.43,23.3,OSM_1434730620
+2531897,"Shelby loam, 9 to 14 percent slopes",Olmitz,5,Moderately well drained,25.0,66.0,2.5,6.5,0.16,28.0,30.0,42.0,1.43,23.3,OSM_1434730620
+2531361,"Lamoni clay loam, 5 to 9 percent slopes, eroded",Clarinda,3,Poorly drained,0.0,20.0,3.2,7.1,0.18,32.0,13.0,55.0,1.48,25.8,OSM_1434730620
+2531361,"Lamoni clay loam, 5 to 9 percent slopes, eroded",Clarinda,3,Poorly drained,20.0,97.0,1.5,5.5,0.1,48.0,7.0,45.0,1.58,,OSM_1434730620
+2531089,"Gara loam, 14 to 18 percent slopes",Armstrong,2,Somewhat poorly drained,0.0,18.0,1.5,6.5,0.16,31.0,35.0,34.0,1.53,25.0,OSM_1434730620
+2531089,"Gara loam, 14 to 18 percent slopes",Bucknell,2,Somewhat poorly drained,0.0,20.0,3.26,6.9,0.22,29.0,13.0,58.0,1.35,24.6,OSM_1434730620
+2531089,"Gara loam, 14 to 18 percent slopes",Gara,2,Well drained,0.0,15.0,2.23,6.8,0.2,18.0,50.0,32.0,1.47,27.5,OSM_1434730620
+2531089,"Gara loam, 14 to 18 percent slopes",Olmitz,2,Moderately well drained,0.0,25.0,3.5,6.5,0.21,26.0,38.0,36.0,1.43,22.1,OSM_1434730620
+2531361,"Lamoni clay loam, 5 to 9 percent slopes, eroded",Arispe,2,Somewhat poorly drained,0.0,18.0,2.06,6.7,0.22,28.0,6.0,66.0,1.38,22.7,OSM_1434730620
+2531089,"Gara loam, 14 to 18 percent slopes",Gara,2,Well drained,15.0,79.0,0.5,6.1,0.13,33.0,34.0,33.0,1.46,27.5,OSM_1434730620
+2531089,"Gara loam, 14 to 18 percent slopes",Armstrong,2,Somewhat poorly drained,18.0,28.0,1.2,5.5,0.15,37.0,22.0,41.0,1.4,28.3,OSM_1434730620
+2531361,"Lamoni clay loam, 5 to 9 percent slopes, eroded",Arispe,2,Somewhat poorly drained,18.0,89.0,1.03,5.5,0.19,38.0,4.0,58.0,1.4,,OSM_1434730620
+2531089,"Gara loam, 14 to 18 percent slopes",Bucknell,2,Somewhat poorly drained,20.0,117.0,0.79,5.9,0.1,50.0,22.0,28.0,1.32,45.5,OSM_1434730620
+2531089,"Gara loam, 14 to 18 percent slopes",Olmitz,2,Moderately well drained,25.0,66.0,2.5,6.5,0.16,28.0,30.0,42.0,1.43,23.3,OSM_1434730620
+2531089,"Gara loam, 14 to 18 percent slopes",Armstrong,2,Somewhat poorly drained,28.0,101.0,0.51,5.5,0.14,44.0,17.0,39.0,1.46,31.9,OSM_1434730620
+1860773,"Grundy silty clay loam, 2 to 5 percent slopes",Grundy,90,Somewhat poorly drained,0.0,31.0,3.3,6.0,0.22,29.0,5.0,66.0,1.27,24.3,OSM_998701371
+1860776,"Haig silt loam, 0 to 2 percent slopes",Haig,90,Poorly drained,0.0,18.0,4.0,6.1,0.23,25.0,10.0,65.0,1.34,21.0,OSM_998701371
+2420357,"Edina silt loam, 0 to 2 percent slopes",Edina,90,Poorly drained,0.0,23.0,2.5,6.2,0.23,21.0,5.0,74.0,1.36,17.8,OSM_998701371
+1860776,"Haig silt loam, 0 to 2 percent slopes",Haig,90,Poorly drained,18.0,33.0,1.5,5.8,0.22,37.0,8.0,55.0,1.37,28.5,OSM_998701371
+2420357,"Edina silt loam, 0 to 2 percent slopes",Edina,90,Poorly drained,23.0,46.0,0.75,6.2,0.21,20.0,5.0,75.0,1.46,17.1,OSM_998701371
+2420355,"Arispe silty clay loam, 5 to 9 percent slopes, moderately eroded",Arispe,85,Somewhat poorly drained,0.0,20.0,3.0,6.5,0.19,33.0,4.0,63.0,1.42,26.4,OSM_998701371
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Arispe,85,Somewhat poorly drained,0.0,20.0,3.5,6.5,0.19,33.0,4.0,63.0,1.41,26.6,OSM_998701371
+2422545,"Clarinda silty clay loam, 5 to 9 percent slopes",Clarinda,85,Poorly drained,0.0,20.0,3.2,6.2,0.16,32.0,4.0,64.0,1.48,25.8,OSM_998701371
+2420355,"Arispe silty clay loam, 5 to 9 percent slopes, moderately eroded",Arispe,85,Somewhat poorly drained,20.0,125.0,0.75,6.5,0.19,39.0,3.0,58.0,1.4,29.2,OSM_998701371
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Arispe,85,Somewhat poorly drained,20.0,33.0,2.5,6.5,0.22,34.0,4.0,62.0,1.33,27.0,OSM_998701371
+2422545,"Clarinda silty clay loam, 5 to 9 percent slopes",Clarinda,85,Poorly drained,20.0,28.0,3.0,6.2,0.16,33.0,5.0,62.0,1.48,26.4,OSM_998701371
+2422545,"Clarinda silty clay loam, 5 to 9 percent slopes",Clarinda,85,Poorly drained,28.0,48.0,0.25,5.5,0.11,47.0,8.0,45.0,1.58,33.0,OSM_998701371
+1860776,"Haig silt loam, 0 to 2 percent slopes",Edina,10,Poorly drained,0.0,20.0,2.6,6.8,0.23,18.0,3.0,79.0,1.31,15.6,OSM_998701371
+2420355,"Arispe silty clay loam, 5 to 9 percent slopes, moderately eroded",Clarinda,10,Poorly drained,0.0,20.0,2.5,6.2,0.16,33.0,5.0,62.0,1.39,26.3,OSM_998701371
+2420357,"Edina silt loam, 0 to 2 percent slopes",Haig,10,Poorly drained,0.0,18.0,4.0,6.1,0.23,26.0,4.0,70.0,1.34,21.7,OSM_998701371
+2422545,"Clarinda silty clay loam, 5 to 9 percent slopes",Clearfield,10,Poorly drained,0.0,20.0,3.5,6.5,0.22,33.0,3.0,64.0,1.35,26.6,OSM_998701371
+2420357,"Edina silt loam, 0 to 2 percent slopes",Haig,10,Poorly drained,18.0,33.0,1.5,5.8,0.22,39.0,2.0,59.0,1.33,29.8,OSM_998701371
+1860776,"Haig silt loam, 0 to 2 percent slopes",Edina,10,Poorly drained,20.0,36.0,1.0,6.4,0.21,23.0,5.0,72.0,1.42,18.7,OSM_998701371
+2420355,"Arispe silty clay loam, 5 to 9 percent slopes, moderately eroded",Clarinda,10,Poorly drained,20.0,41.0,0.25,5.5,0.11,47.0,8.0,45.0,1.38,33.0,OSM_998701371
+2422545,"Clarinda silty clay loam, 5 to 9 percent slopes",Clearfield,10,Poorly drained,20.0,43.0,2.75,6.5,0.19,35.0,3.0,62.0,1.38,27.7,OSM_998701371
+1860773,"Grundy silty clay loam, 2 to 5 percent slopes",Edina,5,Poorly drained,0.0,23.0,4.0,6.2,0.23,23.0,26.0,51.0,1.4,19.6,OSM_998701371
+1860773,"Grundy silty clay loam, 2 to 5 percent slopes",Haig,5,Poorly drained,0.0,18.0,3.5,6.1,0.23,25.0,10.0,65.0,1.34,20.9,OSM_998701371
+2420355,"Arispe silty clay loam, 5 to 9 percent slopes, moderately eroded",Lagonda,5,Somewhat poorly drained,0.0,18.0,2.75,7.4,0.22,28.0,6.0,66.0,1.36,22.9,OSM_998701371
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Arispe,5,Somewhat poorly drained,0.0,20.0,3.5,6.5,0.19,33.0,4.0,63.0,1.41,26.6,OSM_998701371
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Clarinda,5,Poorly drained,0.0,20.0,3.2,6.2,0.16,32.0,4.0,64.0,1.4,25.8,OSM_998701371
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Lagonda,5,Somewhat poorly drained,0.0,18.0,2.75,7.4,0.22,28.0,6.0,66.0,1.36,22.9,OSM_998701371
+2422545,"Clarinda silty clay loam, 5 to 9 percent slopes",Clarinda,5,Poorly drained,0.0,20.0,2.5,6.2,0.16,33.0,5.0,62.0,1.48,25.8,OSM_998701371
+1860773,"Grundy silty clay loam, 2 to 5 percent slopes",Haig,5,Poorly drained,18.0,33.0,1.5,5.8,0.22,37.0,8.0,55.0,1.37,28.5,OSM_998701371
+2420355,"Arispe silty clay loam, 5 to 9 percent slopes, moderately eroded",Lagonda,5,Somewhat poorly drained,18.0,30.0,2.2,6.0,0.12,34.0,8.0,58.0,1.34,26.9,OSM_998701371
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Lagonda,5,Somewhat poorly drained,18.0,30.0,2.2,6.0,0.12,34.0,8.0,58.0,1.34,26.9,OSM_998701371
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Arispe,5,Somewhat poorly drained,20.0,125.0,0.75,6.5,0.19,39.0,3.0,58.0,1.4,29.2,OSM_998701371
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Clarinda,5,Poorly drained,20.0,28.0,3.0,6.2,0.16,33.0,5.0,62.0,1.33,26.4,OSM_998701371
+2422545,"Clarinda silty clay loam, 5 to 9 percent slopes",Clarinda,5,Poorly drained,20.0,41.0,0.25,5.5,0.11,47.0,8.0,45.0,1.58,33.0,OSM_998701371
+1860773,"Grundy silty clay loam, 2 to 5 percent slopes",Edina,5,Poorly drained,23.0,41.0,0.75,6.2,0.21,20.0,26.0,54.0,1.4,16.4,OSM_998701371
+2420356,"Arispe silty clay loam, 5 to 9 percent slopes",Clarinda,5,Poorly drained,28.0,48.0,0.25,5.5,0.11,47.0,8.0,45.0,1.38,33.0,OSM_998701371

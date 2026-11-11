@@ -4,7 +4,7 @@ This directory contains sample field boundary data downloaded from USDA NASS Cro
 
 ## Files
 
-- **sample_2_fields.geojson** - 2 real agricultural field boundaries from the Corn Belt region
+- **real_10_fields_iowa.geojson** - 10 real agricultural field boundaries from Iowa
 
 ## Data Source
 
@@ -16,10 +16,9 @@ This directory contains sample field boundary data downloaded from USDA NASS Cro
 
 ## Fields Included
 
-| Field ID        | Region    | State FIPS | Area (acres) | Crop |
-| --------------- | --------- | ---------- | ------------ | ---- |
-| 271623002471299 | corn_belt | 27 (MN)    | 3.70         | Corn |
-| 271623001561551 | corn_belt | 27 (MN)    | 6.41         | Corn |
+| Field ID prefix | Region    | State | Crop label |
+| --------------- | --------- | ----- | ---------- |
+| OSM_*           | corn_belt | Iowa  | farmland or meadow |
 
 ## Usage
 
@@ -27,7 +26,7 @@ This directory contains sample field boundary data downloaded from USDA NASS Cro
 import geopandas as gpd
 
 # Load sample fields
-fields = gpd.read_file('sample_2_fields.geojson')
+fields = gpd.read_file('real_10_fields_iowa.geojson')
 
 # View data
 print(fields[['field_id', 'region', 'area_acres', 'crop_name']])
@@ -38,6 +37,6 @@ fields.plot()
 
 ## Notes
 
-- These are real field boundaries from Minnesota (State FIPS: 27)
+- These are real field boundaries from Iowa
 - Downloaded using the `field-boundaries` skill
 - Used as reference data for testing and examples

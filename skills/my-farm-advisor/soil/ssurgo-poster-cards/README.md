@@ -1,6 +1,6 @@
 # ssurgo-poster-cards
 
-This skill builds poster-ready soil profile cards from SSURGO horizon data stored in SQLite.
+This workflow builds poster-ready soil profile cards from SSURGO horizon data stored in SQLite.
 
 ## Generates
 
@@ -12,9 +12,10 @@ This skill builds poster-ready soil profile cards from SSURGO horizon data store
 ## Run
 
 ```bash
+export DATA_PIPELINE_DATA_ROOT=/absolute/path/to/my-farm-advisor-runtime
 python scripts/build_ssurgo_poster_cards.py \
-  --db data/my-farm-advisor/raw/ssurgo.sqlite \
-  --out outputs/cards \
+  --db "${DATA_PIPELINE_DATA_ROOT}/data-pipeline/raw/ssurgo.sqlite" \
+  --out "${DATA_PIPELINE_DATA_ROOT}/data-pipeline/derived/cards" \
   --dominant-only \
   --max-profiles 6
 ```

@@ -10,7 +10,7 @@ This directory contains sample Landsat scene metadata for the field-boundaries s
 
 The search bounding box comes from the field-boundaries skill:
 
-- **File**: `.skills/field-boundaries/examples/sample_2_fields.geojson`
+- **File**: `my-farm-advisor/field-management/field-boundaries/examples/real_10_fields_iowa.geojson`
 - **Fields**: 2 corn fields in Minnesota (State FIPS: 27)
 - **Bbox**: `[-95.9483, 44.5544, -92.8838, 47.0645]` (WGS84)
 

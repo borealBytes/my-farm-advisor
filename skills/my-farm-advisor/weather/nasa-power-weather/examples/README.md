@@ -21,7 +21,7 @@ This directory contains sample weather data and a generation script for testing.
 | 271623002471299 | 47.0643  | -95.9458  | Norman County, MN  | 3.70         | Corn |
 | 271623001561551 | 44.5557  | -92.8846  | Goodhue County, MN | 6.41         | Corn |
 
-These fields match the `field-boundaries` skill sample data (`sample_2_fields.geojson`).
+These are legacy two-field test IDs kept for reproducible weather examples. Use `my-farm-advisor/field-management/field-boundaries/examples/real_10_fields_iowa.geojson` for current field-boundary examples.
 
 ## CSV Columns
 

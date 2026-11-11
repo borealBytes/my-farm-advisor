@@ -6,13 +6,13 @@ author: Boreal Bytes
 tags: [usda, nrcs, ssurgo, soil, geospatial, download]
 ---
 
-# Skill: ssurgo-soil
+# Workflow: ssurgo-soil
 
 ## Description
 
-Download, map, and analyze USDA NRCS SSURGO (Soil Survey Geographic Database) soil properties for agricultural fields. This skill queries the free NRCS Soil Data Access (SDA) REST API to retrieve soil organic matter, pH, texture, drainage class, and other properties, then supports field-level choropleths, SSURGO overlays, and headlands-ring workflow figures. No API key required.
+Download, map, and analyze USDA NRCS SSURGO (Soil Survey Geographic Database) soil properties for agricultural fields. This workflow queries the free NRCS Soil Data Access (SDA) REST API to retrieve soil organic matter, pH, texture, drainage class, and other properties, then supports field-level choropleths, SSURGO overlays, and headlands-ring workflow figures. No API key required.
 
-## When to Use This Skill
+## When to Use This Workflow
 
 - **Getting soil data**: Download soil properties for field boundaries or points
 - **Soil analysis**: Organic matter, pH, texture, drainage, bulk density, CEC
@@ -37,7 +37,7 @@ Sample data is included in the `examples/` directory:
 - `examples/soil_data_2_fields.csv` - Real SSURGO soil data for 2 Minnesota fields
 - `examples/soil_data_2_fields.json` - Same data in JSON format
 
-The example data was downloaded from NRCS SDA for the fields in `field-boundaries/examples/sample_2_fields.geojson`.
+The example data was downloaded from NRCS SDA for field-boundary examples in `my-farm-advisor/field-management/field-boundaries/examples/`.
 
 ```python
 import pandas as pd
@@ -63,10 +63,10 @@ import geopandas as gpd
 from ssurgo_soil import download_soil, get_dominant_soil
 
 # Load field boundaries (from field-boundaries skill)
-fields = gpd.read_file('.skills/field-boundaries/examples/sample_2_fields.geojson')
+fields = gpd.read_file('my-farm-advisor/field-management/field-boundaries/examples/real_10_fields_iowa.geojson')
 
 # Download soil data for all fields
-soil = download_soil(fields, output_path='data/my-farm-advisor/growers/demo-grower/farms/demo-farm/derived/tables/soil_data.csv')
+soil = download_soil(fields, output_path='${DATA_PIPELINE_DATA_ROOT}/data-pipeline/growers/demo-grower/farms/demo-farm/derived/tables/soil_data.csv')
 print(f'Downloaded {len(soil)} soil records for {soil["field_id"].nunique()} fields')
 
 # Get dominant soil per field
@@ -77,11 +77,11 @@ EOF
 
 ## Installation (Isolated Environment)
 
-This skill runs in an isolated environment to avoid dependency conflicts:
+This workflow runs in an isolated environment to avoid dependency conflicts:
 
 ```bash
-# Create dedicated environment for this skill
-cd .skills/ssurgo-soil
+# Create dedicated environment for this workflow
+cd my-farm-advisor/soil/ssurgo-soil
 uv venv .venv
 source .venv/bin/activate
 
@@ -139,14 +139,14 @@ import geopandas as gpd
 from ssurgo_soil import download_soil, get_dominant_soil
 
 # Load field boundaries
-fields = gpd.read_file('data/my-farm-advisor/growers/demo-grower/farms/demo-farm/boundary/field_boundaries.geojson')
+fields = gpd.read_file('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/growers/demo-grower/farms/demo-farm/boundary/field_boundaries.geojson')
 
 # Download soil data for all fields
 soil = download_soil(
     fields,
     field_id_column='field_id',
     max_depth_cm=30,
-    output_path='data/my-farm-advisor/growers/demo-grower/farms/demo-farm/derived/tables/soil_EPSG4326.csv'
+    output_path='${DATA_PIPELINE_DATA_ROOT}/data-pipeline/growers/demo-grower/farms/demo-farm/derived/tables/soil_EPSG4326.csv'
 )
 
 # Get one row per field (dominant soil)
@@ -225,20 +225,20 @@ from ssurgo_soil import (
     render_complete_workflow_figure,
 )
 
-fields = gpd.read_file('.skills/field-boundaries/examples/sample_2_fields.geojson').to_crs('EPSG:4326')
+fields = gpd.read_file('my-farm-advisor/field-management/field-boundaries/examples/real_10_fields_iowa.geojson').to_crs('EPSG:4326')
 field = fields[fields['field_id'] == '271623002471299'].copy()
 
 ssurgo_polys, detail_table, _ = prepare_ssurgo_field_package(
     field,
     field_id_column='field_id',
-    fallback_mukey_geojson='docs/classes/examples/class6-geospatial-analysis/03-spatial-joins/output/ssurgo_field_271623002471299_mukey_polygons.geojson',
+    fallback_mukey_geojson='${DATA_PIPELINE_DATA_ROOT}/data-pipeline/soil/ssurgo/fallback/ssurgo_field_271623002471299_mukey_polygons.geojson',
 )
 
 render_ssurgo_property_map(
     field,
     ssurgo_polys,
     'om_r',
-    'output/soil_property_271623002471299_om_r.png',
+    '${DATA_PIPELINE_DATA_ROOT}/data-pipeline/soil/ssurgo/output/soil_property_271623002471299_om_r.png',
     title='OM (Natural Breaks)',
     show_axis_labels=False,
 )
@@ -247,7 +247,7 @@ render_complete_workflow_figure(
     field,
     ssurgo_polys,
     detail_table,
-    'output/workflow_visualization_271623002471299.png',
+    '${DATA_PIPELINE_DATA_ROOT}/data-pipeline/soil/ssurgo/output/workflow_visualization_271623002471299.png',
     combine_width_m=9.0,
 )
 ```

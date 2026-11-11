@@ -1,5 +1,8 @@
 # My Farm Breeding Trial Management
 
+> **Status:** initial stab — real, runnable workflows and examples; this tree will
+> expand the most as the data-pipeline foundation underneath it matures.
+
 My Farm Breeding Trial Management is the breeding-operations skill pack for this repo. It covers how breeding programs move from experimental design to fieldbooks, germplasm handling, selection decisions, and crossing plans.
 
 Use this skill when the problem is operational breeding work rather than farm-wide advisory routing or downstream QTL interpretation.
@@ -11,6 +14,7 @@ Use this skill when the problem is operational breeding work rather than farm-wi
 - Organizes germplasm, pedigree, and accession workflows.
 - Supports ranking, shortlist generation, and selection-index style decisions.
 - Builds crossing and mating-plan scaffolds for the next breeding cycle.
+- Backfills a field-trial placement workflow for field-boundary-aware RCBD placement.
 
 ## How It Runs
 
@@ -40,17 +44,18 @@ flowchart TD
     class output outcome
 ```
 
-The skill revolves around a unified breeding CLI and example modules that map to the core phases of breeding operations.
+The skill revolves around grouped example modules plus a unified breeding CLI that map to the core phases of breeding operations.
 
 ## Core Workflow Areas
 
-| Area      | What it covers                                     | Typical result                            |
-| --------- | -------------------------------------------------- | ----------------------------------------- |
-| Design    | Trial layout planning and experimental structure   | RCBD, alpha-lattice, or augmented designs |
-| Fieldbook | Plot sheets, labels, and field execution artifacts | crew-ready fieldbook outputs              |
-| Germplasm | Accession and pedigree handling                    | organized breeding material records       |
-| Selection | Ranking and shortlist generation                   | candidate line decisions                  |
-| Cross     | Crossing plans and mate pairing                    | next-cycle crossing scaffold              |
+| Area | What it covers | Typical result |
+| --- | --- | --- |
+| Design | Trial layout planning and experimental structure | RCBD, alpha-lattice, or augmented designs |
+| Fieldbook | Plot sheets, labels, imports, and field execution artifacts | crew-ready fieldbook outputs |
+| Field Trial Placement | Field-boundary-aware plot placement | placed trial layouts tied to field geometry |
+| Germplasm | Accession and pedigree handling | organized breeding material records |
+| Selection | Ranking and shortlist generation | candidate line decisions |
+| Cross | Crossing plans and mate pairing | next-cycle crossing scaffold |
 
 ## Breeding Program Flow
 
@@ -77,11 +82,10 @@ flowchart LR
 
 ## Example Modules Included
 
-- Trial design: `examples/rcbd-design/`, `examples/alpha-lattice/`, `examples/augmented-design/`, `examples/field-book/`
-- Germplasm and pedigree: `examples/breedbase-client/`, `examples/pedigree-management/`, `examples/bms-client/`
-- Selection and crossing: `examples/selection-index/`, `examples/breeding-value-ranking/`, `examples/crossing-plan/`, `examples/data-import/`
-- Field systems integration: `examples/iot-field-sync/`
-- Simulation support: `examples/breeding-simulation/`
+- Trial design: `examples/design/rcbd-design/`, `examples/design/alpha-lattice/`, `examples/design/augmented-design/`
+- Fieldbooks and placement: `examples/fieldbook/field-book/`, `examples/fieldbook/data-import/`, `examples/fieldbook/iot-field-sync/`, `examples/field-trial-placement/`
+- Germplasm and pedigree: `examples/germplasm/breedbase-client/`, `examples/germplasm/pedigree-management/`, `examples/germplasm/bms-client/`
+- Selection and crossing: `examples/select/selection-index/`, `examples/select/breeding-value-ranking/`, `examples/select/breeding-simulation-simple-cycle/`, `examples/cross/crossing-plan/`
 
 ## Why It Matters In This Repo
 
@@ -110,7 +114,9 @@ This skill is the operational breeding layer. It is what you use before or along
 ## Start Here
 
 - Main entrypoint: [`SKILL.md`](SKILL.md)
-- Unified CLI examples in `SKILL.md`
-- Trial design examples: [`examples/rcbd-design/`](examples/rcbd-design/)
-- Selection and crossing examples: [`examples/selection-index/`](examples/selection-index/) and [`examples/crossing-plan/`](examples/crossing-plan/)
-- Simulation notes: [`examples/breeding-simulation/README.md`](examples/breeding-simulation/README.md)
+- Progressive router: [`INDEX.md`](INDEX.md)
+- Unified CLI: `python scripts/breeding_cli.py <design|fieldbook|germplasm|select|cross> --help`
+- Trial design examples: [`examples/design/rcbd-design/`](examples/design/rcbd-design/)
+- Field placement example (with rendered demo map): [`examples/field-trial-placement/`](examples/field-trial-placement/) — boundary-aware RCBD placement on a real Iowa field boundary; default output honors `DATA_PIPELINE_DATA_ROOT`
+- Selection and crossing examples: [`examples/select/selection-index/`](examples/select/selection-index/) and [`examples/cross/crossing-plan/`](examples/cross/crossing-plan/)
+- Simulation notes: [`examples/select/breeding-simulation-simple-cycle/README.md`](examples/select/breeding-simulation-simple-cycle/README.md)

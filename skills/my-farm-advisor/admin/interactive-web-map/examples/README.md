@@ -13,7 +13,7 @@ uv run --no-project --with folium --with geopandas --with shapely python << 'EOF
 import folium
 import geopandas as gpd
 
-fields = gpd.read_file('.skills/field-boundaries/examples/sample_2_fields.geojson')
+fields = gpd.read_file('my-farm-advisor/field-management/field-boundaries/examples/real_10_fields_iowa.geojson')
 
 center = [fields.geometry.centroid.y.mean(), fields.geometry.centroid.x.mean()]
 m = folium.Map(location=center, zoom_start=7)
@@ -37,13 +37,13 @@ bounds = fields.total_bounds
 m.fit_bounds([[bounds[1], bounds[0]], [bounds[3], bounds[2]]])
 folium.LayerControl().add_to(m)
 
-m.save('.skills/interactive-web-map/examples/field_boundaries_map.html')
+m.save('my-farm-advisor/admin/interactive-web-map/examples/field_boundaries_map.html')
 EOF
 ```
 
 ## Data Source
 
-- **Input**: `field-boundaries/examples/sample_2_fields.geojson`
+- **Input**: `my-farm-advisor/field-management/field-boundaries/examples/real_10_fields_iowa.geojson`
 - **Fields**: 2 USDA NASS Crop Sequence Boundary polygons (Minnesota corn fields)
 - **Libraries**: folium, geopandas
 

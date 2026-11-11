@@ -1,57 +1,39 @@
 ---
-name: breeding-trial-management
+name: my-farm-breeding-trial-management
 description: >
   Breeding trial management toolkit for design, fieldbook generation, germplasm workflows,
-  selection, and crossing decisions. Complements qtl-analysis for end-to-end breeding genomics.
-allowed-tools: Read Write Edit Bash
+  selection, and crossing decisions. Complements my-farm-qtl-analysis for end-to-end breeding genomics.
 license: Apache-2.0
 metadata:
-  skill-author: Clayton Young / Superior Byte Works, LLC (@borealBytes)
-  skill-version: "1.0.0"
+  author: Clayton Young (borealBytes / Superior Byte Works, LLC)
+  version: "0.1.0"
+  category: breeding-genomics
 ---
 
-# Breeding Trial Management
+<!-- Copyright 2026 Clayton Young (borealBytes / Superior Byte Works, LLC) -->
+<!-- Licensed under the Apache License, Version 2.0. -->
 
-## Overview
+# My Farm Breeding Trial Management
 
-This skill handles breeding operations around trial execution and decision support:
+## Purpose
 
-- Trial design planning
-- Fieldbook preparation
-- Germplasm tracking
-- Selection and crossing workflows
+Use this skill for breeding operations work: trial design, fieldbooks, germplasm records, selection, crossing plans, and field-trial placement.
 
-## Installation
+## Start Here
 
-```bash
-python scripts/check_system.py
-```
+- Read [README.md](README.md) for the human overview.
+- Open [INDEX.md](INDEX.md) to route into design, fieldbook, germplasm, selection, crossing, or field-trial placement examples.
+- Read [AGENTS.md](AGENTS.md) before editing examples, scripts, references, or provenance.
 
-## Unified CLI
+## Routing Guidance
 
-```bash
-python scripts/breeding_cli.py design --help
-python scripts/breeding_cli.py fieldbook --help
-python scripts/breeding_cli.py germplasm --help
-python scripts/breeding_cli.py select --help
-python scripts/breeding_cli.py cross --help
-```
+- Use **Design** for RCBD, alpha-lattice, and augmented trial layouts.
+- Use **Fieldbook** for plot sheets, labels, imports, and field sync workflows.
+- Use **Germplasm** for accession, pedigree, and mock breeding-system integrations.
+- Use **Selection** for ranking, selection-index, and simulation previews.
+- Use **Crossing** for mate pairing and crossing-plan scaffolds.
+- Use **Field Trial Placement** for field-boundary-aware placement examples.
 
-## Tool Selection Guide
+## Runtime Notes
 
-- Use `design` for RCBD/alpha-lattice/augmented planning tasks.
-- Use `fieldbook` to generate plot sheets and labels.
-- Use `germplasm` for accession list and inventory operations.
-- Use `select` for ranking and shortlist generation.
-- Use `cross` for mate pairing and crossing plan scaffolds.
-
-## Example Modules
-
-- Trial design: `examples/rcbd-design/`, `examples/alpha-lattice/`, `examples/augmented-design/`, `examples/field-book/`
-- Germplasm and pedigree: `examples/breedbase-client/`, `examples/pedigree-management/`, `examples/bms-client/`
-- Selection and crossing: `examples/selection-index/`, `examples/breeding-value-ranking/`, `examples/crossing-plan/`, `examples/data-import/`
-- Field systems integration: `examples/iot-field-sync/`
-
-## Examples and Support Docs
-
-- `examples/breeding-simulation/README.md`: AlphaSimR-style forward breeding simulation workflow notes
+The examples are document-routed workflows, not separate runtime-discoverable skills. Load the matching example README from [INDEX.md](INDEX.md), then run the narrow command documented there when dependencies are available.

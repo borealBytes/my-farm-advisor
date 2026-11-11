@@ -28,6 +28,7 @@ import argparse
 import json
 import sys
 from pathlib import Path
+from typing import Any, cast
 
 import contextily as ctx
 import geopandas as gpd
@@ -222,6 +223,7 @@ def find_max_rectangle(interior_geom, num_varieties, num_blocks,
             if found_position:
                 low = mid
                 if mid > best_area:
+                    assert best_pos is not None
                     best_area = mid
                     best_at_angle = {
                         'angle': angle,
@@ -361,8 +363,9 @@ def create_trial_map(field_utm, headlands_gdf, plots_utm, trial_config,
     
     # Satellite basemap
     try:
-        ctx.add_basemap(ax, crs=field_utm.crs, source=ctx.providers.Esri.WorldImagery, 
-                       alpha=0.7, zoom=16)
+        esri_provider = cast(Any, getattr(ctx.providers, 'Esri')).WorldImagery
+        ctx.add_basemap(ax, crs=field_utm.crs, source=esri_provider,
+                       alpha=0.7, zoom='16')
     except:
         ax.set_facecolor('#f0f9ff')
     
@@ -389,13 +392,18 @@ def create_trial_map(field_utm, headlands_gdf, plots_utm, trial_config,
             ax=ax, color=color, alpha=0.75, edgecolor='white', linewidth=1.5)
         
         centroid = plot["geometry"].centroid
-        ax.text(centroid.x, centroid.y - plot_h * 0.15,
+        ax.text(centroid.x, centroid.y - plot_h * 0.35,
                 f"P{plot['plot_id']}", ha='center', va='center',
                 fontsize=8, fontweight='bold', color='white',
                 bbox=dict(boxstyle='round,pad=0.2', facecolor='black', alpha=0.5))
+        # Variety chip is rotated along the plot's long axis so it never collides
+        # with neighbours in narrow plots (labels stay readable, trial stays dense).
+        rot = trial_config['angle'] % 180
+        if rot > 90:
+            rot -= 180
         ax.text(centroid.x, centroid.y + plot_h * 0.15,
                 plot['variety'], ha='center', va='center',
-                fontsize=7, color='white', fontweight='bold',
+                fontsize=7, color='white', fontweight='bold', rotation=rot,
                 bbox=dict(boxstyle='round,pad=0.2', facecolor=color, alpha=0.8))
     
     # Field boundary
@@ -568,12 +576,15 @@ def main():
     if args.output_dir:
         output_dir = Path(args.output_dir)
     else:
-        output_dir = Path(f"data/my-farm-advisor/growers/{args.grower_slug}/farms/{args.farm_slug}/fields/{args.field_id}/trials")
+        import os
+        _root = Path(os.environ.get("DATA_PIPELINE_DATA_ROOT", ".")) / "data-pipeline"
+        output_dir = _root / "growers" / args.grower_slug / "farms" / args.farm_slug / "fields" / args.field_id / "trials"
     output_dir.mkdir(parents=True, exist_ok=True)
     
     # Save fieldbook
     fieldbook = plots_utm[["plot_id", "block", "row", "col", "variety", "area_acres"]].copy()
-    fieldbook.sort_values(["block", "col"]).to_csv(output_dir / "rcbd_fieldbook.csv", index=False)
+    fieldbook_df = pd.DataFrame(fieldbook)
+    fieldbook_df.sort_values(by=["block", "col"]).to_csv(output_dir / "rcbd_fieldbook.csv", index=False)
     
     # Save metadata
     metadata = {

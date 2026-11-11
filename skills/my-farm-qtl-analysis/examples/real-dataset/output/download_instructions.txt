@@ -1,2 +1,0 @@
-Optional real datasets are listed in real_dataset_catalog.csv.
-Download manually to comply with each source's terms and license.

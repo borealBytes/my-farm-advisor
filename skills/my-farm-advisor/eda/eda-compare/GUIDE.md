@@ -6,13 +6,13 @@ author: Boreal Bytes
 tags: [comparison, statistics, groups, pandas, scipy]
 ---
 
-# Skill: eda-compare
+# Workflow: eda-compare
 
 ## Description
 
 Compare groups and categories within agricultural datasets using standard pandas and scipy. Perform statistical comparisons, create comparative visualizations, and calculate statistical significance using real library code.
 
-## When to Use This Skill
+## When to Use This Workflow
 
 - **Comparing regions**: Compare yields across different areas
 - **Crop comparisons**: Analyze differences between crop types
@@ -35,7 +35,7 @@ import seaborn as sns
 from scipy import stats
 
 # Load data
-df = pd.read_csv('data/my-farm-advisor/yields.csv')
+df = pd.read_csv('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/compare/yields.csv')
 
 # Compare yields by crop
 plt.figure(figsize=(10, 6))
@@ -67,7 +67,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Load data
-df = pd.read_csv('data/my-farm-advisor/soil_by_region.csv')
+df = pd.read_csv('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/compare/soil_by_region.csv')
 
 # Create box plot
 plt.figure(figsize=(12, 6))
@@ -77,10 +77,10 @@ plt.xlabel('Region', fontsize=12)
 plt.ylabel('pH Level', fontsize=12)
 plt.xticks(rotation=45)
 plt.tight_layout()
-plt.savefig('output/ph_by_region.png', dpi=300)
+plt.savefig('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/compare/output/ph_by_region.png', dpi=300)
 plt.close()
 
-print("Created: output/ph_by_region.png")
+print("Created: ${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/compare/output/ph_by_region.png")
 ```
 
 ### Task 2: Calculate Group Statistics
@@ -95,7 +95,7 @@ print("Created: output/ph_by_region.png")
 import pandas as pd
 
 # Load data
-df = pd.read_csv('data/my-farm-advisor/yields.csv')
+df = pd.read_csv('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/compare/yields.csv')
 
 # Calculate statistics by group
 stats = df.groupby('crop')['yield'].agg([
@@ -106,7 +106,7 @@ print("Yield Statistics by Crop:")
 print(stats)
 
 # Save to CSV
-stats.to_csv('output/yield_stats_by_crop.csv')
+stats.to_csv('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/compare/output/yield_stats_by_crop.csv')
 
 # Compare specific metrics
 print("\nMean yields:")
@@ -126,7 +126,7 @@ import pandas as pd
 from scipy import stats
 
 # Load data
-df = pd.read_csv('data/my-farm-advisor/treatment_results.csv')
+df = pd.read_csv('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/compare/treatment_results.csv')
 
 # Separate groups
 treated = df[df['treatment'] == 'treated']['yield']
@@ -165,7 +165,7 @@ import pandas as pd
 from scipy import stats
 
 # Load data
-df = pd.read_csv('data/my-farm-advisor/yields_by_region.csv')
+df = pd.read_csv('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/compare/yields_by_region.csv')
 
 # Separate groups
 groups = []
@@ -215,7 +215,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Load data
-df = pd.read_csv('data/my-farm-advisor/soil_data.csv')
+df = pd.read_csv('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/compare/soil_data.csv')
 
 # Create violin plot
 plt.figure(figsize=(12, 6))
@@ -225,10 +225,10 @@ plt.xlabel('Crop Type', fontsize=12)
 plt.ylabel('Organic Matter (%)', fontsize=12)
 plt.xticks(rotation=45)
 plt.tight_layout()
-plt.savefig('output/organic_matter_violin.png', dpi=300)
+plt.savefig('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/compare/output/organic_matter_violin.png', dpi=300)
 plt.close()
 
-print("Created: output/organic_matter_violin.png")
+print("Created: ${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/compare/output/organic_matter_violin.png")
 ```
 
 ## Complete Example
@@ -243,11 +243,11 @@ from scipy import stats
 import os
 
 # Ensure output directory
-os.makedirs('output/comparisons', exist_ok=True)
+os.makedirs('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/compare/output/comparisons', exist_ok=True)
 
 # Load data
 print("Loading data...")
-df = pd.read_csv('data/my-farm-advisor/field_data.csv')
+df = pd.read_csv('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/compare/field_data.csv')
 
 # 1. Group statistics
 print("\n1. Calculating group statistics...")
@@ -256,7 +256,7 @@ crop_stats = df.groupby('crop_type').agg({
     'field_size': 'mean'
 }).round(2)
 
-crop_stats.to_csv('output/comparisons/crop_statistics.csv')
+crop_stats.to_csv('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/compare/output/comparisons/crop_statistics.csv')
 print("Crop Statistics:")
 print(crop_stats)
 
@@ -269,7 +269,7 @@ sns.boxplot(data=df, x='crop_type', y='yield', palette='Set2')
 plt.title('Yield by Crop Type')
 plt.xticks(rotation=45)
 plt.tight_layout()
-plt.savefig('output/comparisons/yield_boxplot.png', dpi=300)
+plt.savefig('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/compare/output/comparisons/yield_boxplot.png', dpi=300)
 plt.close()
 
 # Violin plot
@@ -278,7 +278,7 @@ sns.violinplot(data=df, x='crop_type', y='yield', palette='Set2')
 plt.title('Yield Distribution by Crop Type')
 plt.xticks(rotation=45)
 plt.tight_layout()
-plt.savefig('output/comparisons/yield_violin.png', dpi=300)
+plt.savefig('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/compare/output/comparisons/yield_violin.png', dpi=300)
 plt.close()
 
 # 3. Statistical tests
@@ -319,7 +319,7 @@ for i, crop1 in enumerate(crops):
         print(f"  {crop1} vs {crop2}: p={p:.4f} {sig}")
 
 print("\n✓ Comparison analysis complete!")
-print("Output saved to: output/comparisons/")
+print("Output saved to: ${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/compare/output/comparisons/")
 ```
 
 ## Statistical Test Selection

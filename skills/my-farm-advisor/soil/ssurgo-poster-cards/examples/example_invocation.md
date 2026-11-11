@@ -11,12 +11,12 @@ Use dominant components only, max 6 profiles.
 
 ```bash
 # Basic usage with defaults
-python scripts/build_ssurgo_poster_cards.py --db data/my-farm-advisor/raw/ssurgo.sqlite
+python scripts/build_ssurgo_poster_cards.py --db "${DATA_PIPELINE_DATA_ROOT}/data-pipeline/raw/ssurgo.sqlite"
 
 # With all options
 python scripts/build_ssurgo_poster_cards.py \
-  --db data/my-farm-advisor/raw/ssurgo.sqlite \
-  --out outputs/cards \
+--db "${DATA_PIPELINE_DATA_ROOT}/data-pipeline/raw/ssurgo.sqlite" \
+  --out "${DATA_PIPELINE_DATA_ROOT}/data-pipeline/derived/cards" \
   --dominant-only \
   --max-profiles 6 \
   --mukeys 12345 12346 12347
@@ -24,7 +24,7 @@ python scripts/build_ssurgo_poster_cards.py \
 
 ## Expected Outputs
 
-After running, check `outputs/cards/` for:
+After running, check `${DATA_PIPELINE_DATA_ROOT}/data-pipeline/derived/cards/` for:
 
 - `card_01_single_profile.svg` - Individual profile visualization
 - `card_02_compare_profiles.svg` - Side-by-side profile comparison

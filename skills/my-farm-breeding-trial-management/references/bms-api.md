@@ -16,5 +16,5 @@
 
 ## Mapping to Examples
 
-- `examples/bms-client/run_bms_client.py` simulates read and write operations
+- `examples/germplasm/bms-client/run_bms_client.py` simulates read and write operations
 - Output files represent common trial tables consumed by downstream analytics

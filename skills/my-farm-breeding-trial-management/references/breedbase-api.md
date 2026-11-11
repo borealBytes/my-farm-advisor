@@ -16,5 +16,5 @@
 
 ## Mapping to Examples
 
-- `examples/breedbase-client/run_breedbase_client.py` simulates read and write flows
+- `examples/germplasm/breedbase-client/run_breedbase_client.py` simulates read and write flows
 - Output tables mirror common fields used in breeding pipelines

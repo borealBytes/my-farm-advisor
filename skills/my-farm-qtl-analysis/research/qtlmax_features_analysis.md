@@ -12,7 +12,6 @@ This document provides a comprehensive analysis of all 19 QTLmax features, ident
 ## Feature Categories & Priority Rankings
 
 ### **TIER 1: HIGH PRIORITY** (Essential, well-documented, widely used)
-
 1. VCF format validation
 2. SNP filtering/subsetting
 3. Phenotype plots (box, density, violin, heatmap, scatter matrix)
@@ -23,7 +22,6 @@ This document provides a comprehensive analysis of all 19 QTLmax features, ident
 8. Genomic control
 
 ### **TIER 2: MEDIUM PRIORITY** (Important but more complex)
-
 9. Imputation
 10. BLUP (Best Linear Unbiased Prediction)
 11. Cross-validation (genomic prediction)
@@ -31,7 +29,6 @@ This document provides a comprehensive analysis of all 19 QTLmax features, ident
 13. SNP annotation
 
 ### **TIER 3: SPECIALIZED** (Advanced features, niche use cases)
-
 14. Elastic Net Cross-Validation
 15. Backcross selection
 16. Deep learning clustering
@@ -49,25 +46,21 @@ This document provides a comprehensive analysis of all 19 QTLmax features, ident
 
 **What it does:**
 Validates VCF files prior to genomic analysis, checking for:
-
 - Multi-allelic sites
 - Non-SNP markers
 - Samples without IDs
 - Missing SNPs
 
 **Inputs/Outputs:**
-
 - **Input:** `.vcf` or `.vcf.gz` file
 - **Output:** Validation summary report
 
 **Open-source replacement:**
-
 - **bcftools** (most robust)
 - **vcftools**
 - **GATK ValidateVariants**
 
 **Minimal working example:**
-
 ```bash
 # Using bcftools
 bcftools view -h input.vcf.gz > /dev/null 2>&1 && echo "Valid VCF" || echo "Invalid VCF"
@@ -87,7 +80,6 @@ bcftools view -m2 -M2 -v snps input.vcf.gz | bcftools stats > biallelic_stats.tx
 
 **What it does:**
 Fills in missing genotype data using MCMC (Markov Chain Monte Carlo) methods. Filters by:
-
 - Missing ID % (sample missing rate threshold)
 - Missing SNP % (marker missing rate threshold)
 - HWE (Hardy-Weinberg equilibrium threshold)
@@ -95,22 +87,19 @@ Fills in missing genotype data using MCMC (Markov Chain Monte Carlo) methods. Fi
 - Burn-in and iteration parameters for MCMC
 
 **Inputs/Outputs:**
-
 - **Input:** VCF or VCF.GZ format
-- **Output:**
-  - PLINK format (_.PED, _.MAP)
-  - PLINK binary format (_.bed, _.bim, \*.fam)
-  - Compressed VCF (\*.vcf.gz)
+- **Output:** 
+  - PLINK format (*.PED, *.MAP)
+  - PLINK binary format (*.bed, *.bim, *.fam)
+  - Compressed VCF (*.vcf.gz)
 
 **Open-source replacement:**
-
 - **BEAGLE** (most popular for genotype imputation)
 - **IMPUTE2**
 - **Minimac4**
 - **PLINK --geno** (for filtering only)
 
 **Minimal working example:**
-
 ```bash
 # Using BEAGLE for imputation
 java -jar beagle.jar gt=input.vcf.gz out=imputed_output niterations=10 burnin=5
@@ -129,18 +118,15 @@ plink --vcf input.vcf.gz --geno 0.1 --mind 0.1 --maf 0.05 --hwe 1e-6 --recode vc
 Machine learning method for SNP selection prior to genomic prediction. Uses cross-validation across lambda (λ) values with L1/L2 regularization to select optimal SNP subsets.
 
 **Inputs/Outputs:**
-
 - **Input:** Genomic data (PLINK format), phenotype data
 - **Output:** Selected SNP subset, prediction accuracy metrics
 
 **Open-source replacement:**
-
 - **glmnet** (R package - gold standard)
 - **scikit-learn** (Python)
 - **rrBLUP** (R package for genomic prediction)
 
 **Minimal working example:**
-
 ```r
 # R using glmnet
 library(glmnet)
@@ -167,18 +153,15 @@ selected_snps <- coef(cv_fit, s="lambda.min")
 Estimates breeding values using linear mixed models with environmental factors as covariates.
 
 **Inputs/Outputs:**
-
 - **Input:** Phenotype CSV with columns for sample, phenotype, covariates (location, year, replication, treatments)
 - **Output:** BLUP estimates per sample
 
 **Open-source replacement:**
-
 - **lme4** (R package)
 - **ASReml** (commercial but industry standard)
 - **sommer** (R package for genomic prediction)
 
 **Minimal working example:**
-
 ```r
 # R using lme4
 library(lme4)
@@ -203,22 +186,19 @@ blups <- ranef(model)$sample
 Validates genomic prediction accuracy by splitting population into training/validation sets, calculating marker effects, and predicting validation set phenotypes. Reports Pearson correlation coefficients.
 
 **Inputs/Outputs:**
-
 - **Input:** Genomic data (PLINK), phenotype data
-- **Output:**
+- **Output:** 
   - PCC (Pearson Correlation Coefficient) results
   - PCC histogram
   - PCC plot (ordered)
   - Summary statistics
 
 **Open-source replacement:**
-
 - **rrBLUP** (R package)
 - **BGLR** (R package)
 - **scikit-learn** (Python)
 
 **Minimal working example:**
-
 ```r
 # R using rrBLUP
 library(rrBLUP)
@@ -235,10 +215,10 @@ accuracy <- numeric(n_fold)
 for(i in 1:n_fold) {
   train <- phenotypes[folds != i, ]
   test <- phenotypes[folds == i, ]
-
+  
   # Fit model
   model <- mixed.solve(train$phenotype, Z=genotypes[folds != i, ])
-
+  
   # Predict
   pred <- genotypes[folds == i, ] %*% model$u
   accuracy[i] <- cor(pred, test$phenotype)
@@ -255,24 +235,20 @@ mean_accuracy <- mean(accuracy)
 
 **What it does:**
 Creates subset files from SNP datasets based on:
-
 - List of entries (samples)
 - List of SNPs
 - Proportion thinning (random sampling)
 
 **Inputs/Outputs:**
-
-- **Input:** PLINK format (_.ped, _.map)
-- **Output:** Subset files (_\_subset.ped, _\_subset.map)
+- **Input:** PLINK format (*.ped, *.map)
+- **Output:** Subset files (*_subset.ped, *_subset.map)
 
 **Open-source replacement:**
-
 - **PLINK** (industry standard)
 - **bcftools**
 - **vcftools**
 
 **Minimal working example:**
-
 ```bash
 # Extract specific SNPs
 plink --file input --extract snp_list.txt --recode --out subset
@@ -295,7 +271,6 @@ bcftools view -i 'ID=@snp_list.txt' input.vcf.gz -Oz -o subset.vcf.gz
 
 **What it does:**
 Visualization tools for phenotypic data:
-
 - **Box plots:** Distribution comparison across groups
 - **Density plots:** Distribution visualization
 - **Violin plots:** Distribution with QTL marker data
@@ -303,18 +278,15 @@ Visualization tools for phenotypic data:
 - **Scatter plot matrices:** Multi-trait correlation visualization
 
 **Inputs/Outputs:**
-
 - **Input:** Phenotype CSV with environmental factors
 - **Output:** Publication-quality plots
 
 **Open-source replacement:**
-
 - **ggplot2** (R - gold standard)
 - **matplotlib/seaborn** (Python)
 - **R base graphics**
 
 **Minimal working example:**
-
 ```r
 # R using ggplot2
 library(ggplot2)
@@ -340,7 +312,7 @@ ggplot(data, aes(x=environment, y=trait, fill=environment)) +
 
 # Heatmap
 library(pheatmap)
-pheatmap(data[, c("trait1", "trait2", "trait3")],
+pheatmap(data[, c("trait1", "trait2", "trait3")], 
          annotation_row=data[, "environment", drop=FALSE])
 
 # Scatter plot matrix
@@ -357,18 +329,15 @@ pairs(data[, c("trait1", "trait2", "trait3")])
 Calculates pairwise genetic similarity between individuals. Diagonal = 1 (identical), off-diagonal = 0-1 (similarity coefficient).
 
 **Inputs/Outputs:**
-
-- **Input:** PLINK format (_.ped, _.map)
+- **Input:** PLINK format (*.ped, *.map)
 - **Output:** CSV similarity matrix
 
 **Open-source replacement:**
-
 - **PLINK --distance**
 - **snpStats** (R package)
 - **AGHmatrix** (R package)
 
 **Minimal working example:**
-
 ```r
 # R using snpStats
 library(snpStats)
@@ -377,7 +346,7 @@ library(snpStats)
 data <- read.plink("input")
 
 # Calculate similarity matrix
-similarity <- snpStats::distance(data$genotypes,
+similarity <- snpStats::distance(data$genotypes, 
                                   metric="manhattan")
 
 # Normalize to 0-1 range
@@ -402,18 +371,15 @@ plink --file input --distance-matrix --out similarity
 Calculates genomic relationship matrix using VanRaden method (2018). Widely used in Linear Mixed Models (LMM).
 
 **Inputs/Outputs:**
-
 - **Input:** PLINK format
 - **Output:** Kinship matrix (K matrix)
 
 **Open-source replacement:**
-
 - **rrBLUP** (R package)
 - **AGHmatrix** (R package)
 - **sommer** (R package)
 
 **Minimal working example:**
-
 ```r
 # R using rrBLUP
 library(rrBLUP)
@@ -442,18 +408,15 @@ write.csv(K, "vanraden_kinship.csv")
 Calculates genomic kinship matrix on the same scale as traditional Numerator Relationship Matrix (NRM), ranging 0-2. Enables simulation of future kinship matrices from base populations.
 
 **Inputs/Outputs:**
-
-- **Input:** PLINK format (\*.ped)
+- **Input:** PLINK format (*.ped)
 - **Output:** Genomic NRM (0-2 scale)
 
 **Open-source replacement:**
-
 - **AGHmatrix** (R package)
 - **pedantics** (R package)
 - **Custom R code**
 
 **Minimal working example:**
-
 ```r
 # R using AGHmatrix
 library(AGHmatrix)
@@ -483,18 +446,15 @@ write.csv(K_scaled, "genomic_nrm.csv")
 Calculates Numerator Relationship Matrix (NRM) from pedigree records. Uses plant-pedigree format: `Entry $ ((parent1 / parent2) / parent3)^n`
 
 **Inputs/Outputs:**
-
 - **Input:** Pedigree text file
 - **Output:** Pedigree-based K matrix (0-2 scale)
 
 **Open-source replacement:**
-
 - **AGHmatrix** (R package)
 - **pedantics** (R package)
 - **nadiv** (R package)
 
 **Minimal working example:**
-
 ```r
 # R using AGHmatrix
 library(AGHmatrix)
@@ -508,7 +468,7 @@ pedigree <- data.frame(
 )
 
 # Calculate NRM
-A <- Amatrix(data=pedigree,
+A <- Amatrix(data=pedigree, 
              ploidy=2,
              w=0.5)
 
@@ -525,17 +485,14 @@ write.csv(A, "pedigree_nrm.csv")
 Identifies individuals with genetic similarity to recurrent parent above a threshold. Used in marker-assisted backcross breeding.
 
 **Inputs/Outputs:**
-
 - **Input:** similarity_matrix.csv (from Feature 8)
 - **Output:** List of individuals meeting threshold
 
 **Open-source replacement:**
-
 - **Custom R/Python script**
 - **PLINK --distance**
 
 **Minimal working example:**
-
 ```r
 # R implementation
 # Load similarity matrix
@@ -550,7 +507,7 @@ recurrent_similarity <- sim_matrix[recurrent_parent, ]
 selected <- names(recurrent_similarity[recurrent_similarity >= threshold])
 
 # Output results
-write.csv(data.frame(Individual=selected,
+write.csv(data.frame(Individual=selected, 
                      Similarity=recurrent_similarity[selected]),
           "backcross_selection.csv")
 ```
@@ -565,18 +522,15 @@ write.csv(data.frame(Individual=selected,
 Classifies individuals into subpopulations using K-means algorithm on PCA results.
 
 **Inputs/Outputs:**
-
 - **Input:** PCA result file
 - **Output:** Subpopulation assignments per individual
 
 **Open-source replacement:**
-
 - **stats::kmeans** (R base)
 - **scikit-learn** (Python)
 - **adegenet** (R package for population genetics)
 
 **Minimal working example:**
-
 ```r
 # R base implementation
 # Load PCA results
@@ -594,8 +548,8 @@ pca$cluster <- kmeans_result$cluster
 write.csv(pca, "kmeans_clusters.csv")
 
 # Visualization
-plot(pca_data[, 1], pca_data[, 2],
-     col=kmeans_result$cluster,
+plot(pca_data[, 1], pca_data[, 2], 
+     col=kmeans_result$cluster, 
      pch=19,
      xlab="PC1", ylab="PC2")
 ```
@@ -610,18 +564,15 @@ plot(pca_data[, 1], pca_data[, 2],
 Predicts subpopulation class for individuals using deep learning on genomic data. Semi-supervised approach with training/prediction sets.
 
 **Inputs/Outputs:**
-
 - **Input:** PCA results with partial subpopulation labels
 - **Output:** Predicted subpopulation for unlabeled individuals
 
 **Open-source replacement:**
-
 - **tensorflow/keras** (Python)
 - **torch** (R)
 - **h2o** (R/Python)
 
 **Minimal working example:**
-
 ```python
 # Python using scikit-learn MLP
 from sklearn.neural_network import MLPClassifier
@@ -647,7 +598,7 @@ X_train_scaled = scaler.fit_transform(X_train)
 X_predict_scaled = scaler.transform(X_predict)
 
 # Train neural network
-mlp = MLPClassifier(hidden_layer_sizes=(100, 50),
+mlp = MLPClassifier(hidden_layer_sizes=(100, 50), 
                     max_iter=500,
                     random_state=42)
 mlp.fit(X_train_scaled, y_train)
@@ -665,25 +616,21 @@ predict_data['predicted_subpopulation'] = predictions
 
 **What it does:**
 Creates interactive physical maps (ideograms) of SNPs on chromosomes with:
-
 - Clickable markers linking to genome browser
 - Integrated Manhattan plots
 - Customizable chromosome layouts
 
 **Inputs/Outputs:**
-
 - **Input:** Chromosome template file, GWAS results (pvalues_map.csv)
 - **Output:** Interactive HTML/SVG chromosome maps
 
 **Open-source replacement:**
-
 - **karyoploteR** (R/Bioconductor)
 - **chromPlot** (R)
 - **JBrowse** (genome browser)
 - **IGV** (Integrative Genomics Viewer)
 
 **Minimal working example:**
-
 ```r
 # R using karyoploteR
 library(karyoploteR)
@@ -699,7 +646,7 @@ genome <- toGRanges(chromosomes)
 
 # Load SNP positions
 snps <- read.csv("snp_positions.csv")
-snp_granges <- GRanges(seqnames=snps$chr,
+snp_granges <- GRanges(seqnames=snps$chr, 
                        ranges=IRanges(start=snps$pos, end=snps$pos))
 
 # Plot
@@ -717,19 +664,16 @@ kpPoints(kp, data=snp_granges, pch=19, col="red")
 Interactive genome browser for viewing QTL regions with configurable windows and external database integration.
 
 **Inputs/Outputs:**
-
 - **Input:** GWAS results, P-value cutoff, window margins
 - **Output:** Web browser view of genomic regions
 
 **Open-source replacement:**
-
 - **JBrowse 2** (most popular)
 - **IGV** (Integrative Genomics Viewer)
 - **UCSC Genome Browser** (web-based)
 - **Ensembl Genome Browser**
 
 **Minimal working example:**
-
 ```bash
 # JBrowse 2 setup
 jbrowse create jbrowse_output
@@ -751,25 +695,21 @@ jbrowse serve jbrowse_output
 ### **17. Haplotype Tools**
 
 **What it does:**
-
 - Extracts QTL markers by P-value threshold
 - Creates LD heatmaps from defined genomic windows
 - Lists haplotype information
 
 **Inputs/Outputs:**
-
 - **Input:** GWAS p-values, genomic window definitions
 - **Output:** QTL marker tables, LD heatmaps
 
 **Open-source replacement:**
-
 - **haplo.stats** (R package)
 - **LDheatmap** (R package)
 - **PLINK --ld**
 - **vcftools --geno-r2**
 
 **Minimal working example:**
-
 ```r
 # R using LDheatmap
 library(LDheatmap)
@@ -781,7 +721,7 @@ genotypes <- read.table("genotypes.txt", header=TRUE)
 ld_matrix <- calculateLD(genotypes)
 
 # Plot LD heatmap
-LDheatmap(ld_matrix,
+LDheatmap(ld_matrix, 
           genetic.distances=positions,
           color=heat.colors(20))
 ```
@@ -799,23 +739,19 @@ plink --file input --r2 --ld-window-kb 100 --out ld_results
 
 **What it does:**
 Annotates genetic variants with functional information using snpEff:
-
 - Extracts SNPs from VCF
 - Annotates with gene, effect, impact
 
 **Inputs/Outputs:**
-
 - **Input:** VCF file, list of SNP IDs
 - **Output:** Annotated variants, summary statistics
 
 **Open-source replacement:**
-
 - **snpEff** (exact same tool QTLmax uses)
 - **VEP** (Ensembl Variant Effect Predictor)
 - **ANNOVAR**
 
 **Minimal working example:**
-
 ```bash
 # Using snpEff
 java -jar snpEff.jar download -v rice
@@ -838,20 +774,17 @@ bcftools view -i 'ID=@snp_list.txt' input.vcf.gz -Oz -o subset.vcf.gz
 Adjusts P-values for genomic inflation (population stratification). Calculates lambda (λ) statistic and produces adjusted P-values.
 
 **Inputs/Outputs:**
-
 - **Input:** GWAS p-values file
-- **Output:**
+- **Output:** 
   - gc_pvalues (adjusted P-values)
   - lambda (inflation factor)
 
 **Open-source replacement:**
-
 - **Custom R script**
 - **GenABEL** (R package)
 - **PLINK --adjust**
 
 **Minimal working example:**
-
 ```r
 # R implementation
 # Load p-values
@@ -880,50 +813,45 @@ write(paste("Lambda =", lambda), "lambda.txt")
 ## Implementation Recommendations Summary
 
 ### **Phase 1: Essential Tools (Weeks 1-2)**
-
-| Priority | Feature            | Tool     | Complexity |
-| -------- | ------------------ | -------- | ---------- |
-| 1        | VCF Validation     | bcftools | Low        |
-| 2        | SNP Filtering      | PLINK    | Low        |
-| 3        | Phenotype Plots    | ggplot2  | Low        |
-| 4        | Genetic Similarity | PLINK    | Low        |
-| 5        | K-means Clustering | R stats  | Low        |
-| 6        | Genomic Control    | Custom R | Low        |
+| Priority | Feature | Tool | Complexity |
+|----------|---------|------|------------|
+| 1 | VCF Validation | bcftools | Low |
+| 2 | SNP Filtering | PLINK | Low |
+| 3 | Phenotype Plots | ggplot2 | Low |
+| 4 | Genetic Similarity | PLINK | Low |
+| 5 | K-means Clustering | R stats | Low |
+| 6 | Genomic Control | Custom R | Low |
 
 ### **Phase 2: Core Analysis (Weeks 3-4)**
-
-| Priority | Feature          | Tool      | Complexity |
-| -------- | ---------------- | --------- | ---------- |
-| 7        | VanRaden Kinship | rrBLUP    | Medium     |
-| 8        | Genomic Kinship  | AGHmatrix | Medium     |
-| 9        | BLUP             | lme4      | Medium     |
-| 10       | Cross-validation | rrBLUP    | Medium     |
+| Priority | Feature | Tool | Complexity |
+|----------|---------|------|------------|
+| 7 | VanRaden Kinship | rrBLUP | Medium |
+| 8 | Genomic Kinship | AGHmatrix | Medium |
+| 9 | BLUP | lme4 | Medium |
+| 10 | Cross-validation | rrBLUP | Medium |
 
 ### **Phase 3: Advanced Features (Weeks 5-6)**
-
-| Priority | Feature             | Tool      | Complexity |
-| -------- | ------------------- | --------- | ---------- |
-| 11       | Imputation          | BEAGLE    | High       |
-| 12       | Pedigree Kinship    | AGHmatrix | Medium     |
-| 13       | SNP Annotation      | snpEff    | Medium     |
-| 14       | Haplotype Tools     | LDheatmap | Medium     |
-| 15       | Backcross Selection | Custom R  | Low        |
+| Priority | Feature | Tool | Complexity |
+|----------|---------|------|------------|
+| 11 | Imputation | BEAGLE | High |
+| 12 | Pedigree Kinship | AGHmatrix | Medium |
+| 13 | SNP Annotation | snpEff | Medium |
+| 14 | Haplotype Tools | LDheatmap | Medium |
+| 15 | Backcross Selection | Custom R | Low |
 
 ### **Phase 4: Specialized (Weeks 7+)**
-
-| Priority | Feature         | Tool        | Complexity |
-| -------- | --------------- | ----------- | ---------- |
-| 16       | Elastic Net     | glmnet      | High       |
-| 17       | Deep Learning   | keras       | High       |
-| 18       | Qmapper         | karyoploteR | High       |
-| 19       | Genome Browsing | JBrowse     | High       |
+| Priority | Feature | Tool | Complexity |
+|----------|---------|------|------------|
+| 16 | Elastic Net | glmnet | High |
+| 17 | Deep Learning | keras | High |
+| 18 | Qmapper | karyoploteR | High |
+| 19 | Genome Browsing | JBrowse | High |
 
 ---
 
 ## Key Open-Source Tool Stack
 
 ### **Core Toolkit:**
-
 1. **PLINK** - SNP filtering, format conversion, basic statistics
 2. **bcftools** - VCF manipulation and validation
 3. **R + ggplot2** - Visualization
@@ -932,7 +860,6 @@ write(paste("Lambda =", lambda), "lambda.txt")
 6. **lme4** - Mixed models and BLUP
 
 ### **Specialized Tools:**
-
 7. **BEAGLE** - Genotype imputation
 8. **snpEff/VEP** - Variant annotation
 9. **JBrowse** - Genome browsing

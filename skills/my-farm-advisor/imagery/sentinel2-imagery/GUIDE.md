@@ -10,7 +10,7 @@ metadata:
   tags: sentinel-2, copernicus, remote-sensing, ndvi, rasterio, sentinelsat, agriculture
 ---
 
-# Sentinel-2 Imagery Skill
+# Sentinel-2 Imagery Workflow
 
 _Standard-library workflow using `sentinelsat` + `rasterio`._
 
@@ -27,16 +27,11 @@ _Standard-library workflow using `sentinelsat` + `rasterio`._
 
 ## Class 7 NDVI panel mapping (canonical)
 
-When asked for a Class 7 NDVI panel/grid output, route to this canonical
-workflow script:
-
-```bash
-python docs/classes/examples/class7-satellite-and-drone-intelligence/07-complete-workflow/scripts/08_make_visualization_grid.py
-```
+When asked for a Class 7 NDVI panel/grid output, use this skill's Sentinel-2 examples plus the Landsat imagery guide to assemble the panel and save the generated artifact under the runtime data-pipeline root.
 
 Expected final artifact path:
 
-- `docs/classes/examples/class7-satellite-and-drone-intelligence/07-complete-workflow/output/visualization_grid_OSM_21854396.png`
+- `${DATA_PIPELINE_DATA_ROOT}/data-pipeline/imagery/sentinel2/output/visualization_grid_OSM_21854396.png`
 
 Expected scope for the final panel workflow:
 
@@ -50,15 +45,15 @@ Expected scope for the final panel workflow:
 
 Use the field-boundaries sample data as your AOI source:
 
-- `../field-boundaries/examples/sample_2_fields.geojson`
+- `my-farm-advisor/field-management/field-boundaries/examples/real_10_fields_iowa.geojson`
 
-This skill also includes a small AOI GeoJSON you can use immediately:
+This workflow also includes a small AOI GeoJSON you can use immediately:
 
-- `examples/sample_aoi.geojson`
+- `examples/iowa_10_fields_aoi.geojson`
 
 ## Example outputs (for testing)
 
-This skill includes small, non-imagery example files you can use for tests and demos:
+This workflow includes small, non-imagery example files you can use for tests and demos:
 
 - `examples/sample_ndvi_metadata.json`
 - `examples/sample_field_stats.csv`
@@ -69,7 +64,7 @@ This skill includes small, non-imagery example files you can use for tests and d
 ```bash
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
-cd .skills/sentinel2-imagery
+cd my-farm-advisor/imagery/sentinel2-imagery
 uv venv .venv
 source .venv/bin/activate
 
@@ -89,7 +84,7 @@ export COPERNICUS_API_URL='https://apihub.copernicus.eu/apihub'
 ## Real example: search + download one Sentinel-2 L2A product
 
 ```bash
-cd .skills/sentinel2-imagery
+cd my-farm-advisor/imagery/sentinel2-imagery
 
 uv run \
   --with sentinelsat \
@@ -104,7 +99,7 @@ api = SentinelAPI(
     os.environ.get('COPERNICUS_API_URL', 'https://apihub.copernicus.eu/apihub'),
 )
 
-footprint = geojson_to_wkt(read_geojson('examples/sample_aoi.geojson'))
+footprint = geojson_to_wkt(read_geojson('examples/iowa_10_fields_aoi.geojson'))
 
 products = api.query(
     footprint,
@@ -124,7 +119,7 @@ title = df.loc[product_id, 'title']
 cloud = df.loc[product_id].get('cloudcoverpercentage', None)
 
 print(f"Selected: {title} (cloud={cloud}%)")
-download = api.download(product_id, directory_path='data/my-farm-advisor/sentinel2')
+download = api.download(product_id, directory_path='${DATA_PIPELINE_DATA_ROOT}/data-pipeline/imagery/sentinel2')
 print(f"Saved: {download['path']}")
 PY
 ```
@@ -133,13 +128,13 @@ PY
 
 This example:
 
-- downloads a scene for `examples/sample_aoi.geojson`
+- downloads a scene for `examples/iowa_10_fields_aoi.geojson`
 - extracts B04/B08 10 m JP2 band files from the `.SAFE`
 - writes an NDVI GeoTIFF
-- computes per-field NDVI stats using `../field-boundaries/examples/sample_2_fields.geojson`
+- computes per-field NDVI stats using `my-farm-advisor/field-management/field-boundaries/examples/real_10_fields_iowa.geojson`
 
 ```bash
-cd .skills/sentinel2-imagery
+cd my-farm-advisor/imagery/sentinel2-imagery
 
 uv run \
   --with sentinelsat \
@@ -193,7 +188,7 @@ api = SentinelAPI(
     os.environ.get('COPERNICUS_API_URL', 'https://apihub.copernicus.eu/apihub'),
 )
 
-footprint = geojson_to_wkt(read_geojson('examples/sample_aoi.geojson'))
+footprint = geojson_to_wkt(read_geojson('examples/iowa_10_fields_aoi.geojson'))
 products = api.query(
     footprint,
     date=('20240601', '20240831'),
@@ -210,10 +205,10 @@ df = df.sort_values(['cloudcoverpercentage', 'beginposition'])
 product_id = df.index[0]
 title = df.loc[product_id, 'title']
 
-download = api.download(product_id, directory_path='data/my-farm-advisor/sentinel2')
+download = api.download(product_id, directory_path='${DATA_PIPELINE_DATA_ROOT}/data-pipeline/imagery/sentinel2')
 zip_path = Path(download['path'])
 
-extract_root = Path('data/my-farm-advisor/sentinel2/extracted') / zip_path.stem
+extract_root = Path('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/imagery/sentinel2/extracted') / zip_path.stem
 extract_root.mkdir(parents=True, exist_ok=True)
 with zipfile.ZipFile(zip_path) as zf:
     zf.extractall(extract_root)
@@ -229,10 +224,10 @@ nir_path = find_band_jp2(safe_dir, 'B08', '10m')
 ndvi_path = write_ndvi(
     red_path,
     nir_path,
-    Path('data/my-farm-advisor/sentinel2/ndvi') / f"{title}_NDVI.tif",
+    Path('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/imagery/sentinel2/ndvi') / f"{title}_NDVI.tif",
 )
 
-fields = gpd.read_file('../field-boundaries/examples/sample_2_fields.geojson')
+fields = gpd.read_file('my-farm-advisor/field-management/field-boundaries/examples/real_10_fields_iowa.geojson')
 
 rows = []
 with rasterio.open(ndvi_path) as src:
@@ -257,7 +252,7 @@ with rasterio.open(ndvi_path) as src:
         })
 
 stats = pd.DataFrame(rows)
-out_csv = Path('data/my-farm-advisor/sentinel2/field_ndvi_stats.csv')
+out_csv = Path('${DATA_PIPELINE_DATA_ROOT}/data-pipeline/imagery/sentinel2/field_ndvi_stats.csv')
 out_csv.parent.mkdir(parents=True, exist_ok=True)
 stats.to_csv(out_csv, index=False)
 print(f"Wrote: {out_csv}")
@@ -274,7 +269,7 @@ import geopandas as gpd
 from shapely.geometry import mapping
 from sentinelsat import geojson_to_wkt
 
-fields = gpd.read_file('../field-boundaries/examples/sample_2_fields.geojson')
+fields = gpd.read_file('my-farm-advisor/field-management/field-boundaries/examples/real_10_fields_iowa.geojson')
 union = fields.unary_union
 
 feature_collection = {
@@ -287,11 +282,7 @@ footprint = geojson_to_wkt(feature_collection)
 
 ## Reusable Panel Output (Class 7 style)
 
-If the user asks for a panel NDVI visualization, use the reproducible Class 7 panel script:
-
-```bash
-python docs/classes/examples/class7-satellite-and-drone-intelligence/07-complete-workflow/scripts/08_make_visualization_grid.py
-```
+If the user asks for a panel NDVI visualization, use the reproducible Class 7 panel structure and write the generated panel under `${DATA_PIPELINE_DATA_ROOT}/data-pipeline/imagery/sentinel2/output/`.
 
 This generates a publication-style 3x4 grid for one field with:
 
@@ -304,7 +295,7 @@ This generates a publication-style 3x4 grid for one field with:
 
 Primary output:
 
-- `docs/classes/examples/class7-satellite-and-drone-intelligence/07-complete-workflow/output/visualization_grid_OSM_21854396.png`
+- `${DATA_PIPELINE_DATA_ROOT}/data-pipeline/imagery/sentinel2/output/visualization_grid_OSM_21854396.png`
 
 ## Troubleshooting
 

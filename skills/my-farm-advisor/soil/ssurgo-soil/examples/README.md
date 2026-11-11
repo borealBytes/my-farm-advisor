@@ -17,7 +17,7 @@ This directory contains real SSURGO soil data downloaded from the NRCS Soil Data
 
 ## Fields Included
 
-Data was downloaded for the 2 fields in `field-boundaries/examples/sample_2_fields.geojson`:
+Data was downloaded for legacy two-field examples. Use `my-farm-advisor/field-management/field-boundaries/examples/real_10_fields_iowa.geojson` for current field-boundary examples:
 
 | Field ID        | State | Soil Components                     | Drainage            |
 | --------------- | ----- | ----------------------------------- | ------------------- |

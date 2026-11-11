@@ -8,7 +8,7 @@ tags: [agriculture, soil, ssurgo, visualization, poster]
 
 # SSURGO Poster Cards
 
-## Use this skill when
+## Use this workflow when
 
 - The user wants soil profile figures from SSURGO.
 - The user wants poster-ready SVG, PDF, or high-resolution PNG exports.
@@ -64,7 +64,7 @@ tags: [agriculture, soil, ssurgo, visualization, poster]
 3. Optionally keep only the dominant component per map unit.
 4. Build profile identifiers from MUKEY, component name, and component percentage.
 5. Render one or more profile-card figure types.
-6. Export vector and raster outputs into `outputs/cards/`.
+6. Export vector and raster outputs into `${DATA_PIPELINE_DATA_ROOT}/data-pipeline/derived/cards/`.
 
 ## Notes
 
@@ -79,5 +79,5 @@ tags: [agriculture, soil, ssurgo, visualization, poster]
 Run:
 
 ```bash
-python scripts/build_ssurgo_poster_cards.py --db data/my-farm-advisor/raw/ssurgo.sqlite --out outputs/cards --dominant-only --max-profiles 6
+python scripts/build_ssurgo_poster_cards.py --db "${DATA_PIPELINE_DATA_ROOT}/data-pipeline/raw/ssurgo.sqlite" --out "${DATA_PIPELINE_DATA_ROOT}/data-pipeline/derived/cards" --dominant-only --max-profiles 6
 ```

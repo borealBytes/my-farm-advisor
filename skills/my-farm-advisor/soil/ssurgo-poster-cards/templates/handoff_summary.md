@@ -7,8 +7,8 @@ Merge this into `ag-skills-demo` as a new skill named `{skill-name}`, with the p
 Use this layout:
 
 ```text
-ag-skills-demo/
-  .opencode/skills/{skill-name}/
+my-farm-advisor-skills/
+  my-farm-advisor/soil/{skill-name}/
     SKILL.md
     README.md
     requirements.txt
@@ -17,8 +17,7 @@ ag-skills-demo/
     templates/
       handoff_summary.md
   scripts/{script_name}.py
-  outputs/
-    cards/
+  ${DATA_PIPELINE_DATA_ROOT}/data-pipeline/derived/cards/
 ```
 
 ## Handoff summary
@@ -33,9 +32,9 @@ This merge adds a reusable repo skill for {purpose}.
 
 ### What is being added
 
-- `.opencode/skills/{skill-name}/SKILL.md` with task definition
-- `.opencode/skills/{skill-name}/README.md` with setup and usage
-- `.opencode/skills/{skill-name}/requirements.txt` with dependencies
+- `my-farm-advisor/soil/{skill-name}/SKILL.md` with task definition
+- `my-farm-advisor/soil/{skill-name}/README.md` with setup and usage
+- `my-farm-advisor/soil/{skill-name}/requirements.txt` with dependencies
 - `scripts/{script_name}.py` as the executable implementation
 - Examples and templates for future reuse
 
